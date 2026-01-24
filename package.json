@@ -10,6 +10,7 @@
         "@symfony/webpack-encore": "^4.0.0",
         "@tailwindcss/postcss": "^4.0.0",
         "core-js": "^3.36.0",
+        "daisyui": "^5.5.14",
         "postcss": "^8.4.0",
         "postcss-loader": "^8.1.0",
         "tailwindcss": "^4.0.0",
