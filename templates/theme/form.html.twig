@@ -1,0 +1,73 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}{{ theme.id ? 'Modifier' : 'Nouveau' }} thème{% endblock %}
+
+{% block stylesheets %}
+    {{ parent() }}
+    {% for url in google_font_urls|default([]) %}
+        <link rel="stylesheet" href="{{ url }}">
+    {% endfor %}
+    {% if theme.id and theme.generatedCssPath %}
+        <link rel="stylesheet" href="{{ url('app_theme_css', { id: theme.id, filename: theme.generatedCssPath|split('/')|last }) }}">
+    {% endif %}
+{% endblock %}
+
+{% block body %}
+<div class="max-w-4xl space-y-6">
+    <div>
+        <a href="{{ path('app_theme_index') }}" class="btn btn-ghost btn-sm mb-2">← Retour</a>
+        <h1 class="text-2xl font-bold tracking-tight">{{ theme.id ? 'Modifier' : 'Nouveau' }} thème</h1>
+    </div>
+
+    {{ form_start(form) }}
+    <div class="flex flex-col gap-6">
+        <div class="card p-4">
+            <h2 class="card-title mb-4">Thème</h2>
+            <div class="flex flex-col gap-4 max-w-md">
+                {{ form_row(form.theme.name) }}
+            </div>
+        </div>
+        <div class="card p-4">
+            <h2 class="card-title mb-4">Configuration (schéma theme.yaml)</h2>
+            <div class="flex flex-col gap-4">
+                {{ form_row(form.config.vars) }}
+                <div class="space-y-2">
+                    <p class="label text-sm">Nuancier bleu (base <code>--color-blue</code>)</p>
+                    <div class="grid grid-cols-9 gap-1">
+                        {% for step in ['100', '200', '300', '400', '500', '600', '700', '800', '900'] %}
+                        <div class="flex flex-col items-center gap-1">
+                            <div class="w-full aspect-square rounded border border-border" style="background-color: {{ blue_scale[step]|default('oklch(0.75 0.2 250)') }};" title="bg-blue-{{ step }} · {{ blue_scale[step] }}"></div>
+                            <span class="text-[10px] text-muted-foreground">{{ step }}</span>
+                        </div>
+                        {% endfor %}
+                    </div>
+                    <p class="text-xs text-muted-foreground">Classes générées : <code>.text-blue-100</code> … <code>.text-blue-900</code> et <code>.bg-blue-100</code> … <code>.bg-blue-900</code> (OKLCH)</p>
+                </div>
+                <div class="space-y-2">
+                    <p class="label text-sm">Nuancier jaune (base <code>--color-yellow</code>)</p>
+                    <div class="grid grid-cols-9 gap-1">
+                        {% for step in ['100', '200', '300', '400', '500', '600', '700', '800', '900'] %}
+                        <div class="flex flex-col items-center gap-1">
+                            <div class="w-full aspect-square rounded border border-border" style="background-color: {{ yellow_scale[step]|default('oklch(0.9 0.15 90)') }};" title="bg-yellow-{{ step }} · {{ yellow_scale[step] }}"></div>
+                            <span class="text-[10px] text-muted-foreground">{{ step }}</span>
+                        </div>
+                        {% endfor %}
+                    </div>
+                    <p class="text-xs text-muted-foreground">Classes générées : <code>.text-yellow-100</code> … <code>.text-yellow-900</code> et <code>.bg-yellow-100</code> … <code>.bg-yellow-900</code> (OKLCH)</p>
+                </div>
+                {{ form_row(form.config.body) }}
+                {{ form_row(form.config.h1) }}
+                {{ form_row(form.config.h2) }}
+                {{ form_row(form.config.h3) }}
+                {{ form_row(form.config.h4) }}
+                {{ form_row(form.config.h5) }}
+                {{ form_row(form.config.h6) }}
+                {{ form_row(form.config.div) }}
+                {{ form_row(form.config.p) }}
+            </div>
+        </div>
+        <button type="submit" class="btn btn-primary">Enregistrer</button>
+    </div>
+    {{ form_end(form) }}
+</div>
+{% endblock %}

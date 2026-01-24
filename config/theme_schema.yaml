@@ -1,0 +1,44 @@
+# Schéma de référence pour theme.yaml (générateur de thèmes)
+# Structure utilisée par le formulaire dynamique et ThemeCssGenerator.
+#
+# nom: string
+# vars:
+#   --color-white: hex
+#   --color-black: hex
+#   --color-blue: hex
+#   --color-yellow: hex
+#   --color-red: hex
+#   --font-size-base: px
+# body, h1, h2, h3, h4, h5, h6, div, p:
+#   font-family: string
+#   font-size: string
+#   font-weight: string
+#   line-height: string
+#   background-color: string (body et évent. autres)
+#   padding: string
+#   margin: string
+
+nom: ''
+vars:
+  --color-white: '#ffffff'
+  --color-black: '#000000'
+  --color-blue: '#0000ff'
+  --color-yellow: '#ffff00'
+  --color-red: '#ff0000'
+  --font-size-base: '16px'
+body:
+  font-family: ''
+  font-size: ''
+  font-weight: ''
+  line-height: ''
+  background-color: ''
+  padding: '0'
+  margin: '0'
+h1: { font-family: '', font-size: '', font-weight: '', line-height: '' }
+h2: { font-family: '', font-size: '', font-weight: '', line-height: '' }
+h3: { font-family: '', font-size: '', font-weight: '', line-height: '' }
+h4: { font-family: '', font-size: '', font-weight: '', line-height: '' }
+h5: { font-family: '', font-size: '', font-weight: '', line-height: '' }
+h6: { font-family: '', font-size: '', font-weight: '', line-height: '' }
+div: { font-family: '', font-size: '', font-weight: '', line-height: '', padding: '', margin: '' }
+p: { font-family: '', font-size: '', font-weight: '', line-height: '', padding: '', margin: '' }

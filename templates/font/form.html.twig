@@ -1,0 +1,24 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}{{ font.id ? 'Modifier' : 'Nouvelle' }} police{% endblock %}
+
+{% block body %}
+<div class="max-w-2xl space-y-6">
+    <div>
+        <a href="{{ path('app_font_index') }}" class="btn btn-ghost btn-sm mb-2">← Retour</a>
+        <h1 class="text-2xl font-bold tracking-tight">{{ font.id ? 'Modifier' : 'Nouvelle' }} police</h1>
+    </div>
+
+    {{ form_start(form) }}
+    <div class="flex flex-col gap-4">
+        {{ form_row(form.name) }}
+        {{ form_row(form.type) }}
+        {{ form_row(form.fallback) }}
+        {{ form_row(form.slug) }}
+        {{ form_row(form.googleFontUrl) }}
+        {{ form_row(form.variants) }}
+        <button type="submit" class="btn btn-primary">Enregistrer</button>
+    </div>
+    {{ form_end(form) }}
+</div>
+{% endblock %}

@@ -1,0 +1,23 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Dashboard{% endblock %}
+
+{% block body %}
+<div class="space-y-8">
+    <div>
+        <h1 class="text-2xl font-bold tracking-tight">Dashboard</h1>
+        <p class="text-muted-foreground">Bienvenue sur le générateur de thèmes.</p>
+    </div>
+
+    <div id="dashboard-root"
+         data-font-count="{{ font_count }}"
+         data-theme-count="{{ theme_count }}"
+         data-font-url="{{ path('app_font_index') }}"
+         data-theme-url="{{ path('app_theme_index') }}"></div>
+</div>
+{% endblock %}
+
+{% block javascripts %}
+    {{ parent() }}
+    {{ encore_entry_script_tags('dashboard') }}
+{% endblock %}

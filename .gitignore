@@ -21,6 +21,13 @@
 node_modules
 
 public/build/
+
+###> theme-generator storage ###
+/storage/fonts/*
+!/storage/fonts/.gitkeep
+/storage/themes/*
+!/storage/themes/.gitkeep
+###< theme-generator storage ###
 ###> symfony/webpack-encore-bundle ###
 /node_modules/
 /public/build/

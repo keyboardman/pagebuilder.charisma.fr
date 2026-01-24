@@ -1,0 +1,99 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Polices{% endblock %}
+
+{% block stylesheets %}
+    {{ parent() }}
+    {% for url in google_font_urls|default([]) %}
+        <link rel="stylesheet" href="{{ url }}">
+    {% endfor %}
+{% endblock %}
+
+{% block body %}
+<div class="max-w-4xl space-y-6">
+    <div class="flex items-center justify-between">
+        <h1 class="text-2xl font-bold tracking-tight">Polices</h1>
+        <a href="{{ path('app_font_new') }}" class="btn btn-primary">Nouvelle police</a>
+    </div>
+
+    <div class="card overflow-hidden">
+        <div class="overflow-x-auto">
+            <table class="table-shadcn">
+                <thead>
+                    <tr>
+                        <th>Nom</th>
+                        <th>Type</th>
+                        <th>Slug</th>
+                        <th>Fallback</th>
+                        <th></th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr class="bg-muted">
+                        <td colspan="5" class="font-medium py-2">Native</td>
+                    </tr>
+                    {% for font in fonts_native %}
+                    <tr>
+                        <td style="font-family: {{ font.name }}, {{ font.fallback }}">{{ font.name }}</td>
+                        <td>{{ font.type.value }}</td>
+                        <td><code class="text-xs">{{ font.slug }}</code></td>
+                        <td>{{ font.fallback }}</td>
+                        <td class="flex gap-2">
+                            <a href="{{ path('app_font_edit', { id: font.id }) }}" class="btn btn-sm btn-ghost">Modifier</a>
+                            <form method="post" action="{{ path('app_font_delete', { id: font.id }) }}" onsubmit="return confirm('Supprimer cette police ?');">
+                                <input type="hidden" name="_token" value="{{ csrf_token('delete' ~ font.id) }}">
+                                <button type="submit" class="btn btn-sm btn-destructive">Supprimer</button>
+                            </form>
+                        </td>
+                    </tr>
+                    {% else %}
+                    <tr><td colspan="5" class="text-muted-foreground text-sm">Aucune police native.</td></tr>
+                    {% endfor %}
+
+                    <tr class="bg-muted">
+                        <td colspan="5" class="font-medium py-2">Google</td>
+                    </tr>
+                    {% for font in fonts_google %}
+                    <tr>
+                        <td style="font-family: {{ font.name }}, {{ font.fallback }}">{{ font.name }}</td>
+                        <td>{{ font.type.value }}</td>
+                        <td><code class="text-xs">{{ font.slug }}</code></td>
+                        <td>{{ font.fallback }}</td>
+                        <td class="flex gap-2">
+                            <a href="{{ path('app_font_edit', { id: font.id }) }}" class="btn btn-sm btn-ghost">Modifier</a>
+                            <form method="post" action="{{ path('app_font_delete', { id: font.id }) }}" onsubmit="return confirm('Supprimer cette police ?');">
+                                <input type="hidden" name="_token" value="{{ csrf_token('delete' ~ font.id) }}">
+                                <button type="submit" class="btn btn-sm btn-destructive">Supprimer</button>
+                            </form>
+                        </td>
+                    </tr>
+                    {% else %}
+                    <tr><td colspan="5" class="text-muted-foreground text-sm">Aucune police Google.</td></tr>
+                    {% endfor %}
+
+                    <tr class="bg-muted">
+                        <td colspan="5" class="font-medium py-2">Custom</td>
+                    </tr>
+                    {% for font in fonts_custom %}
+                    <tr>
+                        <td style="font-family: {{ font.name }}, {{ font.fallback }}">{{ font.name }}</td>
+                        <td>{{ font.type.value }}</td>
+                        <td><code class="text-xs">{{ font.slug }}</code></td>
+                        <td>{{ font.fallback }}</td>
+                        <td class="flex gap-2">
+                            <a href="{{ path('app_font_edit', { id: font.id }) }}" class="btn btn-sm btn-ghost">Modifier</a>
+                            <form method="post" action="{{ path('app_font_delete', { id: font.id }) }}" onsubmit="return confirm('Supprimer cette police ?');">
+                                <input type="hidden" name="_token" value="{{ csrf_token('delete' ~ font.id) }}">
+                                <button type="submit" class="btn btn-sm btn-destructive">Supprimer</button>
+                            </form>
+                        </td>
+                    </tr>
+                    {% else %}
+                    <tr><td colspan="5" class="text-muted-foreground text-sm">Aucune police personnalisée.</td></tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endblock %}

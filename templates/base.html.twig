@@ -1,18 +1,41 @@
 <!DOCTYPE html>
-<html data-theme="light">
-    <head>
-        <meta charset="UTF-8">
-        <title>{% block title %}Welcome!{% endblock %}</title>
-        <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 128 128%22><text y=%221.2em%22 font-size=%2296%22>⚫️</text><text y=%221.3em%22 x=%220.2em%22 font-size=%2276%22 fill=%22%23fff%22>sf</text></svg>">
-        {% block stylesheets %}
-            {{ encore_entry_link_tags('app') }}
-        {% endblock %}
-
-        {% block javascripts %}
-            {{ encore_entry_script_tags('app') }}
-        {% endblock %}
-    </head>
-    <body>
-        {% block body %}{% endblock %}
-    </body>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Page Builder{% endblock %}</title>
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 128 128'><text y='1.2em' font-size='96'>⚫</text></svg>">
+    {% block stylesheets %}
+        {{ encore_entry_link_tags('app') }}
+    {% endblock %}
+    {% block javascripts %}
+        {{ encore_entry_script_tags('app') }}
+    {% endblock %}
+</head>
+<body class="min-h-screen">
+    <div class="flex">
+        {# Sidebar — style shadcn/twitter #}
+        <aside class="fixed inset-y-0 left-0 z-40 w-56 border-r bg-card">
+            <div class="flex h-14 items-center border-b px-4">
+                <a href="{{ path('app_dashboard_index') }}" class="font-semibold text-foreground">Page Builder</a>
+            </div>
+            <nav class="flex flex-col gap-1 p-2">
+                <a href="{{ path('app_dashboard_index') }}" class="nav-link {{ app.request.attributes.get('_route') == 'app_dashboard_index' ? 'active' : '' }}">
+                    Dashboard
+                </a>
+                <a href="{{ path('app_font_index') }}" class="nav-link {{ (app.request.attributes.get('_route')|default(''))|slice(0, 8) == 'app_font' ? 'active' : '' }}">
+                    Polices
+                </a>
+                <a href="{{ path('app_theme_index') }}" class="nav-link {{ (app.request.attributes.get('_route')|default(''))|slice(0, 10) == 'app_theme' ? 'active' : '' }}">
+                    Thèmes
+                </a>
+            </nav>
+        </aside>
+        <main class="flex-1 pl-56">
+            <div class="p-6">
+                {% block body %}{% endblock %}
+            </div>
+        </main>
+    </div>
+</body>
 </html>

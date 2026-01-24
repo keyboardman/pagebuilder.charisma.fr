@@ -1,0 +1,129 @@
+{% use "form_div_layout.html.twig" %}
+
+{%- block form_row_render -%}
+    {%- set row_attr = row_attr|default({})|merge({class: (row_attr.class|default('') ~ ' grid w-full gap-2')|trim}) -%}
+    <div{% with {attr: row_attr} %}{{ block('attributes') }}{% endwith %}>
+        {{- form_label(form) -}}
+        {{- form_widget(form, widget_attr) -}}
+        {{- form_errors(form) -}}
+        {{- form_help(form) -}}
+    </div>
+{%- endblock form_row_render -%}
+
+{%- block form_label -%}
+    {% if label is not same as(false) -%}
+        {%- if not compound -%}
+            {% set label_attr = label_attr|default({})|merge({for: id}) %}
+        {%- endif -%}
+        {%- set label_attr = label_attr|default({})|merge({class: (label_attr.class|default('') ~ ' label')|trim}) -%}
+        <{{ element|default('label') }}{% if label_attr %}{% with {attr: label_attr} %}{{ block('attributes') }}{% endwith %}{% endif %}>
+            {{- block('form_label_content') -}}
+        </{{ element|default('label') }}>
+    {%- endif -%}
+{%- endblock form_label -%}
+
+{%- block form_widget_simple -%}
+    {%- set type = type|default('text') -%}
+    {%- if type == 'range' or type == 'color' -%}
+        {%- set required = false -%}
+    {%- endif -%}
+    {%- if type == 'hidden' -%}
+        <input type="{{ type }}" {{ block('widget_attributes') }}{% if value is not empty %} value="{{ value }}"{% endif %} />
+    {%- else -%}
+        {%- set dclass = type == 'file' ? 'input file-input' : 'input' -%}
+        {%- set attr = attr|default({})|merge({class: (attr.class|default('') ~ ' ' ~ dclass)|trim}) -%}
+        <input type="{{ type }}" {{ block('widget_attributes') }}{% if value is not empty and type != 'file' %} value="{{ value }}"{% endif %} />
+    {%- endif -%}
+{%- endblock form_widget_simple -%}
+
+{%- block textarea_widget -%}
+    {%- set attr = attr|default({})|merge({class: (attr.class|default('') ~ ' textarea')|trim}) -%}
+    <textarea {{ block('widget_attributes') }}>{{ value }}</textarea>
+{%- endblock textarea_widget -%}
+
+{%- block choice_widget_collapsed -%}
+    {%- if required and placeholder is none and not placeholder_in_choices and not multiple and (attr.size|default(1) <= 1) -%}
+        {% set required = false %}
+    {%- endif -%}
+    {%- set attr = attr|default({})|merge({class: (attr.class|default('') ~ ' input select-ui')|trim}) -%}
+    <select {{ block('widget_attributes') }}{% if multiple %} multiple="multiple"{% endif %}>
+        {%- if placeholder is not none -%}
+            <option value=""{% if placeholder_attr|default({}) %}{% with {attr: placeholder_attr} %}{{ block('attributes') }}{% endwith %}{% endif %}{% if required and value is empty %} selected="selected"{% endif %}>{{ placeholder != '' ? (translation_domain is same as(false) ? placeholder : placeholder|trans({}, translation_domain)) }}</option>
+        {%- endif -%}
+        {%- if preferred_choices|length > 0 -%}
+            {% set options = preferred_choices %}
+            {% set render_preferred_choices = true %}
+            {{- block('choice_widget_options') -}}
+            {%- if choices|length > 0 and separator is not none -%}
+                {%- if separator_html is not defined or separator_html is same as(false) -%}
+                    <option disabled="disabled">{{ separator }}</option>
+                {% else %}
+                    {{ separator|raw }}
+                {% endif %}
+            {%- endif -%}
+        {%- endif -%}
+        {%- set options = choices -%}
+        {%- set render_preferred_choices = false -%}
+        {{- block('choice_widget_options') -}}
+    </select>
+{%- endblock choice_widget_collapsed -%}
+
+{%- block form_errors -%}
+    {%- if errors|length > 0 -%}
+        <p class="text-sm text-destructive">
+            {%- for error in errors -%}
+                {{ error.message }}{% if not loop.last %}. {% endif %}
+            {%- endfor -%}
+        </p>
+    {%- endif -%}
+{%- endblock form_errors -%}
+
+{%- block form_widget_compound -%}
+    {%- set name = form.vars.name -%}
+    {%- if name matches '/^h[1-6]$/' -%}
+        <div {{ block('widget_container_attributes') }} class="flex flex-col gap-2">
+            {%- if form is rootform -%}{{ form_errors(form) }}{%- endif -%}
+            <div class="grid grid-cols-[2fr_1fr_1fr_1fr_1fr] gap-2">
+                {%- for child in form -%}{{ form_row(child) }}{%- endfor -%}
+            </div>
+            {{- form_rest(form) -}}
+        </div>
+    {%- elseif name == 'body' -%}
+        <div {{ block('widget_container_attributes') }} class="flex flex-col gap-2">
+            {%- if form is rootform -%}{{ form_errors(form) }}{%- endif -%}
+            <div class="grid grid-cols-[2fr_1fr_1fr_1fr_1fr] gap-2">
+                {%- for child in form -%}{% if child.vars.name in ['font-family', 'font-size', 'font-weight', 'font-style', 'line-height'] %}{{ form_row(child) }}{% endif %}{%- endfor -%}
+            </div>
+            <div class="grid grid-cols-[1fr_1fr_1fr] gap-2">
+                {{ form_row(form['padding']) }}{{ form_row(form['margin']) }}{{ form_row(form['background-color']) }}
+            </div>
+            {{- form_rest(form) -}}
+        </div>
+    {%- elseif name in ['div', 'p'] -%}
+        <div {{ block('widget_container_attributes') }} class="flex flex-col gap-2">
+            {%- if form is rootform -%}{{ form_errors(form) }}{%- endif -%}
+            <div class="grid grid-cols-[2fr_1fr_1fr_1fr_1fr] gap-2">
+                {%- for child in form -%}{% if child.vars.name in ['font-family', 'font-size', 'font-weight', 'font-style', 'line-height'] %}{{ form_row(child) }}{% endif %}{%- endfor -%}
+            </div>
+            <div class="grid grid-cols-2 gap-2">
+                {{ form_row(form['padding']) }}{{ form_row(form['margin']) }}
+            </div>
+            {{- form_rest(form) -}}
+        </div>
+    {%- elseif name == 'vars' -%}
+        <div {{ block('widget_container_attributes') }} class="flex flex-col gap-2">
+            {%- if form is rootform -%}{{ form_errors(form) }}{%- endif -%}
+            <div class="grid grid-cols-5 gap-2">
+                {{ form_row(form['color_white']) }}{{ form_row(form['color_black']) }}{{ form_row(form['color_blue']) }}{{ form_row(form['color_yellow']) }}{{ form_row(form['color_red']) }}
+            </div>
+            {{ form_row(form['font_size_base']) }}
+            {{- form_rest(form) -}}
+        </div>
+    {%- else -%}
+        <div {{ block('widget_container_attributes') }} class="flex flex-col gap-2">
+            {%- if form is rootform -%}{{ form_errors(form) }}{%- endif -%}
+            {{- block('form_rows') -}}
+            {{- form_rest(form) -}}
+        </div>
+    {%- endif -%}
+{%- endblock form_widget_compound -%}
