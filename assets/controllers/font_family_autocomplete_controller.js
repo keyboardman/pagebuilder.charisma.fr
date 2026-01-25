@@ -3,6 +3,8 @@ import TomSelect from 'tom-select';
 
 /**
  * Transforme un <select> font-family en champ de recherche (autocomplete) via Tom Select.
+ * La valeur est envoyée via un <input type="hidden"> (même name que le select) car le select
+ * peut être ignoré par FormData/Turbo une fois stylé par Tom Select.
  */
 export default class extends Controller {
     static values = {
@@ -32,9 +34,57 @@ export default class extends Controller {
                 },
             },
         });
+
+        // Forcer la présélection si le select a déjà une valeur (theme.yaml chargé)
+        const initial = this.element.value || this.element.querySelector('option:checked')?.value || '';
+        if (initial && this.tomselect.getValue() !== initial) {
+            this.tomselect.setValue(initial, true);
+        }
+
+        // Input hidden avec le même name que le select : c’est lui qui est soumis (Tom Select
+        // peut faire ignorer le select par FormData). On retire le name du select pour éviter
+        // les doublons.
+        const name = this.element.getAttribute('name');
+        if (name) {
+            this.hiddenInput = document.createElement('input');
+            this.hiddenInput.type = 'hidden';
+            this.hiddenInput.name = name;
+            const v = this.tomselect.getValue();
+            this.hiddenInput.value = Array.isArray(v) ? (v[0] ?? '') : (v ?? '');
+            this.element.removeAttribute('name');
+            this.element.insertAdjacentElement('afterend', this.hiddenInput);
+        }
+
+        this._boundSync = this._syncToSelect.bind(this);
+        this.tomselect.on('change', this._boundSync);
+        const form = this.element.form || this.element.closest('form');
+        if (form) {
+            form.addEventListener('submit', this._boundSync, { capture: true });
+        }
+    }
+
+    _syncToSelect() {
+        if (!this.tomselect) return;
+        const v = this.tomselect.getValue();
+        const str = Array.isArray(v) ? (v[0] ?? '') : (v ?? '');
+        this.element.value = String(str);
+        if (this.hiddenInput) {
+            this.hiddenInput.value = String(str);
+        }
     }
 
     disconnect() {
+        if (this.tomselect && this._boundSync) {
+            this.tomselect.off('change', this._boundSync);
+        }
+        const form = this.element?.form || this.element?.closest?.('form');
+        if (form && this._boundSync) {
+            form.removeEventListener('submit', this._boundSync, { capture: true });
+        }
+        if (this.hiddenInput?.parentNode) {
+            this.hiddenInput.remove();
+        }
+        this.hiddenInput = null;
         if (this.tomselect) {
             this.tomselect.destroy();
             this.tomselect = null;

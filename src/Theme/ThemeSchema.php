@@ -16,6 +16,7 @@ final class ThemeSchema
         '--color-blue',
         '--color-yellow',
         '--color-red',
+        '--color-green',
         '--font-size-base',
     ];
 

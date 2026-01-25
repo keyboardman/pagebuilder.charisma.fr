@@ -1,14 +1,23 @@
 {% use "form_div_layout.html.twig" %}
 
-{%- block form_row_render -%}
+{%- block form_row -%}
+    {%- set widget_attr = widget_attr|default({}) -%}
+    {%- if help is not empty -%}
+        {%- set widget_attr = widget_attr|merge({attr: {'aria-describedby': id ~ '_help'}}) -%}
+    {%- endif -%}
     {%- set row_attr = row_attr|default({})|merge({class: (row_attr.class|default('') ~ ' grid w-full gap-2')|trim}) -%}
     <div{% with {attr: row_attr} %}{{ block('attributes') }}{% endwith %}>
         {{- form_label(form) -}}
         {{- form_widget(form, widget_attr) -}}
+        {%- if form.vars.name == 'file' and (form.parent.parent.vars.name|default('')) == 'variants' and (form.parent.vars.value is not null) and (form.parent.vars.value.path|default('')) != '' -%}
+            <p class="text-xs text-muted-foreground mt-1">
+                <a href="{{ path('app_font_file', {path: form.parent.vars.value.path}) }}" target="_blank" rel="noopener">Fichier actuel</a>
+            </p>
+        {%- endif -%}
         {{- form_errors(form) -}}
         {{- form_help(form) -}}
     </div>
-{%- endblock form_row_render -%}
+{%- endblock form_row -%}
 
 {%- block form_label -%}
     {% if label is not same as(false) -%}
@@ -113,10 +122,16 @@
     {%- elseif name == 'vars' -%}
         <div {{ block('widget_container_attributes') }} class="flex flex-col gap-2">
             {%- if form is rootform -%}{{ form_errors(form) }}{%- endif -%}
-            <div class="grid grid-cols-5 gap-2">
-                {{ form_row(form['color_white']) }}{{ form_row(form['color_black']) }}{{ form_row(form['color_blue']) }}{{ form_row(form['color_yellow']) }}{{ form_row(form['color_red']) }}
+            <div class="grid grid-cols-6 gap-2">
+                {{ form_row(form['color_white']) }}{{ form_row(form['color_black']) }}{{ form_row(form['color_blue']) }}{{ form_row(form['color_yellow']) }}{{ form_row(form['color_red']) }}{{ form_row(form['color_green']) }}
             </div>
             {{ form_row(form['font_size_base']) }}
+            {{- form_rest(form) -}}
+        </div>
+    {%- elseif form.parent.vars.name is defined and form.parent.vars.name == 'variants' -%}
+        <div {{ block('widget_container_attributes') }} class="grid grid-cols-[1fr_1fr_1fr_2fr] gap-2 items-end">
+            {%- if form is rootform -%}{{ form_errors(form) }}{%- endif -%}
+            {{ form_row(form['weight']) }}{{ form_row(form['style']) }}{{ form_row(form['width']) }}{{ form_row(form['file']) }}
             {{- form_rest(form) -}}
         </div>
     {%- else -%}
@@ -127,3 +142,24 @@
         </div>
     {%- endif -%}
 {%- endblock form_widget_compound -%}
+
+{%- block collection_widget -%}
+    {%- if form.vars.prototype is defined -%}
+        {%- set attr = (attr|default({}))|merge({
+            'data-controller': ((attr|default({}))['data-controller']|default('') ~ ' collection-add')|trim,
+        }) -%}
+    {%- endif -%}
+    <div {{ block('widget_container_attributes') }} class="flex flex-col gap-3">
+        <div data-collection-add-target="list">
+            {%- for child in form -%}
+                {{ form_row(child) }}
+            {%- endfor -%}
+        </div>
+        {%- if form.vars.allow_add and form.vars.prototype is defined -%}
+            <template data-collection-add-target="prototype">{{ form_row(form.vars.prototype)|raw }}</template>
+            <button type="button" class="btn btn-ghost btn-sm w-fit" data-action="click->collection-add#add">
+                + Ajouter une variante
+            </button>
+        {%- endif -%}
+    </div>
+{%- endblock collection_widget -%}

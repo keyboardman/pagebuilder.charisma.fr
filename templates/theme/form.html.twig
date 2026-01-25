@@ -55,6 +55,30 @@
                     </div>
                     <p class="text-xs text-muted-foreground">Classes générées : <code>.text-yellow-100</code> … <code>.text-yellow-900</code> et <code>.bg-yellow-100</code> … <code>.bg-yellow-900</code> (OKLCH)</p>
                 </div>
+                <div class="space-y-2">
+                    <p class="label text-sm">Nuancier rouge (base <code>--color-red</code>)</p>
+                    <div class="grid grid-cols-9 gap-1">
+                        {% for step in ['100', '200', '300', '400', '500', '600', '700', '800', '900'] %}
+                        <div class="flex flex-col items-center gap-1">
+                            <div class="w-full aspect-square rounded border border-border" style="background-color: {{ red_scale[step]|default('oklch(0.55 0.2 25)') }};" title="bg-red-{{ step }} · {{ red_scale[step] }}"></div>
+                            <span class="text-[10px] text-muted-foreground">{{ step }}</span>
+                        </div>
+                        {% endfor %}
+                    </div>
+                    <p class="text-xs text-muted-foreground">Classes générées : <code>.text-red-100</code> … <code>.text-red-900</code> et <code>.bg-red-100</code> … <code>.bg-red-900</code> (OKLCH)</p>
+                </div>
+                <div class="space-y-2">
+                    <p class="label text-sm">Nuancier vert (base <code>--color-green</code>)</p>
+                    <div class="grid grid-cols-9 gap-1">
+                        {% for step in ['100', '200', '300', '400', '500', '600', '700', '800', '900'] %}
+                        <div class="flex flex-col items-center gap-1">
+                            <div class="w-full aspect-square rounded border border-border" style="background-color: {{ green_scale[step]|default('oklch(0.6 0.15 140)') }};" title="bg-green-{{ step }} · {{ green_scale[step] }}"></div>
+                            <span class="text-[10px] text-muted-foreground">{{ step }}</span>
+                        </div>
+                        {% endfor %}
+                    </div>
+                    <p class="text-xs text-muted-foreground">Classes générées : <code>.text-green-100</code> … <code>.text-green-900</code> et <code>.bg-green-100</code> … <code>.bg-green-900</code> (OKLCH)</p>
+                </div>
                 {{ form_row(form.config.body) }}
                 {{ form_row(form.config.h1) }}
                 {{ form_row(form.config.h2) }}

@@ -5,48 +5,67 @@ declare(strict_types=1);
 namespace App\Service;
 
 /**
- * Génère une échelle de teintes 100-900 en OKLCH à partir d'une couleur de base (--color-blue).
- * Utilisé pour text-blue-{100..900} et bg-blue-{100..900} afin d'éviter le cache.
+ * Génère une échelle de teintes 100-900 en OKLCH à partir d'une couleur de base.
+ * La couleur saisie = palier 500. Dégradé de 10 % par cran : 100–400 plus clairs, 600–900 plus foncés.
+ * Plus clair : +10 % de la distance vers le blanc (L=1) à chaque cran ; plus foncé : −10 % (×0,9) par cran.
  */
 final class OklchScale
 {
     private const STEPS = ['100', '200', '300', '400', '500', '600', '700', '800', '900'];
 
-    /** L (lightness) fixe par palier : 100=très clair, 900=très foncé. C et H viennent de la base. */
-    private const L_MAP = [
-        '100' => 0.97,
-        '200' => 0.93,
-        '300' => 0.88,
-        '400' => 0.82,
-        '500' => 0.75,
-        '600' => 0.65,
-        '700' => 0.55,
-        '800' => 0.45,
-        '900' => 0.35,
-    ];
+    private const L_MAX = 0.97;
+    private const L_MIN = 0.15;
+    private const STEP_PCT = 0.10;
 
     private const DEFAULT_C = 0.2;
     private const DEFAULT_H = 250;
 
     /**
      * Retourne les 9 teintes en OKLCH : ['100' => 'oklch(...)', ..., '900' => 'oklch(...)'].
-     * Base : hex (#RGB, #RRGGBB) ou oklch(L C H). Si vide/invalide, utilise un bleu par défaut.
+     * 500 = couleur de base. 100–400 : +10 % vers le blanc par cran ; 600–900 : −10 % (×0,9) par cran.
      *
      * @return array<string, string>
      */
     public function shadesFromBase(string $base): array
     {
         $parsed = $this->parseBase($base);
+        $baseL = $parsed['L'];
         $C = $parsed['C'];
         $H = $parsed['H'];
 
         $out = [];
         foreach (self::STEPS as $step) {
-            $L = self::L_MAP[$step];
+            $L = $this->lightnessForStep((int) $step, $baseL);
             $out[$step] = sprintf('oklch(%.4f %.4f %.4f)', $L, $C, $H);
         }
 
         return $out;
+    }
+
+    /**
+     * L pour un palier : 500 = baseL.
+     * 100–400 : à chaque cran, +10 % de la distance restante vers L=1 (blanc).
+     * 600–900 : à chaque cran, ×0,9 (−10 %).
+     */
+    private function lightnessForStep(int $step, float $baseL): float
+    {
+        if ($step === 500) {
+            return $baseL;
+        }
+        if ($step < 500) {
+            $n = (500 - $step) / 100;
+            $L = $baseL;
+            for ($i = 0; $i < $n; $i++) {
+                $L = min(self::L_MAX, $L + self::STEP_PCT * (1 - $L));
+            }
+            return $L;
+        }
+        $n = ($step - 500) / 100;
+        $L = $baseL;
+        for ($i = 0; $i < $n; $i++) {
+            $L = max(self::L_MIN, $L * (1 - self::STEP_PCT));
+        }
+        return $L;
     }
 
     /**

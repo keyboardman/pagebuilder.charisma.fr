@@ -85,6 +85,22 @@ class ThemeCssGenerator
             $lines[] = '.text-yellow-' . $step . ' { color: ' . $value . '; }';
             $lines[] = '.bg-yellow-' . $step . ' { background-color: ' . $value . '; }';
         }
+
+        $baseRed = $vars['--color-red'] ?? '';
+        $redShades = $this->oklchScale->shadesFromBase($baseRed);
+        foreach (['100', '200', '300', '400', '500', '600', '700', '800', '900'] as $step) {
+            $value = $redShades[$step];
+            $lines[] = '.text-red-' . $step . ' { color: ' . $value . '; }';
+            $lines[] = '.bg-red-' . $step . ' { background-color: ' . $value . '; }';
+        }
+
+        $baseGreen = $vars['--color-green'] ?? 'oklch(0.6 0.15 140)';
+        $greenShades = $this->oklchScale->shadesFromBase($baseGreen);
+        foreach (['100', '200', '300', '400', '500', '600', '700', '800', '900'] as $step) {
+            $value = $greenShades[$step];
+            $lines[] = '.text-green-' . $step . ' { color: ' . $value . '; }';
+            $lines[] = '.bg-green-' . $step . ' { background-color: ' . $value . '; }';
+        }
         $lines[] = '';
 
         foreach (ThemeSchema::BLOCKS as $block) {

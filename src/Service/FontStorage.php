@@ -47,4 +47,14 @@ class FontStorage
     {
         return $this->filesystem->fileExists($path);
     }
+
+    /**
+     * Lit le contenu d'un fichier du stockage fonts.
+     *
+     * @param string $path Chemin relatif, ex. "ma-police/Bold-Italic.woff2"
+     */
+    public function read(string $path): string
+    {
+        return $this->filesystem->read($path);
+    }
 }

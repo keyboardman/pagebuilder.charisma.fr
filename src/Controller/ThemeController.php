@@ -54,6 +54,7 @@ class ThemeController extends AbstractController
 
         if ($form->isSubmitted() && $form->isValid()) {
             $theme = $form->get('theme')->getData();
+            
             $config = $form->get('config')->getData() ?? [];
             $theme->setSlug($this->slugger->slug($theme->getName())->toString());
             $themeDir = 'storage/themes/' . $theme->getSlug();
@@ -70,6 +71,8 @@ class ThemeController extends AbstractController
         $vars = $config['vars'] ?? [];
         $blueScale = $this->oklchScale->shadesFromBase($vars['--color-blue'] ?? '');
         $yellowScale = $this->oklchScale->shadesFromBase($vars['--color-yellow'] ?? 'oklch(0.9 0.15 90)');
+        $redScale = $this->oklchScale->shadesFromBase($vars['--color-red'] ?? 'oklch(0.55 0.2 25)');
+        $greenScale = $this->oklchScale->shadesFromBase($vars['--color-green'] ?? 'oklch(0.6 0.15 140)');
 
         return $this->render('theme/form.html.twig', [
             'theme' => $theme,
@@ -77,6 +80,8 @@ class ThemeController extends AbstractController
             'google_font_urls' => $googleFontUrls,
             'blue_scale' => $blueScale,
             'yellow_scale' => $yellowScale,
+            'red_scale' => $redScale,
+            'green_scale' => $greenScale,
         ]);
     }
 
@@ -94,7 +99,9 @@ class ThemeController extends AbstractController
 
         if ($form->isSubmitted() && $form->isValid()) {
             $theme = $form->get('theme')->getData();
+            
             $config = $form->get('config')->getData() ?? [];
+            
             $theme->setSlug($this->slugger->slug($theme->getName())->toString());
             $themeDir = 'storage/themes/' . $theme->getSlug();
             $theme->setGeneratedYamlPath($themeDir . '/theme.yaml');
@@ -110,6 +117,8 @@ class ThemeController extends AbstractController
         $vars = $config['vars'] ?? [];
         $blueScale = $this->oklchScale->shadesFromBase($vars['--color-blue'] ?? '');
         $yellowScale = $this->oklchScale->shadesFromBase($vars['--color-yellow'] ?? 'oklch(0.9 0.15 90)');
+        $redScale = $this->oklchScale->shadesFromBase($vars['--color-red'] ?? 'oklch(0.55 0.2 25)');
+        $greenScale = $this->oklchScale->shadesFromBase($vars['--color-green'] ?? 'oklch(0.6 0.15 140)');
 
         return $this->render('theme/form.html.twig', [
             'theme' => $theme,
@@ -117,6 +126,8 @@ class ThemeController extends AbstractController
             'google_font_urls' => $googleFontUrls,
             'blue_scale' => $blueScale,
             'yellow_scale' => $yellowScale,
+            'red_scale' => $redScale,
+            'green_scale' => $greenScale,
         ]);
     }
 
@@ -180,6 +191,29 @@ class ThemeController extends AbstractController
             mkdir($fullDir, 0755, true);
         }
         $path = $fullDir . '/theme.yaml';
-        file_put_contents($path, Yaml::dump($config, 4, 2));
+        $normalized = $this->normalizeConfigForYaml($config);
+        file_put_contents($path, Yaml::dump($normalized, 4, 2));
+    }
+
+    /**
+     * Parcourt la config et convertit les Font en chaînes "Nom, fallback" pour Yaml::dump.
+     *
+     * @param array<string, mixed> $config
+     * @return array<string, mixed>
+     */
+    private function normalizeConfigForYaml(array $config): array
+    {
+        $out = [];
+        foreach ($config as $k => $v) {
+            if ($v instanceof Font) {
+                $out[$k] = $v->toString();
+            } elseif (is_array($v)) {
+                $out[$k] = $this->normalizeConfigForYaml($v);
+            } else {
+                $out[$k] = $v;
+            }
+        }
+
+        return $out;
     }
 }

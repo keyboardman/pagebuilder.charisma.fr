@@ -85,6 +85,16 @@ class Font
         return $this;
     }
 
+    public function __toString(): string
+    {
+        return $this->toString();
+    }
+
+    public function toString(): string
+    {
+        return $this->name . ', ' . $this->fallback;
+    }
+
     public function getSlug(): string
     {
         return $this->slug;

@@ -24,20 +24,28 @@ class ThemeBlockType extends AbstractType
                     'required' => false,
                     'label' => $key,
                     'choices' => $fonts,
-                    'choice_value' => fn (?Font $f) => $f ? ($f->getName() . ', ' . $f->getFallback()) : '',
-                    'choice_label' => fn (?Font $f) => $f ? $f->getName() : '',
-                    'choice_attr' => function (?Font $f): array {
-                        if (!$f) {
+                    'choice_value' => function (mixed $choice): string {
+                        if ($choice instanceof Font) {
+                            return $choice->getName() . ', ' . $choice->getFallback();
+                        }
+                        return is_string($choice) ? $choice : '';
+                    },
+                    'choice_label' => function (mixed $choice): string {
+                        return $choice instanceof Font ? $choice->getName() : (is_string($choice) ? $choice : '');
+                    },
+                    'choice_attr' => function (mixed $choice): array {
+                        if (!$choice instanceof Font) {
                             return [];
                         }
-                        $n = $f->getName();
-                        $fb = $f->getFallback();
+                        $n = $choice->getName();
+                        $fb = $choice->getFallback();
                         $quoted = (str_contains($n, ' ') || str_contains($n, "'"))
                             ? "'" . str_replace("'", "\\'", $n) . "'" : $n;
 
                         return ['style' => 'font-family: ' . $quoted . ', ' . $fb];
                     },
                     'placeholder' => '—',
+                    'empty_data' => '',
                     'attr' => ['data-controller' => 'font-family-autocomplete'],
                 ]);
             } elseif ($key === 'font-weight') {
