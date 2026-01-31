@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Entity;
 
+use App\DTO\Theme\ThemeConfigDTO;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Validator\Constraints as Assert;
 
@@ -22,6 +23,14 @@ class Theme
 
     #[ORM\Column(type: 'string', length: 255, nullable: true)]
     private ?string $slug = null;
+
+    /**
+     * Configuration du thème (ThemeConfigDTO) au format JSON.
+     *
+     * @var array<string, mixed>|null
+     */
+    #[ORM\Column(type: 'json', nullable: true)]
+    private ?array $config = null;
 
     /** Défini par le contrôleur avant persist (writeYaml + ThemeCssGenerator). */
     #[ORM\Column(type: 'string', length: 512)]
@@ -55,6 +64,38 @@ class Theme
     public function setSlug(?string $slug): static
     {
         $this->slug = $slug;
+        return $this;
+    }
+
+    /**
+     * @return array<string, mixed>|null
+     */
+    public function getConfig(): ?array
+    {
+        return $this->config;
+    }
+
+    /**
+     * @param array<string, mixed>|null $config
+     */
+    public function setConfig(?array $config): static
+    {
+        $this->config = $config;
+        return $this;
+    }
+
+    public function getConfigDto(): ?ThemeConfigDTO
+    {
+        if ($this->config === null || $this->config === []) {
+            return null;
+        }
+
+        return ThemeConfigDTO::fromArray($this->config);
+    }
+
+    public function setConfigDto(?ThemeConfigDTO $dto): static
+    {
+        $this->config = $dto !== null ? $dto->toArray() : null;
         return $this;
     }
 

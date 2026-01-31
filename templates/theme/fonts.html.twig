@@ -1,0 +1,30 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Polices du thème{% endblock %}
+
+{% block javascripts %}
+    {{ parent() }}
+    {{ encore_entry_script_tags('themeForm2') }}
+{% endblock %}
+
+{% block stylesheets %}
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    {% for url in google_font_urls|default([]) %}
+        <link rel="stylesheet" href="{{ url }}">
+    {% endfor %}
+    {{ parent() }}
+{% endblock %}
+
+{% block body %}
+{% if theme_config_json is defined and theme_config_json is not null %}
+<script type="application/json" id="theme-config-json">{{ theme_config_json|json_encode|raw }}</script>
+{% endif %}
+<div
+  id="theme-form-2"
+  data-fonts="{{ fonts_for_js|default([])|json_encode|e('html_attr') }}"
+  data-post-url="{{ post_url|default(path('app_theme_index')) }}"
+  data-field-name="config[fonts]"
+></div>
+
+{% endblock %}

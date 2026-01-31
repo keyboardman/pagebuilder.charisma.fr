@@ -5,14 +5,29 @@ declare(strict_types=1);
 namespace App\Service;
 
 use App\Entity\Font;
+use App\Entity\FontType as FontTypeEnum;
+use App\Entity\FontVariant;
 use App\Theme\ThemeSchema;
 
 /**
  * Génère un fichier CSS à partir de la structure theme.yaml et met à jour le chemin.
  * Le fichier est versionné (hash dans le nom) pour cache-busting.
+ * Inclut @import (Google) et @font-face (Custom) pour les polices importées.
  */
 class ThemeCssGenerator
 {
+    private const WEIGHT_MAP = [
+        'thin' => '100',
+        'extra_light' => '200',
+        'light' => '300',
+        'regular' => '400',
+        'medium' => '500',
+        'semi_bold' => '600',
+        'bold' => '700',
+        'extra_bold' => '800',
+        'black' => '900',
+    ];
+
     public function __construct(
         private readonly string $projectDir,
         private readonly OklchScale $oklchScale,
@@ -24,10 +39,11 @@ class ThemeCssGenerator
      * Supprime l'ancien fichier CSS si fourni. Retourne le chemin relatif du nouveau fichier.
      *
      * @param array<string, mixed> $config
+     * @param list<Font>           $fontsToImport
      */
-    public function generate(array $config, string $themeDir, ?string $oldCssPath = null): string
+    public function generate(array $config, string $themeDir, ?string $oldCssPath = null, array $fontsToImport = []): string
     {
-        $css = $this->buildCss($config);
+        $css = $this->buildCss($config, $fontsToImport);
         $version = substr(hash('sha256', json_encode($config) . (string) microtime(true)), 0, 8);
         $filename = 'theme.' . $version . '.css';
         $fullDir = $this->projectDir . '/' . trim($themeDir, '/');
@@ -49,10 +65,26 @@ class ThemeCssGenerator
 
     /**
      * @param array<string, mixed> $config
+     * @param list<Font>           $fontsToImport
      */
-    public function buildCss(array $config): string
+    public function buildCss(array $config, array $fontsToImport = []): string
     {
         $lines = [];
+
+        foreach ($fontsToImport as $font) {
+            if ($font->getType() === FontTypeEnum::Google && $font->getGoogleFontUrl() !== null && $font->getGoogleFontUrl() !== '') {
+                $lines[] = "@import url('" . str_replace("'", "\\'", $font->getGoogleFontUrl()) . "');";
+            } elseif ($font->getType() === FontTypeEnum::Custom) {
+                foreach ($font->getVariants() as $v) {
+                    foreach ($this->fontFaceLines($font->getName(), $v) as $line) {
+                        $lines[] = $line;
+                    }
+                }
+            }
+        }
+        if ($fontsToImport !== []) {
+            $lines[] = '';
+        }
 
         $vars = $config['vars'] ?? [];
         if (!empty($vars)) {
@@ -151,5 +183,33 @@ class ThemeCssGenerator
             return '"' . str_replace('"', '\\22', $v) . '"';
         }
         return $v;
+    }
+
+    /**
+     * @return list<string>
+     */
+    private function fontFaceLines(string $family, FontVariant $v): array
+    {
+        $path = $v->getPath();
+        $ext = strtolower(pathinfo($path, PATHINFO_EXTENSION));
+        $format = match ($ext) {
+            'woff2' => 'woff2',
+            'woff' => 'woff',
+            'ttf' => 'truetype',
+            default => 'woff2',
+        };
+        $url = '/font/file/' . $path;
+        $weight = self::WEIGHT_MAP[$v->getWeight()] ?? '400';
+        $style = $v->getStyle();
+        $quoted = (str_contains($family, ' ') || str_contains($family, "'")) ? "'" . str_replace("'", "\\'", $family) . "'" : $family;
+
+        return [
+            '@font-face {',
+            '  font-family: ' . $quoted . ';',
+            "  src: url('" . str_replace("'", "\\'", $url) . "') format('" . $format . "');",
+            '  font-weight: ' . $weight . ';',
+            '  font-style: ' . $style . ';',
+            '}',
+        ];
     }
 }

@@ -7,32 +7,24 @@ namespace App\Controller;
 use App\Entity\Font;
 use App\Entity\FontType as FontTypeEnum;
 use App\Entity\Theme;
-use App\Form\ThemeConfigType;
-use App\Form\ThemeType;
-use App\Service\OklchScale;
-use App\Service\ThemeCssGenerator;
+use App\DTO\Theme\ThemeConfigDTO;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
-use Symfony\Component\HttpFoundation\BinaryFileResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\String\Slugger\SluggerInterface;
-use Symfony\Component\Yaml\Yaml;
 
 #[Route('/theme', name: 'app_theme_')]
 class ThemeController extends AbstractController
 {
     public function __construct(
         private readonly EntityManagerInterface $em,
-        private readonly ThemeCssGenerator $themeCssGenerator,
-        private readonly OklchScale $oklchScale,
         private readonly SluggerInterface $slugger,
-        private readonly string $projectDir,
     ) {
     }
 
-    #[Route('', name: 'index', methods: ['GET'])]
+    #[Route('/', name: 'index', methods: ['GET'])]
     public function index(): Response
     {
         $themes = $this->em->getRepository(Theme::class)->findBy([], ['name' => 'ASC']);
@@ -40,123 +32,106 @@ class ThemeController extends AbstractController
     }
 
     #[Route('/new', name: 'new', methods: ['GET', 'POST'])]
-    public function new(Request $request): Response
+    public function themeNew(Request $request): Response
     {
-        $theme = new Theme();
-        $config = [];
         $fonts = $this->em->getRepository(Font::class)->findBy([], ['name' => 'ASC']);
-        $googleFontUrls = $this->collectGoogleFontUrls($fonts);
-        $form = $this->createFormBuilder()
-            ->add('theme', ThemeType::class, ['data' => $theme])
-            ->add('config', ThemeConfigType::class, ['data' => $config, 'fonts' => $fonts])
-            ->getForm();
-        $form->handleRequest($request);
 
-        if ($form->isSubmitted() && $form->isValid()) {
-            $theme = $form->get('theme')->getData();
-            
-            $config = $form->get('config')->getData() ?? [];
+        if ($request->isMethod('POST')) {
+            $config = is_array($request->request->all('config')) ? $request->request->all('config') : [];
+            $dto = ThemeConfigDTO::fromArray($config);
+            $theme = new Theme();
+            $theme->setName($dto->getNom() ?: 'Sans nom');
             $theme->setSlug($this->slugger->slug($theme->getName())->toString());
-            $themeDir = 'storage/themes/' . $theme->getSlug();
-            $theme->setGeneratedYamlPath($themeDir . '/theme.yaml');
-            $config['nom'] = $theme->getName();
-            $this->writeYaml($themeDir, $config);
-            $cssPath = $this->themeCssGenerator->generate($config, $themeDir, null);
-            $theme->setGeneratedCssPath($cssPath);
+            $theme->setConfigDto($dto);
             $this->em->persist($theme);
             $this->em->flush();
-            return $this->redirectToRoute('app_theme_index');
+            $this->addFlash('success', sprintf(
+                'Thème « %s » créé.',
+                $theme->getName()
+            ));
+
+            return $this->redirectToRoute('app_theme_edit', ['id' => $theme->getId()]);
         }
 
-        $vars = $config['vars'] ?? [];
-        $blueScale = $this->oklchScale->shadesFromBase($vars['--color-blue'] ?? '');
-        $yellowScale = $this->oklchScale->shadesFromBase($vars['--color-yellow'] ?? 'oklch(0.9 0.15 90)');
-        $redScale = $this->oklchScale->shadesFromBase($vars['--color-red'] ?? 'oklch(0.55 0.2 25)');
-        $greenScale = $this->oklchScale->shadesFromBase($vars['--color-green'] ?? 'oklch(0.6 0.15 140)');
+        $fontsForJs = array_map(
+            static fn (Font $f): array => [
+                'id' => $f->getId(),
+                'name' => $f->getName(),
+            ],
+            $fonts
+        );
 
-        return $this->render('theme/form.html.twig', [
-            'theme' => $theme,
-            'form' => $form,
-            'google_font_urls' => $googleFontUrls,
-            'blue_scale' => $blueScale,
-            'yellow_scale' => $yellowScale,
-            'red_scale' => $redScale,
-            'green_scale' => $greenScale,
+        return $this->render('theme/fonts.html.twig', [
+            'theme' => null,
+            'post_url' => $this->generateUrl('app_theme_index'),
+            'google_font_urls' => $fonts,
+            'fonts_for_js' => $fontsForJs,
         ]);
     }
 
-    #[Route('/{id}/edit', name: 'edit', methods: ['GET', 'POST'], requirements: ['id' => '\d+'])]
-    public function edit(Request $request, Theme $theme): Response
+    #[Route('/edit/{id}', name: 'edit', methods: ['GET', 'POST'], requirements: ['id' => '\d+'])]
+    public function font(Request $request, Theme $theme): Response
     {
-        $config = $this->loadConfig($theme);
         $fonts = $this->em->getRepository(Font::class)->findBy([], ['name' => 'ASC']);
-        $googleFontUrls = $this->collectGoogleFontUrls($fonts);
-        $form = $this->createFormBuilder()
-            ->add('theme', ThemeType::class, ['data' => $theme])
-            ->add('config', ThemeConfigType::class, ['data' => $config, 'fonts' => $fonts])
-            ->getForm();
-        $form->handleRequest($request);
+        $configDto = $theme->getConfigDto();
+        $configArray = $configDto !== null ? $configDto->toArray() : [];
 
-        if ($form->isSubmitted() && $form->isValid()) {
-            $theme = $form->get('theme')->getData();
-            
-            $config = $form->get('config')->getData() ?? [];
-            
+
+        if ($request->isMethod('POST')) {
+            $config = is_array($request->request->all('config')) ? $request->request->all('config') : [];
+            $dto = ThemeConfigDTO::fromArray($config);
+
+            $theme->setName($dto->getNom() ?: $theme->getName());
             $theme->setSlug($this->slugger->slug($theme->getName())->toString());
-            $themeDir = 'storage/themes/' . $theme->getSlug();
-            $theme->setGeneratedYamlPath($themeDir . '/theme.yaml');
-            $config['nom'] = $theme->getName();
-            $this->writeYaml($themeDir, $config);
-            $oldCss = $theme->getGeneratedCssPath();
-            $cssPath = $this->themeCssGenerator->generate($config, $themeDir, $oldCss);
-            $theme->setGeneratedCssPath($cssPath);
+            $theme->setConfigDto($dto);
+
             $this->em->flush();
-            return $this->redirectToRoute('app_theme_index');
+            $this->addFlash('success', 'Thème « ' . $theme->getName() . ' » mis à jour.');
+
+            return $this->redirectToRoute('app_theme_edit', ['id' => $theme->getId()]);
         }
 
-        $vars = $config['vars'] ?? [];
-        $blueScale = $this->oklchScale->shadesFromBase($vars['--color-blue'] ?? '');
-        $yellowScale = $this->oklchScale->shadesFromBase($vars['--color-yellow'] ?? 'oklch(0.9 0.15 90)');
-        $redScale = $this->oklchScale->shadesFromBase($vars['--color-red'] ?? 'oklch(0.55 0.2 25)');
-        $greenScale = $this->oklchScale->shadesFromBase($vars['--color-green'] ?? 'oklch(0.6 0.15 140)');
+        $fontsForJs = array_map(
+            static fn (Font $f): array => ['id' => $f->getId(), 'name' => $f->getName()],
+            $fonts
+        );
+        $fontsToImport = $this->resolveFontsToImport($configArray['fonts'] ?? []);
+        $googleFontUrls = $this->collectGoogleFontUrls($fontsToImport);
 
-        return $this->render('theme/form.html.twig', [
+        return $this->render('theme/fonts.html.twig', [
             'theme' => $theme,
-            'form' => $form,
+            'post_url' => $this->generateUrl('app_theme_edit', ['id' => $theme->getId()]),
             'google_font_urls' => $googleFontUrls,
-            'blue_scale' => $blueScale,
-            'yellow_scale' => $yellowScale,
-            'red_scale' => $redScale,
-            'green_scale' => $greenScale,
+            'fonts_for_js' => $fontsForJs,
+            'theme_config_json' => $configArray,
         ]);
     }
 
-    #[Route('/{id}/{filename}', name: 'css', methods: ['GET'], requirements: ['id' => '\d+', 'filename' => 'theme\.[a-zA-Z0-9]+\.css'])]
-    public function css(Theme $theme, string $filename): Response
-    {
-        $generatedPath = $theme->getGeneratedCssPath();
-        if (basename($generatedPath) !== $filename) {
-            throw $this->createNotFoundException('CSS du thème introuvable.');
-        }
-        $path = $this->projectDir . '/' . ltrim($generatedPath, '/');
-        $real = realpath($path);
-        $projectReal = realpath($this->projectDir);
-        if ($real === false || $projectReal === false || !is_file($real) || !str_starts_with($real, $projectReal)) {
-            throw $this->createNotFoundException('CSS du thème introuvable.');
-        }
-
-        return new BinaryFileResponse($real, 200, ['Content-Type' => 'text/css']);
-    }
-
-    #[Route('/{id}', name: 'delete', methods: ['POST'], requirements: ['id' => '\d+'])]
+    #[Route('/font/{id}/delete', name: 'delete', methods: ['POST'], requirements: ['id' => '\d+'])]
     public function delete(Request $request, Theme $theme): Response
     {
         $token = $request->request->getString('_token');
         if ($this->isCsrfTokenValid('delete' . $theme->getId(), $token)) {
             $this->em->remove($theme);
             $this->em->flush();
+            $this->addFlash('success', sprintf('Thème « %s » a été supprimé.', $theme->getName()));
         }
+
         return $this->redirectToRoute('app_theme_index');
+    }
+
+    /**
+     * @param array<int|string> $ids
+     * @return list<Font>
+     */
+    private function resolveFontsToImport(array $ids): array
+    {
+        if ($ids === []) {
+            return [];
+        }
+        $fonts = $this->em->getRepository(Font::class)->findBy(['id' => array_map('intval', $ids)]);
+
+        return array_values(array_filter($fonts, fn (Font $f): bool => $f->getType() === FontTypeEnum::Google || $f->getType() === FontTypeEnum::Custom));
     }
 
     /** @param list<Font> $fonts */
@@ -170,50 +145,5 @@ class ThemeController extends AbstractController
         }
 
         return array_keys($urls);
-    }
-
-    /** @return array<string, mixed> */
-    private function loadConfig(Theme $theme): array
-    {
-        $path = $this->projectDir . '/' . $theme->getGeneratedYamlPath();
-        if (!is_file($path)) {
-            return [];
-        }
-        $parsed = Yaml::parseFile($path);
-        return is_array($parsed) ? $parsed : [];
-    }
-
-    /** @param array<string, mixed> $config */
-    private function writeYaml(string $themeDir, array $config): void
-    {
-        $fullDir = $this->projectDir . '/' . trim($themeDir, '/');
-        if (!is_dir($fullDir)) {
-            mkdir($fullDir, 0755, true);
-        }
-        $path = $fullDir . '/theme.yaml';
-        $normalized = $this->normalizeConfigForYaml($config);
-        file_put_contents($path, Yaml::dump($normalized, 4, 2));
-    }
-
-    /**
-     * Parcourt la config et convertit les Font en chaînes "Nom, fallback" pour Yaml::dump.
-     *
-     * @param array<string, mixed> $config
-     * @return array<string, mixed>
-     */
-    private function normalizeConfigForYaml(array $config): array
-    {
-        $out = [];
-        foreach ($config as $k => $v) {
-            if ($v instanceof Font) {
-                $out[$k] = $v->toString();
-            } elseif (is_array($v)) {
-                $out[$k] = $this->normalizeConfigForYaml($v);
-            } else {
-                $out[$k] = $v;
-            }
-        }
-
-        return $out;
     }
 }

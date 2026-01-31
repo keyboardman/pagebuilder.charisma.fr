@@ -2,6 +2,7 @@
 # Structure utilisée par le formulaire dynamique et ThemeCssGenerator.
 #
 # nom: string
+# fonts: [id, ...]  # IDs des polices à importer (Google + Custom). Définit les polices disponibles.
 # vars:
 #   --color-white: hex
 #   --color-black: hex

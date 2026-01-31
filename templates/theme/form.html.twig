@@ -2,6 +2,11 @@
 
 {% block title %}{{ theme.id ? 'Modifier' : 'Nouveau' }} thème{% endblock %}
 
+{% block javascripts %}
+    {{ parent() }}
+    {{ encore_entry_script_tags('themeForm') }}
+{% endblock %}
+
 {% block stylesheets %}
     {{ parent() }}
     {% for url in google_font_urls|default([]) %}
@@ -30,6 +35,11 @@
         <div class="card p-4">
             <h2 class="card-title mb-4">Configuration (schéma theme.yaml)</h2>
             <div class="flex flex-col gap-4">
+                {{ form_widget(form.config.fonts) }}
+                <div id="theme-font-picker"
+                     data-fonts="{{ fonts_for_picker|default([])|json_encode|e('html_attr') }}"
+                     data-selected="{{ selected_font_ids|default([])|json_encode|e('html_attr') }}"
+                ></div>
                 {{ form_row(form.config.vars) }}
                 <div class="space-y-2">
                     <p class="label text-sm">Nuancier bleu (base <code>--color-blue</code>)</p>

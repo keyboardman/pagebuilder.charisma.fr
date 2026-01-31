@@ -40,7 +40,3 @@ services:
     App\Service\ThemeCssGenerator:
         arguments:
             $projectDir: '%kernel.project_dir%'
-
-    App\Controller\ThemeController:
-        arguments:
-            $projectDir: '%kernel.project_dir%'

@@ -1,5 +1,4 @@
 import { registerReactControllerComponents } from '@symfony/ux-react';
-import '@hotwired/turbo';
 import './styles/app.css';
 import './bootstrap';
 
