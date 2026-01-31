@@ -75,4 +75,31 @@ class ThemeCssGeneratorTest extends TestCase
         $gen->generate($config, $themeDir, $oldPath);
         $this->assertFileDoesNotExist($this->projectDir . '/' . $oldPath);
     }
+
+    public function testBuildCssIncludesButtonClasses(): void
+    {
+        $gen = new ThemeCssGenerator($this->projectDir, new OklchScale());
+        $config = [
+            'vars' => [],
+            'ch_btn' => [
+                'background-color' => '#e0e0e0',
+                'color' => '#333',
+                'border-width' => '1px',
+                'border-radius' => '0.375rem',
+                'padding' => '0.5rem 1rem',
+            ],
+            'ch_btn_primary' => ['background-color' => '#0066cc', 'color' => '#fff', 'border-color' => '#0066cc'],
+            'ch_btn_hover' => ['background-color' => '#d0d0d0', 'color' => '#000', 'border-color' => '#ccc'],
+            'ch_btn_disabled' => ['background-color' => '#f0f0f0', 'color' => '#999', 'border-color' => '#e0e0e0'],
+            'ch_btn_sm' => ['padding' => '0.25rem 0.5rem', 'font-size' => '0.875rem', 'line-height' => '1.25'],
+        ];
+        $css = $gen->buildCss($config);
+        $this->assertStringContainsString('.ch_btn {', $css);
+        $this->assertStringContainsString('border-style: solid', $css);
+        $this->assertStringContainsString('.ch_btn_primary {', $css);
+        $this->assertStringContainsString('.ch_btn:hover', $css);
+        $this->assertStringContainsString('.ch_btn:disabled', $css);
+        $this->assertStringContainsString('.ch_btn.disabled', $css);
+        $this->assertStringContainsString('.ch_btn_sm {', $css);
+    }
 }

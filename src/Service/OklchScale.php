@@ -21,6 +21,32 @@ final class OklchScale
     private const DEFAULT_H = 250;
 
     /**
+     * Parse une couleur CSS (hex, oklch) en composantes OKLCH.
+     * Retourne null pour var(--...), currentColor ou format non reconnu.
+     *
+     * @return array{L: float, C: float, H: float}|null
+     */
+    public function parseToOklch(string $color): ?array
+    {
+        $color = trim($color);
+        if ($color === '' || str_starts_with($color, 'var(') || strtolower($color) === 'currentcolor') {
+            return null;
+        }
+        if (preg_match('/^oklch\s*\(\s*([\d.]+)\s+([\d.]+)\s+([\d.]+)/', $color, $m)) {
+            $L = (float) $m[1];
+            if ($L > 1) {
+                $L /= 100;
+            }
+            return ['L' => $L, 'C' => (float) $m[2], 'H' => (float) $m[3]];
+        }
+        $hex = $this->normalizeHex($color);
+        if ($hex !== null) {
+            return $this->hexToOklch($hex);
+        }
+        return null;
+    }
+
+    /**
      * Retourne les 9 teintes en OKLCH : ['100' => 'oklch(...)', ..., '900' => 'oklch(...)'].
      * 500 = couleur de base. 100–400 : +10 % vers le blanc par cran ; 600–900 : −10 % (×0,9) par cran.
      *
@@ -143,5 +169,38 @@ final class OklchScale
         }
 
         return ['L' => $L, 'C' => $C, 'H' => $H];
+    }
+
+    /**
+     * Convertit LCH (L, C, H comme dans parseToOklch) en hex #rrggbb.
+     * Utilise la conversion inverse OKLab pour rester cohérent avec hexToOklch.
+     */
+    public function oklchToHex(float $L, float $C, float $H): string
+    {
+        $hRad = $H * M_PI / 180.0;
+        $a = $C * cos($hRad);
+        $b = $C * sin($hRad);
+
+        $l_ = $L + 0.3963377774 * $a + 0.2158037573 * $b;
+        $m_ = $L - 0.1055613458 * $a - 0.0638541728 * $b;
+        $n_ = $L - 0.0894841775 * $a - 1.2914855480 * $b;
+
+        $l = $l_ * $l_ * $l_;
+        $m = $m_ * $m_ * $m_;
+        $n = $n_ * $n_ * $n_;
+
+        $rLin = 4.0767416621 * $l - 3.3077115913 * $m + 0.2309699292 * $n;
+        $gLin = -1.2684380046 * $l + 2.6097574011 * $m - 0.3413193965 * $n;
+        $bLin = -0.0041960863 * $l - 0.7034186147 * $m + 1.7076147010 * $n;
+
+        $r = $rLin <= 0.0031308 ? 12.92 * $rLin : 1.055 * ($rLin ** (1 / 2.4)) - 0.055;
+        $g = $gLin <= 0.0031308 ? 12.92 * $gLin : 1.055 * ($gLin ** (1 / 2.4)) - 0.055;
+        $b = $bLin <= 0.0031308 ? 12.92 * $bLin : 1.055 * ($bLin ** (1 / 2.4)) - 0.055;
+
+        $r = (int) round(max(0, min(1, $r)) * 255);
+        $g = (int) round(max(0, min(1, $g)) * 255);
+        $b = (int) round(max(0, min(1, $b)) * 255);
+
+        return sprintf('#%02x%02x%02x', $r, $g, $b);
     }
 }

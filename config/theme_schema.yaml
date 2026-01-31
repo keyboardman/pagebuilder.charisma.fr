@@ -45,3 +45,37 @@ h5: { font-family: '', font-size: '', font-weight: '', line-height: '' }
 h6: { font-family: '', font-size: '', font-weight: '', line-height: '' }
 div: { font-family: '', font-size: '', font-weight: '', line-height: '', padding: '', margin: '' }
 p: { font-family: '', font-size: '', font-weight: '', line-height: '', padding: '', margin: '' }
+
+# Boutons (classes ch_btn, ch_btn_primary, ch_btn_info, ch_btn_sm, ch_btn_lg)
+ch_btn:
+  background-color: ''
+  color: ''
+  border-width: ''
+  border-color: ''
+  border-radius: ''
+  padding: ''
+  margin: ''
+  font-size: ''
+  font-family: ''
+  line-height: ''
+# Variantes : uniquement couleurs (le reste hérite de ch_btn)
+ch_btn_primary: { background-color: '', color: '', border-color: '' }
+ch_btn_info: { background-color: '', color: '', border-color: '' }
+ch_btn_warning: { background-color: '', color: '', border-color: '' }
+ch_btn_success: { background-color: '', color: '', border-color: '' }
+ch_btn_danger: { background-color: '', color: '', border-color: '' }
+# Hover et disabled par variante (uniquement background-color, color, border-color)
+ch_btn_hover: { background-color: '', color: '', border-color: '' }
+ch_btn_disabled: { background-color: '', color: '', border-color: '' }
+ch_btn_primary_hover: { background-color: '', color: '', border-color: '' }
+ch_btn_primary_disabled: { background-color: '', color: '', border-color: '' }
+ch_btn_info_hover: { background-color: '', color: '', border-color: '' }
+ch_btn_info_disabled: { background-color: '', color: '', border-color: '' }
+ch_btn_warning_hover: { background-color: '', color: '', border-color: '' }
+ch_btn_warning_disabled: { background-color: '', color: '', border-color: '' }
+ch_btn_success_hover: { background-color: '', color: '', border-color: '' }
+ch_btn_success_disabled: { background-color: '', color: '', border-color: '' }
+ch_btn_danger_hover: { background-color: '', color: '', border-color: '' }
+ch_btn_danger_disabled: { background-color: '', color: '', border-color: '' }
+ch_btn_sm: { padding: '', font-size: '', line-height: '' }
+ch_btn_lg: { padding: '', font-size: '', line-height: '' }

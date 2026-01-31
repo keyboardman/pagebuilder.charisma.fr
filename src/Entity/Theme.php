@@ -32,11 +32,11 @@ class Theme
     #[ORM\Column(type: 'json', nullable: true)]
     private ?array $config = null;
 
-    /** Défini par le contrôleur avant persist (writeYaml + ThemeCssGenerator). */
+    /** Défini par ThemeCssGeneratorListener après persist/update. */
     #[ORM\Column(type: 'string', length: 512)]
     private string $generatedYamlPath = '';
 
-    /** Défini par le contrôleur avant persist (ThemeCssGenerator). */
+    /** Chemin du fichier CSS généré ; mis à jour par ThemeCssGeneratorListener après persist/update. */
     #[ORM\Column(type: 'string', length: 512)]
     private string $generatedCssPath = '';
 

@@ -15,6 +15,6 @@
 - [x] 3.2 (Optionnel) Ajouter une aide visuelle indiquant que les variables sont inspirées des valeurs par défaut Tailwind et peuvent être personnalisées.
 
 ## 4. Tests et vérifications
-- [ ] 4.1 Ajouter/synchroniser des tests unitaires ou d’intégration autour du mapping des `vars` dans le `ThemeCssGenerator` si nécessaire.
-- [ ] 4.2 Vérifier manuellement que l’ajout, la modification et la suppression de variables sur `/theme/fonts` se reflètent bien dans le CSS généré (présence/absence des variables dans `:root`).
+- [x] 4.1 Ajouter/synchroniser des tests unitaires ou d’intégration autour du mapping des `vars` dans le `ThemeCssGenerator` si nécessaire.
+- [x] 4.2 Vérifier manuellement que l’ajout, la modification et la suppression de variables sur `/theme/fonts` se reflètent bien dans le CSS généré (présence/absence des variables dans `:root`).
 

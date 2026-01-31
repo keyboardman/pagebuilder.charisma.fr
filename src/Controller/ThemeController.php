@@ -12,6 +12,7 @@ use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpFoundation\StreamedResponse;
 use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\String\Slugger\SluggerInterface;
 
@@ -21,7 +22,61 @@ class ThemeController extends AbstractController
     public function __construct(
         private readonly EntityManagerInterface $em,
         private readonly SluggerInterface $slugger,
+        private readonly string $projectDir,
     ) {
+    }
+
+    #[Route('/showcase', name: 'showcase', methods: ['GET'])]
+    public function showcase(Request $request): Response
+    {
+        $themes = $this->em->getRepository(Theme::class)->findBy([], ['name' => 'ASC']);
+        $themesWithCss = array_values(array_filter($themes, fn (Theme $t): bool => $t->getGeneratedCssPath() !== ''));
+
+        $selectedId = $request->query->getInt('theme');
+        $selectedTheme = null;
+        foreach ($themesWithCss as $t) {
+            if ($t->getId() === $selectedId) {
+                $selectedTheme = $t;
+                break;
+            }
+        }
+        if ($selectedTheme === null && $themesWithCss !== []) {
+            return $this->redirectToRoute('app_theme_showcase', ['theme' => $themesWithCss[0]->getId()]);
+        }
+
+        return $this->render('theme/showcase.html.twig', [
+            'themes' => $themesWithCss,
+            'selected_theme' => $selectedTheme,
+        ]);
+    }
+
+    #[Route('/{id}/css', name: 'css', methods: ['GET'], requirements: ['id' => '\d+'])]
+    public function css(Theme $theme): Response
+    {
+        $path = $theme->getGeneratedCssPath();
+        if ($path === '') {
+            return new Response('', Response::HTTP_NOT_FOUND);
+        }
+        $fullPath = $this->projectDir . '/' . ltrim(str_replace('\\', '/', $path), '/');
+        $realPath = realpath($fullPath);
+        if ($realPath === false || !is_file($realPath)) {
+            return new Response('', Response::HTTP_NOT_FOUND);
+        }
+        $baseDir = realpath($this->projectDir);
+        if ($baseDir === false || strpos($realPath, $baseDir) !== 0) {
+            return new Response('', Response::HTTP_FORBIDDEN);
+        }
+
+        $response = new StreamedResponse(static function () use ($realPath): void {
+            $handle = fopen($realPath, 'rb');
+            if ($handle !== false) {
+                stream_copy_to_stream($handle, fopen('php://output', 'wb'));
+                fclose($handle);
+            }
+        });
+        $response->headers->set('Content-Type', 'text/css; charset=utf-8');
+
+        return $response;
     }
 
     #[Route('/', name: 'index', methods: ['GET'])]

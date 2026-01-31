@@ -26,8 +26,11 @@
                 <a href="{{ path('app_font_index') }}" class="nav-link {{ (app.request.attributes.get('_route')|default(''))|slice(0, 8) == 'app_font' ? 'active' : '' }}">
                     Polices
                 </a>
-                <a href="{{ path('app_theme_index') }}" class="nav-link {{ (app.request.attributes.get('_route')|default(''))|slice(0, 10) == 'app_theme' ? 'active' : '' }}">
+                <a href="{{ path('app_theme_index') }}" class="nav-link {{ (app.request.attributes.get('_route')|default(''))|slice(0, 10) == 'app_theme' and app.request.attributes.get('_route') != 'app_theme_showcase' ? 'active' : '' }}">
                     Thèmes
+                </a>
+                <a href="{{ path('app_theme_showcase') }}" class="nav-link {{ app.request.attributes.get('_route') == 'app_theme_showcase' ? 'active' : '' }}">
+                    Présentation
                 </a>
             </nav>
         </aside>
