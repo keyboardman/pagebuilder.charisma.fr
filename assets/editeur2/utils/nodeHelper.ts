@@ -133,7 +133,6 @@ const nodeHelper = {
         return map;
     },
     getChildren: (nodes: NodesType, parentId: NodeID | null, zone = "main"): NodesType => {
-        console.log('nodeHelper: getChildren', Object.values(nodes).map( n => n.parent.id));
         return Object.values(nodes)
             .filter(n => n.parent?.id === parentId && n.parent.zone === zone)
             .sort((a, b) => a.parent.order - b.parent.order)

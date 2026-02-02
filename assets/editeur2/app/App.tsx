@@ -5,9 +5,7 @@ import Builder from "./builder/Builder";
 
 function App() {
 
-  const { mode, nodes } = useAppContext();
-
-  console.log('App: nodes', nodes);
+  const { mode } = useAppContext();
 
   return mode === APP_MODE.VIEW ? <NodeWrapper /> : <Builder />
 

@@ -1,3 +1,4 @@
+import React from "react";
 import { useDraggable } from "@dnd-kit/react";
 
 type DraggableItemProps = {
@@ -7,14 +8,21 @@ type DraggableItemProps = {
 };
 
 function DraggableItem({ id, data, children }: DraggableItemProps) {
-  const draggable = useDraggable({
+  const { ref, handleRef } = useDraggable({
     id,
     type: "add-block",
     feedback: "clone",
     data: data ?? {},
   });
 
-  return <div ref={draggable.ref}>{children}</div>;
+  const child = React.Children.only(children) as React.ReactElement<{ ref?: React.Ref<unknown> }>;
+  return (
+    <div ref={ref} className="cursor-grab active:cursor-grabbing" style={{ touchAction: "none" }}>
+      {child && React.isValidElement(child)
+        ? React.cloneElement(child, { ref: handleRef } as Record<string, unknown>)
+        : children}
+    </div>
+  );
 }
 
 export default DraggableItem;

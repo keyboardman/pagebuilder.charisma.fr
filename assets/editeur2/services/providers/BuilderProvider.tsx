@@ -104,7 +104,7 @@ export const BuilderProvider: FC<BuilderContextProviderProps> = ({
     }
   }, []); // Seulement au montage/démontage - la ref est mise à jour séparément
 
-  const onSave = () => {
+  const onSave = useCallback(() => {
     if (onSaveCallback) {
       onSaveCallback(nodes);
     }
@@ -115,7 +115,7 @@ export const BuilderProvider: FC<BuilderContextProviderProps> = ({
         textarea.value = JSON.stringify(nodes);
       }
     }
-  }
+  }, [nodes, onSaveCallback, target]);
 
   const updateNode = (node: NodeType) => {
     setNodes(nodes => ({ ...nodes, [node.id]: {...nodes[node.id], ...node} }));

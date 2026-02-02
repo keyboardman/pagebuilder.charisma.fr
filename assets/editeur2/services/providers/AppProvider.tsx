@@ -63,10 +63,13 @@ export const AppProvider: FC<AppProviderProps> = ({ children, json = defaultJson
 
     const [nodes, setNodes] = useState<NodesType>(() => parseJsonToNodes(json));
 
+    // Ne pas synchroniser json→nodes en mode intégré (onSaveCallback) : on est la source
+    // de vérité, le parent reçoit nos saves. Resynchroniser créerait une boucle infinie.
     useEffect(() => {
+        if (onSaveCallback) return;
         const next = parseJsonToNodes(json);
         setNodes((prev) => (JSON.stringify(prev) === JSON.stringify(next) ? prev : next));
-    }, [json]);
+    }, [json, onSaveCallback]);
 
     const [mode, setMode] = useState<AppModeType>(view === false ? APP_MODE.EDIT : APP_MODE.VIEW);
 
@@ -80,9 +83,7 @@ export const AppProvider: FC<AppProviderProps> = ({ children, json = defaultJson
         
         return nodeHelper.getChildren(nodes, parentId, zone)
     }
-    
-    console.log('AppProvider: nodes', nodes);
-    
+
     return (
         <ThemeProvider>
             <AppContext.Provider value={{

@@ -48,6 +48,8 @@ config.watchOptions.ignored = [
   ...(Array.isArray(config.watchOptions.ignored) ? config.watchOptions.ignored : []),
   '**/public/build/**',
 ];
+// Polling pour macOS (fsevents peut ignorer certains changements)
+config.watchOptions.poll = 1000;
 config.resolve = config.resolve || {};
 config.resolve.alias = {
     ...(config.resolve.alias || {}),

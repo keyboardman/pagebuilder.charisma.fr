@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useRef, useState } from "react";
-import { DragDropProvider } from "@dnd-kit/react";
+import { DragDropProvider, PointerSensor, KeyboardSensor } from "@dnd-kit/react";
 import {
   APP_MODE,
   type AppModeType,
@@ -78,6 +78,7 @@ function Builder() {
   const [activeDragData, setActiveDragData] = useState<{ action?: "add" | "move-node"; type?: string; id?: string } | null>(null);
 
   const handleDragStart: DragStartHandler = useCallback((event) => {
+
     const source = event.operation.source;
     if (source) {
       setActiveDragId(source.id as string);
@@ -128,6 +129,10 @@ function Builder() {
 
   return (
     <DragDropProvider
+      sensors={[
+        PointerSensor.configure({ activationConstraints: () => undefined }),
+        KeyboardSensor,
+      ]}
       onDragStart={handleDragStart}
       onDragEnd={handleDragEnd}
     >

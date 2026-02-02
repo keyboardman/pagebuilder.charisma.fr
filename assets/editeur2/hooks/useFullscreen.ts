@@ -6,85 +6,65 @@ const useFullscreen = () => {
     const context = useBuilderContextSafe();
     const iframeRef = context?.iframeRef;
 
-    // Obtenir le document de l'iframe
-    const getIframeDocument = useCallback(() => {
-        return iframeRef?.current?.contentDocument || null;
+    const getDoc = useCallback(() => {
+        return iframeRef?.current?.contentDocument ?? (typeof document !== "undefined" ? document : null);
     }, [iframeRef]);
 
-    // Obtenir le body de l'iframe
-    const getIframeBody = useCallback(() => {
-        return iframeRef?.current?.contentDocument?.body || null;
-    }, [iframeRef]);
-
-    const enterFullScreen = async () => {
-        const iframeBody = getIframeBody();
-        const iframeDoc = getIframeDocument();
-
-        if (iframeBody && iframeDoc) {
-            try {
-                // Utiliser le document de l'iframe pour le fullscreen
-                const docElement = iframeDoc.documentElement;
-                if (docElement.requestFullscreen) {
-                    await docElement.requestFullscreen();
-                } else if ('webkitRequestFullscreen' in docElement && typeof (docElement as { webkitRequestFullscreen?: () => Promise<void> }).webkitRequestFullscreen === 'function') {
-                    await (docElement as { webkitRequestFullscreen: () => Promise<void> }).webkitRequestFullscreen();
-                } else if ('mozRequestFullScreen' in docElement && typeof (docElement as { mozRequestFullScreen?: () => Promise<void> }).mozRequestFullScreen === 'function') {
-                    await (docElement as { mozRequestFullScreen: () => Promise<void> }).mozRequestFullScreen();
-                } else if ('msRequestFullscreen' in docElement && typeof (docElement as { msRequestFullscreen?: () => Promise<void> }).msRequestFullscreen === 'function') {
-                    await (docElement as { msRequestFullscreen: () => Promise<void> }).msRequestFullscreen();
-                }
-            } catch (error) {
-                console.error('Erreur lors de l\'entrée en plein écran:', error);
+    const enterFullScreen = useCallback(async () => {
+        const doc = getDoc();
+        const el = doc?.documentElement;
+        if (!el) return;
+        try {
+            if (el.requestFullscreen) {
+                await el.requestFullscreen();
+            } else if (typeof (el as unknown as { webkitRequestFullscreen?: () => Promise<void> }).webkitRequestFullscreen === "function") {
+                await (el as unknown as { webkitRequestFullscreen: () => Promise<void> }).webkitRequestFullscreen();
+            } else if (typeof (el as unknown as { mozRequestFullScreen?: () => Promise<void> }).mozRequestFullScreen === "function") {
+                await (el as unknown as { mozRequestFullScreen: () => Promise<void> }).mozRequestFullScreen();
+            } else if (typeof (el as unknown as { msRequestFullscreen?: () => Promise<void> }).msRequestFullscreen === "function") {
+                await (el as unknown as { msRequestFullscreen: () => Promise<void> }).msRequestFullscreen();
             }
+        } catch (error) {
+            console.error("Erreur entrée plein écran:", error);
         }
-    };
+    }, [getDoc]);
 
-    const exitFullScreen = async () => {
-        const iframeDoc = getIframeDocument();
-        
-        if (iframeDoc && iframeDoc.fullscreenElement) {
-            try {
-                if (iframeDoc.exitFullscreen) {
-                    await iframeDoc.exitFullscreen();
-                } else if ('webkitExitFullscreen' in iframeDoc && typeof (iframeDoc as { webkitExitFullscreen?: () => Promise<void> }).webkitExitFullscreen === 'function') {
-                    await (iframeDoc as { webkitExitFullscreen: () => Promise<void> }).webkitExitFullscreen();
-                } else if ('mozCancelFullScreen' in iframeDoc && typeof (iframeDoc as { mozCancelFullScreen?: () => Promise<void> }).mozCancelFullScreen === 'function') {
-                    await (iframeDoc as { mozCancelFullScreen: () => Promise<void> }).mozCancelFullScreen();
-                } else if ('msExitFullscreen' in iframeDoc && typeof (iframeDoc as { msExitFullscreen?: () => Promise<void> }).msExitFullscreen === 'function') {
-                    await (iframeDoc as { msExitFullscreen: () => Promise<void> }).msExitFullscreen();
-                }
-            } catch (error) {
-                console.error('Erreur lors de la sortie du plein écran:', error);
+    const exitFullScreen = useCallback(async () => {
+        const doc = getDoc();
+        if (!doc?.fullscreenElement) return;
+        try {
+            if (doc.exitFullscreen) {
+                await doc.exitFullscreen();
+            } else if (typeof (doc as unknown as { webkitExitFullscreen?: () => Promise<void> }).webkitExitFullscreen === "function") {
+                await (doc as unknown as { webkitExitFullscreen: () => Promise<void> }).webkitExitFullscreen();
+            } else if (typeof (doc as unknown as { mozCancelFullScreen?: () => Promise<void> }).mozCancelFullScreen === "function") {
+                await (doc as unknown as { mozCancelFullScreen: () => Promise<void> }).mozCancelFullScreen();
+            } else if (typeof (doc as unknown as { msExitFullscreen?: () => Promise<void> }).msExitFullscreen === "function") {
+                await (doc as unknown as { msExitFullscreen: () => Promise<void> }).msExitFullscreen();
             }
+        } catch (error) {
+            console.error("Erreur sortie plein écran:", error);
         }
-    };
+    }, [getDoc]);
 
-    // Détection du changement d'état (entrée/sortie du plein écran)
     useEffect(() => {
-        const iframeDoc = getIframeDocument();
-        if (!iframeDoc) return;
-
-        const updateFullscreenState = () => {
-            setIsFullScreen(!!iframeDoc.fullscreenElement);
-        };
-
-        iframeDoc.addEventListener('fullscreenchange', updateFullscreenState);
-        iframeDoc.addEventListener('webkitfullscreenchange', updateFullscreenState);
-        iframeDoc.addEventListener('mozfullscreenchange', updateFullscreenState);
-        iframeDoc.addEventListener('MSFullscreenChange', updateFullscreenState);
-
-        // Vérifier l'état initial
-        updateFullscreenState();
-
+        const doc = getDoc();
+        if (!doc) return;
+        const update = () => setIsFullScreen(!!doc.fullscreenElement);
+        doc.addEventListener("fullscreenchange", update);
+        doc.addEventListener("webkitfullscreenchange", update);
+        doc.addEventListener("mozfullscreenchange", update);
+        doc.addEventListener("MSFullscreenChange", update);
+        update();
         return () => {
-            iframeDoc.removeEventListener('fullscreenchange', updateFullscreenState);
-            iframeDoc.removeEventListener('webkitfullscreenchange', updateFullscreenState);
-            iframeDoc.removeEventListener('mozfullscreenchange', updateFullscreenState);
-            iframeDoc.removeEventListener('MSFullscreenChange', updateFullscreenState);
+            doc.removeEventListener("fullscreenchange", update);
+            doc.removeEventListener("webkitfullscreenchange", update);
+            doc.removeEventListener("mozfullscreenchange", update);
+            doc.removeEventListener("MSFullscreenChange", update);
         };
-    }, [getIframeDocument]);
+    }, [getDoc]);
 
-    return { enterFullScreen, exitFullScreen, isFullScreen }
-}
+    return { enterFullScreen, exitFullScreen, isFullScreen };
+};
 
 export default useFullscreen
