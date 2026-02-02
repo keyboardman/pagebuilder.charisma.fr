@@ -17,7 +17,8 @@
     "resolveJsonModule": true,
     "baseUrl": ".",
     "paths": {
-      "@/*": ["assets/*"]
+      "@/*": ["assets/*"],
+      "@editeur/*": ["assets/editeur2/*"]
     },
     "types": ["node"]
   },

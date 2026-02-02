@@ -33,8 +33,8 @@ class Page
     #[ORM\Column(type: 'text', nullable: true)]
     private ?string $description = null;
 
-    #[ORM\Column(type: 'text', nullable: true)]
-    private ?string $content = null;
+    #[ORM\Column(type: 'json', nullable: true)]
+    private ?array $content = null;
 
     public function getId(): ?int
     {
@@ -85,14 +85,19 @@ class Page
         return $this;
     }
 
-    public function getContent(): ?string
+    public function getContent(): ?array
     {
         return $this->content;
     }
 
-    public function setContent(?string $content): static
+    public function setContent(array|string|null $content): static
     {
-        $this->content = $content;
+        if (\is_string($content)) {
+            $decoded = json_decode($content, true);
+            $this->content = json_last_error() === \JSON_ERROR_NONE ? $decoded : null;
+        } else {
+            $this->content = $content;
+        }
         return $this;
     }
 }

@@ -1,0 +1,73 @@
+{
+  "hkasbcjjkrkk" : {
+    "id": "hkasbcjjkrkk",
+      "type": "node-text",
+      "parent": {
+        "id": null,
+        "order": 0,
+        "zone": "main"
+      },
+      "isDroppable": false,
+      "content": {
+        "html": "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Pellentesque eget ornare orci. Sed sodales purus sit amet felis posuere malesuada. Praesent venenatis sed nulla eu tristique. In ornare mauris quis ex sodales sagittis. Aliquam vitae accumsan eros. Vestibulum ut blandit sapien. Phasellus eu metus maximus, lobortis libero non, rutrum risus. Suspendisse metus nisi, lobortis vel sapien vulputate, congue lobortis risus. Curabitur bibendum, nulla id vestibulum aliquam, velit dui suscipit risus, nec mattis odio elit eu lectus. In eu arcu sollicitudin, egestas metus non, pharetra augue. Ut id molestie urna. Mauris sagittis lorem nec faucibus condimentum. Sed dapibus libero posuere ante elementum, in vestibulum lectus bibendum. Vestibulum elementum eget sapien ac fringilla. Phasellus pretium purus sit amet odio laoreet, ac ornare lacus lacinia."
+      },
+      "attributes": {
+        "id": "",
+        "className": "bg-yellow-500",
+        "style": {}
+      },
+      "related": {
+        "design": null,
+        "settings": null
+      }
+  },
+  "stgtsuxzfppt": {
+    "id": "stgtsuxzfppt",
+      "type": "node-image",
+      "parent": {
+        "id": null,
+        "order": 1,
+        "zone": "main"
+      },
+      "isDroppable": false,
+      "content": {
+        "alt": "....",
+        "src": "https://placehold.net/3-800x600.png"
+      }
+  },
+  "tissaffrqntr": {
+    "id": "tissaffrqntr",
+      "type": "node-container",
+      "parent": {
+        "id": null,
+        "order": 2,
+        "zone": "main"
+      },
+      "isDroppable": true
+  },
+  "dpiambmqtybn": {
+    "id": "dpiambmqtybn",
+      "type": "node-video",
+      "parent": {
+        "id": null,
+        "order": 3,
+        "zone": "main"
+      },
+      "isDroppable": false,
+      "content": {
+        "alt": "....",
+        "src": "https://streaming.charisma.fr/video/aSeQRoHh7sq0.mp4",
+        "poster": "https://content.charisma.fr/web/videos/thumbs/300/aSeQRoHh7sq0.jpg",
+        "controls": true
+      }
+  },
+  "cylsqgudkwtz": {
+    "id": "cylsqgudkwtz",
+    "type": "node-root",
+    "parent": null,
+    "content": {
+      "title": ""
+    }
+  } 
+
+}

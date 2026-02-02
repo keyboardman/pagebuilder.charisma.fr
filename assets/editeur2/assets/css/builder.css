@@ -1,0 +1,178 @@
+.admin-layout {
+    height: 100vh;
+    background-color: var(--background);
+    color: var(--foreground);
+    overflow: hidden;
+}
+
+.admin-layout>* {
+    min-height: 0;
+    /* 🔥 CRITIQUE POUR GRID */
+    min-width: 0;
+}
+
+.admin-layout[data-mode=edit] {
+    display: grid;
+    grid-template-areas:
+        "header header header"
+        "aside-left main aside-right"
+        "footer footer footer";
+    grid-template-columns: var(--sizes-sidebarWidth) 1fr var(--sizes-sidebarRightWidth);
+    grid-template-rows: auto 1fr auto;
+    height: 100vh;
+    overflow: hidden;
+    overscroll-behavior: contain;
+    width: 100%;
+    transition: grid-template-columns 700ms ease-in-out;
+}
+
+.admin-layout[data-mode=edit].admin-layout--sidebar-collapsed {
+    grid-template-columns: 0 1fr var(--sizes-sidebarRightWidth);
+}
+
+.admin-layout[data-mode=preview] {
+    overflow-y: scroll;
+}
+
+.admin-layout__header {
+    grid-area: header;
+    background-color: var(--card);
+    color: var(--card-foreground);
+    border-bottom: 1px solid var(--border);
+}
+
+.admin-layout__left {
+    grid-area: aside-left;
+    border-right: 1px solid var(--admin-border-color);
+    color: var(--admin-color);
+    min-height: 100%;
+    height: 100%;
+
+}
+
+.admin-layout__left--collapsed {
+    width: 0;
+    min-width: 0;
+    padding: 0;
+}
+
+.admin-layout__right {
+    grid-area: aside-right;
+    border-left: 1px solid var(--admin-border-color);
+    color: var(--admin-color);
+    min-height: 0;
+    height: 100%;
+}
+
+.admin-layout__footer {
+    grid-area: footer;
+    background-color: var(--card);
+    color: var(--muted-foreground);
+    border-top: 1px solid var(--border);
+    width: 100%;
+}
+
+.admin-layout__main {
+    grid-area: main;
+    background-color: oklch(0.95 0 0);
+    /* Gris très clair, indépendant du thème */
+}
+
+/* Exclusion des zones admin-layout des styles par défaut de .node-root-content */
+/* Ces règles appliquent les styles par défaut de Tailwind pour les éléments dans les zones admin */
+
+.admin-layout__footer,
+.admin-layout__header,
+.admin-layout__right {
+    color: var(--foreground);
+    font-family: var(--font-sans);
+    font-size: 16px;
+    line-height: 1.5;
+
+}
+
+.admin-layout__footer h1,
+.admin-layout__header h1,
+.admin-layout__right h1 {
+    font-size: inherit;
+    line-height: inherit;
+}
+
+.admin-layout__footer h2,
+.admin-layout__header h2,
+.admin-layout__right h2 {
+    font-size: inherit;
+    line-height: inherit;
+}
+
+.admin-layout__footer h3,
+.admin-layout__header h3,
+.admin-layout__right h3 {
+    font-size: inherit;
+    line-height: inherit;
+}
+
+.admin-layout__footer h4,
+.admin-layout__header h4,
+.admin-layout__right h4 {
+    font-size: inherit;
+    line-height: inherit;
+}
+
+.admin-layout__footer h5,
+.admin-layout__header h5,
+.admin-layout__right h5 {
+    font-size: inherit;
+    line-height: inherit;
+}
+
+.admin-layout__footer h6,
+.admin-layout__header h6,
+.admin-layout__right h6 {
+    font-size: inherit;
+    line-height: inherit;
+}
+
+.admin-layout__footer p,
+.admin-layout__header p,
+.admin-layout__right p {
+    font-size: 1rem;
+    line-height: 1.5;
+}
+
+.admin-layout__footer div,
+.admin-layout__header div,
+.admin-layout__right div {
+    /*font-size: inherit; // ecraser tailwind dans le builder */
+    line-height: inherit;
+}
+
+[data-dragging="true"] {
+    box-shadow:
+        inset 0px 0px 1px rgba(0, 0, 0, 0.5),
+        -1px 0 15px 0 rgba(34, 33, 81, 0.01),
+        0px 15px 15px 0 rgba(34, 33, 81, 0.25);
+}
+
+[data-ce-fluid=false] {
+    max-width: 1240px;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+/* Garantir que les zones de drag fonctionnent (éviter conflits avec overflow/scroll) */
+.admin-layout[data-mode=edit] .cursor-grab,
+.admin-layout[data-mode=edit] [data-dnd-dragging],
+.admin-layout[data-mode=edit] .bg-diagonal-blue {
+  touch-action: none;
+}
+
+.bg-diagonal-blue {
+    background-image: repeating-linear-gradient(
+      -45deg,
+      rgba(59, 130, 246, 0.06),
+      rgba(59, 130, 246, 0.06) 14px,
+      rgba(59, 130, 246, 0.02) 14px,
+      rgba(59, 130, 246, 0.02) 28px
+    );
+}

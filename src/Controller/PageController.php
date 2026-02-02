@@ -40,7 +40,6 @@ class PageController extends AbstractController
             $title = $request->request->getString('title');
             $themeId = $request->request->getInt('theme_id');
             $description = $request->request->get('description');
-            $content = $request->request->get('content');
 
             if ($title === '') {
                 $this->addFlash('error', 'Le titre est obligatoire.');
@@ -59,7 +58,7 @@ class PageController extends AbstractController
             $page->setSlug($slug);
             $page->setTheme($theme);
             $page->setDescription(\is_string($description) ? $description : null);
-            $page->setContent(\is_string($content) ? $content : null);
+            $page->setContent(['cylsqgudkwtz' => ['id' => 'cylsqgudkwtz', 'type' => 'node-root', 'parent' => null, 'content' => ['title' => '']]]);
 
             $this->em->persist($page);
             try {
@@ -97,7 +96,6 @@ class PageController extends AbstractController
             $title = $request->request->getString('title');
             $themeId = $request->request->getInt('theme_id');
             $description = $request->request->get('description');
-            $content = $request->request->get('content');
 
             if ($title === '') {
                 $this->addFlash('error', 'Le titre est obligatoire.');
@@ -115,7 +113,6 @@ class PageController extends AbstractController
             $page->setSlug($slug);
             $page->setTheme($theme);
             $page->setDescription(\is_string($description) ? $description : null);
-            $page->setContent(\is_string($content) ? $content : null);
 
             try {
                 $this->em->flush();
@@ -139,6 +136,32 @@ class PageController extends AbstractController
             'themes_for_js' => $themesForJs,
             'post_url' => $this->generateUrl('app_page_edit', ['id' => $page->getId()]),
         ]);
+    }
+
+    #[Route('/{id}/builder', name: 'builder', methods: ['GET'], requirements: ['id' => '\d+'])]
+    public function builder(Page $page): Response
+    {
+        return $this->render('page/builder.html.twig', ['page' => $page]);
+    }
+
+    #[Route('/{id}/content', name: 'api_content', methods: ['PATCH', 'PUT'], requirements: ['id' => '\d+'])]
+    public function apiContent(Request $request, Page $page): Response
+    {
+        $data = json_decode((string) $request->getContent(), true) ?: [];
+        $token = $data['_token'] ?? '';
+        if (!$this->isCsrfTokenValid('page_form', $token)) {
+            return new Response('', 403);
+        }
+        $contentRaw = $data['content'] ?? null;
+        if (!\is_string($contentRaw)) {
+            return new Response('', 400);
+        }
+        if ($contentRaw !== '' && json_decode($contentRaw) === null && json_last_error() !== \JSON_ERROR_NONE) {
+            return new Response('', 400);
+        }
+        $page->setContent($contentRaw);
+        $this->em->flush();
+        return new Response('', 204);
     }
 
     #[Route('/preview/{id}', name: 'preview', methods: ['GET'], requirements: ['id' => '\d+'])]

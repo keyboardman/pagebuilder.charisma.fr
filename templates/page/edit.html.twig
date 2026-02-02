@@ -21,6 +21,7 @@
             <a href="{{ path('app_page_index') }}" class="btn btn-ghost btn-sm mb-2">← Retour</a>
             <h1 class="text-2xl font-bold tracking-tight">Modifier la page</h1>
         </div>
+        <a href="{{ path('app_page_builder', { id: page.id }) }}" class="btn btn-outline btn-sm">Builder</a>
         <a href="{{ path('app_page_preview', { id: page.id }) }}" class="btn btn-outline btn-sm" target="_blank" rel="noopener">Prévisualiser</a>
     </div>
 
@@ -28,7 +29,7 @@
       id="page-form-root"
       data-post-url="{{ post_url }}"
       data-themes="{{ themes_for_js|json_encode|e('html_attr') }}"
-      data-page="{{ { id: page.id, title: page.title, slug: page.slug, theme_id: page.theme.id, description: page.description ?? '', content: page.content ?? '' }|json_encode|e('html_attr') }}"
+      data-page="{{ { id: page.id, title: page.title, slug: page.slug, theme_id: page.theme.id, description: page.description ?? '' }|json_encode|e('html_attr') }}"
       data-csrf-token="{{ csrf_token('page_form') }}"
     ></div>
 </div>

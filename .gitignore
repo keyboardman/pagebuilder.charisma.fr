@@ -37,3 +37,6 @@ yarn-error.log
 
 /storage/media/*
 !/storage/media/.gitkeep
+
+# Clone source pour analyse (editeur2)
+.editeur2-source/

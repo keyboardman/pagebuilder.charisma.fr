@@ -17,7 +17,6 @@ export interface PageFormProps {
     title: string;
     theme_id: number;
     description: string;
-    content: string;
   } | null;
   csrfToken: string;
 }
@@ -28,7 +27,6 @@ export function PageForm({ postUrl, themes, initialPage, csrfToken }: PageFormPr
     String(initialPage?.theme_id ?? themes[0]?.id ?? '')
   );
   const [description, setDescription] = useState(initialPage?.description ?? '');
-  const [content, setContent] = useState(initialPage?.content ?? '');
 
   return (
     <form method="post" action={postUrl} className="space-y-6">
@@ -91,23 +89,6 @@ export function PageForm({ postUrl, themes, initialPage, csrfToken }: PageFormPr
             placeholder="Description pour les moteurs de recherche"
             rows={3}
             className="w-full"
-          />
-        </div>
-      </div>
-      <div className="card p-4 space-y-4">
-        <h2 className="text-lg font-semibold">Contenu</h2>
-        <div className="space-y-2">
-          <label htmlFor="page-content" className="text-sm font-medium">
-            Contenu
-          </label>
-          <Textarea
-            id="page-content"
-            name="content"
-            value={content}
-            onChange={(e) => setContent(e.target.value)}
-            placeholder="Contenu de la page"
-            rows={10}
-            className="w-full min-h-[200px]"
           />
         </div>
       </div>

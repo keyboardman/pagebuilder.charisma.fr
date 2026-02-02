@@ -1,0 +1,16 @@
+/*
+@source inline("{hover:,focus:, sm:,md:,lg:,xl:, 2xl:, dark:,}{bg, text, border, border-t-, border-r-, border-b-, border-l-}-{blue,red,green,yellow,purple,pink,gray,orange,teal,cyan,lime,emerald,indigo,violet,rose}-{50,{100..900..100},950}");
+@source inline("{hover:,focus:,}{bg,border,text}-{white,black,transparent}");
+
+@source inline("{border-color}-{white,black,transparent}");
+@source inline("{border-opacity}-{0.05,0.1,0.2,0.3,0.4,0.5,0.6,0.7,0.8,0.9,1}");
+@source inline("{rounded}-{sm,md,lg,xl}");
+@source inline("{border}-{1,2,4,8}");
+@source inline("{border,divide}-{solid,dashed,dotted,double,hidden,none}");
+@source inline("{border}-{white,black,transparent}");
+@source inline("{border-opacity}-{0.05,0.1,0.2,0.3,0.4,0.5,0.6,0.7,0.8,0.9,1}");
+
+
+
+@source inline("{sm:,md:,lg:,xl:, 2xl:, hover:, focus:, dark:}{border-, border-x-, border-y-, border-t-, border-r-, border-b-, border-l-}{white,black,transparent,1,2,4,8,solid,dashed,dotted,double,hidden,none}");
+*/

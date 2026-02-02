@@ -32,7 +32,22 @@ class MediaController extends AbstractController
     {
         $path = (string) $request->query->get('path', '');
         $path = $this->sanitizePath($path);
-        $items = $this->mediaStorage->listContents($path);
+        $rawItems = $this->mediaStorage->listContents($path);
+        $baseUrl = $request->getSchemeAndHttpHost() . $request->getBasePath();
+        $items = array_map(function (array $item) use ($baseUrl): array {
+            $url = $item['type'] === 'file'
+                ? $baseUrl . $this->generateUrl('app_media_file', ['path' => $item['path']])
+                : '';
+            return [
+                'id' => $item['path'],
+                'name' => $item['name'],
+                'path' => $item['path'],
+                'url' => $url,
+                'type' => $item['type'] === 'dir' ? 'directory' : ($item['type'] ?? 'file'),
+                'size' => $item['size'] ?? null,
+                'isFolder' => $item['type'] === 'dir',
+            ];
+        }, $rawItems);
         return new JsonResponse(['items' => $items, 'path' => $path]);
     }
 
@@ -77,7 +92,17 @@ class MediaController extends AbstractController
         } finally {
             fclose($stream);
         }
-        return new JsonResponse(['path' => $targetPath, 'name' => $name]);
+        $mimeType = $this->mediaStorage->mimeType($targetPath);
+        $url = $request->getSchemeAndHttpHost() . $request->getBasePath()
+            . $this->generateUrl('app_media_file', ['path' => $targetPath]);
+        return new JsonResponse([
+            'id' => $targetPath,
+            'path' => $targetPath,
+            'name' => $name,
+            'url' => $url,
+            'type' => $mimeType,
+            'mimeType' => $mimeType,
+        ]);
     }
 
     /** Upload par chunks (8 Mo) : évite les limites post_max_size. */
@@ -153,7 +178,75 @@ class MediaController extends AbstractController
             $this->removeTempUploadDir($tempDir);
         }
 
-        return new JsonResponse(['path' => $targetPath, 'name' => $name]);
+        $mimeType = $this->mediaStorage->mimeType($targetPath);
+        $url = $request->getSchemeAndHttpHost() . $request->getBasePath()
+            . $this->generateUrl('app_media_file', ['path' => $targetPath]);
+        return new JsonResponse([
+            'id' => $targetPath,
+            'path' => $targetPath,
+            'name' => $name,
+            'url' => $url,
+            'type' => $mimeType,
+            'mimeType' => $mimeType,
+        ]);
+    }
+
+    #[Route('/media/api/rename', name: 'api_rename', methods: ['POST'])]
+    public function rename(Request $request): JsonResponse
+    {
+        $data = json_decode((string) $request->getContent(), true) ?: [];
+        $id = (string) ($data['id'] ?? '');
+        $name = trim((string) ($data['name'] ?? ''));
+        if ($id === '' || $name === '' || preg_match('/[^a-zA-Z0-9._\-\s]/', $name)) {
+            return new JsonResponse(['error' => 'id et name requis, nom invalide'], 400);
+        }
+        $oldPath = $this->sanitizePath($id);
+        $dir = \dirname($oldPath);
+        $newPath = ($dir !== '.' ? $dir . '/' : '') . $name;
+        $newPath = $this->sanitizePath($newPath);
+        if (!$this->mediaStorage->fileExists($oldPath)) {
+            return new JsonResponse(['error' => 'Fichier introuvable', 'id' => $id], 404);
+        }
+        $stream = $this->mediaStorage->readStream($oldPath);
+        try {
+            $this->mediaStorage->writeStream($newPath, $stream);
+        } finally {
+            fclose($stream);
+        }
+        $this->mediaStorage->delete($oldPath);
+        $mimeType = $this->mediaStorage->mimeType($newPath);
+        $url = $request->getSchemeAndHttpHost() . $request->getBasePath()
+            . $this->generateUrl('app_media_file', ['path' => $newPath]);
+        return new JsonResponse([
+            'id' => $newPath,
+            'path' => $newPath,
+            'name' => $name,
+            'url' => $url,
+            'type' => $mimeType,
+            'mimeType' => $mimeType,
+        ]);
+    }
+
+    #[Route('/media/api/folder', name: 'api_folder', methods: ['POST'])]
+    public function createFolder(Request $request): JsonResponse
+    {
+        $data = json_decode((string) $request->getContent(), true) ?: $request->request->all();
+        $name = trim((string) ($data['name'] ?? $request->request->get('name', '')));
+        $path = (string) ($data['path'] ?? $request->request->get('path', ''));
+        $path = $this->sanitizePath($path);
+        if ($name === '' || preg_match('/[^a-zA-Z0-9._\-\s]/', $name)) {
+            return new JsonResponse(['error' => 'Nom de dossier invalide'], 400);
+        }
+        $targetPath = $path !== '' ? $path . '/' . $name : $name;
+        $this->mediaStorage->createDirectory($targetPath);
+        return new JsonResponse([
+            'id' => $targetPath,
+            'path' => $targetPath . '/',
+            'name' => $name,
+            'url' => '',
+            'type' => 'directory',
+            'isFolder' => true,
+        ]);
     }
 
     private function removeTempUploadDir(string $dir): void
@@ -185,7 +278,11 @@ class MediaController extends AbstractController
     #[Route('/media/api/delete', name: 'api_delete', methods: ['DELETE', 'POST'])]
     public function delete(Request $request): JsonResponse
     {
-        $path = (string) ($request->request->get('path') ?? $request->query->get('path', ''));
+        $path = (string) ($request->request->get('path') ?? $request->request->get('id') ?? $request->query->get('path', ''));
+        if ($path === '' && $request->getContent()) {
+            $data = json_decode((string) $request->getContent(), true);
+            $path = (string) ($data['path'] ?? $data['id'] ?? '');
+        }
         $path = $this->sanitizePath($path);
         if ($path === '' || $path === '.') {
             return new JsonResponse(['error' => 'Chemin requis'], 400);

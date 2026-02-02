@@ -14,6 +14,8 @@ Encore
     .addEntry('themeForm2', './assets/themeForm2.tsx')
     .addEntry('fileManager', './assets/fileManager.jsx')
     .addEntry('pageForm', './assets/pageForm.jsx')
+    .addEntry('pagePreview', './assets/pagePreview.jsx')
+    .addEntry('pageBuilderStandalone', './assets/pageBuilderStandalone.jsx')
     .enableStimulusBridge('./assets/controllers.json')
     .splitEntryChunks()
     .enableSingleRuntimeChunk()
@@ -33,10 +35,24 @@ Encore
         config.useBuiltIns = 'usage';
         config.corejs = 3;
     })
+    .configureCssMinimizerPlugin((options) => {
+        options.minimizerOptions = {
+            preset: ['default', { calc: false }],
+        };
+    })
 ;
 
 const config = Encore.getWebpackConfig();
+config.watchOptions = config.watchOptions || {};
+config.watchOptions.ignored = [
+  ...(Array.isArray(config.watchOptions.ignored) ? config.watchOptions.ignored : []),
+  '**/public/build/**',
+];
 config.resolve = config.resolve || {};
-config.resolve.alias = { ...(config.resolve.alias || {}), '@': path.resolve(__dirname, 'assets') };
+config.resolve.alias = {
+    ...(config.resolve.alias || {}),
+    '@': path.resolve(__dirname, 'assets'),
+    '@editeur': path.resolve(__dirname, 'assets/editeur2'),
+  };
 config.resolve.extensions = [...(config.resolve.extensions || []), '.ts', '.tsx'];
 module.exports = config;

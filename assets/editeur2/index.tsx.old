@@ -1,0 +1,57 @@
+
+import { createRoot } from "react-dom/client";
+import App from "./app/App";
+import OpenEditorButton from "./app/builder/OpenEditorButton";
+import AppProvider from "./services/providers/AppProvider";
+
+/* Runtime Tailwind JS */
+import "./assets/css/index.css";
+
+interface BuilderGlobal {
+    init: (options: { target: string }) => void;
+    view: (options: { target: string }) => void;
+};
+
+const Builder: BuilderGlobal = {
+    init({ target }: { target: string }) {
+        const container = document.getElementById(target);
+        if (!container) {
+            console.error('Target not found:', target);
+            return;
+        }
+
+        if (container instanceof HTMLTextAreaElement === false) {
+            console.error('Target not Textarea');
+            return;
+        }
+
+        const json = container.value;
+
+        const root = document.createElement('div');
+
+        container.insertAdjacentElement('afterend', root);
+
+        container.style.display = 'none';
+
+        createRoot(root!).render(<OpenEditorButton targetId={target} json={json} />);
+
+    },
+    view({ target }: { target: string }) {
+
+        const root = document.getElementById(target);
+
+        if (root) {
+            
+            const _json = root.dataset.json ?? '{}';
+            
+            const _start = _json !== undefined ? _json.replace(/[\n\r\t]/g, '') : "{}";
+            
+            createRoot(root!).render(<AppProvider json={_start} view={true}><App /></AppProvider>);
+        }
+
+    }
+};
+
+(window as any).CharismaPageBuilder = Builder;
+
+export default Builder;
