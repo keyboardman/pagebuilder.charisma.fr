@@ -268,9 +268,9 @@ export function ApiManagerModal({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-2xl max-h-[80vh] flex flex-col">
+      <DialogContent className="api-manager-ui max-w-2xl max-h-[80vh] flex flex-col">
         <DialogHeader>
-          <DialogTitle>Sélectionner un item depuis une API</DialogTitle>
+          <DialogTitle className="node-block-title">Sélectionner un item depuis une API</DialogTitle>
           <DialogDescription>
             Choisissez une API et sélectionnez un item à afficher dans la card.
           </DialogDescription>

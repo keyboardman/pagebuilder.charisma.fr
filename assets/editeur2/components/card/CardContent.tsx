@@ -26,7 +26,7 @@ function Title({ text, style, className }: { text: string, style?: React.CSSProp
     role="heading"
     aria-level={3}
     dangerouslySetInnerHTML={{ __html: text }}
-    className={cn("w-full leading-1.2 text-xl font-bold", className ?? "")}
+    className={cn("node-block-title w-full leading-1.2 text-xl font-bold", className ?? "")}
     style={style ?? {}}
     />
 }

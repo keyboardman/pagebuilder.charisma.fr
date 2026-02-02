@@ -1,6 +1,7 @@
 import React, { useState, useCallback } from 'react';
 import { createRoot } from 'react-dom/client';
 import PageBuilderEmbed from './editeur2/PageBuilderEmbed';
+import { registerFont } from './editeur2/services/typography';
 import './editeur2/assets/css/index.css';
 
 const fileManagerConfig = {
@@ -95,6 +96,16 @@ if (dataEl && rootEl) {
         
     csrfToken = data.csrfToken ?? '';
     saveUrl = data.saveUrl ?? '';
+    const themeFonts = data.themeFonts ?? [];
+    themeFonts.forEach((font) => {
+      try {
+        if (font?.name && font?.href && font?.fontFamily) {
+          registerFont({ name: font.name, href: font.href, fontFamily: font.fontFamily });
+        }
+      } catch (e) {
+        console.warn('Erreur enregistrement police:', font?.name, e);
+      }
+    });
   } catch (_) {}
   const root = createRoot(rootEl);
   root.render(

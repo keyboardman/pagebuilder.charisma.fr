@@ -4,8 +4,10 @@ declare(strict_types=1);
 
 namespace App\Controller;
 
+use App\Entity\Font;
 use App\Entity\Page;
 use App\Entity\Theme;
+use App\Entity\FontType as FontTypeEnum;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
@@ -139,9 +141,45 @@ class PageController extends AbstractController
     }
 
     #[Route('/{id}/builder', name: 'builder', methods: ['GET'], requirements: ['id' => '\d+'])]
-    public function builder(Page $page): Response
+    public function builder(Page $page, Request $request): Response
     {
-        return $this->render('page/builder.html.twig', ['page' => $page]);
+        $themeFonts = $this->buildThemeFontsForBuilder($page->getTheme(), $request);
+        return $this->render('page/builder.html.twig', ['page' => $page, 'theme_fonts' => $themeFonts]);
+    }
+
+    /**
+     * Construit la liste des polices du thème pour le builder (format attendu par registerFont).
+     *
+     * @return list<array{name: string, href: string, fontFamily: string}>
+     */
+    private function buildThemeFontsForBuilder(Theme $theme, Request $request): array
+    {
+        $config = $theme->getConfigDto()?->toArray() ?? [];
+        $fontIds = array_map('intval', (array) ($config['fonts'] ?? []));
+        $fontIds = array_values(array_filter($fontIds, fn (int $id): bool => $id > 0));
+        if ($fontIds === []) {
+            return [];
+        }
+        $fonts = $this->em->getRepository(Font::class)->findBy(['id' => $fontIds]);
+        $baseUrl = $request->getSchemeAndHttpHost() . $request->getBasePath();
+        $result = [];
+        foreach ($fonts as $font) {
+            $name = $font->getName();
+            $fontFamily = $name . ', ' . ($font->getFallback() ?: 'sans-serif');
+            if ($font->getType() === FontTypeEnum::Google && $font->getGoogleFontUrl() !== null && $font->getGoogleFontUrl() !== '') {
+                $result[] = ['name' => $name, 'href' => $font->getGoogleFontUrl(), 'fontFamily' => $fontFamily];
+            } elseif ($font->getType() === FontTypeEnum::Custom) {
+                $variant = $font->getVariants()->first();
+                if ($variant) {
+                    $path = $variant->getPath();
+                    $href = $baseUrl . $this->generateUrl('app_font_file', ['path' => $path]);
+                    $result[] = ['name' => $name, 'href' => $href, 'fontFamily' => $fontFamily];
+                }
+            } elseif ($font->getType() === FontTypeEnum::Native) {
+                $result[] = ['name' => $name, 'href' => 'builtin:native-' . $font->getSlug(), 'fontFamily' => $fontFamily];
+            }
+        }
+        return $result;
     }
 
     #[Route('/{id}/content', name: 'api_content', methods: ['PATCH', 'PUT'], requirements: ['id' => '\d+'])]

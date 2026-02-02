@@ -20,7 +20,7 @@ export const EditableTitle: FC<EditableTitleProps> = ({ show, title, className, 
     return edit ? (
         <Form.InputEditor
             value={title}
-            className={cn("w-full leading-1.2 text-xl/normal font-bold", className)}
+            className={cn("node-block-title w-full leading-1.2 text-xl/normal font-bold", className)}
             tagName="div"
             style={style}
             onFocus={() => {
@@ -36,7 +36,7 @@ export const EditableTitle: FC<EditableTitleProps> = ({ show, title, className, 
                 role="heading"
                 aria-level={3}
                 dangerouslySetInnerHTML={{ __html: title }}
-                className={cn("w-full text-xl/normal font-bold", className)}
+                className={cn("node-block-title w-full text-xl/normal font-bold", className)}
                 style={style}
                 onClick={() => {
                     onSelect();
@@ -45,7 +45,7 @@ export const EditableTitle: FC<EditableTitleProps> = ({ show, title, className, 
             {!title ? (<div
                 role="heading"
                 aria-level={3}
-                className="text-muted-foreground/50"
+                className="node-block-title text-muted-foreground/50"
                 onClick={() => {
                     onSelect();
                 }}

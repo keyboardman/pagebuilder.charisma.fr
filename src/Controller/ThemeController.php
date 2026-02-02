@@ -51,7 +51,7 @@ class ThemeController extends AbstractController
     }
 
     #[Route('/{id}/css', name: 'css', methods: ['GET'], requirements: ['id' => '\d+'])]
-    public function css(Theme $theme): Response
+    public function css(Theme $theme, Request $request): Response
     {
         $path = $theme->getGeneratedCssPath();
         if ($path === '') {
@@ -67,16 +67,41 @@ class ThemeController extends AbstractController
             return new Response('', Response::HTTP_FORBIDDEN);
         }
 
-        $response = new StreamedResponse(static function () use ($realPath): void {
-            $handle = fopen($realPath, 'rb');
-            if ($handle !== false) {
-                stream_copy_to_stream($handle, fopen('php://output', 'wb'));
-                fclose($handle);
-            }
-        });
+        $scoped = $request->query->getBoolean('scoped');
+        $content = file_get_contents($realPath);
+        if ($scoped && $content !== false) {
+            $content = $this->scopeThemeCss($content);
+        }
+
+        $finalContent = $content !== false ? $content : '';
+        $response = new Response($finalContent);
         $response->headers->set('Content-Type', 'text/css; charset=utf-8');
 
         return $response;
+    }
+
+    /**
+     * Scopie le CSS du thème sous .theme-preview-scope pour limiter son impact au canvas.
+     */
+    private function scopeThemeCss(string $css): string
+    {
+        $scope = '.theme-preview-scope';
+
+        return preg_replace_callback(
+            '/^(\s*)((?![@])(?:[^{])+)\s*\{/m',
+            function (array $m) use ($scope): string {
+                $sel = preg_replace('/\s+/', ' ', trim($m[2]));
+                if ($sel === '') {
+                    return $m[0];
+                }
+                $selectors = array_map('trim', explode(',', $sel));
+                $scoped = array_map(static function (string $s) use ($scope): string {
+                    return ($s === ':root' || $s === 'body') ? $scope : $scope . ' ' . $s;
+                }, $selectors);
+                return $m[1] . implode(', ', $scoped) . ' {';
+            },
+            $css
+        );
     }
 
     #[Route('/', name: 'index', methods: ['GET'])]

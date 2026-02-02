@@ -119,7 +119,7 @@ const Settings: FC<NodeSettingsProps> = () => {
 
     return (
       <div className="flex flex-1 flex-col gap-2 p-1 m-1 border border-border/30 rounded-lg mb-3">
-        <h3 className="text-center text-sm font-medium">Sélection API</h3>
+        <h3 className="node-block-title text-center text-sm font-medium">Sélection API</h3>
         {loading && (
           <div className="flex items-center justify-center py-4">
             <Loader2 className="h-5 w-5 animate-spin text-muted-foreground" />

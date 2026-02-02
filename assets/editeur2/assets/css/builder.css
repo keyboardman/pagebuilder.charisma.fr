@@ -78,6 +78,22 @@
     /* Gris très clair, indépendant du thème */
 }
 
+/* Titres et labels des blocs : non impactés par le thème de la page */
+.theme-preview-scope .node-block-title,
+.admin-layout .node-block-title {
+    font-family: var(--font-sans);
+    font-size: 1.25rem;
+    font-weight: 600;
+    line-height: 1.2;
+    color: var(--foreground);
+}
+/* Labels UI (ex: Sélection API) : taille réduite dans les settings */
+.admin-layout__right .node-block-title.text-sm,
+.admin-layout__left .node-block-title.text-sm {
+    font-size: 0.875rem;
+    font-weight: 500;
+}
+
 /* Exclusion des zones admin-layout des styles par défaut de .node-root-content */
 /* Ces règles appliquent les styles par défaut de Tailwind pour les éléments dans les zones admin */
 
@@ -165,6 +181,51 @@
 .admin-layout[data-mode=edit] [data-dnd-dragging],
 .admin-layout[data-mode=edit] .bg-diagonal-blue {
   touch-action: none;
+}
+
+/* Style isolé des modales builder : non impacté par le thème de la page */
+.file-manager-ui,
+.api-manager-ui {
+    font-family: var(--font-sans);
+    font-size: 16px;
+    color: var(--foreground);
+    background-color: var(--background);
+}
+.file-manager-ui h1,
+.file-manager-ui h2,
+.file-manager-ui h3,
+.file-manager-ui h4,
+.file-manager-ui h5,
+.file-manager-ui h6,
+.api-manager-ui h1,
+.api-manager-ui h2,
+.api-manager-ui h3,
+.api-manager-ui h4,
+.api-manager-ui h5,
+.api-manager-ui h6 {
+    font-family: var(--font-sans);
+    font-weight: 600;
+    line-height: 1.25;
+    color: var(--foreground);
+}
+.api-manager-ui h2 {
+    font-size: 1.125rem;
+}
+.file-manager-ui [data-slot="dialog-title"],
+.api-manager-ui [data-slot="dialog-title"],
+.api-manager-ui .node-block-title {
+    font-size: 1.125rem;
+    font-weight: 600;
+    color: var(--foreground);
+}
+.file-manager-ui p,
+.file-manager-ui span,
+.file-manager-ui div,
+.api-manager-ui p,
+.api-manager-ui span,
+.api-manager-ui div {
+    font-family: var(--font-sans);
+    color: inherit;
 }
 
 .bg-diagonal-blue {

@@ -24,7 +24,7 @@ export const ViewTitle: FC<ViewTitleProps> = ({ title, className, style, onClick
             role="heading"
             aria-level={3}
             dangerouslySetInnerHTML={{ __html: title }}
-            className={cn("w-full text-xl/6 font-bold", className)}
+            className={cn("node-block-title w-full text-xl/6 font-bold", className)}
             style={style}
             onClick={onClick}
         />

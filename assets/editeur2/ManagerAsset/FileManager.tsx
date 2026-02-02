@@ -229,7 +229,7 @@ const FileManager: FC<FileManagerProps> = ({
 
   return (
     <Dialog open={effectiveOpen} onOpenChange={onOpenChange}>
-      <DialogContent className="p-0 flex flex-col w-[calc(100vw-40px)] h-[calc(100vh-40px)] max-w-[calc(100vw-40px)] max-h-[calc(100vh-40px)] left-[20px] top-[20px] translate-x-0 translate-y-0">
+      <DialogContent className="file-manager-ui p-0 flex flex-col w-[calc(100vw-40px)] h-[calc(100vh-40px)] max-w-[calc(100vw-40px)] max-h-[calc(100vh-40px)] left-[20px] top-[20px] translate-x-0 translate-y-0">
         <VisuallyHidden asChild>
           <DialogTitle>Gestionnaire de fichiers</DialogTitle>
         </VisuallyHidden>
