@@ -1,0 +1,50 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Pages{% endblock %}
+
+{% block body %}
+<div class="max-w-4xl space-y-6">
+    <div class="flex items-center justify-between">
+        <h1 class="text-2xl font-bold tracking-tight">Pages</h1>
+        <div class="flex gap-2">
+            <a href="{{ path('app_page_new') }}" class="btn btn-primary">Nouvelle page</a>
+        </div>
+    </div>
+
+    <div class="card overflow-hidden">
+        <div class="overflow-x-auto">
+            <table class="table-shadcn">
+                <thead>
+                    <tr>
+                        <th>Titre</th>
+                        <th>Slug</th>
+                        <th>Thème</th>
+                        <th></th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for page in pages %}
+                    <tr>
+                        <td>{{ page.title }}</td>
+                        <td><code class="text-xs">{{ page.slug }}</code></td>
+                        <td>{{ page.theme.name }}</td>
+                        <td class="text-end">
+                            <div class="flex gap-2 justify-end items-center">
+                                <a href="{{ path('app_page_preview', { id: page.id }) }}" class="btn btn-ghost btn-sm" target="_blank" rel="noopener">Prévisualiser</a>
+                                <a href="{{ path('app_page_edit', { id: page.id }) }}" class="btn btn-ghost btn-sm">Modifier</a>
+                                <form method="post" action="{{ path('app_page_delete', { id: page.id }) }}" class="inline" onsubmit="return confirm('Supprimer la page « {{ page.title|e('js') }} » ?');">
+                                    <input type="hidden" name="_token" value="{{ csrf_token('delete' ~ page.id) }}">
+                                    <button type="submit" class="btn btn-ghost btn-sm text-destructive">Supprimer</button>
+                                </form>
+                            </div>
+                        </td>
+                    </tr>
+                    {% else %}
+                    <tr><td colspan="4" class="text-muted-foreground">Aucune page.</td></tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endblock %}

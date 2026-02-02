@@ -12,6 +12,8 @@ Encore
     .addEntry('dashboard', './assets/dashboard.jsx')
     .addEntry('themeForm', './assets/themeForm.jsx')
     .addEntry('themeForm2', './assets/themeForm2.tsx')
+    .addEntry('fileManager', './assets/fileManager.jsx')
+    .addEntry('pageForm', './assets/pageForm.jsx')
     .enableStimulusBridge('./assets/controllers.json')
     .splitEntryChunks()
     .enableSingleRuntimeChunk()

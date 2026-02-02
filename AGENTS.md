@@ -16,3 +16,9 @@ Use `@/openspec/AGENTS.md` to learn:
 Keep this managed block so 'openspec update' can refresh the instructions.
 
 <!-- OPENSPEC:END -->
+
+## Stockage médias et file manager
+
+- **Stockage** : les fichiers médias (images, vidéo, audio) sont stockés via Flysystem dans `storage/media` (service `MediaStorage`, `media_storage.filesystem`), distinct de `storage/fonts`.
+- **Médiathèque** : file manager custom avec shadcn/ui (React) : liste, upload, création de dossiers, suppression. Page `/media` ; API `/media/api/list`, `/media/api/upload`, `/media/api/mkdir`, `/media/api/delete` ; lecture des fichiers via `/media/file/{path}`.
+- **Menu** : le lien « Médias » dans la sidebar (`templates/base.html.twig`) mène à `/media`.

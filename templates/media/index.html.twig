@@ -1,0 +1,12 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Médias{% endblock %}
+
+{% block javascripts %}
+    {{ parent() }}
+    {{ encore_entry_script_tags('fileManager') }}
+{% endblock %}
+
+{% block body %}
+    <div id="file-manager-root" data-csrf-token="{{ csrf_token('media') }}"></div>
+{% endblock %}
