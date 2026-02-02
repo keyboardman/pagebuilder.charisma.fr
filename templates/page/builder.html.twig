@@ -10,17 +10,11 @@
     {{ encore_entry_link_tags('pageBuilderStandalone') }}
 </head>
 <body class="h-screen flex flex-col overflow-hidden m-0">
-    <header class="shrink-0 flex items-center gap-4 px-4 py-2 border-b bg-background">
-        <a href="{{ path('app_page_edit', { id: page.id }) }}" class="text-sm font-medium text-primary hover:underline">
-            ← Retour à la page
-        </a>
-        <span class="text-sm text-muted-foreground">{{ page.title }}</span>
-    </header>
-    <main class="flex-1 min-h-0">
+    <main class="flex-1 min-h-0 flex flex-col">
         {% set default_content = '{"cylsqgudkwtz":{"id":"cylsqgudkwtz","type":"node-root","parent":null,"content":{"title":""}}}' %}
         {% set content_json = (page.content is defined and page.content is not empty) ? (page.content|json_encode(constant('JSON_UNESCAPED_UNICODE'))) : default_content %}
         <script type="application/json" id="page-builder-data">
-            {{ { content: content_json, csrfToken: csrf_token('page_form'), saveUrl: path('app_page_api_content', { id: page.id }), themeFonts: theme_fonts|default([]), apiCardsBaseUrl: path('app_page_builder_api_cards_list')|replace({'/cards': ''}) }|json_encode|raw }}
+            {{ { content: content_json, csrfToken: csrf_token('page_form'), saveUrl: path('app_page_api_content', { id: page.id }), backUrl: path('app_page_edit', { id: page.id }), pageTitle: page.title, themeFonts: theme_fonts|default([]), apiCardsBaseUrl: path('app_page_builder_api_cards_list')|replace({'/cards': ''}) }|json_encode|raw }}
         </script>
         <div id="page-builder-standalone-root" class="h-full"></div>
     </main>

@@ -297,6 +297,7 @@ function Builder() {
             <NodeSettings />
           </Layout.SidebarRight>
         )}
+        
         {mode === APP_MODE.EDIT && !isAutoSaveActive && (
           <Layout.Footer>
             <div className="flex w-full flex-wrap items-center justify-between gap-3">

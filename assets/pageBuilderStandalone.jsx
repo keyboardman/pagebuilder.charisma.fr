@@ -15,7 +15,7 @@ const fileManagerConfig = {
   },
 };
 
-function PageBuilderStandalone({ initialContent, csrfToken, saveUrl, apiCardsBaseUrl = null }) {
+function PageBuilderStandalone({ initialContent, csrfToken, saveUrl, backUrl = '', pageTitle = '', apiCardsBaseUrl = null }) {
   const [content, setContent] = useState(initialContent || '');
   const [saveStatus, setSaveStatus] = useState('idle');
 
@@ -51,7 +51,12 @@ function PageBuilderStandalone({ initialContent, csrfToken, saveUrl, apiCardsBas
 
   return (
     <div className="admin-layout relative h-full flex flex-col overflow-hidden">
-      <div className="shrink-0 flex items-center justify-end gap-2 px-4 py-1 text-xs">
+      <header className="shrink-0 flex items-center gap-4 px-4 py-2 border-b bg-background">
+        <a href={backUrl} className="text-sm font-medium text-primary hover:underline">
+          ← Retour à la page
+        </a>
+        <span className="text-sm text-muted-foreground">{pageTitle}</span>
+        <div className="flex-1 min-w-0" />
         <button
           type="button"
           onClick={handleSave}
@@ -60,10 +65,10 @@ function PageBuilderStandalone({ initialContent, csrfToken, saveUrl, apiCardsBas
         >
           Enregistrer
         </button>
-        {saveStatus === 'saving' && <span className="text-muted-foreground">Enregistrement…</span>}
-        {saveStatus === 'saved' && <span className="text-green-600">Enregistré</span>}
-        {saveStatus === 'error' && <span className="text-red-600">Erreur</span>}
-      </div>
+        {saveStatus === 'saving' && <span className="text-muted-foreground text-sm">Enregistrement…</span>}
+        {saveStatus === 'saved' && <span className="text-green-600 text-sm">Enregistré</span>}
+        {saveStatus === 'error' && <span className="text-red-600 text-sm">Erreur</span>}
+      </header>
       <div className="flex-1 min-h-0 min-w-0 overflow-auto">
         <PageBuilderEmbed
           value={content || '{"cylsqgudkwtz":{"id":"cylsqgudkwtz","type":"node-root","parent":null,"content":{"title":""}}}'}
@@ -82,12 +87,14 @@ if (dataEl && rootEl) {
   let initialContent = '';
   let csrfToken = '';
   let saveUrl = '';
+  let backUrl = '';
+  let pageTitle = '';
   let apiCardsBaseUrl = '';
   try {
     const data = JSON.parse(dataEl.textContent);
-    
+
     const raw = data.content;
-    
+
     initialContent =
       typeof raw === 'string'
         ? raw
@@ -95,9 +102,10 @@ if (dataEl && rootEl) {
           ? JSON.stringify(raw)
           : '';
 
-        
     csrfToken = data.csrfToken ?? '';
     saveUrl = data.saveUrl ?? '';
+    backUrl = typeof data.backUrl === 'string' ? data.backUrl : '';
+    pageTitle = typeof data.pageTitle === 'string' ? data.pageTitle : '';
     apiCardsBaseUrl = typeof data.apiCardsBaseUrl === 'string' ? data.apiCardsBaseUrl : '';
     const themeFonts = data.themeFonts ?? [];
     themeFonts.forEach((font) => {
@@ -117,6 +125,8 @@ if (dataEl && rootEl) {
       initialContent={initialContent}
       csrfToken={csrfToken}
       saveUrl={saveUrl}
+      backUrl={backUrl}
+      pageTitle={pageTitle}
       apiCardsBaseUrl={apiCardsBaseUrl || null}
     />
   );

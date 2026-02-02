@@ -197,8 +197,9 @@ const Settings: FC<NodeSettingsProps> = () => {
   };
 
   return (
-    <Tabs defaultValue={selectedElement || "card"}>
-      <NodeSettingsWrapper
+    <Tabs defaultValue={selectedElement || "card"} className="flex h-full min-h-0 flex-col">
+      <div className="flex min-h-0 flex-1 flex-col overflow-hidden">
+        <NodeSettingsWrapper
         header={
           <>
             {renderApiSection()}
@@ -237,6 +238,7 @@ const Settings: FC<NodeSettingsProps> = () => {
           </TabsContent>
         </>}
       />
+      </div>
     </Tabs>
 
   )
