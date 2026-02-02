@@ -20,7 +20,7 @@
         {% set default_content = '{"cylsqgudkwtz":{"id":"cylsqgudkwtz","type":"node-root","parent":null,"content":{"title":""}}}' %}
         {% set content_json = (page.content is defined and page.content is not empty) ? (page.content|json_encode(constant('JSON_UNESCAPED_UNICODE'))) : default_content %}
         <script type="application/json" id="page-builder-data">
-            {{ { content: content_json, csrfToken: csrf_token('page_form'), saveUrl: path('app_page_api_content', { id: page.id }), themeFonts: theme_fonts|default([]) }|json_encode|raw }}
+            {{ { content: content_json, csrfToken: csrf_token('page_form'), saveUrl: path('app_page_api_content', { id: page.id }), themeFonts: theme_fonts|default([]), apiCardsBaseUrl: path('app_page_builder_api_cards_list')|replace({'/cards': ''}) }|json_encode|raw }}
         </script>
         <div id="page-builder-standalone-root" class="h-full"></div>
     </main>

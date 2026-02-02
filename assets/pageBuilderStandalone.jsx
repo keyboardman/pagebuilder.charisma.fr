@@ -15,7 +15,7 @@ const fileManagerConfig = {
   },
 };
 
-function PageBuilderStandalone({ initialContent, csrfToken, saveUrl }) {
+function PageBuilderStandalone({ initialContent, csrfToken, saveUrl, apiCardsBaseUrl = null }) {
   const [content, setContent] = useState(initialContent || '');
   const [saveStatus, setSaveStatus] = useState('idle');
 
@@ -69,6 +69,7 @@ function PageBuilderStandalone({ initialContent, csrfToken, saveUrl }) {
           value={content || '{"cylsqgudkwtz":{"id":"cylsqgudkwtz","type":"node-root","parent":null,"content":{"title":""}}}'}
           onChange={handleChange}
           fileManagerConfig={fileManagerConfig}
+          apiCardsBaseUrl={apiCardsBaseUrl}
         />
       </div>
     </div>
@@ -81,6 +82,7 @@ if (dataEl && rootEl) {
   let initialContent = '';
   let csrfToken = '';
   let saveUrl = '';
+  let apiCardsBaseUrl = '';
   try {
     const data = JSON.parse(dataEl.textContent);
     
@@ -96,6 +98,7 @@ if (dataEl && rootEl) {
         
     csrfToken = data.csrfToken ?? '';
     saveUrl = data.saveUrl ?? '';
+    apiCardsBaseUrl = typeof data.apiCardsBaseUrl === 'string' ? data.apiCardsBaseUrl : '';
     const themeFonts = data.themeFonts ?? [];
     themeFonts.forEach((font) => {
       try {
@@ -108,11 +111,13 @@ if (dataEl && rootEl) {
     });
   } catch (_) {}
   const root = createRoot(rootEl);
+
   root.render(
     <PageBuilderStandalone
       initialContent={initialContent}
       csrfToken={csrfToken}
       saveUrl={saveUrl}
+      apiCardsBaseUrl={apiCardsBaseUrl || null}
     />
   );
 }

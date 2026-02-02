@@ -29,9 +29,9 @@
 - [x] 5.1 Tester la sauvegarde et le chargement du contenu (nouvelle page, page existante)
 - [x] 5.2 Vérifier que la preview (`page/preview`) affiche correctement le contenu produit par le builder
 - [x] 5.3 Vérifier le chargement du CSS du thème sur la page d'édition
-- [ ] 5.4 Ajouter ou mettre à jour les tests (PHPUnit, tests manuels) si pertinent
+- [x] 5.4 Ajouter ou mettre à jour les tests (PHPUnit, tests manuels) si pertinent
 
 ## 6. Validation
 
 - [x] 6.1 Exécuter `npm run build` pour s'assurer de l'absence d'erreurs de compilation
-- [ ] 6.2 Valider manuellement le flux complet : création page → édition avec builder → sauvegarde → preview
+- [x] 6.2 Valider manuellement le flux complet : création page → édition avec builder → sauvegarde → preview

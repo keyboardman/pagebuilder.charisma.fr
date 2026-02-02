@@ -63,3 +63,20 @@ services:
     App\EventListener\DisableProfilerOnMediaUploadListener:
         arguments:
             $profiler: '@?profiler'
+
+    App\PageBuilder\ApiCard\ApiCardRegistry:
+        arguments:
+            $cards: !tagged_iterator app.builder_api_card
+
+    # StubApiCard : pas de tag pour ne pas l’afficher dans le builder (conservé pour tests)
+    # App\PageBuilder\ApiCard\StubApiCard:
+    #     tags: [app.builder_api_card]
+
+    App\PageBuilder\ApiCard\FlashnewsApiCard:
+        tags: [app.builder_api_card]
+
+    App\PageBuilder\ApiCard\CharismaArticleAuteurApiCard:
+        tags: [app.builder_api_card]
+
+    App\PageBuilder\ApiCard\CharismaVideosApiCard:
+        tags: [app.builder_api_card]
