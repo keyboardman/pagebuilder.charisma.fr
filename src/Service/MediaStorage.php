@@ -28,7 +28,7 @@ class MediaStorage
         $items = [];
         foreach ($listing as $attr) {
             $name = basename($attr->path());
-            if ($name === '.' || $name === '..') {
+            if ($name === '.' || $name === '..' || str_starts_with($name, '.')) {
                 continue;
             }
             $item = [

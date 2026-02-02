@@ -30,25 +30,56 @@ class MediaController extends AbstractController
     #[Route('/media/api/list', name: 'api_list', methods: ['GET'])]
     public function list(Request $request): JsonResponse
     {
-        $path = (string) $request->query->get('path', '');
-        $path = $this->sanitizePath($path);
-        $rawItems = $this->mediaStorage->listContents($path);
-        $baseUrl = $request->getSchemeAndHttpHost() . $request->getBasePath();
-        $items = array_map(function (array $item) use ($baseUrl): array {
-            $url = $item['type'] === 'file'
-                ? $baseUrl . $this->generateUrl('app_media_file', ['path' => $item['path']])
-                : '';
-            return [
-                'id' => $item['path'],
-                'name' => $item['name'],
-                'path' => $item['path'],
-                'url' => $url,
-                'type' => $item['type'] === 'dir' ? 'directory' : ($item['type'] ?? 'file'),
-                'size' => $item['size'] ?? null,
-                'isFolder' => $item['type'] === 'dir',
-            ];
-        }, $rawItems);
-        return new JsonResponse(['items' => $items, 'path' => $path]);
+        try {
+            $path = (string) $request->query->get('path', '');
+            $path = $this->sanitizePath($path);
+            $typeFilter = $request->query->getString('type');
+            $rawItems = $this->mediaStorage->listContents($path);
+            $baseUrl = $request->getSchemeAndHttpHost() . $request->getBasePath();
+            $items = array_map(function (array $item) use ($baseUrl): array {
+                $isDir = $item['type'] === 'dir';
+                $url = !$isDir
+                    ? $baseUrl . $this->generateUrl('app_media_file', ['path' => $item['path']])
+                    : '';
+                $result = [
+                    'id' => $item['path'],
+                    'name' => $item['name'],
+                    'path' => $item['path'],
+                    'url' => $url,
+                    'type' => $isDir ? 'directory' : ($item['type'] ?? 'file'),
+                    'size' => $item['size'] ?? null,
+                    'isFolder' => $isDir,
+                ];
+                if (!$isDir) {
+                    try {
+                        $result['mimeType'] = $this->mediaStorage->mimeType($item['path']);
+                    } catch (\Throwable) {
+                        $result['mimeType'] = 'application/octet-stream';
+                    }
+                }
+                return $result;
+            }, $rawItems);
+
+            if ($typeFilter !== '' && $typeFilter !== 'all') {
+                $items = array_values(array_filter($items, function (array $item) use ($typeFilter): bool {
+                    if ($item['isFolder'] ?? false) {
+                        return true;
+                    }
+                    $mime = $item['mimeType'] ?? '';
+                    return match ($typeFilter) {
+                        'image' => str_starts_with($mime, 'image/'),
+                        'video' => str_starts_with($mime, 'video/'),
+                        'audio' => str_starts_with($mime, 'audio/'),
+                        'document' => $mime !== '' && !str_starts_with($mime, 'image/') && !str_starts_with($mime, 'video/') && !str_starts_with($mime, 'audio/'),
+                        default => true,
+                    };
+                }));
+            }
+
+            return new JsonResponse(['items' => $items, 'path' => $path]);
+        } catch (\Throwable $e) {
+            return new JsonResponse(['error' => 'Erreur lors du chargement', 'message' => $e->getMessage()], 500);
+        }
     }
 
     #[Route('/media/api/upload', name: 'api_upload', methods: ['POST'])]

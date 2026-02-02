@@ -26,10 +26,14 @@ function PageBuilderStandalone({ initialContent, csrfToken, saveUrl }) {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ content: newContent, _token: csrfToken }),
       });
-      if (!res.ok) throw new Error('Save failed');
+      if (!res.ok) {
+        const msg = await res.text().catch(() => res.statusText);
+        throw new Error(msg || 'Save failed');
+      }
       setSaveStatus('saved');
       setTimeout(() => setSaveStatus('idle'), 2000);
     } catch (err) {
+      console.error('Erreur enregistrement:', err);
       setSaveStatus('error');
       setTimeout(() => setSaveStatus('idle'), 3000);
     }

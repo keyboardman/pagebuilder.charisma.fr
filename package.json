@@ -4,6 +4,7 @@
         "webpack-dev-server": "5.2.1"
     },
     "devDependencies": {
+        "concurrently": "^9.1.0",
         "@babel/plugin-transform-class-properties": "^7.24.0",
         "@babel/preset-env": "^7.24.0",
         "@babel/preset-react": "^7.24.0",
@@ -30,7 +31,8 @@
     "scripts": {
         "dev": "encore dev",
         "watch": "encore dev --watch",
-        "build": "encore production"
+        "build": "encore production",
+        "start": "concurrently -n symfony,webpack -c blue,green \"symfony serve\" \"npm run watch\""
     },
     "browserslist": [
         "defaults"

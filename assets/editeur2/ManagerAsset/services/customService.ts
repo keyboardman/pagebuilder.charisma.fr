@@ -38,31 +38,51 @@ export class CustomService implements FileService {
     options: RequestInit = {}
   ): Promise<T> {
     const headers = this.getHeaders();
-    
-    const response = await fetch(endpoint, {
-      ...options,
-      headers: {
-        ...headers,
-        ...options.headers,
-      },
-    });
 
-    if (!response.ok) {
-      throw new Error(`Erreur HTTP: ${response.status} ${response.statusText}`);
+    let response: Response;
+    try {
+      response = await fetch(endpoint, {
+        ...options,
+        headers: {
+          ...headers,
+          ...options.headers,
+        },
+      });
+    } catch (err) {
+      const msg = err instanceof Error ? err.message : String(err);
+      throw new Error(`Erreur réseau: ${msg}`);
     }
 
-    return response.json();
+    if (!response.ok) {
+      const body = await response.text().catch(() => '');
+      const detail = body ? ` - ${body.slice(0, 200)}` : '';
+      throw new Error(`Erreur HTTP: ${response.status} ${response.statusText}${detail}`);
+    }
+
+    const text = await response.text().catch(() => '');
+    if (text === '') {
+      return {} as T;
+    }
+    try {
+      return JSON.parse(text) as T;
+    } catch {
+      throw new Error(`Réponse invalide (JSON attendu): ${text.slice(0, 200)}`);
+    }
   }
 
   private uploadWithXHR(
     file: File,
     endpoint: string,
-    onProgress?: (progress: number) => void
+    onProgress?: (progress: number) => void,
+    path?: string
   ): Promise<FileItem> {
     return new Promise((resolve, reject) => {
       const xhr = new XMLHttpRequest();
       const formData = new FormData();
       formData.append('file', file);
+      if (path !== undefined && path !== '') {
+        formData.append('path', path);
+      }
       if (onProgress) {
         xhr.upload.onprogress = (e) => {
           if (e.lengthComputable) {
@@ -105,10 +125,14 @@ export class CustomService implements FileService {
 
   private async uploadWithFetch(
     file: File,
-    endpoint: string
+    endpoint: string,
+    path?: string
   ): Promise<FileItem> {
     const formData = new FormData();
     formData.append('file', file);
+    if (path !== undefined && path !== '') {
+      formData.append('path', path);
+    }
 
     // Pour FormData, on ne définit pas Content-Type (le navigateur le fait automatiquement)
     // Mais on inclut quand même l'API_KEY si configurée
@@ -162,30 +186,31 @@ export class CustomService implements FileService {
     const url = `${this.config.listEndpoint}${params.toString() ? `?${params.toString()}` : ''}`;
     const response = await this.request<PaginatedFileResponse | FileItem[]>(url);
     
-    // Si la réponse est déjà paginée, la retourner telle quelle
-    if (response && typeof response === 'object' && 'items' in response && 'pagination' in response) {
-      const paginatedResponse = response as PaginatedFileResponse;
-      // S'assurer que les dossiers ont les bonnes propriétés
-      paginatedResponse.items = paginatedResponse.items.map(item => {
-        // Si c'est un dossier mais que les propriétés ne sont pas définies, les ajouter
+    const mapItems = (items: FileItem[]) =>
+      items.map((item) => {
         if ((item.type === 'directory' || item.type === 'folder' || item.mimeType === 'directory') && !item.isFolder) {
           return { ...item, isFolder: true, type: item.type || 'folder' };
         }
         return item;
       });
+
+    // Réponse paginée : items + pagination
+    if (response && typeof response === 'object' && 'items' in response && 'pagination' in response) {
+      const paginatedResponse = response as PaginatedFileResponse;
+      paginatedResponse.items = mapItems(Array.isArray(paginatedResponse.items) ? paginatedResponse.items : []);
       return paginatedResponse;
     }
-    
-    // Sinon, retourner comme un tableau simple (rétrocompatibilité)
-    const fileList = response as FileItem[];
-    // S'assurer que les dossiers ont les bonnes propriétés
-    return fileList.map(item => {
-      // Si c'est un dossier mais que les propriétés ne sont pas définies, les ajouter
-      if ((item.type === 'directory' || item.type === 'folder' || item.mimeType === 'directory') && !item.isFolder) {
-        return { ...item, isFolder: true, type: item.type || 'folder' };
-      }
-      return item;
-    });
+
+    // Réponse avec items sans pagination (ex: MediaController { items, path })
+    if (response && typeof response === 'object' && 'items' in response) {
+      const data = response as { items?: unknown };
+      const items = Array.isArray(data.items) ? data.items : [];
+      return mapItems(items as FileItem[]);
+    }
+
+    // Tableau simple (rétrocompatibilité)
+    const fileList = Array.isArray(response) ? response : [];
+    return mapItems(fileList as FileItem[]);
   }
 
   async uploadFile(
@@ -225,11 +250,11 @@ export class CustomService implements FileService {
 
     // Utiliser XHR si disponible (forcé ou lorsque la progression est demandée)
     if ((forceXHR || !!onProgress) && xhrAvailable) {
-      return this.uploadWithXHR(file, uploadEndpoint, onProgress);
+      return this.uploadWithXHR(file, uploadEndpoint, onProgress, effectivePath);
     }
-    
+
     // Fallback sur fetch
-    return this.uploadWithFetch(file, uploadEndpoint);
+    return this.uploadWithFetch(file, uploadEndpoint, effectivePath);
   }
 
   private shouldUseChunkUpload(file: File, chunkConfig?: ChunkUploadConfig): chunkConfig is ChunkUploadConfig {

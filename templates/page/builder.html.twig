@@ -4,9 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Builder — {{ page.title }}</title>
-    {% if page.theme.generatedCssPath %}
-        <link rel="stylesheet" href="{{ path('app_theme_css', { id: page.theme.id }) }}">
-    {% endif %}
+    {# Thème de la page non chargé ici : les modales doivent garder le style du builder #}
     {{ encore_entry_link_tags('pageBuilderStandalone') }}
 </head>
 <body class="h-screen flex flex-col overflow-hidden m-0">

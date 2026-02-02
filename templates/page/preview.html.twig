@@ -10,13 +10,14 @@
     {% if page.theme.generatedCssPath %}
         <link rel="stylesheet" href="{{ path('app_theme_css', { id: page.theme.id }) }}">
     {% endif %}
+    {{ encore_entry_link_tags('pagePreview') }}
 </head>
 <body class="min-h-screen p-6">
-    <div class="max-w-3xl mx-auto">
+    <div class="mx-auto">
         <p class="mb-4 text-sm text-muted-foreground">
             <a href="{{ path('app_page_edit', { id: page.id }) }}" class="underline">← Retour à l'édition</a>
         </p>
-        <article>
+        <div>
             <h1 class="text-3xl font-bold tracking-tight mb-6">{{ page.title }}</h1>
             <div class="prose prose-neutral dark:prose-invert max-w-none">
                 {% if page.content is not empty %}
@@ -26,7 +27,7 @@
                     <p class="text-muted-foreground">Aucun contenu.</p>
                 {% endif %}
             </div>
-        </article>
+        </div>
     </div>
 </body>
 </html>

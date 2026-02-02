@@ -147,21 +147,25 @@ class PageController extends AbstractController
     #[Route('/{id}/content', name: 'api_content', methods: ['PATCH', 'PUT'], requirements: ['id' => '\d+'])]
     public function apiContent(Request $request, Page $page): Response
     {
-        $data = json_decode((string) $request->getContent(), true) ?: [];
-        $token = $data['_token'] ?? '';
-        if (!$this->isCsrfTokenValid('page_form', $token)) {
-            return new Response('', 403);
+        try {
+            $data = json_decode((string) $request->getContent(), true) ?: [];
+            $token = $data['_token'] ?? '';
+            if (!$this->isCsrfTokenValid('page_form', $token)) {
+                return new Response('', 403);
+            }
+            $contentRaw = $data['content'] ?? null;
+            if (!\is_string($contentRaw)) {
+                return new Response('', 400);
+            }
+            if ($contentRaw !== '' && json_decode($contentRaw) === null && json_last_error() !== \JSON_ERROR_NONE) {
+                return new Response('', 400);
+            }
+            $page->setContent($contentRaw);
+            $this->em->flush();
+            return new Response('', 204);
+        } catch (\Throwable $e) {
+            return new Response($e->getMessage(), 500, ['Content-Type' => 'text/plain']);
         }
-        $contentRaw = $data['content'] ?? null;
-        if (!\is_string($contentRaw)) {
-            return new Response('', 400);
-        }
-        if ($contentRaw !== '' && json_decode($contentRaw) === null && json_last_error() !== \JSON_ERROR_NONE) {
-            return new Response('', 400);
-        }
-        $page->setContent($contentRaw);
-        $this->em->flush();
-        return new Response('', 204);
     }
 
     #[Route('/preview/{id}', name: 'preview', methods: ['GET'], requirements: ['id' => '\d+'])]
