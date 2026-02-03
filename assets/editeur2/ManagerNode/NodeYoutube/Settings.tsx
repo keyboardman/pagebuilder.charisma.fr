@@ -27,7 +27,7 @@ const Settings: FC<NodeSettingsProps> = () => {
               })}
             />
             <Form.Group>
-              <Form.Label text="ID de la vidéo YouTube" />
+              <Form.Label text="ID de la vidéo YouTube" className="node-block-title text-sm" />
               <Form.Input
                 type="text"
                 value={content?.videoId ?? ""}
@@ -39,7 +39,7 @@ const Settings: FC<NodeSettingsProps> = () => {
                 }}
                 placeholder="Ex: dQw4w9WgXcQ"
               />
-              <p className="text-xs text-muted-foreground mt-1">
+              <p className="node-block-title text-muted-foreground mt-1 text-sm">
                 Entrez l'ID de la vidéo YouTube (visible dans l'URL de la vidéo)
               </p>
             </Form.Group>

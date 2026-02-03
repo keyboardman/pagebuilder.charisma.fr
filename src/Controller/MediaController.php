@@ -10,7 +10,6 @@ use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\HttpFoundation\StreamedResponse;
 use Symfony\Component\Routing\Attribute\Route;
 
 #[Route(name: 'app_media_')]
@@ -35,12 +34,9 @@ class MediaController extends AbstractController
             $path = $this->sanitizePath($path);
             $typeFilter = $request->query->getString('type');
             $rawItems = $this->mediaStorage->listContents($path);
-            $baseUrl = $request->getSchemeAndHttpHost() . $request->getBasePath();
-            $items = array_map(function (array $item) use ($baseUrl): array {
+            $items = array_map(function (array $item) use ($request): array {
                 $isDir = $item['type'] === 'dir';
-                $url = !$isDir
-                    ? $baseUrl . $this->generateUrl('app_media_file', ['path' => $item['path']])
-                    : '';
+                $url = !$isDir ? $this->publicMediaUrl($request, $item['path']) : '';
                 $result = [
                     'id' => $item['path'],
                     'name' => $item['name'],
@@ -124,8 +120,7 @@ class MediaController extends AbstractController
             fclose($stream);
         }
         $mimeType = $this->mediaStorage->mimeType($targetPath);
-        $url = $request->getSchemeAndHttpHost() . $request->getBasePath()
-            . $this->generateUrl('app_media_file', ['path' => $targetPath]);
+        $url = $this->publicMediaUrl($request, $targetPath);
         return new JsonResponse([
             'id' => $targetPath,
             'path' => $targetPath,
@@ -210,8 +205,7 @@ class MediaController extends AbstractController
         }
 
         $mimeType = $this->mediaStorage->mimeType($targetPath);
-        $url = $request->getSchemeAndHttpHost() . $request->getBasePath()
-            . $this->generateUrl('app_media_file', ['path' => $targetPath]);
+        $url = $this->publicMediaUrl($request, $targetPath);
         return new JsonResponse([
             'id' => $targetPath,
             'path' => $targetPath,
@@ -246,8 +240,7 @@ class MediaController extends AbstractController
         }
         $this->mediaStorage->delete($oldPath);
         $mimeType = $this->mediaStorage->mimeType($newPath);
-        $url = $request->getSchemeAndHttpHost() . $request->getBasePath()
-            . $this->generateUrl('app_media_file', ['path' => $newPath]);
+        $url = $this->publicMediaUrl($request, $newPath);
         return new JsonResponse([
             'id' => $newPath,
             'path' => $newPath,
@@ -326,24 +319,12 @@ class MediaController extends AbstractController
         return new JsonResponse(['ok' => true]);
     }
 
-    #[Route('/media/file/{path}', name: 'file', requirements: ['path' => '.+'], methods: ['GET'])]
-    public function serveFile(string $path): Response
+    private function publicMediaUrl(Request $request, string $path): string
     {
-        $path = $this->sanitizePath($path);
-        if (!$this->mediaStorage->fileExists($path)) {
-            throw $this->createNotFoundException('Fichier introuvable');
-        }
-        $mimeType = $this->mediaStorage->mimeType($path);
-        $stream = $this->mediaStorage->readStream($path);
-        $response = new StreamedResponse(function () use ($stream): void {
-            if (is_resource($stream)) {
-                fpassthru($stream);
-                fclose($stream);
-            }
-        });
-        $response->headers->set('Content-Type', $mimeType);
-        $response->headers->set('Content-Disposition', 'inline; filename="' . basename($path) . '"');
-        return $response;
+        $base = $request->getSchemeAndHttpHost() . $request->getBasePath();
+        $encoded = implode('/', array_map('rawurlencode', explode('/', $path)));
+
+        return $base . '/media/' . $encoded;
     }
 
     private function sanitizePath(string $path): string

@@ -128,13 +128,13 @@ const Settings: FC<NodeSettingsProps> = () => {
         {error && (
           <div className="flex items-center gap-2 p-3 bg-destructive/10 border border-destructive/20 rounded-lg">
             <AlertCircle className="h-4 w-4 text-destructive" />
-            <p className="text-sm text-destructive">{error}</p>
+            <p className="node-block-title text-sm text-destructive">{error}</p>
           </div>
         )}
         {content.apiId && selectedAdapter && (
           <div className="p-2 bg-muted/50 rounded text-xs">
-            <p className="text-muted-foreground">API: <span className="font-medium">{selectedAdapter.label}</span></p>
-            <p className="text-muted-foreground mt-1">Item: <span className="font-medium">{selectedItemTitle}</span></p>
+            <p className="node-block-title text-muted-foreground text-sm">API: <span className="font-medium">{selectedAdapter.label}</span></p>
+            <p className="node-block-title text-muted-foreground mt-1 text-sm">Item: <span className="font-medium">{selectedItemTitle}</span></p>
           </div>
         )}
         <Button

@@ -8,7 +8,8 @@
 # https://symfony.com/doc/current/best_practices.html#use-parameters-for-application-configuration
 parameters:
     storage.fonts.path: '%kernel.project_dir%/storage/fonts'
-    storage.media.path: '%kernel.project_dir%/storage/media'
+    # /media/api/* (list, upload, mkdir, delete, etc.) lit/écrit dans public/media ; les fichiers sont servis en direct à /media/{path}
+    storage.media.path: '%kernel.project_dir%/public/media'
 
 services:
     font_storage.adapter:

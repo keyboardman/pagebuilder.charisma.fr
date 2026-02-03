@@ -1,10 +1,30 @@
 import type { FC } from "react";
-import { BaseSettings, BackgroundSettings, BorderSettings, SpacingSettings } from "../Settings";
-import { type NodeSettingsProps } from "../NodeConfigurationType";
-import { useNodeBuilderContext } from "../../services/providers/NodeBuilderContext";
+import {
+  Base2Settings,
+  Background2Settings,
+  Border2Settings,
+  Spacing2Settings,
+} from "../Settings";
+import Button from "../../components/button";
 import Form from "../../components/form";
 import { Switch } from "@editeur/components/ui/switch";
-import type { NodeTwoColumnsType, ColumnWidth, NodeTwoColumnsLayout } from "./index";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@editeur/components/ui/table";
+import { type NodeSettingsProps } from "../NodeConfigurationType";
+import { useNodeBuilderContext } from "../../services/providers/NodeBuilderContext";
+import { NodeSettingsWrapper } from "../components/NodeSettingsWrapper";
+import { Monitor, Tablet, Phone } from "lucide-react";
+import type {
+  NodeTwoColumnsType,
+  ColumnWidth,
+  NodeTwoColumnsLayout,
+} from "./index";
 
 const widthOptions = [
   { label: "33-66", value: "33-66" },
@@ -16,131 +36,179 @@ const widthOptions = [
 const Settings: FC<NodeSettingsProps> = () => {
   const { node, onChange } = useNodeBuilderContext();
   const twoColumnsNode = node as NodeTwoColumnsType;
-  
-  const layout: NodeTwoColumnsLayout = twoColumnsNode.attributes?.layout || {
-    desktop: "50-50",
-    tablet: "50-50",
-    mobile: "50-50",
-    reverseDesktop: false,
-    reverseTablet: false,
-    reverseMobile: false
-  };
+
+  const layout: NodeTwoColumnsLayout =
+    twoColumnsNode.attributes?.layout || {
+      desktop: "50-50",
+      tablet: "50-50",
+      mobile: "50-50",
+      reverseDesktop: false,
+      reverseTablet: false,
+      reverseMobile: false,
+    };
 
   const updateLayout = (updates: Partial<NodeTwoColumnsLayout>) => {
     onChange({
       ...node,
       attributes: {
         ...twoColumnsNode.attributes,
-        layout: {
-          ...layout,
-          ...updates
-        }
-      } as NodeTwoColumnsType['attributes']
+        layout: { ...layout, ...updates },
+      } as NodeTwoColumnsType["attributes"],
     });
   };
 
   return (
-    <>
-      <BaseSettings />
-      
-      <div className="flex flex-col gap-6 mt-4">
-        <h3 className="text-sm font-semibold text-foreground/80">Layout des colonnes</h3>
-        
-        {/* Desktop */}
-        <div className="flex flex-col gap-3">
-          <h4 className="text-sm font-medium text-foreground/70">Desktop</h4>
-          <Form.Group>
-            <Form.Label text="Largeur" />
-            <Form.Select
-              value={layout.desktop || "50-50"}
-              onChange={(value) => updateLayout({ desktop: value as ColumnWidth })}
-              options={widthOptions}
-            />
-          </Form.Group>
-          <Form.Group>
-            <div className="flex items-center justify-between">
-              <Form.Label text="Inverser l'ordre" />
-              <Switch
-                checked={layout.reverseDesktop || false}
-                onCheckedChange={(checked) => updateLayout({ reverseDesktop: checked })}
-              />
-            </div>
-          </Form.Group>
-        </div>
+    <NodeSettingsWrapper
+      header={
+        <>
+          <Base2Settings
+            attributes={node.attributes}
+            onChange={(attributes: { className?: string; id?: string }) =>
+              onChange({
+                ...node,
+                attributes: { ...node.attributes, ...attributes },
+              })
+            }
+          />
+          <Button
+            onClick={() => {
+              onChange({
+                ...node,
+                attributes: {
+                  ...node.attributes,
+                  options: {
+                    ...node.attributes?.options,
+                    fluid: !(node.attributes?.options?.fluid ?? false),
+                  },
+                },
+              });
+            }}
+          >
+            {node.attributes?.options?.fluid ? "fluid" : "no-fluid"}
+          </Button>
 
-        {/* Tablet */}
-        <div className="flex flex-col gap-3">
-          <h4 className="text-sm font-medium text-foreground/70">Tablet</h4>
-          <Form.Group>
-            <Form.Label text="Largeur" />
-            <Form.Select
-              value={layout.tablet || "50-50"}
-              onChange={(value) => updateLayout({ tablet: value as ColumnWidth })}
-              options={widthOptions}
-            />
-          </Form.Group>
-          <Form.Group>
-            <div className="flex items-center justify-between">
-              <Form.Label text="Inverser l'ordre" />
-              <Switch
-                checked={layout.reverseTablet || false}
-                onCheckedChange={(checked) => updateLayout({ reverseTablet: checked })}
-              />
-            </div>
-          </Form.Group>
-        </div>
-
-        {/* Mobile */}
-        <div className="flex flex-col gap-3">
-          <h4 className="text-sm font-medium text-foreground/70">Mobile</h4>
-          <Form.Group>
-            <Form.Label text="Largeur" />
-            <Form.Select
-              value={layout.mobile || "50-50"}
-              onChange={(value) => updateLayout({ mobile: value as ColumnWidth })}
-              options={widthOptions}
-            />
-          </Form.Group>
-          <Form.Group>
-            <div className="flex items-center justify-between">
-              <Form.Label text="Inverser l'ordre" />
-              <Switch
-                checked={layout.reverseMobile || false}
-                onCheckedChange={(checked) => updateLayout({ reverseMobile: checked })}
-              />
-            </div>
-          </Form.Group>
-        </div>
-      </div>
-
-      <div className="flex flex-col gap-4 mt-4">
-        <Form.Group>
-          <div className="flex items-center justify-between">
-            <Form.Label text="Largeur fluide" />
-            <Switch
-              checked={twoColumnsNode.attributes?.options?.fluid ?? false}
-              onCheckedChange={(checked) => {
-                onChange({
-                  ...node,
-                  attributes: {
-                    ...twoColumnsNode.attributes,
-                    options: {
-                      ...twoColumnsNode.attributes?.options,
-                      fluid: checked
-                    }
-                  }
-                });
-              }}
-            />
+          <div className="mt-2">
+            <p className="node-block-title text-sm font-medium mb-1.5">
+              Layout des colonnes
+            </p>
+            <Table>
+              <TableHeader>
+                <TableRow className="border-border/50">
+                  <TableHead className="node-block-title py-1.5 px-2 text-xs font-medium" />
+                  <TableHead className="node-block-title py-1.5 px-2 text-xs font-medium text-center" title="Desktop">
+                    <Monitor className="h-4 w-4 mx-auto" />
+                  </TableHead>
+                  <TableHead className="node-block-title py-1.5 px-2 text-xs font-medium text-center" title="Tablet">
+                    <Tablet className="h-4 w-4 mx-auto" />
+                  </TableHead>
+                  <TableHead className="node-block-title py-1.5 px-2 text-xs font-medium text-center" title="Mobile">
+                    <Phone className="h-4 w-4 mx-auto" />
+                  </TableHead>
+                </TableRow>
+              </TableHeader>
+              <TableBody>
+                <TableRow className="border-border/50">
+                  <TableCell className="node-block-title py-1 px-2 text-xs">
+                  Col.
+                  </TableCell>
+                  <TableCell className="py-1 px-2">
+                    <Form.Select
+                      value={layout.desktop || "50-50"}
+                      onChange={(value) =>
+                        updateLayout({ desktop: value as ColumnWidth })
+                      }
+                      options={widthOptions}
+                      className="h-7 text-xs"
+                    />
+                  </TableCell>
+                  <TableCell className="py-1 px-2">
+                    <Form.Select
+                      value={layout.tablet || "50-50"}
+                      onChange={(value) =>
+                        updateLayout({ tablet: value as ColumnWidth })
+                      }
+                      options={widthOptions}
+                      className="h-7 text-xs"
+                    />
+                  </TableCell>
+                  <TableCell className="py-1 px-2">
+                    <Form.Select
+                      value={layout.mobile || "50-50"}
+                      onChange={(value) =>
+                        updateLayout({ mobile: value as ColumnWidth })
+                      }
+                      options={widthOptions}
+                      className="h-7 text-xs"
+                    />
+                  </TableCell>
+                </TableRow>
+                <TableRow className="border-border/50">
+                  <TableCell className="node-block-title py-1 px-2 text-xs">
+                    Inv.
+                  </TableCell>
+                  <TableCell className="py-1 px-2 text-center">
+                    <Switch
+                      checked={layout.reverseDesktop || false}
+                      onCheckedChange={(checked) =>
+                        updateLayout({ reverseDesktop: checked })
+                      }
+                    />
+                  </TableCell>
+                  <TableCell className="py-1 px-2 text-center">
+                    <Switch
+                      checked={layout.reverseTablet || false}
+                      onCheckedChange={(checked) =>
+                        updateLayout({ reverseTablet: checked })
+                      }
+                    />
+                  </TableCell>
+                  <TableCell className="py-1 px-2 text-center">
+                    <Switch
+                      checked={layout.reverseMobile || false}
+                      onCheckedChange={(checked) =>
+                        updateLayout({ reverseMobile: checked })
+                      }
+                    />
+                  </TableCell>
+                </TableRow>
+              </TableBody>
+            </Table>
           </div>
-        </Form.Group>
-      </div>
-      
-      <SpacingSettings />
-      <BackgroundSettings />
-      <BorderSettings />
-    </>
+        </>
+      }
+      content={
+        <>
+          <Background2Settings
+            style={node.attributes?.style || {}}
+            onChange={(style) =>
+              onChange({
+                ...node,
+                attributes: { ...node.attributes, style },
+              })
+            }
+          />
+          <Border2Settings
+            style={node.attributes?.style || {}}
+            onChange={(style) =>
+              onChange({
+                ...node,
+                attributes: { ...node.attributes, style },
+              })
+            }
+          />
+          <Spacing2Settings
+            style={node.attributes?.style || {}}
+            onChange={(style) =>
+              onChange({
+                ...node,
+                attributes: { ...node.attributes, style },
+              })
+            }
+          />
+        </>
+      }
+    />
   );
-}
+};
 
 export default Settings;

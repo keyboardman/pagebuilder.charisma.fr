@@ -7,7 +7,7 @@ import { Input } from '@/components/ui/input';
 import { cn } from '@/lib/utils';
 
 const API = '/media/api';
-const FILE_URL = '/media/file';
+const FILE_URL = '/media';
 const CHUNK_SIZE = 8 * 1024 * 1024; // 8 Mo par chunk
 
 const IMAGE_EXT = /\.(jpe?g|png|gif|webp|svg|bmp|avif)$/i;
@@ -264,7 +264,8 @@ export function FileManager() {
     }
   };
 
-  const fileUrl = (item: Item) => `${FILE_URL}/${encodeURIComponent(item.path)}`;
+  const fileUrl = (item: Item) =>
+    `${FILE_URL}/${item.path.split('/').map((s) => encodeURIComponent(s)).join('/')}`;
 
   const previewMediaType = previewItem && previewItem.type === 'file' ? getMediaType(previewItem.name) : null;
   const previewUrl = previewItem ? fileUrl(previewItem) : '';

@@ -1,5 +1,8 @@
 export type FileManagerType = 'base64' | 's3' | 'custom';
 
+/** Chemin public des médias : fichiers servis directement à /media/{path} (sans PHP). */
+export const MEDIA_PUBLIC_PATH = '/media';
+
 export interface FileItem {
   id: string;
   name: string;

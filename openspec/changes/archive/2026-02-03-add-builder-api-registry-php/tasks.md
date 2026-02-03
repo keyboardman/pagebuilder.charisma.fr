@@ -20,4 +20,4 @@
 ## 4. Validation et tests
 
 - [x] 4.1 Ajouter des tests unitaires ou d’intégration pour le registre et au moins un endpoint
-- [ ] 4.2 Vérifier en manuel : liste des APIs visible dans le builder, sélection d’une API et d’un item, affichage dans une card
+- [x] 4.2 Vérifier en manuel : liste des APIs visible dans le builder, sélection d’une API et d’un item, affichage dans une card

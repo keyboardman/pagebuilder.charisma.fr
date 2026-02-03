@@ -5,7 +5,14 @@ import type {
   PaginatedFileResponse,
   ChunkUploadConfig,
 } from '../types';
+import { MEDIA_PUBLIC_PATH } from '../types';
 import type { FileService } from './fileService';
+
+/** Normalise l’URL d’un fichier : /media/file/… → /media/… (accès direct public). */
+function normalizeFileUrl(url: string | undefined): string {
+  if (!url) return '';
+  return url.replace(/\/media\/file\//, `${MEDIA_PUBLIC_PATH}/`);
+}
 
 export class CustomService implements FileService {
   private config: Required<Pick<FileManagerConfig, 'custom'>>['custom'];
@@ -96,6 +103,7 @@ export class CustomService implements FileService {
         if (xhr.status >= 200 && xhr.status < 300) {
           try {
             const response = JSON.parse(xhr.responseText);
+            if (response?.url) response.url = normalizeFileUrl(response.url);
             resolve(response);
           } catch (parseError) {
             console.error('Réponse invalide du serveur', parseError);
@@ -151,7 +159,9 @@ export class CustomService implements FileService {
       throw new Error(`Erreur HTTP: ${response.status} ${response.statusText}`);
     }
 
-    return response.json();
+    const data = await response.json();
+    if (data?.url) data.url = normalizeFileUrl(data.url);
+    return data;
   }
 
   async listFiles(
@@ -188,10 +198,15 @@ export class CustomService implements FileService {
     
     const mapItems = (items: FileItem[]) =>
       items.map((item) => {
+        const normalized = { ...item };
         if ((item.type === 'directory' || item.type === 'folder' || item.mimeType === 'directory') && !item.isFolder) {
-          return { ...item, isFolder: true, type: item.type || 'folder' };
+          normalized.isFolder = true;
+          normalized.type = item.type || 'folder';
         }
-        return item;
+        if (!normalized.isFolder && normalized.url) {
+          normalized.url = normalizeFileUrl(normalized.url);
+        }
+        return normalized;
       });
 
     // Réponse paginée : items + pagination
@@ -432,10 +447,12 @@ export class CustomService implements FileService {
   }
 
   async renameFile(fileId: string, newName: string): Promise<FileItem> {
-    return this.request<FileItem>(this.config.renameEndpoint, {
+    const item = await this.request<FileItem>(this.config.renameEndpoint, {
       method: 'POST',
       body: JSON.stringify({ id: fileId, name: newName }),
     });
+    if (item?.url) item.url = normalizeFileUrl(item.url);
+    return item;
   }
 
   async deleteFile(fileId: string): Promise<void> {

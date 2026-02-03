@@ -27,12 +27,14 @@ const Edit: FC<NodeEditProps> = () => {
       style={node?.attributes?.style ?? {}}
     />
   ) : (
-    React.createElement(
-      tag,
-      {
-        dangerouslySetInnerHTML: { __html: html }
-      }
-    )
+    React.createElement(tag, {
+      "data-ce-id": node.id,
+      "data-ce-type": node.type,
+      id: node?.attributes?.id ?? undefined,
+      className: node?.attributes?.className ?? undefined,
+      style: node?.attributes?.style ?? undefined,
+      dangerouslySetInnerHTML: { __html: html },
+    })
   )
 }
 

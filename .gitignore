@@ -35,8 +35,8 @@ npm-debug.log
 yarn-error.log
 ###< symfony/webpack-encore-bundle ###
 
-/storage/media/*
-!/storage/media/.gitkeep
+/public/media/*
+!/public/media/.gitkeep
 
 # Clone source pour analyse (editeur2)
 .editeur2-source/

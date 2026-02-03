@@ -1,223 +1,265 @@
 import { type FC, useMemo } from "react";
-import { BaseSettings, BackgroundSettings, BorderSettings, SpacingSettings } from "../Settings";
+import {
+  Base2Settings,
+  Background2Settings,
+  Border2Settings,
+  Spacing2Settings,
+} from "../Settings";
 import Form from "../../components/form";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@editeur/components/ui/table";
+import { Monitor, Tablet, Phone } from "lucide-react";
 import { type NodeSettingsProps } from "../NodeConfigurationType";
 import { useNodeBuilderContext } from "../../services/providers/NodeBuilderContext";
+import { NodeSettingsWrapper } from "../components/NodeSettingsWrapper";
 import type { NodeGridType, NodeGridLayout } from "./index";
 
 const Settings: FC<NodeSettingsProps> = () => {
+  const { node, onChange } = useNodeBuilderContext();
+  const gridNode = node as NodeGridType;
 
-    const { node, onChange } = useNodeBuilderContext();
-    const gridNode = node as NodeGridType;
+  const legacyColumns = gridNode?.attributes?.options?.columns ?? 2;
+  const legacyRows = gridNode?.attributes?.options?.rows ?? 2;
 
-    // Rétrocompatibilité : utiliser options si layout n'existe pas
-    const legacyColumns = gridNode?.attributes?.options?.columns ?? 2;
-    const legacyRows = gridNode?.attributes?.options?.rows ?? 2;
+  const layout: NodeGridLayout = gridNode?.attributes?.layout || {
+    desktop: { columns: legacyColumns, rows: legacyRows },
+    tablet: { columns: legacyColumns, rows: legacyRows },
+    mobile: { columns: legacyColumns, rows: legacyRows },
+  };
 
-    const layout: NodeGridLayout = gridNode?.attributes?.layout || {
-        desktop: { columns: legacyColumns, rows: legacyRows },
-        tablet: { columns: legacyColumns, rows: legacyRows },
-        mobile: { columns: legacyColumns, rows: legacyRows }
-    };
+  const updateLayout = (
+    breakpoint: keyof NodeGridLayout,
+    updates: Partial<NodeGridLayout[keyof NodeGridLayout]>
+  ) => {
+    onChange({
+      ...node,
+      attributes: {
+        ...gridNode.attributes,
+        layout: {
+          ...layout,
+          [breakpoint]: {
+            ...layout[breakpoint],
+            ...updates,
+          },
+        },
+      } as NodeGridType["attributes"],
+    });
+  };
 
-    const updateLayout = (breakpoint: keyof NodeGridLayout, updates: Partial<NodeGridLayout[keyof NodeGridLayout]>) => {
-        onChange({
-            ...node,
-            attributes: {
-                ...gridNode.attributes,
-                layout: {
-                    ...layout,
-                    [breakpoint]: {
-                        ...layout[breakpoint],
-                        ...updates
-                    }
-                }
-            } as NodeGridType['attributes']
-        });
-    };
+  const desktopCells =
+    (layout.desktop?.columns ?? 2) * (layout.desktop?.rows ?? 2);
+  const tabletCells =
+    (layout.tablet?.columns ?? 2) * (layout.tablet?.rows ?? 2);
+  const mobileCells =
+    (layout.mobile?.columns ?? 2) * (layout.mobile?.rows ?? 2);
 
-    // Calculer le nombre de cellules pour chaque breakpoint
-    const desktopCells = (layout.desktop?.columns ?? 2) * (layout.desktop?.rows ?? 2);
-    const tabletCells = (layout.tablet?.columns ?? 2) * (layout.tablet?.rows ?? 2);
-    const mobileCells = (layout.mobile?.columns ?? 2) * (layout.mobile?.rows ?? 2);
+  const hasDifferentCellCount = useMemo(() => {
+    const cells = [desktopCells, tabletCells, mobileCells];
+    return new Set(cells).size > 1;
+  }, [desktopCells, tabletCells, mobileCells]);
 
-    // Vérifier si le nombre de cellules diffère
-    const hasDifferentCellCount = useMemo(() => {
-        const cells = [desktopCells, tabletCells, mobileCells];
-        return new Set(cells).size > 1;
-    }, [desktopCells, tabletCells, mobileCells]);
+  const numInput = (
+    value: number,
+    min: number,
+    max: number,
+    onChangeNum: (n: number) => void
+  ) => (
+    <Form.Input
+      type="number"
+      value={value.toString()}
+      onChange={(value: string) => {
+        const numValue = parseInt(value, 10);
+        if (!isNaN(numValue) && numValue >= min && numValue <= max) {
+          onChangeNum(numValue);
+        }
+      }}
+      className="h-7 text-sm"
+      min={min}
+      max={max}
+    />
+  );
 
-    return (
+  return (
+    <NodeSettingsWrapper
+      header={
         <>
-            <BaseSettings />
-            
-            {hasDifferentCellCount && (
-                <div className="mb-4 p-3 bg-yellow-50 dark:bg-yellow-900/20 border border-yellow-200 dark:border-yellow-800 rounded-md">
-                    <p className="text-sm text-yellow-800 dark:text-yellow-200">
-                        <strong>Attention :</strong> Le nombre de cellules diffère entre les breakpoints. 
-                        Desktop: {desktopCells}, Tablet: {tabletCells}, Mobile: {mobileCells}. 
-                        Cela peut affecter l&apos;affichage des contenus.
-                    </p>
-                </div>
-            )}
+          <Base2Settings
+            attributes={node.attributes}
+            onChange={(attributes: { className?: string; id?: string }) =>
+              onChange({
+                ...node,
+                attributes: { ...node.attributes, ...attributes },
+              })
+            }
+          />
 
-            <div className="flex flex-col gap-2 mt-2">
-                <h3 className="text-sm font-semibold text-foreground/80 mb-1">Configuration de la grille</h3>
-                
-                {/* Gap */}
-                <div className="flex items-center gap-2">
-                    <h4 className="text-sm font-medium text-foreground/70 w-20 shrink-0">Gap</h4>
-                    <Form.Group className="mb-0 flex-1">
-                        <Form.Label text="Espacement" />
-                        <Form.Input
-                            type="number"
-                            value={(gridNode?.attributes?.options?.gap ?? 4).toString()}
-                            onChange={(value: string) => {
-                                const numValue = parseInt(value, 10);
-                                if (!isNaN(numValue) && numValue >= 0 && numValue <= 20) {
-                                    onChange({
-                                        ...node,
-                                        attributes: {
-                                            ...gridNode.attributes,
-                                            options: {
-                                                ...gridNode.attributes?.options,
-                                                gap: numValue
-                                            }
-                                        }
-                                    });
-                                }
-                            }}
-                            className="h-7 text-sm"
-                            min="0"
-                            max="20"
-                        />
-                    </Form.Group>
-                </div>
-                
-                {/* Desktop */}
-                <div className="flex items-center gap-2">
-                    <h4 className="text-sm font-medium text-foreground/70 w-20 shrink-0">Desktop</h4>
-                    <div className="grid grid-cols-2 gap-1 flex-1">
-                        <Form.Group className="mb-0">
-                            <Form.Label text="Colonnes" />
-                            <Form.Input
-                                type="number"
-                                value={(layout.desktop?.columns ?? 2).toString()}
-                                onChange={(value: string) => {
-                                    const numValue = parseInt(value, 10);
-                                    if (!isNaN(numValue) && numValue >= 1 && numValue <= 12) {
-                                        updateLayout('desktop', { columns: numValue });
-                                    }
-                                }}
-                                className="h-7 text-sm"
-                                min="1"
-                                max="12"
-                            />
-                        </Form.Group>
-                        <Form.Group className="mb-0">
-                            <Form.Label text="Lignes" />
-                            <Form.Input
-                                type="number"
-                                value={(layout.desktop?.rows ?? 2).toString()}
-                                onChange={(value: string) => {
-                                    const numValue = parseInt(value, 10);
-                                    if (!isNaN(numValue) && numValue >= 1 && numValue <= 12) {
-                                        updateLayout('desktop', { rows: numValue });
-                                    }
-                                }}
-                                className="h-7 text-sm"
-                                min="1"
-                                max="12"
-                            />
-                        </Form.Group>
-                    </div>
-                </div>
-
-                {/* Tablet */}
-                <div className="flex items-center gap-2">
-                    <h4 className="text-sm font-medium text-foreground/70 w-20 shrink-0">Tablet</h4>
-                    <div className="grid grid-cols-2 gap-1 flex-1">
-                        <Form.Group className="mb-0">
-                            <Form.Label text="Colonnes" />
-                            <Form.Input
-                                type="number"
-                                value={(layout.tablet?.columns ?? 2).toString()}
-                                onChange={(value: string) => {
-                                    const numValue = parseInt(value, 10);
-                                    if (!isNaN(numValue) && numValue >= 1 && numValue <= 12) {
-                                        updateLayout('tablet', { columns: numValue });
-                                    }
-                                }}
-                                className="h-7 text-sm"
-                                min="1"
-                                max="12"
-                            />
-                        </Form.Group>
-                        <Form.Group className="mb-0">
-                            <Form.Label text="Lignes" />
-                            <Form.Input
-                                type="number"
-                                value={(layout.tablet?.rows ?? 2).toString()}
-                                onChange={(value: string) => {
-                                    const numValue = parseInt(value, 10);
-                                    if (!isNaN(numValue) && numValue >= 1 && numValue <= 12) {
-                                        updateLayout('tablet', { rows: numValue });
-                                    }
-                                }}
-                                className="h-7 text-sm"
-                                min="1"
-                                max="12"
-                            />
-                        </Form.Group>
-                    </div>
-                </div>
-
-                {/* Mobile */}
-                <div className="flex items-center gap-2">
-                    <h4 className="text-sm font-medium text-foreground/70 w-20 shrink-0">Mobile</h4>
-                    <div className="grid grid-cols-2 gap-1 flex-1">
-                        <Form.Group className="mb-0">
-                            <Form.Label text="Colonnes" />
-                            <Form.Input
-                                type="number"
-                                value={(layout.mobile?.columns ?? 2).toString()}
-                                onChange={(value: string) => {
-                                    const numValue = parseInt(value, 10);
-                                    if (!isNaN(numValue) && numValue >= 1 && numValue <= 12) {
-                                        updateLayout('mobile', { columns: numValue });
-                                    }
-                                }}
-                                className="h-7 text-sm"
-                                min="1"
-                                max="12"
-                            />
-                        </Form.Group>
-                        <Form.Group className="mb-0">
-                            <Form.Label text="Lignes" />
-                            <Form.Input
-                                type="number"
-                                value={(layout.mobile?.rows ?? 2).toString()}
-                                onChange={(value: string) => {
-                                    const numValue = parseInt(value, 10);
-                                    if (!isNaN(numValue) && numValue >= 1 && numValue <= 12) {
-                                        updateLayout('mobile', { rows: numValue });
-                                    }
-                                }}
-                                className="h-7 text-sm"
-                                min="1"
-                                max="12"
-                            />
-                        </Form.Group>
-                    </div>
-                </div>
+          {hasDifferentCellCount && (
+            <div className="mb-2 p-2 bg-amber-500/10 border border-amber-500/30 rounded text-xs">
+              <p className="node-block-title text-amber-700 dark:text-amber-200">
+                Le nombre de cellules diffère (D: {desktopCells}, T:{" "}
+                {tabletCells}, M: {mobileCells}). Peut affecter l&apos;affichage.
+              </p>
             </div>
+          )}
 
-            <SpacingSettings />
-            <hr className="mt-2 border-white-500 border border-dotted" />
-            <BackgroundSettings />
-            <BorderSettings />
+          <div className="mt-2">
+            <p className="node-block-title text-sm font-medium mb-1.5">
+              Configuration de la grille
+            </p>
+            <div className="flex items-center gap-2 mb-2">
+              <span className="node-block-title text-xs w-14 shrink-0">
+                Gap
+              </span>
+              <Form.Input
+                type="number"
+                value={(gridNode?.attributes?.options?.gap ?? 4).toString()}
+                onChange={(value: string) => {
+                  const numValue = parseInt(value, 10);
+                  if (!isNaN(numValue) && numValue >= 0 && numValue <= 20) {
+                    onChange({
+                      ...node,
+                      attributes: {
+                        ...gridNode.attributes,
+                        options: {
+                          ...gridNode.attributes?.options,
+                          gap: numValue,
+                        },
+                      },
+                    });
+                  }
+                }}
+                className="h-7 text-sm flex-1"
+                min="0"
+                max="20"
+              />
+            </div>
+            <Table>
+              <TableHeader>
+                <TableRow className="border-border/50">
+                  <TableHead className="node-block-title py-1.5 px-2 text-xs font-medium" />
+                  <TableHead
+                    className="node-block-title py-1.5 px-2 text-xs font-medium text-center"
+                    title="Desktop"
+                  >
+                    <Monitor className="h-4 w-4 mx-auto" />
+                  </TableHead>
+                  <TableHead
+                    className="node-block-title py-1.5 px-2 text-xs font-medium text-center"
+                    title="Tablet"
+                  >
+                    <Tablet className="h-4 w-4 mx-auto" />
+                  </TableHead>
+                  <TableHead
+                    className="node-block-title py-1.5 px-2 text-xs font-medium text-center"
+                    title="Mobile"
+                  >
+                    <Phone className="h-4 w-4 mx-auto" />
+                  </TableHead>
+                </TableRow>
+              </TableHeader>
+              <TableBody>
+                <TableRow className="border-border/50">
+                  <TableCell className="node-block-title py-1 px-2 text-xs">
+                    C.
+                  </TableCell>
+                  <TableCell className="py-1 px-2">
+                    {numInput(
+                      layout.desktop?.columns ?? 2,
+                      1,
+                      12,
+                      (n) => updateLayout("desktop", { columns: n })
+                    )}
+                  </TableCell>
+                  <TableCell className="py-1 px-2">
+                    {numInput(
+                      layout.tablet?.columns ?? 2,
+                      1,
+                      12,
+                      (n) => updateLayout("tablet", { columns: n })
+                    )}
+                  </TableCell>
+                  <TableCell className="py-1 px-2">
+                    {numInput(
+                      layout.mobile?.columns ?? 2,
+                      1,
+                      12,
+                      (n) => updateLayout("mobile", { columns: n })
+                    )}
+                  </TableCell>
+                </TableRow>
+                <TableRow className="border-border/50">
+                  <TableCell className="node-block-title py-1 px-2 text-xs">
+                    L.
+                  </TableCell>
+                  <TableCell className="py-1 px-2">
+                    {numInput(
+                      layout.desktop?.rows ?? 2,
+                      1,
+                      12,
+                      (n) => updateLayout("desktop", { rows: n })
+                    )}
+                  </TableCell>
+                  <TableCell className="py-1 px-2">
+                    {numInput(
+                      layout.tablet?.rows ?? 2,
+                      1,
+                      12,
+                      (n) => updateLayout("tablet", { rows: n })
+                    )}
+                  </TableCell>
+                  <TableCell className="py-1 px-2">
+                    {numInput(
+                      layout.mobile?.rows ?? 2,
+                      1,
+                      12,
+                      (n) => updateLayout("mobile", { rows: n })
+                    )}
+                  </TableCell>
+                </TableRow>
+              </TableBody>
+            </Table>
+          </div>
         </>
-    );
-}
+      }
+      content={
+        <>
+          <Background2Settings
+            style={node.attributes?.style || {}}
+            onChange={(style) =>
+              onChange({
+                ...node,
+                attributes: { ...node.attributes, style },
+              })
+            }
+          />
+          <Border2Settings
+            style={node.attributes?.style || {}}
+            onChange={(style) =>
+              onChange({
+                ...node,
+                attributes: { ...node.attributes, style },
+              })
+            }
+          />
+          <Spacing2Settings
+            style={node.attributes?.style || {}}
+            onChange={(style) =>
+              onChange({
+                ...node,
+                attributes: { ...node.attributes, style },
+              })
+            }
+          />
+        </>
+      }
+    />
+  );
+};
 
 export default Settings;

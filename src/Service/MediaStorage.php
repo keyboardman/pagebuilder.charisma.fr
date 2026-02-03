@@ -17,7 +17,7 @@ class MediaStorage
     }
 
     /**
-     * Liste le contenu d'un répertoire (stockage = storage/media).
+     * Liste le contenu d'un répertoire (stockage = public/media).
      *
      * @return array<int, array{name: string, path: string, type: 'file'|'dir', size?: int}>
      */

@@ -7,8 +7,8 @@ interface SidebarRightProps extends PropsWithChildren {
 
 const SidebarRight = ({ children, dark = false }: SidebarRightProps) => {
   return (
-    <aside className={cn("admin-layout__right relative flex flex-col gap-6 bg-sidebar px-5 py-6", dark && "dark")}>
-      <div className="h-full min-h-0 overflow-hidden">
+    <aside className={cn("admin-layout__right relative flex flex-col overflow-hidden bg-sidebar px-5 py-6", dark && "dark")}>
+      <div className="flex min-h-0 flex-1 flex-col overflow-hidden">
         {children}
       </div>
     </aside>

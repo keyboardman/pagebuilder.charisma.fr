@@ -167,12 +167,12 @@ const Settings: FC<NodeSettingsProps> = () => {
         {error && (
           <div className="flex items-center gap-2 p-3 bg-destructive/10 border border-destructive/20 rounded-lg">
             <AlertCircle className="h-4 w-4 text-destructive" />
-            <p className="text-sm text-destructive">{error}</p>
+            <p className="node-block-title text-sm text-destructive">{error}</p>
           </div>
         )}
         {content.apiId && selectedAdapter && (
           <div className="px-2 bg-muted/50 rounded text-xs">
-            <p className="text-muted-foreground">API: <span className="font-medium">{selectedAdapter.label}</span></p>
+            <p className="node-block-title text-sm text-muted-foreground">API: <span className="font-medium">{selectedAdapter.label}</span></p>
           </div>
         )}
         <Button
@@ -197,7 +197,7 @@ const Settings: FC<NodeSettingsProps> = () => {
   };
 
   return (
-    <Tabs defaultValue={selectedElement || "card"} className="flex h-full min-h-0 flex-col">
+    <Tabs defaultValue={selectedElement || "card"} className="flex min-h-0 flex-1 flex-col overflow-hidden">
       <div className="flex min-h-0 flex-1 flex-col overflow-hidden">
         <NodeSettingsWrapper
         header={
