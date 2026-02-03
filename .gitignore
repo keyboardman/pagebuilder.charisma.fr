@@ -40,3 +40,5 @@ yarn-error.log
 
 # Clone source pour analyse (editeur2)
 .editeur2-source/
+config/secrets/dev/dev.decrypt.private.php
+config/secrets/dev/dev.encrypt.public.php
