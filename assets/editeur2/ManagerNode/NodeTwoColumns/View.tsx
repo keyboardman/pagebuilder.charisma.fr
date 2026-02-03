@@ -4,6 +4,7 @@ import { useNodeContext } from "../../services/providers/NodeContext";
 import { useAppContext } from "../../services/providers/AppContext";
 import { type NodeEditProps, type NodeViewProps } from "../NodeConfigurationType";
 import type { NodeTwoColumnsType, ColumnWidth } from "./index";
+import { styleForView } from "../../utils/styleHelper";
 
 const View: FC<NodeViewProps|NodeEditProps> = () => {
   
@@ -106,7 +107,7 @@ const View: FC<NodeViewProps|NodeEditProps> = () => {
       data-ce-type={node.type}
       id={node?.attributes?.id}
       className={node?.attributes?.className}
-      style={node?.attributes?.style}
+      style={styleForView(node?.attributes?.style)}
       {...dataAttributes}
     >
       <div className={`grid ${getWidthClass(currentWidth)} gap-4 ${isFluid ? 'w-full' : ''}`}>

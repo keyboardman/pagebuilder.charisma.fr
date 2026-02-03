@@ -1,7 +1,13 @@
 import { cn } from "@editeur/lib/utils"
 import { useCard } from "./Card"
 
-function Root({ children }: { children: React.ReactNode }) {
+type RootProps = {
+  children: React.ReactNode
+  className?: string
+  style?: React.CSSProperties
+}
+
+function Root({ children, className, style }: RootProps) {
   const { variant, align } = useCard()
 
   return (
@@ -9,26 +15,31 @@ function Root({ children }: { children: React.ReactNode }) {
       className={cn(
         "flex flex-col gap-2",
         variant === "overlay" &&
-          "absolute inset-0 z-10  text-white",
-          align === "start" && "justify-start",
-          align === "center" && "justify-center",
-          align === "end" && "justify-end",
-          align === "stretch" && "justify-stretch",
+          "absolute inset-0 z-10 text-white",
+        variant !== "overlay" && "flex-1 min-w-0",
+        align === "start" && "justify-start",
+        align === "center" && "justify-center",
+        align === "end" && "justify-end",
+        align === "stretch" && "justify-stretch",
+        className
       )}
+      style={style}
     >
       {children}
     </div>
   )
 }
 
-function Title({ text, style, className }: { text: string, style?: React.CSSProperties, className?: string }) {
-  return <div
-    role="heading"
-    aria-level={3}
-    dangerouslySetInnerHTML={{ __html: text }}
-    className={cn("node-block-title w-full leading-1.2 text-xl font-bold", className ?? "")}
-    style={style ?? {}}
+function Title({ text, style, className }: { text: string; style?: React.CSSProperties; className?: string }) {
+  return (
+    <div
+      role="heading"
+      aria-level={3}
+      dangerouslySetInnerHTML={{ __html: text }}
+      className={cn("node-block-title w-full leading-1.2 text-xl font-bold", className ?? "")}
+      style={style ?? {}}
     />
+  )
 }
 
 function Description({ text }: { text: string }) {

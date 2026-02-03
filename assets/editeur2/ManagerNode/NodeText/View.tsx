@@ -2,6 +2,7 @@ import React, { type FC } from "react";
 import { type NodeViewProps } from "../NodeConfigurationType";
 import { useNodeContext } from "../../services/providers/NodeContext";
 import type { NodeTextType } from "./index";
+import { styleForView } from "../../utils/styleHelper";
 
 const View: FC<NodeViewProps> = () => {
   const { node } = useNodeContext();
@@ -14,7 +15,7 @@ const View: FC<NodeViewProps> = () => {
       data-ce-id={node.id}
       data-ce-type={node.type}
       className={node?.attributes?.className ?? ""}
-      style={node?.attributes?.style ?? {}}
+      style={styleForView(node?.attributes?.style ?? {})}
       id={node?.attributes?.id ?? ""}
     >
       {React.createElement(

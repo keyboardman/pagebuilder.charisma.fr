@@ -78,6 +78,7 @@ final class CharismaArticleAuteurApiCard implements ApiCardArticleInterface
         $auteur = $item->auteur ?? null;
         $link = $item->link ?? null;
 
+        
         $labels = [];
         if (is_array($classements)) {
             foreach ($classements as $c) {
@@ -85,8 +86,8 @@ final class CharismaArticleAuteurApiCard implements ApiCardArticleInterface
             }
         }
         $image = null;
-        if (is_object($auteur) && isset($auteur->photo) && $auteur->photo !== null && $auteur->photo !== '') {
-            $image = (string) $auteur->photo;
+        if (\is_array($auteur) && isset($auteur['photo']) && $auteur['photo'] !== null && $auteur['photo'] !== '') {
+            $image = (string) $auteur['photo'];
         }
 
         return [

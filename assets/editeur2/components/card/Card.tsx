@@ -25,13 +25,20 @@ type CardProps = {
     style?: React.CSSProperties;
     className?: string;
     children: React.ReactNode;
+    /** Pour l’éditeur : identifiant du nœud (data-ce-id) */
+    "data-ce-id"?: string;
+    /** Pour l’éditeur : type du nœud (data-ce-type) */
+    "data-ce-type"?: string;
 }
 
-export function Card({ children, className, style, variant = "top", align = "center" }: CardProps) {
+export function Card({ children, className, style, variant = "top", align = "center", id, "data-ce-id": dataCeId, "data-ce-type": dataCeType }: CardProps) {
 
     return (
         <CardContext.Provider value={{ variant, align }}>
             <div
+                {...(id != null && { id })}
+                {...(dataCeId != null && { "data-ce-id": dataCeId })}
+                {...(dataCeType != null && { "data-ce-type": dataCeType })}
                 data-variant={variant}
                 className={cn(
                     "relative overflow-hidden",

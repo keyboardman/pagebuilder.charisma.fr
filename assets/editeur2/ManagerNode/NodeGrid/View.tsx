@@ -4,6 +4,7 @@ import { useNodeContext } from "../../services/providers/NodeContext";
 import { useAppContext, APP_MODE } from "../../services/providers/AppContext";
 import { type NodeEditProps, type NodeViewProps } from "../NodeConfigurationType";
 import type { NodeGridType, NodeGridLayout } from "./index";
+import { styleForView } from "../../utils/styleHelper";
 
 const View: FC<NodeViewProps|NodeEditProps> = () => {
 
@@ -67,7 +68,7 @@ const View: FC<NodeViewProps|NodeEditProps> = () => {
       data-ce-type={node.type}
       id={node?.attributes?.id}
       className={node?.attributes?.className}
-      style={node?.attributes?.style}
+      style={styleForView(node?.attributes?.style)}
       {...dataAttributes}
     >
       <div 

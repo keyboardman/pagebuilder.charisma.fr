@@ -1,5 +1,5 @@
 import { type FC, useEffect, useState } from "react";
-import { BaseSettings } from "../Settings";
+import { Base2Settings } from "../Settings";
 import { useNodeBuilderContext } from "../../services/providers/NodeBuilderContext";
 import { type NodeSettingsProps } from "../NodeConfigurationType";
 import type { NodeCardApiType } from "./index";
@@ -203,7 +203,12 @@ const Settings: FC<NodeSettingsProps> = () => {
         header={
           <>
             {renderApiSection()}
-            <BaseSettings />
+            <Base2Settings
+              attributes={node.attributes}
+              onChange={(attributes: { className?: string; id?: string }) =>
+                onChange({ ...node, attributes: { ...node.attributes, ...attributes } })
+              }
+            />
             <TabsList className="justify-center w-full">
               <TabsTrigger value="card">Card</TabsTrigger>
               <TabsTrigger value="container">Container</TabsTrigger>

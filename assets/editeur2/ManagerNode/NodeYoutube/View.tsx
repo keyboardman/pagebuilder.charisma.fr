@@ -4,6 +4,7 @@ import type { NodeYoutubeType } from ".";
 import { useNodeContext } from "../../services/providers/NodeContext";
 import YouTube from "react-youtube";
 import { cn } from "@editeur/lib/utils";
+import { styleForView } from "../../utils/styleHelper";
 
 const View: FC<NodeViewProps|NodeEditProps> = () => {
   const { node } = useNodeContext() as { node: NodeYoutubeType };
@@ -18,7 +19,7 @@ const View: FC<NodeViewProps|NodeEditProps> = () => {
         data-ce-type={node.type}
         id={id}
         className={className}
-        style={style}
+        style={styleForView(style)}
       >
         <div className="flex items-center justify-center p-8 border-2 border-dashed border-muted-foreground/30 rounded-lg">
           <p className="text-sm text-muted-foreground">Aucune vidéo YouTube configurée</p>
@@ -44,7 +45,7 @@ const View: FC<NodeViewProps|NodeEditProps> = () => {
       data-ce-type={node.type}
       id={id}
       className={cn(className, "overflow-hidden relative w-full")}
-      style={style}
+      style={styleForView(style)}
     >
       <div className="relative w-full" style={{ paddingBottom: '56.25%' }}>
         <div className="absolute top-0 left-0 w-full h-full">

@@ -1,5 +1,5 @@
 import { type FC } from "react";
-import { BaseSettings } from "../Settings";
+import { Base2Settings } from "../Settings";
 import { useNodeBuilderContext } from "../../services/providers/NodeBuilderContext";
 import { type NodeSettingsProps } from "../NodeConfigurationType";
 import type { NodeCardType } from "./index";
@@ -10,16 +10,22 @@ import { TextSettings } from "./TextSettings";
 import { LabelsSettings } from "./LabelsSettings";
 
 const Settings: FC<NodeSettingsProps> = () => {
-  const { node } = useNodeBuilderContext();
+  const { node, onChange } = useNodeBuilderContext();
   const cardNode = node as NodeCardType;
   const content = cardNode.content || {};
   const selectedElement = content.selectedElement || null;
 
   // Afficher les settings selon l'élément sélectionné, avec CardSettings toujours en premier
+  const baseProps = {
+    attributes: node.attributes,
+    onChange: (attributes: { className?: string; id?: string }) =>
+      onChange({ ...node, attributes: { ...node.attributes, ...attributes } }),
+  };
+
   if (selectedElement === "image") {
     return (
       <>
-        <BaseSettings />
+        <Base2Settings {...baseProps} />
         <CardSettings />
         <ImageSettings />
       </>
@@ -29,7 +35,7 @@ const Settings: FC<NodeSettingsProps> = () => {
   if (selectedElement === "title") {
     return (
       <>
-        <BaseSettings />
+        <Base2Settings {...baseProps} />
         <CardSettings />
         <TitleSettings />
       </>
@@ -39,7 +45,7 @@ const Settings: FC<NodeSettingsProps> = () => {
   if (selectedElement === "text") {
     return (
       <>
-        <BaseSettings />
+        <Base2Settings {...baseProps} />
         <CardSettings />
         <TextSettings />
       </>
@@ -49,7 +55,7 @@ const Settings: FC<NodeSettingsProps> = () => {
   if (selectedElement === "labels") {
     return (
       <>
-        <BaseSettings />
+        <Base2Settings {...baseProps} />
         <CardSettings />
         <LabelsSettings />
       </>
@@ -59,7 +65,7 @@ const Settings: FC<NodeSettingsProps> = () => {
   // Par défaut, afficher les settings généraux
   return (
     <>
-      <BaseSettings />
+      <Base2Settings {...baseProps} />
       <CardSettings />
     </>
   );

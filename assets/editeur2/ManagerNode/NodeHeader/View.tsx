@@ -3,6 +3,7 @@ import { type NodeViewProps } from "../NodeConfigurationType";
 import { useNodeContext } from "../../services/providers/NodeContext";
 import type { NodeHeaderType } from "./index";
 import { cn } from "@editeur/lib/utils";
+import { styleForView } from "../../utils/styleHelper";
 
 const View: FC<NodeViewProps> = () => {
   const { node } = useNodeContext();
@@ -17,7 +18,7 @@ const View: FC<NodeViewProps> = () => {
       "data-ce-id": node.id,
       "data-ce-type": node.type,
       className,
-      style: node?.attributes?.style ?? {},
+      style: styleForView(node?.attributes?.style ?? {}),
       id: node?.attributes?.id ?? "",
     },
     text

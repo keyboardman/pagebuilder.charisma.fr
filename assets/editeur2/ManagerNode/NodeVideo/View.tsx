@@ -11,6 +11,7 @@ import {
   DialogTitle,
 } from "@editeur/components/ui/dialog";
 import { VisuallyHidden } from "@editeur/components/ui/visually-hidden";
+import { styleForView } from "../../utils/styleHelper";
 
 const View: FC<NodeViewProps | NodeEditProps> = () => {
   const { node } = useNodeContext() as { node: NodeVideoType };
@@ -34,7 +35,7 @@ const View: FC<NodeViewProps | NodeEditProps> = () => {
         data-ce-id={node.id}
         data-ce-type={node.type}
         className={cn(className ?? "", "p-8 border-2 border-dashed border-border/50 rounded-lg flex flex-col items-center justify-center bg-muted/50 text-muted-foreground")}
-        style={style ?? {}}
+        style={styleForView(style ?? {})}
         id={id ?? ""}
       >
         <VideoIcon className="h-12 w-12 mb-2" />
@@ -49,7 +50,7 @@ const View: FC<NodeViewProps | NodeEditProps> = () => {
         data-ce-id={node.id}
         data-ce-type={node.type}
         className={cn(className ?? "", "relative overflow-hidden rounded-lg")}
-        style={style ?? {}}
+        style={styleForView(style ?? {})}
         id={id ?? ""}
       >
         {hasPoster ? (
