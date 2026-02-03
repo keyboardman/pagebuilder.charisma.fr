@@ -2,7 +2,7 @@
 
 ## Context
 
-- L’application dispose déjà d’une entité `Theme` avec `generatedCssPath` et d’un CRUD Thème (liste, new, edit, delete). Le formulaire thème (polices/config) est en React (themeForm2) avec shadcn/ui.
+- L’application dispose déjà d’une entité `Theme` avec `generatedCssPath` et d’un CRUD Thème (liste, new, edit, delete). Le formulaire thème (polices/config) est en React (ThemeForm2) avec shadcn/ui.
 - Il faut introduire une entité Page liée à un Theme pour afficher des pages web dont le style est piloté par le CSS du thème choisi.
 
 ## Goals / Non-Goals
@@ -14,7 +14,7 @@
 
 - **Relation Page → Theme** : ManyToOne (une page a un thème ; un thème peut être utilisé par plusieurs pages). Le CSS chargé est celui du thème associé (`Theme.generatedCssPath`), servi via la route existante `app_theme_css`.
 - **Slug** : dérivé du titre, normalisé en minuscule (et caractères ASCII/accents gérés comme pour Theme, ex. SluggerInterface). Unique par page ; généré côté serveur à la création/mise à jour pour rester cohérent.
-- **Formulaire page** : React + shadcn/ui, comme pour le formulaire thème (themeForm2). Données envoyées en POST (ou API dédiée si préféré) ; le contrôleur Symfony gère la validation et la persistance. Champs : titre, slug (éditable mais pré-rempli depuis le titre), select thème (liste des Theme avec CSS), description (texte), content (texte long / textarea ou éditeur riche si besoin ultérieur).
+- **Formulaire page** : React + shadcn/ui, comme pour le formulaire thème (ThemeForm2). Données envoyées en POST (ou API dédiée si préféré) ; le contrôleur Symfony gère la validation et la persistance. Champs : titre, slug (éditable mais pré-rempli depuis le titre), select thème (liste des Theme avec CSS), description (texte), content (texte long / textarea ou éditeur riche si besoin ultérieur).
 - **Routes** : préfixe `/page`, noms `app_page_*` (index, new, edit, delete, show pour affichage public si nécessaire). Pas de conflit avec les routes theme/media existantes.
 
 ## Risks / Trade-offs

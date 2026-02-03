@@ -11,7 +11,7 @@ Encore
     .addEntry('app', './assets/app.js')
     .addEntry('dashboard', './assets/dashboard.jsx')
     .addEntry('themeForm', './assets/themeForm.jsx')
-    .addEntry('themeForm2', './assets/themeForm2.tsx')
+    .addEntry('ThemeForm2', './assets/ThemeForm2.tsx')
     .addEntry('fileManager', './assets/fileManager.jsx')
     .addEntry('pageForm', './assets/pageForm.jsx')
     .addEntry('pagePreview', './assets/pagePreview.jsx')
