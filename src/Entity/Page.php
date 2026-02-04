@@ -36,6 +36,9 @@ class Page
     #[ORM\Column(type: 'json', nullable: true)]
     private ?array $content = null;
 
+    #[ORM\Column(type: 'text', nullable: true)]
+    private ?string $render = null;
+
     public function getId(): ?int
     {
         return $this->id;
@@ -98,6 +101,17 @@ class Page
         } else {
             $this->content = $content;
         }
+        return $this;
+    }
+
+    public function getRender(): ?string
+    {
+        return $this->render;
+    }
+
+    public function setRender(?string $render): static
+    {
+        $this->render = $render;
         return $this;
     }
 }

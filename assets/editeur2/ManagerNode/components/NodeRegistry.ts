@@ -1,6 +1,7 @@
 import NodeText from "./../NodeText"
 import NodeHeader from "./../NodeHeader";
 import NodeContainer from "./../NodeContainer";
+import NodeFlex from "./../NodeFlex";
 import NodeGrid from "./../NodeGrid";
 import NodeImage from "./../NodeImage";
 import NodeTwoColumns from "./../NodeTwoColumns";
@@ -17,6 +18,7 @@ export const NodeRegistry = {
     [NodeText.type]: NodeText,
     [NodeRoot.type]: NodeRoot,
     [NodeContainer.type]: NodeContainer,
+    [NodeFlex.type]: NodeFlex,
     [NodeGrid.type]: NodeGrid,
     [NodeImage.type]: NodeImage,
     [NodeCard.type]: NodeCard,

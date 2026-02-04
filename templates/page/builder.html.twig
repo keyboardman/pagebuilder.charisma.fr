@@ -13,8 +13,11 @@
     <main class="flex-1 min-h-0 flex flex-col">
         {% set default_content = '{"cylsqgudkwtz":{"id":"cylsqgudkwtz","type":"node-root","parent":null,"content":{"title":""}}}' %}
         {% set content_json = (page.content is defined and page.content is not empty) ? (page.content|json_encode(constant('JSON_UNESCAPED_UNICODE'))) : default_content %}
+        {% set base_url = app.request.schemeAndHttpHost ~ app.request.basePath %}
+        {% set render_css_paths = encore_entry_css_files('pagePreview') %}
+        {% set render_css_urls = render_css_paths|map(p => base_url ~ p)|default([]) %}
         <script type="application/json" id="page-builder-data">
-            {{ { content: content_json, csrfToken: csrf_token('page_form'), saveUrl: path('app_page_api_content', { id: page.id }), backUrl: path('app_page_edit', { id: page.id }), pageTitle: page.title, themeFonts: theme_fonts|default([]), apiCardsBaseUrl: path('app_page_builder_api_cards_list')|replace({'/cards': ''}) }|json_encode|raw }}
+            {{ { content: content_json, csrfToken: csrf_token('page_form'), saveUrl: path('app_page_api_content', { id: page.id }), backUrl: path('app_page_edit', { id: page.id }), pageTitle: page.title, pageDescription: page.description|default(''), baseUrl: base_url, themeCssUrl: page.theme.generatedCssPath ? path('app_theme_css', { id: page.theme.id }) : '', renderCssUrls: render_css_urls, themeFonts: theme_fonts|default([]), apiCardsBaseUrl: path('app_page_builder_api_cards_list')|replace({'/cards': ''}) }|json_encode|raw }}
         </script>
         <div id="page-builder-standalone-root" class="h-full"></div>
     </main>

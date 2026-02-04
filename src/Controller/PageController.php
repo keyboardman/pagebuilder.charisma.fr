@@ -12,6 +12,7 @@ use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\String\Slugger\SluggerInterface;
 
@@ -198,7 +199,12 @@ class PageController extends AbstractController
             if ($contentRaw !== '' && json_decode($contentRaw) === null && json_last_error() !== \JSON_ERROR_NONE) {
                 return new Response('', 400);
             }
-            $page->setContent($contentRaw);
+            $page->setContent(content: $contentRaw);
+            $renderRaw = $data['render'] ?? null;
+            if (\is_string($renderRaw) && $renderRaw !== '') {
+                $page->setRender($renderRaw);
+            }
+            $this->em->persist($page);
             $this->em->flush();
             return new Response('', 204);
         } catch (\Throwable $e) {
@@ -210,6 +216,90 @@ class PageController extends AbstractController
     public function preview(Page $page): Response
     {
         return $this->render('page/preview.html.twig', ['page' => $page]);
+    }
+
+    /**
+     * GET contenu render par id ou slug : /page/render/1 ou /page/render/mon-slug
+     */
+    #[Route('/render/{idOrSlug}', name: 'render', methods: ['GET'])]
+    public function renderPage(Request $request, string $idOrSlug): Response
+    {
+        $page = \is_numeric($idOrSlug)
+            ? $this->em->getRepository(Page::class)->find((int) $idOrSlug)
+            : $this->em->getRepository(Page::class)->findOneBy(['slug' => $idOrSlug]);
+        return $this->renderPageContent($page, $request);
+    }
+
+    /**
+     * GET contenu render par id : /page/1/render (même réponse que /page/render/1).
+     */
+    #[Route('/{id}/render', name: 'render_by_id', methods: ['GET'], requirements: ['id' => '\d+'])]
+    public function renderPageById(Request $request, Page $page): Response
+    {
+        return $this->renderPageContent($page, $request);
+    }
+
+    private function renderPageContent(?Page $page, Request $request): Response
+    {
+        if ($page === null) {
+            throw new NotFoundHttpException('Page not found.');
+        }
+        $render = $page->getRender();
+        if ($render === null || $render === '') {
+            throw new NotFoundHttpException('No render content for this page.');
+        }
+
+        $baseUrl = rtrim($request->getSchemeAndHttpHost() . $request->getBasePath(), '/');
+        $assetsHead = $this->renderView('page/_render_assets_head.html.twig');
+        $assetsBody = $this->renderView('page/_render_assets_body.html.twig');
+        $absoluteUrl = static fn (string $s): string => preg_replace('#(href|src)="/(?!\/)#', '$1="' . $baseUrl . '/', $s);
+        $assetsHead = $absoluteUrl($assetsHead);
+        $assetsBody = $absoluteUrl($assetsBody);
+        $html = preg_replace('/<\/head>/', $assetsHead . '</head>', $render, 1) ?? $render;
+        $html = preg_replace('/<\/body>/', $assetsBody . '</body>', $html, 1) ?? $html;
+
+        $title = $page->getTitle();
+        if ($title !== null && $title !== '') {
+            $escapedTitle = htmlspecialchars($title, \ENT_QUOTES | \ENT_SUBSTITUTE | \ENT_HTML5, 'UTF-8');
+            $titleReplaced = preg_replace('/<title>\s*.*?\s*<\/title>/is', '<title>' . $escapedTitle . '</title>', $html, 1);
+            $html = $titleReplaced !== null ? $titleReplaced : $html;
+        }
+
+        $description = $page->getDescription();
+        $escapedDescription = $description !== null && $description !== ''
+            ? htmlspecialchars($description, \ENT_QUOTES | \ENT_SUBSTITUTE | \ENT_HTML5, 'UTF-8')
+            : '';
+        $metaDescription = '<meta name="description" content="' . $escapedDescription . '">';
+        $metaCount = 0;
+        $replaced = preg_replace('/<meta\s+name=["\']description["\'][^>]*>/i', $metaDescription, $html, 1, $metaCount);
+        if ($metaCount === 0) {
+            $html = preg_replace('/<\/head>/', $metaDescription . "\n</head>", $html, 1);
+        } else {
+            $html = $replaced ?? $html;
+        }
+
+        return new Response($html, 200, ['Content-Type' => 'text/html']);
+    }
+
+    #[Route('/{id}/render', name: 'api_render', methods: ['PATCH', 'PUT'], requirements: ['id' => '\d+'])]
+    public function apiRender(Request $request, Page $page): Response
+    {
+        try {
+            $data = json_decode((string) $request->getContent(), true) ?: [];
+            $token = $data['_token'] ?? '';
+            if (!$this->isCsrfTokenValid('page_form', $token)) {
+                return new Response('', 403);
+            }
+            $render = $data['render'] ?? null;
+            if (!\is_string($render)) {
+                return new Response('', 400);
+            }
+            $page->setRender($render === '' ? null : $render);
+            $this->em->flush();
+            return new Response('', 204);
+        } catch (\Throwable $e) {
+            return new Response($e->getMessage(), 500, ['Content-Type' => 'text/plain']);
+        }
     }
 
     #[Route('/delete/{id}', name: 'delete', methods: ['POST'], requirements: ['id' => '\d+'])]

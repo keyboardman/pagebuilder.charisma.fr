@@ -40,7 +40,7 @@ export const ViewContentOverlay: FC<ViewContentOverlayProps> = ({ position, back
                 "absolute px-4 py-3 z-10 w-full",
                 position ? positionClasses[position] : ""
             )}
-            style={style}
+            style={{ ...backgroundStyle, ...style }}
         >
             {children}
         </div>
