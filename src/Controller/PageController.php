@@ -244,39 +244,10 @@ class PageController extends AbstractController
         if ($page === null) {
             throw new NotFoundHttpException('Page not found.');
         }
-        $render = $page->getRender();
-        if ($render === null || $render === '') {
-            throw new NotFoundHttpException('No render content for this page.');
-        }
 
+        $html = $this->renderView('page/render_view.html.twig', ['page' => $page]);
         $baseUrl = rtrim($request->getSchemeAndHttpHost() . $request->getBasePath(), '/');
-        $assetsHead = $this->renderView('page/_render_assets_head.html.twig');
-        $assetsBody = $this->renderView('page/_render_assets_body.html.twig');
-        $absoluteUrl = static fn (string $s): string => preg_replace('#(href|src)="/(?!\/)#', '$1="' . $baseUrl . '/', $s);
-        $assetsHead = $absoluteUrl($assetsHead);
-        $assetsBody = $absoluteUrl($assetsBody);
-        $html = preg_replace('/<\/head>/', $assetsHead . '</head>', $render, 1) ?? $render;
-        $html = preg_replace('/<\/body>/', $assetsBody . '</body>', $html, 1) ?? $html;
-
-        $title = $page->getTitle();
-        if ($title !== null && $title !== '') {
-            $escapedTitle = htmlspecialchars($title, \ENT_QUOTES | \ENT_SUBSTITUTE | \ENT_HTML5, 'UTF-8');
-            $titleReplaced = preg_replace('/<title>\s*.*?\s*<\/title>/is', '<title>' . $escapedTitle . '</title>', $html, 1);
-            $html = $titleReplaced !== null ? $titleReplaced : $html;
-        }
-
-        $description = $page->getDescription();
-        $escapedDescription = $description !== null && $description !== ''
-            ? htmlspecialchars($description, \ENT_QUOTES | \ENT_SUBSTITUTE | \ENT_HTML5, 'UTF-8')
-            : '';
-        $metaDescription = '<meta name="description" content="' . $escapedDescription . '">';
-        $metaCount = 0;
-        $replaced = preg_replace('/<meta\s+name=["\']description["\'][^>]*>/i', $metaDescription, $html, 1, $metaCount);
-        if ($metaCount === 0) {
-            $html = preg_replace('/<\/head>/', $metaDescription . "\n</head>", $html, 1);
-        } else {
-            $html = $replaced ?? $html;
-        }
+        $html = preg_replace('#(href|src)="/(?!\/)#', '$1="' . $baseUrl . '/', $html) ?? $html;
 
         return new Response($html, 200, ['Content-Type' => 'text/html']);
     }

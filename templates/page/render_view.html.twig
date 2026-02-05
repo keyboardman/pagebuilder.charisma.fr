@@ -1,0 +1,19 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ page.title }}</title>
+    {% if page.description %}
+        <meta name="description" content="{{ page.description|e('html_attr') }}">
+    {% endif %}
+    {% if page.theme.generatedCssPath %}
+        <link rel="stylesheet" href="{{ path('app_theme_css', { id: page.theme.id }) }}">
+    {% endif %}
+    {{ encore_entry_link_tags('pagePreview') }}
+</head>
+<body class="theme-view-scope min-h-screen m-0">
+    <div id="page-preview-root" data-json="{{ (page.content ?? {})|json_encode(constant('JSON_UNESCAPED_UNICODE'))|e('html_attr') }}"></div>
+    {{ encore_entry_script_tags('pagePreview') }}
+</body>
+</html>

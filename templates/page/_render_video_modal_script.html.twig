@@ -1,0 +1,43 @@
+<script>
+(function() {
+  function initVideoModals() {
+    document.querySelectorAll('[data-video-src]').forEach(function(el) {
+      if (el.dataset.videoModalInit) return;
+      el.dataset.videoModalInit = '1';
+      el.addEventListener('click', function(e) {
+        e.preventDefault();
+        var src = el.getAttribute('data-video-src');
+        if (!src) return;
+        var poster = el.getAttribute('data-video-poster') || '';
+        var overlay = document.createElement('div');
+        overlay.className = 'fixed inset-0 z-[100] flex items-center justify-center bg-black/80 p-4';
+        var wrap = document.createElement('div');
+        wrap.className = 'relative w-full max-w-4xl aspect-video bg-black rounded-lg overflow-hidden';
+        var video = document.createElement('video');
+        video.className = 'w-full h-full';
+        video.src = src;
+        video.poster = poster;
+        video.controls = true;
+        video.autoplay = true;
+        wrap.appendChild(video);
+        var btn = document.createElement('button');
+        btn.type = 'button';
+        btn.className = 'absolute right-4 top-4 z-10 rounded-sm opacity-70 hover:opacity-100 bg-white/90 text-black p-2';
+        btn.setAttribute('aria-label', 'Fermer');
+        btn.textContent = '\u2715';
+        function close() { try { video.pause(); } catch (x) {} overlay.remove(); }
+        btn.addEventListener('click', close);
+        wrap.appendChild(btn);
+        overlay.appendChild(wrap);
+        overlay.addEventListener('click', function(e) { if (e.target === overlay) close(); });
+        document.body.appendChild(overlay);
+      });
+    });
+  }
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', initVideoModals);
+  } else {
+    initVideoModals();
+  }
+})();
+</script>

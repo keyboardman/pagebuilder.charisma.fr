@@ -59,6 +59,8 @@ const View: FC<NodeViewProps | NodeEditProps> = () => {
             onClick={handleVideoClick}
             role={!isEditMode ? "button" : undefined}
             tabIndex={!isEditMode ? 0 : undefined}
+            data-video-src={hasVideo ? content.src : undefined}
+            data-video-poster={hasPoster ? content.poster : undefined}
             onKeyDown={(e) => {
               if (!isEditMode && (e.key === "Enter" || e.key === " ")) {
                 e.preventDefault();
@@ -86,6 +88,8 @@ const View: FC<NodeViewProps | NodeEditProps> = () => {
             onClick={!isEditMode ? handleVideoClick : undefined}
             role={!isEditMode ? "button" : undefined}
             tabIndex={!isEditMode ? 0 : undefined}
+            data-video-src={hasVideo ? content.src : undefined}
+            data-video-poster={hasPoster ? content.poster : undefined}
             onKeyDown={(e) => {
               if (!isEditMode && (e.key === "Enter" || e.key === " ")) {
                 e.preventDefault();

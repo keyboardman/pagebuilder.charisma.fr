@@ -78,14 +78,15 @@
     /* Gris très clair, indépendant du thème */
 }
 
-/* Titres et labels des blocs : non impactés par le thème de la page */
+/* Titres et labels des blocs : couleur en dur (pas de var --foreground selon le thème) */
 .theme-preview-scope .node-block-title,
+.theme-view-scope .node-block-title,
 .admin-layout .node-block-title {
     font-family: var(--font-sans);
     font-size: 1.25rem;
     font-weight: 600;
     line-height: 1.2;
-    color: var(--foreground);
+    color: #171717;
 }
 /* Labels UI (ex: Sélection API) : taille réduite dans les settings */
 .admin-layout__right .node-block-title.text-sm,
