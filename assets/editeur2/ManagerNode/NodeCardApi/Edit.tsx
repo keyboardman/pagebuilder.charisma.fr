@@ -3,7 +3,7 @@ import { useNodeBuilderContext } from "../../services/providers/NodeBuilderConte
 import { useNodeContext } from "../../services/providers/NodeContext";
 import { type NodeEditProps } from "../NodeConfigurationType";
 import { cn } from "@editeur/lib/utils";
-import EditableImage from "../NodeCard/EditableImage";
+import EditableImage from "../NodeCard/Edit/EditableImage";
 import { getImageFromNode, getTitleFromNode, getTextFromNode, getLabelsFromNode } from "./utils";
 import type { NodeCardApiType } from "./index";
 import type { ContainerAlign, ContainerRatio } from "../NodeCard";
@@ -45,7 +45,7 @@ const Edit: FC<NodeEditProps> = () => {
     const _text = getTextFromNode(node as NodeCardApiType);
 
     const _labels = getLabelsFromNode(node as NodeCardApiType);
-
+    
 
     // Configuration du contenu en overlay
     const containerPosition = node.content?.container?.position as ContainerPositionApi;
@@ -125,8 +125,9 @@ const Edit: FC<NodeEditProps> = () => {
                 node?.attributes?.className , 
                 "overflow-hidden"
             )}
-            id={node?.attributes?.id ?? ""}
             style={cardStyle}
+            id={node?.attributes?.id ?? ""}
+            
         >
             <ViewContainer
                 position={(containerPosition === "overlay" ? "top" : containerPosition) || "top"}

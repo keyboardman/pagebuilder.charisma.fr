@@ -2,7 +2,7 @@ import React, { useEffect, useRef, useState } from "react";
 import { NativeSelect, NativeSelectOption } from "@editeur/components/ui/native-select";
 import useDebounce from "../../hooks/useDebounce";
 
-type SelectProps = Omit<React.SelectHTMLAttributes<HTMLSelectElement>, 'onChange' | 'value'> & {
+type SelectProps = Omit<React.SelectHTMLAttributes<HTMLSelectElement>, 'onChange' | 'value' | 'options'> & {
     value?: string;
     onChange?: (input: string) => void;
     className?: string;

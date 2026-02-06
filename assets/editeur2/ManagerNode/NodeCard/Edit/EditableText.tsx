@@ -1,5 +1,5 @@
 import { type FC } from "react";
-import Form from "../../components/form";
+import Form from "../../../components/form";
 import { cn } from "@editeur/lib/utils";
 
 interface EditableTextProps {

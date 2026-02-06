@@ -1,15 +1,18 @@
 import { type FC } from "react";
 import { cn } from "@editeur/lib/utils";
-import type { ContainerPosition, ContainerAlign, ContainerRatio } from "./index";
 
-interface ContainerProps {
+export type ContainerPosition = "left" | "top" | "right";
+export type ContainerAlign = "start" | "center" | "end" | "stretch";
+export type ContainerRatio = "1/4" | "1/3"| "2/5" | "1/2" | "2/3" | "full";
+
+interface ViewContainerProps {
     position: ContainerPosition;
     content: React.ReactNode;
     image: React.ReactNode;
 }
 
 
-export const ContainerImage: FC<{
+export const ViewContainerImage: FC<{
     position: ContainerPosition;
     align: ContainerAlign;
     ratio: ContainerRatio;
@@ -28,21 +31,22 @@ export const ContainerImage: FC<{
     )
 }
 
-export const ContainerContent: FC<{
+export const ViewContainerContent: FC<{
     align: ContainerAlign;
     children: React.ReactNode;
-}> = ({ align = 'start', children }) => {
+    style?: React.CSSProperties;
+}> = ({ align = 'start', children, style }) => {
 
     const _align = `justify-${align}`;
 
     return (
-        <div className={cn("flex flex-col h-full justify-center shrink-0", _align)}>
+        <div className={cn("flex flex-col h-full justify-center shrink-0", _align)} style={style}>
             {children}
         </div>
     )
 }
 
-export const Container: FC<ContainerProps> = ({
+export const ViewContainer: FC<ViewContainerProps> = ({
     position = "right",
     image,
     content,
@@ -64,6 +68,3 @@ export const Container: FC<ContainerProps> = ({
         </div>
     )
 }
-
-
-export default Container;

@@ -3,7 +3,6 @@ import { useNodeBuilderContext } from "../../services/providers/NodeBuilderConte
 import NodeRegistry, {isKnownNode} from "./NodeRegistry";
 import { APP_MODE } from "../../services/providers/AppContext";
 import { NODE_ROOT_TYPE } from "../NodeRoot";
-
 import { useAppContext } from "../../services/providers/AppContext";
 import DropZone from "./DropZone";
 import {type ReactNode } from "react";
@@ -48,9 +47,15 @@ function NodeComponent() {
         return <EmptySettings />;
     }
 
-    const Component = mode === APP_MODE.EDIT ? NodeRegistry[node.type]['edit'] : NodeRegistry[node.type]['view'];
+    const Component = (mode === APP_MODE.VIEW || mode === APP_MODE.PREVIEW)
+        ? NodeRegistry[node.type].view
+        : NodeRegistry[node.type].edit;
 
-    return mode === APP_MODE.EDIT ? (<NodeBuilderComponent><Component /></NodeBuilderComponent>) : <Component />;
+    return (mode === APP_MODE.VIEW || mode === APP_MODE.PREVIEW) ? (
+        <Component />
+    ) : (
+        <NodeBuilderComponent><Component /></NodeBuilderComponent>
+    );
 }
 
 export default NodeComponent;

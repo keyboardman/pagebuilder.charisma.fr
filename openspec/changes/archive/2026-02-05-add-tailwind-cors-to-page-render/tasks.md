@@ -12,6 +12,6 @@
 
 ## 3. Validation
 
-- [ ] 3.1 Vérifier en dev que GET `/page/render/{id}` renvoie un document HTML contenant les link/script du builder et que les styles Tailwind s’appliquent.
-- [ ] 3.2 Vérifier que le document contient `<title>` avec le titre de la page et `<meta name="description" content="...">` avec la description.
-- [ ] 3.3 Vérifier qu’une requête GET cross-origin vers l’URL render reçoit bien les en-têtes CORS attendus (origine et port quelconques acceptés).
+- [x] 3.1 Vérifier en dev que GET `/page/render/{id}` renvoie un document HTML contenant les link/script du builder et que les styles Tailwind s’appliquent.
+- [x] 3.2 Vérifier que le document contient `<title>` avec le titre de la page et `<meta name="description" content="...">` avec la description.
+- [x] 3.3 Vérifier qu’une requête GET cross-origin vers l’URL render reçoit bien les en-têtes CORS attendus (origine et port quelconques acceptés).

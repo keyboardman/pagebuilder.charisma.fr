@@ -9,7 +9,7 @@ export const NODE_CARD_TYPE = "node-card" as const;
 
 export type CardElementType = "image" | "title" | "text" | "labels" | null;
 
-export type ContainerPosition = "left" | "top" | "right";
+export type ContainerPosition = "left" | "top" | "right" | "overlay";
 export type ContainerAlign = "start" | "center" | "end" | "stretch";
 export type ContainerRatio = "1/4" | "1/3"| "2/5" | "1/2" | "2/3" | "full";
 
@@ -22,12 +22,23 @@ export interface NodeCardType extends NodeType {
       text?: boolean;
       labels?: boolean;
     };
+    card?: {
+      style?: React.CSSProperties;
+    };
     // container
     container: {
       position: ContainerPosition;
       align: ContainerAlign;
       ratio: ContainerRatio;
       link?: string;
+      style?: React.CSSProperties;
+      textOverlay?: {
+        position?: "bottom" | "top" | "center";
+        background?: {
+          gradient?: string;
+          color?: string | null;
+        };
+      };
     };
 
     // image
@@ -84,7 +95,7 @@ export const NodeCard: NodeConfigurationType = {
       ...defaultNodeConfiguration.button,
       label: "Card",
       icon: IoCard,
-      category: 'standard',
+      category: 'content',
       order: 2
     },
     default: {
