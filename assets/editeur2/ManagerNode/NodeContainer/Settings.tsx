@@ -1,6 +1,6 @@
 
 import { type FC } from "react";
-import { Base2Settings, Background2Settings, Border2Settings, Spacing2Settings } from "../Settings";
+import { Base2Settings, Background2Settings, Border2Settings, Spacing2Settings, Size2Settings } from "../Settings";
 import Button from "../../components/button";
 import { type NodeSettingsProps } from "../NodeConfigurationType";
 import { useNodeBuilderContext } from "../../services/providers/NodeBuilderContext";
@@ -55,6 +55,13 @@ const Settings: FC<NodeSettingsProps> = () => {
                     })}
                 />
                 <Spacing2Settings
+                    style={node.attributes?.style || {}}
+                    onChange={(style) => onChange({
+                        ...node,
+                        attributes: { ...node.attributes, style }
+                    })}
+                />
+                <Size2Settings
                     style={node.attributes?.style || {}}
                     onChange={(style) => onChange({
                         ...node,

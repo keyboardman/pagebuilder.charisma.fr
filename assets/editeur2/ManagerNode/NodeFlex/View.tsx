@@ -43,7 +43,7 @@ const View: FC<NodeViewProps | NodeEditProps> = () => {
       data-ce-id={node.id}
       data-ce-type={node.type}
       id={node?.attributes?.id}
-      className={cn(node?.attributes?.className, "flex")}
+      className={cn(node?.attributes?.className, "flex h-full")}
       style={styleForView(node?.attributes?.style)}
       {...dataAttributes}
     >

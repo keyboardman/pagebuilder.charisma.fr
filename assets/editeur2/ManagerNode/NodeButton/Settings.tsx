@@ -4,7 +4,7 @@ import Form from "../../components/form";
 import { useNodeBuilderContext } from "../../services/providers/NodeBuilderContext";
 import type { NodeButtonType, NodeButtonButtonType } from "./index";
 import { NodeSettingsWrapper } from "../components/NodeSettingsWrapper";
-import { Base2Settings, Background2Settings, Text2Settings, Border2Settings, Size2Settings } from "../Settings";
+import { Base2Settings, Background2Settings, Text2Settings, Border2Settings, Size2Settings, Spacing2Settings } from "../Settings";
 
 const BUTTON_TYPE_OPTIONS: { value: NodeButtonButtonType; label: string }[] = [
   { value: "button", label: "Bouton" },
@@ -114,6 +114,15 @@ const Settings: FC<NodeSettingsProps> = () => {
             }
           />
           <Size2Settings
+            style={node.attributes?.style || {}}
+            onChange={(style) =>
+              onChange({
+                ...node,
+                attributes: { ...node.attributes, style },
+              })
+            }
+          />
+          <Spacing2Settings
             style={node.attributes?.style || {}}
             onChange={(style) =>
               onChange({
