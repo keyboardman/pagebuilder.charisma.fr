@@ -32,41 +32,15 @@ const TagNameEditable = ({
         }
     };
 
-    const charBeforeCursor = (): string | null => {
-        const selection = window.getSelection();
-        const range = selection?.rangeCount ? selection.getRangeAt(0) : null;
-        if (!range || !range.collapsed) return null;
-        const container = range.startContainer;
-        const offset = range.startOffset;
-        if (offset <= 0) return null;
-        if (container.nodeType === Node.TEXT_NODE) {
-            const text = container.textContent ?? "";
-            return text.charAt(offset - 1) || null;
-        }
-        return null;
-    };
-
     const handleKeyDown = (e: React.KeyboardEvent<HTMLElement>) => {
         if (e.key === " ") {
             e.preventDefault();
             insertTextAtCursor(NBSP);
-            return;
-        }
-        if (e.key === ".") {
-            const prev = charBeforeCursor();
-            if (prev === " " || prev === NBSP) {
-                e.preventDefault();
-                insertTextAtCursor(NBSP);
-            }
         }
     };
 
     const handleKeyPress = (e: React.KeyboardEvent<HTMLElement>) => {
         if (e.key === " ") e.preventDefault();
-        if (e.key === ".") {
-            const prev = charBeforeCursor();
-            if (prev === " " || prev === NBSP) e.preventDefault();
-        }
     };
 
     const handlePaste = (e: React.ClipboardEvent<HTMLElement>) => {
