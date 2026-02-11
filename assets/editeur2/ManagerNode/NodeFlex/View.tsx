@@ -4,6 +4,7 @@ import { useNodeContext } from "../../services/providers/NodeContext";
 import { type NodeEditProps, type NodeViewProps } from "../NodeConfigurationType";
 import { styleForView } from "../../utils/styleHelper";
 import type { NodeFlexType, NodeFlexOptions } from "./index";
+import { cn } from "@editeur/lib/utils";
 
 const defaultOptions: NodeFlexOptions = {
   direction: "row",
@@ -42,11 +43,11 @@ const View: FC<NodeViewProps | NodeEditProps> = () => {
       data-ce-id={node.id}
       data-ce-type={node.type}
       id={node?.attributes?.id}
-      className={node?.attributes?.className}
+      className={cn(node?.attributes?.className, "flex")}
       style={styleForView(node?.attributes?.style)}
       {...dataAttributes}
     >
-      <div style={flexStyle} className="h-full">
+      <div style={flexStyle} className="h-full flex-1">
         <NodeCollection nodes={children} parentId={node.id} zone="main" />
       </div>
     </div>
