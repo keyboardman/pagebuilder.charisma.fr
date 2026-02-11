@@ -5,6 +5,7 @@ import {
   Border2Settings,
   Object2Settings,
   Spacing2Settings,
+  Size2Settings,
 } from "../Settings";
 import Form from "../../components/form";
 import { InputFile } from "../../components/form/InputFile";
@@ -93,6 +94,15 @@ const Settings: FC<NodeSettingsProps> = () => {
             }
           />
           <Spacing2Settings
+            style={node.attributes?.style ?? {}}
+            onChange={(style) =>
+              onChange({
+                ...node,
+                attributes: { ...node.attributes, style },
+              })
+            }
+          />
+          <Size2Settings
             style={node.attributes?.style ?? {}}
             onChange={(style) =>
               onChange({
