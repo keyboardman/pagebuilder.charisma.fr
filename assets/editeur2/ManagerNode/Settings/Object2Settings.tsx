@@ -12,7 +12,7 @@ export function Object2Settings({ style, onChange }: Object2SettingsProps) {
             <div className="text-center text-sm py-0 leading-tight text-white bg-gray-200/50">Image</div>
             <div className="flex flex-1">
                 <Form.Group className="mb-0">
-                    <Form.Label text="object-fit" />
+                    <Form.Label text="object-fit" className="text-foreground" />
                     <Form.Select options={[
                         { label: '...', value: '' },
                         { label: 'fill', value: 'fill' },
@@ -27,7 +27,7 @@ export function Object2Settings({ style, onChange }: Object2SettingsProps) {
                     />
                 </Form.Group>
                 <Form.Group className="mb-0">
-                    <Form.Label text="object-position" />
+                    <Form.Label text="object-position" className="text-foreground" />
                     <Form.Select options={[
                         { label: '...', value: '' },
                         { label: 'top', value: 'top' },
@@ -44,7 +44,7 @@ export function Object2Settings({ style, onChange }: Object2SettingsProps) {
             </div>
             <div className="flex flex-1">
                 <Form.Group className="mb-0">
-                    <Form.Label text="aspect-ratio" />
+                    <Form.Label text="aspect-ratio" className="text-foreground" />
                     <Form.Input
                         type="text"
                         value={style?.aspectRatio?.toString() ?? ""}
@@ -52,7 +52,6 @@ export function Object2Settings({ style, onChange }: Object2SettingsProps) {
                         className="h-7 text-sm"
                     />
                 </Form.Group>
-                <div></div>
             </div>
         </div>
     )

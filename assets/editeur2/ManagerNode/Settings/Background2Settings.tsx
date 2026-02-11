@@ -1,4 +1,18 @@
+import { useState } from "react";
 import Form from "../../components/form";
+import { Button } from "@editeur/components/ui/button";
+import { ImageIcon } from "lucide-react";
+import FileManager from "../../ManagerAsset/FileManager";
+import { useFileManager } from "../../ManagerAsset/hooks/useFileManager";
+import type { FileItem } from "../../ManagerAsset/types";
+import { useAppContext, APP_MODE } from "../../services/providers/AppContext";
+
+function toAbsoluteUrl(url: string): string {
+    if (typeof window === "undefined" || !url) return url;
+    if (url.startsWith("http://") || url.startsWith("https://")) return url;
+    const path = url.startsWith("/") ? url : `/${url}`;
+    return `${window.location.origin}${path}`;
+}
 
 export interface Background2SettingsProps {
     style: React.CSSProperties;
@@ -6,22 +20,59 @@ export interface Background2SettingsProps {
 }
 
 export function Background2Settings({ style, onChange }: Background2SettingsProps) {
+    const [isFileManagerOpen, setIsFileManagerOpen] = useState(false);
+    const fileService = useFileManager();
+    const { mode } = useAppContext();
+    const isViewMode = mode === APP_MODE.VIEW;
+
+    const handleSelectImage = (file: FileItem) => {
+        const absoluteUrl = toAbsoluteUrl(file.url);
+        onChange({
+            ...style,
+            backgroundImage: `url(${absoluteUrl})`,
+            backgroundPosition: style?.backgroundPosition ?? "center",
+        });
+        setIsFileManagerOpen(false);
+    };
 
     return (
         <div className="flex flex-col gap-1 mb-2 mt-1">
             <div className="text-center text-sm py-0 leading-tight text-white bg-gray-200/50">Background</div>
             <Form.Group className="mb-0">
-                <Form.Label text="background-image" />
-                <Form.Input
-                    type="text"
-                    value={style?.backgroundImage?.toString() ?? ""}
-                    onChange={(value) => onChange({ ...style, backgroundImage: value as React.CSSProperties['backgroundImage'] })}
-                    className="h-7 text-sm"
-                />
+                <Form.Label text="background-image" className="text-foreground" />
+                <div className="flex gap-1">
+                    <Form.Input
+                        type="text"
+                        value={style?.backgroundImage?.toString() ?? ""}
+                        onChange={(value) => onChange({ ...style, backgroundImage: value as React.CSSProperties["backgroundImage"] })}
+                        className="h-7 text-sm flex-1 min-w-0"
+                    />
+                    {!isViewMode && fileService && (
+                        <>
+                            <Button
+                                type="button"
+                                variant="outline"
+                                size="icon"
+                                className="h-7 w-7 shrink-0"
+                                onClick={() => setIsFileManagerOpen(true)}
+                                title="Choisir une image"
+                            >
+                                <ImageIcon className="h-4 w-4" />
+                            </Button>
+                            <FileManager
+                                open={isFileManagerOpen}
+                                onOpenChange={setIsFileManagerOpen}
+                                onSelectFile={handleSelectImage}
+                                fileService={fileService}
+                                acceptedTypes="image/*"
+                            />
+                        </>
+                    )}
+                </div>
             </Form.Group>
             <div className="flex flex-1">
                 <Form.Group className="mb-0">
-                    <Form.Label text="color" />
+                    <Form.Label text="color" className="text-foreground" />
                     <Form.InputColor
                         type="text"
                         value={style?.backgroundColor?.toString() ?? ""}
@@ -30,7 +81,7 @@ export function Background2Settings({ style, onChange }: Background2SettingsProp
                     />
                 </Form.Group>
                 <Form.Group className="mb-0">
-                    <Form.Label text="position" />
+                    <Form.Label text="position" className="text-foreground" />
                     <Form.Select options={[
                         { label: '...', value: '' },
                         { label: 'top', value: 'top' },
@@ -47,7 +98,7 @@ export function Background2Settings({ style, onChange }: Background2SettingsProp
             </div>
             <div className="flex flex-1">
                 <Form.Group className="mb-0">
-                    <Form.Label text="size" />
+                    <Form.Label text="size" className="text-foreground" />
                     <Form.Select options={[
                         { label: '...', value: '' },
                         { label: 'cover', value: 'cover' },
@@ -59,7 +110,7 @@ export function Background2Settings({ style, onChange }: Background2SettingsProp
                     />
                 </Form.Group>
                 <Form.Group className="mb-0">
-                    <Form.Label text="repeat" />
+                    <Form.Label text="repeat" className="text-foreground" />
                     <Form.Select options={[
                         { label: '...', value: '' },
                         { label: 'repeat', value: 'repeat' },

@@ -12,7 +12,7 @@ export function Spacing2Settings({ style, onChange }: Spacing2SettingsProps) {
                 <div className="text-center text-sm py-0 leading-tight text-white bg-gray-200/50">Margin</div>
                 <div className="grid grid-cols-2 gap-1">
                     <Form.Group className="mb-0">
-                        <Form.Label text="top" />
+                        <Form.Label text="top" className="text-foreground" />
                         <Form.Input
                             type="text"
                             value={style?.marginTop?.toString() ?? ""}
@@ -21,7 +21,7 @@ export function Spacing2Settings({ style, onChange }: Spacing2SettingsProps) {
                         />
                     </Form.Group>
                     <Form.Group className="mb-0">
-                        <Form.Label text="bottom" />
+                        <Form.Label text="bottom" className="text-foreground" />
                         <Form.Input
                             type="text"
                             value={style?.marginBottom?.toString() ?? ""}
@@ -41,7 +41,7 @@ export function Spacing2Settings({ style, onChange }: Spacing2SettingsProps) {
                         />
                     </Form.Group>
                     <Form.Group className="mb-0">
-                        <Form.Label text="right" />
+                        <Form.Label text="right" className="text-foreground" />
                         <Form.Input
                             type="text"
                             value={style?.marginRight?.toString() ?? ""}
@@ -56,7 +56,7 @@ export function Spacing2Settings({ style, onChange }: Spacing2SettingsProps) {
                 <div className="text-center text-sm py-0 leading-tight text-white bg-gray-200/50">Padding</div>
                 <div className="grid grid-cols-2 gap-1">
                     <Form.Group className="mb-0">
-                        <Form.Label text="top" />
+                        <Form.Label text="top" className="text-foreground" />
                         <Form.Input
                             type="text"
                             value={style?.paddingTop?.toString() ?? ""}
@@ -65,7 +65,7 @@ export function Spacing2Settings({ style, onChange }: Spacing2SettingsProps) {
                         />
                     </Form.Group>
                     <Form.Group className="mb-0">
-                        <Form.Label text="bottom" />
+                        <Form.Label text="bottom" className="text-foreground" />
                         <Form.Input
                             type="text"
                             value={style?.paddingBottom?.toString() ?? ""}
@@ -76,7 +76,7 @@ export function Spacing2Settings({ style, onChange }: Spacing2SettingsProps) {
                 </div>
                 <div className="grid grid-cols-2 gap-1">
                     <Form.Group className="mb-0">
-                        <Form.Label text="left" />
+                        <Form.Label text="left" className="text-foreground" />
                         <Form.Input
                             type="text"
                             value={style?.paddingLeft?.toString() ?? ""}

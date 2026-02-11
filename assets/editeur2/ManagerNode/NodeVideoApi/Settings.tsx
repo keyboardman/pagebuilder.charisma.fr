@@ -119,7 +119,7 @@ const Settings: FC<NodeSettingsProps> = () => {
 
     return (
       <div className="flex flex-1 flex-col gap-2 p-1 m-1 border border-border/30 rounded-lg mb-3">
-        <h3 className="node-block-title text-center text-sm font-medium">Sélection API</h3>
+        <h3 className="node-block-title text-center text-sm font-medium text-foreground">Sélection API</h3>
         {loading && (
           <div className="flex items-center justify-center py-4">
             <Loader2 className="h-5 w-5 animate-spin text-muted-foreground" />
@@ -133,8 +133,8 @@ const Settings: FC<NodeSettingsProps> = () => {
         )}
         {content.apiId && selectedAdapter && (
           <div className="p-2 bg-muted/50 rounded text-xs">
-            <p className="node-block-title text-muted-foreground text-sm">API: <span className="font-medium">{selectedAdapter.label}</span></p>
-            <p className="node-block-title text-muted-foreground mt-1 text-sm">Item: <span className="font-medium">{selectedItemTitle}</span></p>
+            <p className="node-block-title text-foreground text-sm">API: <span className="font-medium">{selectedAdapter.label}</span></p>
+            <p className="node-block-title text-foreground mt-1 text-sm">Item: <span className="font-medium">{selectedItemTitle}</span></p>
           </div>
         )}
         <Button

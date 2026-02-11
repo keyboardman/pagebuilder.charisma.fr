@@ -112,6 +112,10 @@ class ThemeCssGenerator
             }
             $rules = [];
             foreach ($data as $prop => $value) {
+                // Ne pas émettre background sur body : le builder (canvas) contrôle le fond.
+                if ($block === 'body' && ($prop === 'background' || $prop === 'background-color')) {
+                    continue;
+                }
                 if ($value !== '' && $value !== null) {
                     $rules[] = '  ' . $prop . ': ' . $this->formatCssValue($this->resolveColorValue($this->valueToString($value), $vars), $prop) . ';';
                 }

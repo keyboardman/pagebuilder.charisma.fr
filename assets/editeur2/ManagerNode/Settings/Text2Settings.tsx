@@ -15,7 +15,7 @@ export function Text2Settings({ style, onChange }: Text2SettingsProps) {
             <div className="text-center text-sm py-0 leading-tight text-white bg-gray-200/50">Text</div>
             <div className="flex flex-1">
                 <Form.Group className="w-1/2">
-                    <Form.Label text="font-size" />
+                    <Form.Label text="font-size" className="text-foreground" />
                     <Form.Input
                         type="text"
                         list="node-card-title-font-sizes"
@@ -31,7 +31,7 @@ export function Text2Settings({ style, onChange }: Text2SettingsProps) {
                     </datalist>
                 </Form.Group>
                 <Form.Group className="w-1/2">
-                    <Form.Label text="font-weight" />
+                    <Form.Label text="font-weight" className="text-foreground" />
                     <Form.Select
                         options={[
                             { label: '...', value: '' },
@@ -53,7 +53,7 @@ export function Text2Settings({ style, onChange }: Text2SettingsProps) {
             </div>
             <div className="flex flex-1">
                 <Form.Group className="w-1/2">
-                    <Form.Label text="font-style" />
+                    <Form.Label text="font-style" className="text-foreground" />
                     <Form.Select
                         options={[
                             { label: '...', value: '' },
@@ -68,7 +68,7 @@ export function Text2Settings({ style, onChange }: Text2SettingsProps) {
                 </Form.Group>
 
                 <Form.Group className="mb-0">
-                    <Form.Label text="font-family" />
+                    <Form.Label text="font-family" className="text-foreground" />
                     <Form.FontFamilySelect
                         value={style?.fontFamily?.toString() ?? ""}
                         onChange={(value) => onChange({ ...style, fontFamily: value as React.CSSProperties['fontFamily'] })}
@@ -79,7 +79,7 @@ export function Text2Settings({ style, onChange }: Text2SettingsProps) {
             
             <div className="flex flex-1">
                 <Form.Group className="mb-0 w-1/2">
-                    <Form.Label text="text-align" />
+                    <Form.Label text="text-align" className="text-foreground" />
                     <Form.Select options={[
                         { label: '...', value: '' },
                         { label: 'left', value: 'left' },
@@ -96,7 +96,7 @@ export function Text2Settings({ style, onChange }: Text2SettingsProps) {
                 </Form.Group>
 
                 <Form.Group className="mb-0">
-                    <Form.Label text="color" />
+                    <Form.Label text="color" className="text-foreground" />
                     <Form.InputColor
                         type="text"
                         value={style?.color?.toString() ?? ""}
@@ -107,7 +107,7 @@ export function Text2Settings({ style, onChange }: Text2SettingsProps) {
             </div>
             <div className="flex flex-1" >
                 <Form.Group className="w-1/2 mb-0">
-                    <Form.Label text="decoration" />
+                    <Form.Label text="decoration" className="text-foreground" />
                     <Form.Select options={[
                         { label: '...', value: '' },
                         { label: 'underline', value: 'underline' },
@@ -122,7 +122,7 @@ export function Text2Settings({ style, onChange }: Text2SettingsProps) {
                     />
                 </Form.Group>
                 <Form.Group className="mb-0">
-                    <Form.Label text="line-height" />
+                    <Form.Label text="line-height" className="text-foreground" />
                     <Form.Input
                         type="text"
                         value={style?.lineHeight?.toString() ?? ""}

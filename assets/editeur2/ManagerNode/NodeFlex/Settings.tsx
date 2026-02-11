@@ -4,6 +4,7 @@ import {
   Background2Settings,
   Border2Settings,
   Spacing2Settings,
+  Size2Settings,
 } from "../Settings";
 import Form from "../../components/form";
 import { type NodeSettingsProps } from "../NodeConfigurationType";
@@ -73,11 +74,11 @@ const Settings: FC<NodeSettingsProps> = () => {
             }
           />
 
-          <div className="mt-2 space-y-2 text-xs [font-size:0.75rem] [line-height:1rem]">
-            <p className="node-block-title font-medium [font-size:0.8125rem]">Flex</p>
+          <div className="mt-2 space-y-2 text-xs">
+            <p className="node-block-title font-medium text-foreground text-sm">Flex</p>
 
             <div className="flex items-center gap-2">
-              <span className="node-block-title w-14 shrink-0">Direction</span>
+              <span className="node-block-title w-14 shrink-0 text-foreground text-sm">Direction</span>
               <Form.Select
                 value={options.direction ?? "row"}
                 onChange={(v) => updateOption("direction", v as FlexDirection)}
@@ -87,7 +88,7 @@ const Settings: FC<NodeSettingsProps> = () => {
             </div>
 
             <div className="flex items-center gap-2">
-              <span className="node-block-title w-14 shrink-0">Justify</span>
+              <span className="node-block-title w-14 shrink-0 text-foreground text-sm">Justify</span>
               <Form.Select
                 value={options.justify ?? "flex-start"}
                 onChange={(v) => updateOption("justify", v as FlexJustify)}
@@ -97,7 +98,7 @@ const Settings: FC<NodeSettingsProps> = () => {
             </div>
 
             <div className="flex items-center gap-2">
-              <span className="node-block-title w-14 shrink-0">Align</span>
+              <span className="node-block-title w-14 shrink-0 text-foreground text-sm">Align</span>
               <Form.Select
                 value={options.align ?? "stretch"}
                 onChange={(v) => updateOption("align", v as FlexAlign)}
@@ -107,7 +108,7 @@ const Settings: FC<NodeSettingsProps> = () => {
             </div>
 
             <div className="flex items-center gap-2">
-              <span className="node-block-title w-14 shrink-0">Wrap</span>
+              <span className="node-block-title w-14 shrink-0 text-foreground text-sm">Wrap</span>
               <Form.Select
                 value={options.wrap ?? "nowrap"}
                 onChange={(v) => updateOption("wrap", v as FlexWrap)}
@@ -117,7 +118,7 @@ const Settings: FC<NodeSettingsProps> = () => {
             </div>
 
             <div className="flex items-center gap-2">
-              <span className="node-block-title w-14 shrink-0">Gap</span>
+              <span className="node-block-title w-14 shrink-0 text-foreground text-sm">Gap</span>
               <Form.Input
                 type="number"
                 value={(options.gap ?? 4).toString()}
@@ -156,6 +157,15 @@ const Settings: FC<NodeSettingsProps> = () => {
             }
           />
           <Spacing2Settings
+            style={node.attributes?.style || {}}
+            onChange={(style) =>
+              onChange({
+                ...node,
+                attributes: { ...node.attributes, style },
+              })
+            }
+          />
+          <Size2Settings
             style={node.attributes?.style || {}}
             onChange={(style) =>
               onChange({

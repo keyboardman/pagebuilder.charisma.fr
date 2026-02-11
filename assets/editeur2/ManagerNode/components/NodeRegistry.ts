@@ -11,11 +11,13 @@ import NodeRoot from "./../NodeRoot";
 import NodeCard from "./../NodeCard";
 import NodeCardApi from "./../NodeCardApi";
 import NodeVideoApi from "./../NodeVideoApi";
+import NodeButton from "./../NodeButton";
 import type { NodeType } from "../../types/NodeType";
 
 export const NodeRegistry = {
     [NodeHeader.type]: NodeHeader,
     [NodeText.type]: NodeText,
+    [NodeButton.type]: NodeButton,
     [NodeRoot.type]: NodeRoot,
     [NodeContainer.type]: NodeContainer,
     [NodeFlex.type]: NodeFlex,

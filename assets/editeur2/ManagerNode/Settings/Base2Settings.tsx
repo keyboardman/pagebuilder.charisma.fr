@@ -15,7 +15,7 @@ export function Base2Settings({ attributes, onChange }: Base2SettingsProps) {
     return (
         <div className="flex flex-col gap-1 mb-1 mt-1">
             <Form.Group className="mb-0">
-                <Form.Label text="ID" />
+                <Form.Label text="ID"  className="text-foreground" />
                 <Form.Input
                     type="text"
                     value={id ?? ""}
@@ -27,7 +27,7 @@ export function Base2Settings({ attributes, onChange }: Base2SettingsProps) {
                 />
             </Form.Group>
             <Form.Group className="mb-0">
-                <Form.Label text="Classe" />
+                <Form.Label text="Classe" className="text-foreground" />
                 <Form.Input
                     type="text"
                     value={className ?? ""}

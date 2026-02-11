@@ -27,7 +27,10 @@ const Settings: FC<NodeSettingsProps> = () => {
               })}
             />
             <Form.Group>
-              <Form.Label text="ID de la vidéo YouTube" className="node-block-title text-sm" />
+              <Form.Label
+                text="ID de la vidéo YouTube"
+                className="text-sm font-medium text-foreground"
+              />
               <Form.Input
                 type="text"
                 value={content?.videoId ?? ""}
@@ -39,9 +42,7 @@ const Settings: FC<NodeSettingsProps> = () => {
                 }}
                 placeholder="Ex: dQw4w9WgXcQ"
               />
-              <p className="node-block-title text-muted-foreground mt-1 text-sm">
-                Entrez l'ID de la vidéo YouTube (visible dans l'URL de la vidéo)
-              </p>
+              <div className="mt-1 text-sm font-medium text-foreground">Entrez l'ID de la vidéo YouTube (visible dans l'URL de la vidéo)</div>
             </Form.Group>
           </>
         }
@@ -62,7 +63,6 @@ const Settings: FC<NodeSettingsProps> = () => {
             })}
           />
         </>}
-
       />
     </>
   );

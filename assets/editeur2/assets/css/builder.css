@@ -36,6 +36,8 @@
 
 .admin-layout__header {
     grid-area: header;
+    flex-shrink: 0;
+    min-height: fit-content;
     background-color: var(--card);
     color: var(--card-foreground);
     border-bottom: 1px solid var(--border);
@@ -86,7 +88,7 @@
     font-size: 1.25rem;
     font-weight: 600;
     line-height: 1.2;
-    color: #171717;
+    color: var(--foreground);
 }
 /* Labels UI (ex: Sélection API) : taille réduite dans les settings */
 .admin-layout__right .node-block-title.text-sm,

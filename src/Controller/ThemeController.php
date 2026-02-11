@@ -69,6 +69,7 @@ class ThemeController extends AbstractController
 
         $scoped = $request->query->getBoolean('scoped');
         $content = file_get_contents($realPath);
+
         if ($scoped && $content !== false) {
             $content = $this->scopeThemeCss($content);
         }

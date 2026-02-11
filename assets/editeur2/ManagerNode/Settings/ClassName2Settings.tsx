@@ -10,7 +10,7 @@ export function ClassName2Settings({ classes, onChange }: ClassName2SettingsProp
     return (
         <div className="flex flex-col gap-1 mb-2 mt-1">
             <Form.Group>
-                <Form.Label text="class" />
+                <Form.Label text="class" className="text-foreground" />
                 <Form.Input
                     type="text"
                     value={classes}

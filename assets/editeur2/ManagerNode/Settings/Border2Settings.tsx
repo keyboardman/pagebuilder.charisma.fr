@@ -12,7 +12,7 @@ export function Border2Settings({ style, onChange }: Border2SettingsProps) {
             <div className="text-center text-sm py-0 leading-tight text-white bg-gray-200/50">Border</div>
             <div className="flex flex-1">
                 <Form.Group className="mb-0">
-                    <Form.Label text="border-color" />
+                    <Form.Label text="border-color" className="text-foreground" />
                     <Form.InputColor
                         type="text"
                         value={style?.borderColor?.toString() ?? ""}
@@ -21,7 +21,7 @@ export function Border2Settings({ style, onChange }: Border2SettingsProps) {
                     />
                 </Form.Group>
                 <Form.Group className="mb-0">
-                    <Form.Label text="border-width" />
+                    <Form.Label text="border-width" className="text-foreground" />
                     <Form.Input
                         type="text"
                         value={style?.borderWidth?.toString() ?? ""}
@@ -32,7 +32,7 @@ export function Border2Settings({ style, onChange }: Border2SettingsProps) {
             </div>
             <div className="flex flex-1">
                 <Form.Group className="mb-0">
-                    <Form.Label text="border-style" />
+                    <Form.Label text="border-style" className="text-foreground" />
                     <Form.Select options={[
                         { label: '...', value: '' },
                         { label: 'solid', value: 'solid' },
@@ -46,7 +46,7 @@ export function Border2Settings({ style, onChange }: Border2SettingsProps) {
                     />
                 </Form.Group>
                 <Form.Group className="mb-0">
-                    <Form.Label text="border-radius" />
+                    <Form.Label text="border-radius" className="text-foreground" />
                     <Form.Input
                         type="text"
                         value={style?.borderRadius?.toString() ?? ""}

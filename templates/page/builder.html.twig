@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Builder — {{ page.title }}</title>
     {% if page.theme.generatedCssPath %}
-        <link rel="stylesheet" href="{{ path('app_theme_css', { id: page.theme.id }) }}?scoped=1">
+        <link rel="stylesheet" href="{{ path('app_theme_css', { id: page.theme.id }) }}">
     {% endif %}
     {{ encore_entry_link_tags('pageBuilderStandalone') }}
 </head>
