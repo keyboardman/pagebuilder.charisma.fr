@@ -46,7 +46,7 @@ const View: FC<NodeViewProps | NodeEditProps> = () => {
       style={styleForView(node?.attributes?.style)}
       {...dataAttributes}
     >
-      <div style={flexStyle}>
+      <div style={flexStyle} className="h-full">
         <NodeCollection nodes={children} parentId={node.id} zone="main" />
       </div>
     </div>
