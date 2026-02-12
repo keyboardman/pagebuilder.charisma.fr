@@ -234,8 +234,8 @@
 .bg-diagonal-blue {
     background-image: repeating-linear-gradient(
       -45deg,
-      rgba(59, 130, 246, 0.06),
-      rgba(59, 130, 246, 0.06) 14px,
+      #8DB4FA,
+      #8DB4FA 14px,
       rgba(59, 130, 246, 0.02) 14px,
       rgba(59, 130, 246, 0.02) 28px
     );

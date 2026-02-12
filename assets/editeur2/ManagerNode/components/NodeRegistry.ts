@@ -12,6 +12,7 @@ import NodeCard from "./../NodeCard";
 import NodeCardApi from "./../NodeCardApi";
 import NodeVideoApi from "./../NodeVideoApi";
 import NodeButton from "./../NodeButton";
+import NodeHero from "./../NodeHero";
 import type { NodeType } from "../../types/NodeType";
 
 export const NodeRegistry = {
@@ -21,6 +22,7 @@ export const NodeRegistry = {
     [NodeRoot.type]: NodeRoot,
     [NodeContainer.type]: NodeContainer,
     [NodeFlex.type]: NodeFlex,
+    [NodeHero.type]: NodeHero,
     [NodeGrid.type]: NodeGrid,
     [NodeImage.type]: NodeImage,
     [NodeCard.type]: NodeCard,
