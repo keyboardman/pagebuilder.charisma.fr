@@ -132,6 +132,62 @@ export function Text2Settings({ style, onChange }: Text2SettingsProps) {
                     />
                 </Form.Group>
             </div>
+            <div className="flex flex-1">
+                <Form.Group className="w-1/2 mb-0">
+                    <Form.Label text="text-transform" className="text-foreground" />
+                    <Form.Select
+                        options={[
+                            { label: 'none', value: 'none' },
+                            { label: 'capitalize', value: 'capitalize' },
+                            { label: 'uppercase', value: 'uppercase' },
+                            { label: 'lowercase', value: 'lowercase' },
+                        ]}
+                        value={style?.textTransform?.toString() ?? "none"}
+                        onChange={(value) => onChange({
+                            ...style, textTransform: value as React.CSSProperties['textTransform']
+                        })}
+                        className="h-7 text-sm"
+                    />
+                </Form.Group>
+                <Form.Group className="w-1/2 mb-0">
+                    <Form.Label text="text-overflow" className="text-foreground" />
+                    <Form.Select
+                        options={[
+                            { label: 'clip', value: 'clip' },
+                            { label: 'ellipsis', value: 'ellipsis' },
+                        ]}
+                        value={style?.textOverflow?.toString() ?? "ellipsis"}
+                        onChange={(value) => onChange({
+                            ...style, textOverflow: value as React.CSSProperties['textOverflow']
+                        })}
+                        className="h-7 text-sm"
+                    />
+                </Form.Group>
+            </div>
+            <div className="flex flex-1">
+                <Form.Group className="mb-0">
+                    <Form.Label text="line-clamp" className="text-foreground" />
+                    <Form.Select
+                        options={[
+                            { label: '...', value: '' },
+                            { label: '2', value: '2' },
+                            { label: '3', value: '3' },
+                            { label: '4', value: '4' },
+                        ]}
+                        value={style?.WebkitLineClamp?.toString() ?? ""}
+                        onChange={(value) => {
+                            const next = { ...style };
+                            if (value === "") {
+                                delete next.WebkitLineClamp;
+                            } else {
+                                next.WebkitLineClamp = value as unknown as number;
+                            }
+                            onChange(next);
+                        }}
+                        className="h-7 text-sm"
+                    />
+                </Form.Group>
+            </div>
         </div>
     )
 }
