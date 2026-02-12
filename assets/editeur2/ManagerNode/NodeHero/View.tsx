@@ -19,6 +19,16 @@ const defaultOptions: NodeHeroOptions = {
   alignVertical: "middle",
 };
 
+/** Hauteur min en cqw (1% de la largeur du conteneur) pour respecter le ratio (ex. "16/9" → "56.25cqw"). */
+function ratioToMinHeightCqw(ratio: string): string {
+  const parts = ratio.trim().split("/").map((p) => parseFloat(p.trim()));
+  if (parts.length !== 2 || !Number.isFinite(parts[0]) || !Number.isFinite(parts[1]) || parts[0] <= 0) {
+    return "56.25cqw";
+  }
+  const [w, h] = parts;
+  return `${(h / w) * 100}cqw`;
+}
+
 function toJustifyContent(align: ContainerImageAlignHorizontal): React.CSSProperties["justifyContent"] {
   switch (align) {
     case "start":
@@ -61,7 +71,9 @@ const View: FC<NodeViewProps | NodeEditProps> = () => {
   const containerStyle: React.CSSProperties = {
     width: "100%",
     position: "relative",
-    ...(isEditMode ? {} : { aspectRatio: ratio }),
+    ...(isEditMode
+      ? { containerType: "inline-size" as const, minHeight: ratioToMinHeightCqw(ratio) }
+      : { aspectRatio: ratio }),
     ...(src
       ? {
           backgroundImage: `url(${src})`,

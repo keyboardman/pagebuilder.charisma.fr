@@ -2,10 +2,10 @@ import { type FC } from "react";
 import NodeCollection from "../components/NodeCollection";
 import type { NodesType } from "../../types/NodeType";
 
-const classByType: Record<string, string> = {
-  mobile: "max-w-xl",
-  tablet: "max-w-3xl",
-  desktop: "max-w-7xl",
+const classByType: Record<string, string | undefined> = {
+  mobile: "max-w-sm",
+  tablet: "max-w-lg",
+  desktop: undefined,
 };
 
 interface NodeRootContentProps {

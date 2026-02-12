@@ -2,7 +2,7 @@ import type { NodeType } from "../../types/NodeType";
 
 // Identifiant technique du node dans le contenu sérialisé.
 // On garde la même valeur string pour compatibilité.
-export const NODE_HERO_TYPE = "node-container-image" as const;
+export const NODE_HERO_TYPE = "node-hero" as const;
 
 export type ContainerImageAlignHorizontal = "start" | "center" | "end";
 export type ContainerImageAlignVertical = "top" | "middle" | "bottom";
