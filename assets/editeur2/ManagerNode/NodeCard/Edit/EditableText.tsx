@@ -1,6 +1,7 @@
 import { type FC } from "react";
 import Form from "../../../components/form";
 import { cn } from "@editeur/lib/utils";
+import { styleForView } from "../../../utils/styleHelper";
 
 interface EditableTextProps {
     show: boolean;
@@ -21,7 +22,7 @@ export const EditableText: FC<EditableTextProps> = ({ show, text, className, sty
             value={text}
             className={cn("text-base/6", className )}
             tagName="div"
-            style={style}
+            style={styleForView(style)}
             onFocus={() => {
                 onFocus();
             }}
@@ -34,7 +35,7 @@ export const EditableText: FC<EditableTextProps> = ({ show, text, className, sty
             <div
                 dangerouslySetInnerHTML={{ __html: text }}
                 className={cn("text-base/6", className )}
-                style={style}
+                style={styleForView(style)}
                 onClick={() => {
                     onSelect();
                 }}

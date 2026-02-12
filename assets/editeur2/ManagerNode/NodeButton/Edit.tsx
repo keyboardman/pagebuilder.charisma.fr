@@ -3,6 +3,7 @@ import { type NodeEditProps } from "../NodeConfigurationType";
 import { useNodeBuilderContext } from "../../services/providers/NodeBuilderContext";
 import type { NodeButtonType } from "./index";
 import TagNameEditable from "./components/TagNameEditable";
+import { styleForView } from "../../utils/styleHelper";
 
 const Edit: FC<NodeEditProps> = () => {
   const { node, onChange } = useNodeBuilderContext();
@@ -11,7 +12,7 @@ const Edit: FC<NodeEditProps> = () => {
   const label = buttonNode.content?.label ?? "";
   const href = buttonNode.content?.href ?? "";
   const target = buttonNode.content?.target ?? "_self";
-  const style = node?.attributes?.style ?? {};
+  const style = styleForView(node?.attributes?.style ?? {});
 
   const className = node?.attributes?.className ?? "";
   const commonProps = {

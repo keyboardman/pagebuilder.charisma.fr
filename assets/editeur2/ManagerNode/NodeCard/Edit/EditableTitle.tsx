@@ -2,6 +2,7 @@ import { type FC } from "react";
 import Form from "../../../components/form";
 import  { ViewTitle }  from "../View/index";
 import { cn } from "@editeur/lib/utils";
+import { styleForView } from "../../../utils/styleHelper";
 
 interface EditableTitleProps {
     show: boolean;
@@ -19,13 +20,13 @@ interface EditableTitleProps {
 export const EditableTitle: FC<EditableTitleProps> = (props: EditableTitleProps) => {
     const { show, title, className, style, edit, onBlur, onFocus, onSelect } = props;
 
-    if (!show) return <ViewTitle text={title} className={className} style={style} />;
+    if (!show) return <ViewTitle text={title} className={className} style={styleForView(style)} />;
     return edit ? (
         <Form.InputEditor
             value={title}
             className={cn("node-block-title w-full leading-1.2 text-xl font-bold", className ?? "")}
             tagName="div"
-            style={style}
+            style={styleForView(style)}
             onFocus={() => {
                 onFocus();
             }}
@@ -37,7 +38,7 @@ export const EditableTitle: FC<EditableTitleProps> = (props: EditableTitleProps)
         <ViewTitle
             text={title}
             className={className}
-            style={style}
+            style={styleForView(style)}
         /> 
     )
 }

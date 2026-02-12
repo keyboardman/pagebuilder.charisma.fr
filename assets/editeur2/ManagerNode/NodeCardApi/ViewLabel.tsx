@@ -1,6 +1,7 @@
 import { type FC } from "react";
 import { cn } from "@editeur/lib/utils";
 import { Badge } from "@editeur/components/ui/badge";
+import { styleForView } from "../../utils/styleHelper";
 
 export type ViewLabelProps = {
     className: string;
@@ -16,7 +17,7 @@ export const ViewLabel: FC<ViewLabelProps> = ({ label, className, style, show, o
 
     return (
         <div className="flex flex-wrap gap-2"  onClick={onClick}>
-            <Badge variant="secondary" className={cn(className)} style={style}>{label}</Badge>
+            <Badge variant="secondary" className={cn(className)} style={styleForView(style)}>{label}</Badge>
         </div>
     );
 }

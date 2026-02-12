@@ -1,5 +1,6 @@
 import { type FC } from "react";
 import { cn } from "@editeur/lib/utils";
+import { styleForView } from "../../utils/styleHelper";
 
 /**
  * Props for the ViewTitle component
@@ -25,7 +26,7 @@ export const ViewTitle: FC<ViewTitleProps> = ({ title, className, style, onClick
             aria-level={3}
             dangerouslySetInnerHTML={{ __html: title }}
             className={cn("node-block-title w-full text-xl/6 font-bold", className)}
-            style={style}
+            style={styleForView(style)}
             onClick={onClick}
         />
     );

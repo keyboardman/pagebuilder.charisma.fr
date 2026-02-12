@@ -1,5 +1,6 @@
 import { type FC } from "react";
 import { cn } from "@editeur/lib/utils";
+import { styleForView } from "../../utils/styleHelper";
 
 export type ViewTextProps = {
     className: string;
@@ -17,7 +18,7 @@ export const ViewText: FC<ViewTextProps> = ({ className, show, style, text, onCl
         <div
             dangerouslySetInnerHTML={{ __html: text }}
             className={cn("text-base/6", className)}
-            style={style}
+            style={styleForView(style)}
             onClick={onClick}
         />
     );
