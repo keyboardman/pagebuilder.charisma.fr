@@ -22,10 +22,12 @@ const defaultOptions: NodeHeroOptions = {
 /** Hauteur min en cqw (1% de la largeur du conteneur) pour respecter le ratio (ex. "16/9" → "56.25cqw"). */
 function ratioToMinHeightCqw(ratio: string): string {
   const parts = ratio.trim().split("/").map((p) => parseFloat(p.trim()));
+  console.log(parts);
   if (parts.length !== 2 || !Number.isFinite(parts[0]) || !Number.isFinite(parts[1]) || parts[0] <= 0) {
     return "56.25cqw";
   }
   const [w, h] = parts;
+  console.log(w, h, (h / w) * 100);
   return `${(h / w) * 100}cqw`;
 }
 
@@ -100,10 +102,10 @@ const View: FC<NodeViewProps | NodeEditProps> = () => {
   };
 
   const dataAttributes = Object.entries(containerNode?.attributes?.options ?? {}).reduce(
-    (acc, [key, value]) => ({
-      ...acc,
-      [`data-ce-${key}`]: value,
-    }),
+    (acc, [key, value]) => {
+      if (typeof value === "object") return acc;
+      return { ...acc, [`data-ce-${key.toLowerCase()}`]: value };
+    },
     {}
   );
 
