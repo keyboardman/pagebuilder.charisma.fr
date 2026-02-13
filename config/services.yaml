@@ -81,3 +81,6 @@ services:
 
     App\PageBuilder\ApiCard\CharismaVideosApiCard:
         tags: [app.builder_api_card]
+
+    App\PageBuilder\ApiCard\CharismaTemoignageApiCard:
+        tags: [app.builder_api_card]

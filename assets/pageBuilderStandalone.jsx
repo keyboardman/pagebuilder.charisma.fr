@@ -178,6 +178,8 @@ if (dataEl && rootEl) {
 
     const raw = data.content;
 
+    console.log('raw',  data.apiCardsBaseUrl);
+
     initialContent =
       typeof raw === 'string'
         ? raw
