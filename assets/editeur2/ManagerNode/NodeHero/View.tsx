@@ -46,13 +46,26 @@ function toAlignItems(align: ContainerImageAlignVertical): React.CSSProperties["
 }
 
 function calculateRatio(ratio: string | number | undefined): number {
-  let _ratio = 16 / 9;
-  if (typeof ratio === "number") {
+  const defaultRatio = 16 / 9;
+
+  let _ratio = defaultRatio;
+
+  if (typeof ratio === "number" && !isNaN(ratio) && ratio > 0) {
     _ratio = ratio;
-  }
-  if (typeof ratio === "string") {
-    const parts = ratio.trim().split("/").map((p) => parseFloat(p.trim()));
-    _ratio = parts.length === 2 ? parts[0] / parts[1] : 16 / 9;
+  } else if (typeof ratio === "string") {
+    const trimmed = ratio.trim();
+
+    if (trimmed.includes("/")) {
+      const parts = trimmed.split("/").map(p => parseFloat(p.trim()));
+      if (parts.length === 2 && !isNaN(parts[0]) && !isNaN(parts[1]) && parts[1] !== 0) {
+        _ratio = parts[0] / parts[1];
+      }
+    } else {
+      const num = parseFloat(trimmed);
+      if (!isNaN(num) && num > 0) {
+        _ratio = num;
+      }
+    }
   }
   return 1 / _ratio;
 }
@@ -82,7 +95,7 @@ const View: FC<NodeViewProps | NodeEditProps> = () => {
       : {}),
     ...styleForView(node?.attributes?.style),
   };
-  console.log('containerStyle', containerStyle);
+
   const contentBlockStyleFromOptions = options.dropzoneStyle ?? {};
   const overlayStyle: React.CSSProperties = {
     display: "flex",
