@@ -19,18 +19,6 @@ const defaultOptions: NodeHeroOptions = {
   alignVertical: "middle",
 };
 
-/** Hauteur min en cqw (1% de la largeur du conteneur) pour respecter le ratio (ex. "16/9" → "56.25cqw"). */
-function ratioToMinHeightCqw(ratio: string): string {
-  const parts = ratio.trim().split("/").map((p) => parseFloat(p.trim()));
-  console.log(parts);
-  if (parts.length !== 2 || !Number.isFinite(parts[0]) || !Number.isFinite(parts[1]) || parts[0] <= 0) {
-    return "56.25cqw";
-  }
-  const [w, h] = parts;
-  console.log(w, h, (h / w) * 100);
-  return `${(h / w) * 100}cqw`;
-}
-
 function toJustifyContent(align: ContainerImageAlignHorizontal): React.CSSProperties["justifyContent"] {
   switch (align) {
     case "start":
@@ -57,10 +45,21 @@ function toAlignItems(align: ContainerImageAlignVertical): React.CSSProperties["
   }
 }
 
+function calculateRatio(ratio: string | number | undefined): number {
+  let _ratio = 16 / 9;
+  if (typeof ratio === "number") {
+    _ratio = ratio;
+  }
+  if (typeof ratio === "string") {
+    const parts = ratio.trim().split("/").map((p) => parseFloat(p.trim()));
+    _ratio = parts.length === 2 ? parts[0] / parts[1] : 16 / 9;
+  }
+  return 1 / _ratio;
+}
+
 const View: FC<NodeViewProps | NodeEditProps> = () => {
   const { node, getChildren } = useNodeContext();
   const { mode } = useAppContext();
-  const isEditMode = mode === APP_MODE.EDIT;
 
   const containerNode = node as NodeHeroType;
   const options = { ...defaultOptions, ...containerNode?.attributes?.options };
@@ -73,25 +72,23 @@ const View: FC<NodeViewProps | NodeEditProps> = () => {
   const containerStyle: React.CSSProperties = {
     width: "100%",
     position: "relative",
-    ...(isEditMode
-      ? { containerType: "inline-size" as const, minHeight: ratioToMinHeightCqw(ratio) }
-      : { aspectRatio: ratio }),
+    minHeight: calculateRatio(ratio) * 100 + "cqw",
     ...(src
       ? {
-          backgroundImage: `url(${src})`,
-          backgroundSize: "cover",
-          backgroundPosition: "center",
-        }
+        backgroundImage: `url(${src})`,
+        backgroundSize: "cover",
+        backgroundPosition: "center",
+      }
       : {}),
     ...styleForView(node?.attributes?.style),
   };
-
+  console.log('containerStyle', containerStyle);
   const contentBlockStyleFromOptions = options.dropzoneStyle ?? {};
   const overlayStyle: React.CSSProperties = {
-    ...(isEditMode ? {} : { position: "absolute", inset: 0 }),
     display: "flex",
     justifyContent: toJustifyContent(options.alignHorizontal ?? "center"),
     alignItems: toAlignItems(options.alignVertical ?? "middle"),
+    minHeight: calculateRatio(ratio) * 100 + "cqw",
   };
 
   const contentBlockStyle: React.CSSProperties = {
@@ -110,17 +107,19 @@ const View: FC<NodeViewProps | NodeEditProps> = () => {
   );
 
   return (
-    <div
-      data-ce-id={node.id}
-      data-ce-type={node.type}
-      id={node?.attributes?.id}
-      className={cn(node?.attributes?.className, "overflow-hidden")}
-      style={containerStyle}
-      {...dataAttributes}
-    >
-      <div style={overlayStyle}>
-        <div style={contentBlockStyle}>
-          <NodeCollection nodes={children} parentId={node.id} zone="main" />
+    <div style={{ containerType: "inline-size" }}>
+      <div
+        data-ce-id={node.id}
+        data-ce-type={node.type}
+        id={node?.attributes?.id}
+        className={cn(node?.attributes?.className)}
+        style={containerStyle}
+        {...dataAttributes}
+      >
+        <div style={overlayStyle}>
+          <div style={contentBlockStyle}>
+            <NodeCollection nodes={children} parentId={node.id} zone="main" />
+          </div>
         </div>
       </div>
     </div>
