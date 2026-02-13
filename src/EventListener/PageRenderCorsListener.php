@@ -9,14 +9,15 @@ use Symfony\Component\HttpKernel\Event\ResponseEvent;
 use Symfony\Component\HttpKernel\KernelEvents;
 
 /**
- * Ajoute les en-têtes CORS pour les routes GET du contenu render,
- * afin d'accepter toute origine et tout port (iframe, autre domaine).
+ * Ajoute les en-têtes CORS pour les routes GET du contenu render et des fichiers polices,
+ * afin d'accepter toute origine et tout port (iframe, autre domaine, www.charisma.fr).
  */
 final class PageRenderCorsListener implements EventSubscriberInterface
 {
     private const RENDER_GET_ROUTES = [
         'app_page_render',
         'app_page_render_by_id',
+        'app_font_file',
     ];
 
     public static function getSubscribedEvents(): array
