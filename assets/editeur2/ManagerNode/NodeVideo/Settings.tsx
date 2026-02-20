@@ -42,7 +42,7 @@ const Settings: FC<NodeSettingsProps> = () => {
                     content: { ...content, src: value },
                   });
                 }}
-                acceptedTypes="video/*"
+                typeMedia="video"
                 className="h-7 text-sm"
               />
             </Form.Group>
@@ -57,7 +57,7 @@ const Settings: FC<NodeSettingsProps> = () => {
                     content: { ...content, poster: value },
                   });
                 }}
-                acceptedTypes="image/*"
+                typeMedia="image"
                 className="h-7 text-sm"
               />
             </Form.Group>

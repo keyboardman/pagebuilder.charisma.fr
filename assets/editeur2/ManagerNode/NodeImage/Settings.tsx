@@ -43,7 +43,7 @@ const Settings: FC<NodeSettingsProps> = () => {
                     content: { ...content, src: value },
                   });
                 }}
-                acceptedTypes="image/*"
+                typeMedia="image"
                 className="h-7 text-sm"
               />
             </Form.Group>

@@ -47,6 +47,12 @@
             "migrations/.gitignore"
         ]
     },
+    "keyboardman/filemanager-bundle": {
+        "version": "dev-main"
+    },
+    "keyboardman/filesystem-bundle": {
+        "version": "dev-main"
+    },
     "phpunit/phpunit": {
         "version": "12.5",
         "recipe": {

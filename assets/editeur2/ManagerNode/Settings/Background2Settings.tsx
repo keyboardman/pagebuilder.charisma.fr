@@ -2,8 +2,7 @@ import { useState } from "react";
 import Form from "../../components/form";
 import { Button } from "@editeur/components/ui/button";
 import { ImageIcon } from "lucide-react";
-import FileManager from "../../ManagerAsset/FileManager";
-import { useFileManager } from "../../ManagerAsset/hooks/useFileManager";
+import { FileManagerIframePicker } from "../../ManagerAsset/FileManagerIframePicker";
 import type { FileItem } from "../../ManagerAsset/types";
 import { useAppContext, APP_MODE } from "../../services/providers/AppContext";
 
@@ -21,9 +20,7 @@ export interface Background2SettingsProps {
 
 export function Background2Settings({ style, onChange }: Background2SettingsProps) {
     const [isFileManagerOpen, setIsFileManagerOpen] = useState(false);
-    const fileService = useFileManager();
-    const { mode } = useAppContext();
-    const isViewMode = mode === APP_MODE.VIEW;
+    const { fileManagerConfig } = useAppContext();
 
     const handleSelectImage = (file: FileItem) => {
         const absoluteUrl = toAbsoluteUrl(file.url);
@@ -38,6 +35,7 @@ export function Background2Settings({ style, onChange }: Background2SettingsProp
     return (
         <div className="flex flex-col gap-1 mb-2 mt-1">
             <div className="text-center text-sm py-0 leading-tight text-white bg-gray-200/50">Background</div>
+
             <Form.Group className="mb-0">
                 <Form.Label text="background-image" className="text-foreground" />
                 <div className="flex gap-1">
@@ -47,27 +45,24 @@ export function Background2Settings({ style, onChange }: Background2SettingsProp
                         onChange={(value) => onChange({ ...style, backgroundImage: value as React.CSSProperties["backgroundImage"] })}
                         className="h-7 text-sm flex-1 min-w-0"
                     />
-                    {!isViewMode && fileService && (
-                        <>
-                            <Button
-                                type="button"
-                                variant="outline"
-                                size="icon"
-                                className="h-7 w-7 shrink-0"
-                                onClick={() => setIsFileManagerOpen(true)}
-                                title="Choisir une image"
-                            >
-                                <ImageIcon className="h-4 w-4" />
-                            </Button>
-                            <FileManager
-                                open={isFileManagerOpen}
-                                onOpenChange={setIsFileManagerOpen}
-                                onSelectFile={handleSelectImage}
-                                fileService={fileService}
-                                acceptedTypes="image/*"
-                            />
-                        </>
-                    )}
+                    <Button
+                        type="button"
+                        variant="outline"
+                        size="icon"
+                        className="h-7 w-7 shrink-0"
+                        onClick={() => setIsFileManagerOpen(true)}
+                        title="Choisir une image"
+                    >
+                        <ImageIcon className="h-4 w-4" />
+                    </Button>
+                    <FileManagerIframePicker
+                        open={isFileManagerOpen}
+                        onOpenChange={setIsFileManagerOpen}
+                        onSelectFile={handleSelectImage}
+                        filemanagerUrl={fileManagerConfig?.filemanagerUrl ?? ''}
+                        resolveUrl={fileManagerConfig?.resolveUrl}
+                        type="image"
+                    />
                 </div>
             </Form.Group>
             <div className="flex flex-1">

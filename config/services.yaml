@@ -84,3 +84,20 @@ services:
 
     App\PageBuilder\ApiCard\CharismaTemoignageApiCard:
         tags: [app.builder_api_card]
+
+    app.s3_client:
+        class: Aws\S3\S3Client
+        factory: ['@App\Service\S3ClientFactory', '__invoke']
+        arguments:
+        - '%env(MINIO_ENDPOINT)%'
+        - '%env(MINIO_REGION)%'
+        - '%env(MINIO_ACCESS_KEY)%'
+        - '%env(MINIO_SECRET_KEY)%'
+        - '%env(MINIO_BUCKET)%'
+
+    app.flysystem_adapter.s3:
+        class: League\Flysystem\AwsS3V3\AwsS3V3Adapter
+        arguments:
+        - '@app.s3_client'
+        - '%env(MINIO_BUCKET)%'
+        - ''

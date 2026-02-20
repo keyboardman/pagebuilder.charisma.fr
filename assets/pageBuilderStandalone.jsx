@@ -6,16 +6,15 @@ import App from './editeur2/app/App';
 import { registerFont } from './editeur2/services/typography';
 import './editeur2/assets/css/index.css';
 
-const fileManagerConfig = {
-  type: 'custom',
-  custom: {
-    listEndpoint: '/media/api/list',
-    uploadEndpoint: '/media/api/upload',
-    renameEndpoint: '/media/api/rename',
-    deleteEndpoint: '/media/api/delete',
-    useXHR: true,
-  },
-};
+// Config filemanager : si filemanagerUrl est fourni (backend), mode iframe keyboardman ; sinon custom (legacy)
+function getFileManagerConfig(data) {
+  const filemanagerUrl = typeof data?.filemanagerUrl === 'string' && data.filemanagerUrl ? data.filemanagerUrl : null;
+  const resolveUrl = typeof data?.resolveUrl === 'string' && data.resolveUrl ? data.resolveUrl : null;
+  if (filemanagerUrl) {
+    return { type: 'iframe', filemanagerUrl, resolveUrl };
+  }
+  return { type: 'iframe', filemanagerUrl, resolveUrl };
+}
 
 function makeLinksAbsolute(html, baseUrl) {
   if (!baseUrl) return html;
@@ -87,6 +86,7 @@ function PageBuilderStandalone({
   pageDescription = '',
   themeCssUrl = '',
   renderCssUrls = [],
+  fileManagerConfig = null,
 }) {
   const [content, setContent] = useState(initialContent || '');
   const [saveStatus, setSaveStatus] = useState('idle');
@@ -152,7 +152,7 @@ function PageBuilderStandalone({
         <PageBuilderEmbed
           value={content || '{"cylsqgudkwtz":{"id":"cylsqgudkwtz","type":"node-root","parent":null,"content":{"title":""}}}'}
           onChange={handleChange}
-          fileManagerConfig={fileManagerConfig}
+          fileManagerConfig={fileManagerConfig ?? getFileManagerConfig({})}
           apiCardsBaseUrl={apiCardsBaseUrl}
         />
       </div>
@@ -173,6 +173,7 @@ if (dataEl && rootEl) {
   let pageDescription = '';
   let themeCssUrl = '';
   let renderCssUrls = [];
+  let fileManagerConfig = null;
   try {
     const data = JSON.parse(dataEl.textContent);
 
@@ -196,6 +197,8 @@ if (dataEl && rootEl) {
     pageDescription = typeof data.pageDescription === 'string' ? data.pageDescription : '';
     themeCssUrl = typeof data.themeCssUrl === 'string' ? data.themeCssUrl : '';
     renderCssUrls = Array.isArray(data.renderCssUrls) ? data.renderCssUrls : [];
+    fileManagerConfig = getFileManagerConfig(data);
+
     const themeFonts = data.themeFonts ?? [];
     themeFonts.forEach((font) => {
       try {
@@ -221,6 +224,7 @@ if (dataEl && rootEl) {
       pageDescription={pageDescription}
       themeCssUrl={themeCssUrl}
       renderCssUrls={renderCssUrls}
+      fileManagerConfig={fileManagerConfig}
     />
   );
 }

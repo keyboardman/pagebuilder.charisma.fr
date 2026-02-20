@@ -17,16 +17,16 @@ export interface AppProviderProps {
     onSaveCallback?: (nodes: NodesType) => void;
 }
 
-const defaultJson =JSON.stringify({
-            "cylsqgudkwtz": {
-                "id": "cylsqgudkwtz",
-                "type": "node-root",
-                "parent": null,
-                "content": {
-                    "title": ""
-                }
-            }
-        });
+const defaultJson = JSON.stringify({
+    "cylsqgudkwtz": {
+        "id": "cylsqgudkwtz",
+        "type": "node-root",
+        "parent": null,
+        "content": {
+            "title": ""
+        }
+    }
+});
 export const AppProvider: FC<AppProviderProps> = ({ children, json = defaultJson, target, view = false, fileManagerConfig = null, onSaveCallback }: AppProviderProps) => {
 
     const defaultNodes: NodesType = {
@@ -37,6 +37,7 @@ export const AppProvider: FC<AppProviderProps> = ({ children, json = defaultJson
             content: { title: "" }
         }
     } as NodesType;
+
 
     const parseJsonToNodes = (input: string | object | undefined): NodesType => {
         if (!input) return defaultNodes;
@@ -80,7 +81,7 @@ export const AppProvider: FC<AppProviderProps> = ({ children, json = defaultJson
     }
 
     const getChildren = (parentId: NodeID | null, zone: string) => {
-        
+
         return nodeHelper.getChildren(nodes, parentId, zone)
     }
 

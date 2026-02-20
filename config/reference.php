@@ -1459,6 +1459,20 @@ use Symfony\Component\Config\Loader\ParamConfigurator as Param;
  *     controllers_path?: scalar|Param|null, // The path to the directory where React controller components are stored - relevant only when using symfony/asset-mapper. // Default: "%kernel.project_dir%/assets/react/controllers"
  *     name_glob?: list<scalar|Param|null>,
  * }
+ * @psalm-type KeyboardmanFilesystemConfig = array{
+ *     api?: array{
+ *         allowed_types?: list<scalar|Param|null>,
+ *         max_upload_size?: scalar|Param|null, // Max file size per file in bytes, or human-readable (e.g. 10M, 50M). Default 10 MiB. // Default: 10485760
+ *     },
+ *     filesystems?: array<string, array{ // Default: []
+ *         adapter: scalar|Param|null, // Service id of the Flysystem adapter (League\Flysystem\FilesystemAdapter)
+ *     }>,
+ * }
+ * @psalm-type KeyboardmanFilemanagerConfig = array{
+ *     url_route?: scalar|Param|null, // Route name to generate file URL (params: filesystem, path). If null, URL resolution is disabled. // Default: null
+ *     available_filesystems?: list<scalar|Param|null>,
+ *     s3_filesystems?: list<scalar|Param|null>,
+ * }
  * @psalm-type ConfigType = array{
  *     imports?: ImportsConfig,
  *     parameters?: ParametersConfig,
@@ -1473,6 +1487,8 @@ use Symfony\Component\Config\Loader\ParamConfigurator as Param;
  *     monolog?: MonologConfig,
  *     webpack_encore?: WebpackEncoreConfig,
  *     react?: ReactConfig,
+ *     keyboardman_filesystem?: KeyboardmanFilesystemConfig,
+ *     keyboardman_filemanager?: KeyboardmanFilemanagerConfig,
  *     "when@dev"?: array{
  *         imports?: ImportsConfig,
  *         parameters?: ParametersConfig,
@@ -1490,6 +1506,8 @@ use Symfony\Component\Config\Loader\ParamConfigurator as Param;
  *         maker?: MakerConfig,
  *         webpack_encore?: WebpackEncoreConfig,
  *         react?: ReactConfig,
+ *         keyboardman_filesystem?: KeyboardmanFilesystemConfig,
+ *         keyboardman_filemanager?: KeyboardmanFilemanagerConfig,
  *     },
  *     "when@prod"?: array{
  *         imports?: ImportsConfig,
@@ -1505,6 +1523,8 @@ use Symfony\Component\Config\Loader\ParamConfigurator as Param;
  *         monolog?: MonologConfig,
  *         webpack_encore?: WebpackEncoreConfig,
  *         react?: ReactConfig,
+ *         keyboardman_filesystem?: KeyboardmanFilesystemConfig,
+ *         keyboardman_filemanager?: KeyboardmanFilemanagerConfig,
  *     },
  *     "when@test"?: array{
  *         imports?: ImportsConfig,
@@ -1521,6 +1541,8 @@ use Symfony\Component\Config\Loader\ParamConfigurator as Param;
  *         monolog?: MonologConfig,
  *         webpack_encore?: WebpackEncoreConfig,
  *         react?: ReactConfig,
+ *         keyboardman_filesystem?: KeyboardmanFilesystemConfig,
+ *         keyboardman_filemanager?: KeyboardmanFilemanagerConfig,
  *     },
  *     ...<string, ExtensionType|array{ // extra keys must follow the when@%env% pattern or match an extension alias
  *         imports?: ImportsConfig,

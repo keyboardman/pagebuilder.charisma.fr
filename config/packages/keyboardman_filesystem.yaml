@@ -1,0 +1,12 @@
+# Stockage médias : default = local (public/media), s3 = MinIO/S3
+# Pour S3 : installer league/flysystem-aws-s3-v3 et définir les services app.flysystem_adapter.s3 + app.s3_client (voir doc bundle)
+keyboardman_filesystem:
+    filesystems:
+        default:
+            adapter: media_storage.adapter
+        # S3 (MinIO) : décommenter et configurer app.flysystem_adapter.s3 après avoir installé league/flysystem-aws-s3-v3
+        s3:
+            adapter: app.flysystem_adapter.s3
+    api:
+        allowed_types: ['image', 'audio', 'video']
+        max_upload_size: 52428800  # 50 MiB

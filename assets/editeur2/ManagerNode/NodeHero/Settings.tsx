@@ -85,7 +85,7 @@ const Settings: FC<NodeSettingsProps> = () => {
                     type="text"
                     value={options.src ?? ""}
                     onChange={(value: string) => updateOption("src", value)}
-                    acceptedTypes="image/*"
+                    typeMedia="image"
                     className="h-7 text-sm"
                   />
                 </Form.Group>

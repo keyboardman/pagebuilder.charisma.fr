@@ -24,6 +24,8 @@ export function PageFormWithBuilder({ postUrl, themes, initialPage, csrfToken })
     },
   };
 
+  console.log('PageFormWithBuilder', fileManagerConfig); //
+
   return (
     <form method="post" action={postUrl} className="space-y-6">
       <input type="hidden" name="_token" value={csrfToken} />
@@ -86,7 +88,7 @@ export function PageFormWithBuilder({ postUrl, themes, initialPage, csrfToken })
             <PageBuilderEmbed
               value={content || '{"cylsqgudkwtz":{"id":"cylsqgudkwtz","type":"node-root","parent":null,"content":{"title":""}}}'}
               onChange={setContent}
-              fileManagerConfig={fileManagerConfig}
+              //fileManagerConfig={fileManagerConfig}
             />
           </div>
         </div>
