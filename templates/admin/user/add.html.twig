@@ -1,0 +1,25 @@
+{% extends 'base.html.twig' %}
+
+
+{% block body %}
+<div class="max-w-2xl space-y-6">
+    <div>
+        <a href="{{ path('app_admin_comptes') }}" class="btn btn-ghost btn-sm mb-2">← Retour</a>
+        {% if form.vars.value.email is not empty %}
+         <h1 class="text-2xl font-bold tracking-tight">{{form.vars.value.email}}</h1>
+        {% else %}
+        <h1 class="text-2xl font-bold tracking-tight">Créer compte</h1>
+        {% endif %}
+    </div>
+
+    {{ form_start(form) }}
+    <div class="flex flex-col gap-4">
+        {{form_row(form.plainPassword)}}
+        {{ form_help(form.plainPassword) }}
+        {{ form_rest(form)}}
+        <button type="submit" class="btn btn-primary">Enregistrer</button>
+    </div>
+    {{ form_end(form) }}
+</div>
+
+{% endblock %}

@@ -38,9 +38,6 @@
                 <a href="{{ path('app_page_index') }}" class="nav-link {{ (app.request.attributes.get('_route')|default(''))|slice(0, 10) == 'app_page_' ? 'active' : '' }}">
                     Pages
                 </a>
-                <a href="{{ path('app_admin_comptes') }}" class="nav-link {{ (app.request.attributes.get('_route')|default(''))|slice(0, 10) == 'app_admin_compte' ? 'active' : '' }}">
-                    Comptes
-                </a>
             </nav>
         </aside>
         <main class="flex-1 pl-56">

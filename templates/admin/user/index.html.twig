@@ -1,0 +1,51 @@
+{% extends 'base.html.twig' %}
+
+{% block body %}
+  <div class="max-w-4xl space-y-6">
+    <div class="flex items-center justify-between">
+      <h1 class="text-2xl font-bold tracking-tight">Comptes</h1>
+      <div class="flex gap-2">
+        <a href="{{ path('app_admin_compte_add') }}" class="btn btn-primary">Nouvelle utilisateur</a>
+      </div>
+    </div>
+
+    <div class="container mt-3">
+      {% if app.flashes('warning') is not empty %}
+        <p class="text-sm text-destructive">
+          {%- for message in app.flashes('warning') -%}
+            {{ message }}{% if not loop.last %}. {% endif %}
+          {%- endfor -%}
+        </p>
+      {% endif %}
+    </div>
+
+    <div class="card overflow-hidden">
+      <div class="overflow-x-auto">
+        <table class="table-shadcn">
+          <thead>
+            <tr>
+              <th>#</th>
+              <th>Email</th>
+              <th></th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for user in comptes %}
+              <tr>
+                <td>{{ loop.index }}</td>
+                <td>{{ user.email }}</td>
+                <td>
+                  <a href="{{ path('app_admin_compte_edit', { id: user.id }) }}" class="btn btn-ghost btn-sm">Modifier</a>
+                </td>
+              </tr>
+            {% else %}
+              <tr>
+                <td colspan="4" class="text-muted-foreground">Aucune utilisateur.</td>
+              </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+{% endblock %}

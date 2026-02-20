@@ -1,0 +1,52 @@
+{% extends 'simple.html.twig' %}
+
+{% block title %}
+  Log in!
+{% endblock %}
+
+{% block body %}
+  <div class="group/body overscroll-none antialiased [--footer-height:calc(var(--spacing)*14)] [--header-height:calc(var(--spacing)*14)] xl:[--footer-height:calc(var(--spacing)*24)] theme-default">
+    <div class="w-full max-w-sm mx-auto">
+      <div class="flex flex-col gap-4">
+        <div data-slot="card" class="bg-card text-card-foreground flex flex-col gap-6 rounded-xl border py-6 shadow-sm">
+          <div data-slot="card-header" class="@container/card-header grid auto-rows-min grid-rows-[auto_auto] items-start gap-2 px-6 has-data-[slot=card-action]:grid-cols-[1fr_auto] [.border-b]:pb-6">
+            <div data-slot="card-title" class="leading-none font-semibold">Connecter-vous à votre compte</div>
+            <div data-slot="card-description" class="text-muted-foreground text-sm">Saisissez votre email et mot de passe pour vous connecter.</div>
+          </div>
+
+          <div data-slot="card-content" class="@container/card-content grid auto-rows-min grid-rows-[auto_auto] items-start gap-2 px-6">
+            <form method="post">
+              {% if error %}
+                <div class="alert alert-danger">{{ error.messageKey|trans(error.messageData, 'security') }}</div>
+              {% endif %}
+              {% if app.user %}
+                <div class="mb-3">
+                  You are logged in as {{ app.user.userIdentifier }}, <a href="{{ path('app_logout') }}">Logout</a>
+                </div>
+              {% endif %}
+
+              <div data-slot="field-group" class="flex w-full flex-col gap-7">
+                <div role="group" data-slot="field">
+                  <div class="text-sm font-medium">Email</div>
+                  <input type="email" name="_username" id="email" required value="{{ last_username }}" autofocus class="w-full border rounded px-3 py-1" />
+                </div>
+
+                <div role="group" data-slot="field">
+                  <label for="password" class="text-sm font-medium">Password</label>
+                  <input type="password" name="_password" id="password" required class="w-full border rounded px-3 py-1" />
+                </div>
+
+                <input type="hidden" name="_csrf_token" value="{{ csrf_token('authenticate') }}" />
+                <input type="hidden" name="_target_path" value="/">
+
+                <div role="group" data-slot="field">
+                  <button type="submit" class="bg-primary text-white px-4 py-2 rounded">Se connecter</button>
+                </div>
+              </div>
+            </form>
+          </div> {# close card-content #}
+        </div> {# close card #}
+      </div> {# close flex flex-col gap-4 #}
+    </div> {# close w-full max-w-sm #}
+  </div>
+{% endblock %}
