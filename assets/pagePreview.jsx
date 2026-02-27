@@ -1,8 +1,8 @@
 import React from 'react';
 import { createRoot } from 'react-dom/client';
-import AppProvider from './editeur2/services/providers/AppProvider';
-import App from './editeur2/app/App';
-import './editeur2/assets/css/index.css';
+import AppProvider from './editeur/services/providers/AppProvider';
+import App from './editeur/app/App';
+import './editeur/assets/css/index.css';
 
 const el = document.getElementById('page-preview-root');
 if (el) {

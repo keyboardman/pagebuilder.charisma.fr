@@ -145,6 +145,7 @@ class PageController extends AbstractController
     public function builder(Page $page, Request $request): Response
     {
         $themeFonts = $this->buildThemeFontsForBuilder($page->getTheme(), $request);
+
         return $this->render('page/builder.html.twig', ['page' => $page, 'theme_fonts' => $themeFonts]);
     }
 

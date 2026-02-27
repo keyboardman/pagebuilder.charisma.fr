@@ -1,8 +1,9 @@
-# File manager keyboardman : url_route = route qui sert un fichier (params: filesystem, path)
-# available_filesystems : ceux proposés dans l’UI ; s3_filesystems : ceux détectés comme S3 (URL pré-signée)
+# config/packages/keyboardman_filemanager.yaml
 keyboardman_filemanager:
-    url_route: app_filemanager_serve
-    available_filesystems: ['default', 's3']
-    # Décommenter quand S3 est configuré :
-    # available_filesystems: ['default', 's3']
-    s3_filesystems: ['s3']
+  disks:
+    default:
+      label: Default
+      storage: default.storage          # identifiant du storage Flysystem
+      visibility: public
+      signed_urls: true
+      default_uri: "%env(resolve:DEFAULT_URI)%/media"

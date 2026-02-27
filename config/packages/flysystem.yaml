@@ -1,0 +1,7 @@
+flysystem:
+  storages:
+    default.storage:
+            adapter: local
+            visibility: public
+            options:
+                directory: "%kernel.project_dir%/public/media"

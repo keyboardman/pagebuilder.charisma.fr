@@ -11,8 +11,5 @@ controllers:
     resource: ../src/Controller/
     type: attribute
 
-keyboardman_filesystem_api:
-    resource: '@KeyboardmanFilesystemBundle/Resources/config/routes.yaml'
-
-keyboardman_filemanager:
-    resource: '@KeyboardmanFilemanagerBundle/Resources/config/routes.yaml'
+keyboardman_filemanager_bundle_routes:
+  resource: '@KeyboardmanFilemanagerBundle/config/routes.yaml'

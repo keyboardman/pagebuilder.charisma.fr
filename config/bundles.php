@@ -16,6 +16,6 @@ return [
     Symfony\WebpackEncoreBundle\WebpackEncoreBundle::class => ['all' => true],
     Symfony\UX\React\ReactBundle::class => ['all' => true],
     Symfony\UX\Autocomplete\AutocompleteBundle::class => ['all' => true],
-    Keyboardman\FilesystemBundle\KeyboardmanFilesystemBundle::class => ['all' => true],
     Keyboardman\FilemanagerBundle\KeyboardmanFilemanagerBundle::class => ['all' => true],
+    League\FlysystemBundle\FlysystemBundle::class => ['all' => true],
 ];

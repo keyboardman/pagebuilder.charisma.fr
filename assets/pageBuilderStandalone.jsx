@@ -1,19 +1,17 @@
 import React, { useState, useCallback } from 'react';
 import { createRoot } from 'react-dom/client';
-import PageBuilderEmbed from './editeur2/PageBuilderEmbed';
-import AppProvider from './editeur2/services/providers/AppProvider';
-import App from './editeur2/app/App';
-import { registerFont } from './editeur2/services/typography';
-import './editeur2/assets/css/index.css';
+import PageBuilderEmbed from './editeur/PageBuilderEmbed';
+import AppProvider from './editeur/services/providers/AppProvider';
+import App from './editeur/app/App';
+import { registerFont } from './editeur/services/typography';
+import './editeur/assets/css/index.css';
 
 // Config filemanager : si filemanagerUrl est fourni (backend), mode iframe keyboardman ; sinon custom (legacy)
 function getFileManagerConfig(data) {
+ 
   const filemanagerUrl = typeof data?.filemanagerUrl === 'string' && data.filemanagerUrl ? data.filemanagerUrl : null;
-  const resolveUrl = typeof data?.resolveUrl === 'string' && data.resolveUrl ? data.resolveUrl : null;
-  if (filemanagerUrl) {
-    return { type: 'iframe', filemanagerUrl, resolveUrl };
-  }
-  return { type: 'iframe', filemanagerUrl, resolveUrl };
+
+  return { type: 'iframe', filemanagerUrl };
 }
 
 function makeLinksAbsolute(html, baseUrl) {
@@ -161,6 +159,7 @@ function PageBuilderStandalone({
 }
 
 const dataEl = document.getElementById('page-builder-data');
+
 const rootEl = document.getElementById('page-builder-standalone-root');
 if (dataEl && rootEl) {
   let initialContent = '';
@@ -179,7 +178,6 @@ if (dataEl && rootEl) {
 
     const raw = data.content;
 
-    console.log('raw',  data.apiCardsBaseUrl);
 
     initialContent =
       typeof raw === 'string'

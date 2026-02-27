@@ -42,3 +42,13 @@ yarn-error.log
 .editeur2-source/
 config/secrets/dev/dev.decrypt.private.php
 config/secrets/dev/dev.encrypt.public.php
+
+###> symfony/asset-mapper ###
+/public/assets/
+/assets/vendor/
+###< symfony/asset-mapper ###
+
+_old/
+assets/editeur2/_old
+assets/editeur2_bck
+config/tokens/filemanager_tokens.json

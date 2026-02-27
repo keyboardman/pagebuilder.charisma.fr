@@ -7,6 +7,10 @@ framework:
 
     #esi: true
     #fragments: true
+    assets:
+        packages:
+            bundles:
+                base_path: ''
 
 when@test:
     framework:

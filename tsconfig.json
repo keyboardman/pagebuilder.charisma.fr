@@ -18,7 +18,7 @@
     "baseUrl": ".",
     "paths": {
       "@/*": ["assets/*"],
-      "@editeur/*": ["assets/editeur2/*"]
+      "@editeur/*": ["assets/editeur/*"]
     },
     "types": ["node"]
   },
