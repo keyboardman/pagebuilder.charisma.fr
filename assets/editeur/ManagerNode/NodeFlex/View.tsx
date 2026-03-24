@@ -22,7 +22,6 @@ const View: FC<NodeViewProps | NodeEditProps> = () => {
   const children = getChildren("main");
 
   const flexStyle: React.CSSProperties = {
-    display: "flex",
     flexDirection: options.direction ?? "row",
     justifyContent: options.justify ?? "flex-start",
     alignItems: options.align ?? "stretch",
@@ -43,11 +42,11 @@ const View: FC<NodeViewProps | NodeEditProps> = () => {
       data-ce-id={node.id}
       data-ce-type={node.type}
       id={node?.attributes?.id}
-      className={cn(node?.attributes?.className, "flex h-full")}
+      className={cn("ce-flex", node?.attributes?.className)}
       style={styleForView(node?.attributes?.style)}
       {...dataAttributes}
     >
-      <div style={flexStyle} className="h-full flex-1">
+      <div style={ flexStyle } className="ce-flex-inner">
         <NodeCollection nodes={children} parentId={node.id} zone="main" />
       </div>
     </div>

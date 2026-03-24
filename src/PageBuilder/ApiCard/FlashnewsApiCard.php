@@ -15,8 +15,7 @@ final class FlashnewsApiCard implements ApiCardArticleInterface
 
     public function __construct(
         private readonly HttpClientInterface $httpClient,
-    ) {
-    }
+    ) {}
 
     public function getId(): string
     {
@@ -51,22 +50,33 @@ final class FlashnewsApiCard implements ApiCardArticleInterface
             $query['order[' . (string) $params['sort'] . ']'] = 'asc';
         }
 
-        $response = $this->httpClient->request('GET', self::BASE_URL . '/api/articles', [
-            'query' => $query,
-        ]);
-        $data = $response->toArray();
-        $member = $data['member'] ?? [];
-        $totalItems = (int) ($data['totalItems'] ?? 0);
-        $items = array_map(static fn (mixed $item): object => (object) (is_array($item) ? $item : []), $member);
+        try {
+            $response = $this->httpClient->request('GET', self::BASE_URL . '/api/articles', [
+                'query' => $query,
+                'timeout' => 30,
+            ]);
+            $data = $response->toArray();
+            $member = $data['member'] ?? [];
+            $totalItems = (int) ($data['totalItems'] ?? 0);
+            $items = array_map(static fn(mixed $item): object => (object) (is_array($item) ? $item : []), $member);
 
-        return ['items' => $items, 'total' => $totalItems];
+            return ['items' => $items, 'total' => $totalItems];
+        } catch (\Exception $e) {
+            return ['items' => [], 'total' => 0];
+        }
     }
 
     public function fetchItem(string $id): object
     {
-        $response = $this->httpClient->request('GET', self::BASE_URL . '/api/articles/' . rawurlencode($id));
-        $data = $response->toArray();
-        return (object) $data;
+        try {
+            $response = $this->httpClient->request('GET', self::BASE_URL . '/api/articles/' . rawurlencode($id), ['timeout' => 30,]);
+            $data = $response->toArray();
+            return (object) $data;
+        } catch (\Exception $e) {
+            return (object) [
+                'error' => $e->getMessage(),
+            ];
+        }
     }
 
     public function mapItem(object $item): array

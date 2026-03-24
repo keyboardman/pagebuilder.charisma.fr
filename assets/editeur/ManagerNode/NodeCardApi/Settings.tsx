@@ -3,12 +3,6 @@ import { Base2Settings } from "../Settings";
 import { useNodeBuilderContext } from "../../services/providers/NodeBuilderContext";
 import { type NodeSettingsProps } from "../NodeConfigurationType";
 import type { NodeCardApiType } from "./index";
-import { CardSettings } from "./Settings/CardSettings";
-import { ImageSettings } from "./Settings/ImageSettings";
-import { TitleSettings } from "./Settings/TitleSettings";
-import { TextSettings } from "./Settings/TextSettings";
-import { LabelsSettings } from "./Settings/LabelsSettings";
-import { ContainerSettings } from "./Settings/ContainerSettings";
 import { ApiManagerModal } from "../../ManagerApi/ApiManagerModal";
 import { apiRegistry } from "../../ManagerApi/ApiRegistry";
 import { Loader2, AlertCircle } from "lucide-react";
@@ -16,6 +10,7 @@ import { Button } from "@/editeur/components/ui/button";
 import { Database } from "lucide-react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/editeur/components/ui/tabs";
 import { NodeSettingsWrapper } from "../components/NodeSettingsWrapper";
+import { CardSettings, ContainerSettings, ImageSettings, TitleSettings, TextSettings, LabelsSettings } from "./Settings/index";
 
 function extractText(mappedData: { text?: string; description?: string; }): string {
   return mappedData?.text?.trim() as string || "";
@@ -40,7 +35,6 @@ const Settings: FC<NodeSettingsProps> = () => {
   const { node, onChange } = useNodeBuilderContext();
   const cardApiNode = node as NodeCardApiType;
   const content = cardApiNode.content || {};
-  const selectedElement = content.selectedElement || null;
   const [loading, setLoading] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
   const [modalOpen, setModalOpen] = useState<boolean>(false);
@@ -197,7 +191,7 @@ const Settings: FC<NodeSettingsProps> = () => {
   };
 
   return (
-    <Tabs defaultValue={selectedElement || "card"} className="flex min-h-0 flex-1 flex-col overflow-hidden">
+    <Tabs className="flex min-h-0 flex-1 flex-col overflow-hidden" defaultValue="card">
       <div className="flex min-h-0 flex-1 flex-col overflow-hidden">
         <NodeSettingsWrapper
         header={

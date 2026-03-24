@@ -22,11 +22,12 @@ export default function DropZone({ parent }: DropZoneProps) {
   });
 
   const { ref, isDropTarget } = droppable;
-  const isHover = isDropTarget ? "p-10 bg-primary/20 border-2 border-dashed border-primary" : "p-5 bg-gray-50/20 border-dotted border border-gray-200";
+  const isHover = isDropTarget ? "p-5 border-2 border-dashed border-primary bg-blue-900/20" : "p-1 border-none bg-transparent";
+
   return (
     <div
       ref={ref}
-      className={`${isHover} bg-diagonal-blue m-1 duration-300 ease-in-out`}
+      className={`${isHover} m-1 duration-300 ease-in-out`}
     />
   );
 }

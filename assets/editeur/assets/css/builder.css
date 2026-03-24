@@ -241,3 +241,23 @@
       rgba(59, 130, 246, 0.02) 28px
     );
 }
+
+/* Styles par défaut pour les liens du menu burger (NodeNavItem) */
+.theme-view-scope .ce-burger-menu [data-ce-type="node-nav-item"] > a,
+.theme-view-scope .ce-burger-menu [data-ce-type="node-nav-item"] > button {
+    display: inline-flex;
+    align-items: center;
+    justify-content: flex-end;
+    gap: 0.25rem;
+    padding: 0.375rem 0.75rem;
+    border-radius: 9999px;
+    font-size: 0.875rem;
+    line-height: 1.25rem;
+    text-decoration: none;
+    color: inherit;
+}
+
+.theme-view-scope .ce-burger-menu [data-ce-type="node-nav-item"] > a:hover,
+.theme-view-scope .ce-burger-menu [data-ce-type="node-nav-item"] > button:hover {
+    background-color: rgba(0, 0, 0, 0.06);
+}

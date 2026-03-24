@@ -1,0 +1,52 @@
+.ce-button {
+    background-color: lightgray;
+    border-radius: .25rem;
+    cursor: pointer;
+    display: inline-block;
+    font-size: 1rem;
+    font-weight: bold;
+    line-height: 1.5;
+    padding: 0.25rem 0.75rem;
+    text-align: center;
+    text-decoration: none;
+    user-select: none;
+    vertical-align: middle;
+
+    transition-property: opacity;
+    transition-duration: 150ms;
+    transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.ce-button-small {
+    font-size: 0.875rem;
+    padding: 0.25rem 0.5rem;
+}
+
+.ce-button-medium {
+    font-size: 1rem;
+    padding: 0.25rem 0.75rem;
+}
+
+.ce-button-large {
+    font-size: 1.25rem;
+    padding: 0.5rem 1rem;
+}
+
+.ce-button-default {
+    background-color: lightgray;
+    color: black;
+}
+
+.ce-button-primary {
+    background-color: blue;
+    color: white;
+}
+
+.ce-button-secondary {
+    background-color: gray;
+    color: white;
+}
+
+.ce-button:hover {
+    opacity: 0.9;
+}

@@ -13,6 +13,10 @@ import NodeCardApi from "../NodeCardApi";
 import NodeVideoApi from "../NodeVideoApi";
 import NodeButton from "../NodeButton";
 import NodeHero from "../NodeHero";
+import NodeHtml from "../NodeHtml";
+import NodeNav from "../NodeNav";
+import NodeNavItem from "../NodeNavItem";
+import NodeSlideshow from "../NodeSlideshow";
 import type { NodeType } from "../../types/NodeType";
 
 export const NodeRegistry = {
@@ -30,7 +34,11 @@ export const NodeRegistry = {
     [NodeTwoColumns.type]: NodeTwoColumns,
     [NodeVideo.type]: NodeVideo,
     [NodeVideoApi.type]: NodeVideoApi,
-    [NodeYoutube.type]: NodeYoutube
+    [NodeYoutube.type]: NodeYoutube,
+    [NodeHtml.type]: NodeHtml,
+    [NodeNav.type]: NodeNav,
+    [NodeNavItem.type]: NodeNavItem,
+    [NodeSlideshow.type]: NodeSlideshow,
 }
 
 export type NodeTypeFromRegistry<T extends Record<string, any>> =

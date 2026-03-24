@@ -50,23 +50,34 @@ final class CharismaArticleAuteurApiCard implements ApiCardArticleInterface
         if (!empty($params['sort'])) {
             $query['order[' . (string) $params['sort'] . ']'] = 'asc';
         }
-
-        $response = $this->httpClient->request('GET', self::BASE_URL . '/api/charisma/article/auteurs', [
-            'query' => $query,
-        ]);
-        $data = $response->toArray();
-        $member = $data['member'] ?? [];
-        $totalItems = (int) ($data['totalItems'] ?? 0);
-        $items = array_map(static fn (mixed $item): object => (object) (is_array($item) ? $item : []), $member);
-
-        return ['items' => $items, 'total' => $totalItems];
+        try {   
+            $response = $this->httpClient->request('GET', self::BASE_URL . '/api/charisma/article/auteurs', [
+                'query' => $query,
+                'timeout' => 30,
+            ]);
+            $data = $response->toArray();
+            $member = $data['member'] ?? [];
+            $totalItems = (int) ($data['totalItems'] ?? 0);
+            $items = array_map(static fn (mixed $item): object => (object) (is_array($item) ? $item : []), $member);
+    
+            return ['items' => $items, 'total' => $totalItems];
+        } catch (\Exception $e) {
+            return ['items' => [], 'total' => 0];
+        }
+        
     }
 
     public function fetchItem(string $id): object
     {
-        $response = $this->httpClient->request('GET', self::BASE_URL . '/api/charisma/article/auteurs/' . rawurlencode($id));
-        $data = $response->toArray();
-        return (object) $data;
+        try {   
+            $response = $this->httpClient->request('GET', self::BASE_URL . '/api/charisma/article/auteurs/' . rawurlencode($id), ['timeout' => 30]);
+            $data = $response->toArray();
+            return (object) $data;
+        } catch (\Exception $e) {
+            return (object) [
+                'error' => $e->getMessage(),
+            ];
+        }
     }
 
     public function mapItem(object $item): array
@@ -82,7 +93,8 @@ final class CharismaArticleAuteurApiCard implements ApiCardArticleInterface
         $labels = [];
         if (is_array($classements)) {
             foreach ($classements as $c) {
-                $labels[] = is_object($c) && isset($c->nom) ? (string) $c->nom : (string) $c;
+
+                $labels[] = $c['nom'];
             }
         }
         $image = null;
@@ -98,7 +110,7 @@ final class CharismaArticleAuteurApiCard implements ApiCardArticleInterface
             'labels' => $labels ?: null,
             'link' => $link !== null ? (string) $link : null,
             'text' => $resume !== null ? (string) $resume : null,
-            'raw' => $item,
+            //'raw' => $item,
         ];
     }
 

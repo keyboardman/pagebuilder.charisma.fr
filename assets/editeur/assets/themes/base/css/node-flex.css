@@ -1,0 +1,9 @@
+.ce-flex {
+    display: flex;
+    height: 100%;
+}
+
+.ce-flex-inner {
+    display: flex;
+    flex: 1;
+}

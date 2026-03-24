@@ -35,14 +35,23 @@ export default function useDnd() {
     }
 
     const targetData = target?.data;
+    const parentId = targetData?.id !== "root" ? targetData?.id : null;
+    const parentNode = parentId ? nodes[parentId] : null;
 
     if (data && data?.action === "add") {
+      const addedType = data.type as string;
+      if (parentNode?.type === "node-nav" && addedType !== "node-nav-item") {
+        return;
+      }
+      if (addedType === "node-nav-item" && (!parentNode || parentNode.type !== "node-nav")) {
+        return;
+      }
 
       const _node = nodeHelper.createNode(
-        data.type,
-        targetData?.id !== "root" ? targetData?.id : null,
-        targetData?.zone,
-        targetData?.order
+        addedType,
+        parentId,
+        targetData?.zone ?? "main",
+        targetData?.order ?? 0
       );
 
       updateNodes(
@@ -53,10 +62,19 @@ export default function useDnd() {
 
     if (data && data?.action === "move-node") {
       const _target = {
-        id: targetData?.id !== "root" ? targetData?.id : null,
-        zone: targetData?.zone,
-        order: targetData?.order,
+        id: parentId,
+        zone: targetData?.zone ?? "main",
+        order: targetData?.order ?? 0,
       } as ParentProps;
+
+      const movingNode = nodes[data.id];
+      if (movingNode?.type === "node-nav-item") {
+        if (!parentNode || parentNode.type !== "node-nav") {
+          return;
+        }
+      } else if (parentNode?.type === "node-nav") {
+        return;
+      }
 
       updateNodes(
         nodeHelper.moveNode(nodes, data.id, data?.parent as ParentProps, _target)

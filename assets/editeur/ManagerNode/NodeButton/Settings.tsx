@@ -2,9 +2,12 @@ import { type FC } from "react";
 import { type NodeSettingsProps } from "../NodeConfigurationType";
 import Form from "../../components/form";
 import { useNodeBuilderContext } from "../../services/providers/NodeBuilderContext";
-import type { NodeButtonType, NodeButtonButtonType } from "./index";
+import type { NodeButtonType, NodeButtonButtonType, NodeButtonVariantType, NodeButtonSizeType } from "./index";
+import { NODE_BUTTON_VARIANT_OPTIONS, NODE_BUTTON_SIZE_OPTIONS } from "./index";
+
 import { NodeSettingsWrapper } from "../components/NodeSettingsWrapper";
 import { Base2Settings, Background2Settings, Text2Settings, Border2Settings, Size2Settings, Spacing2Settings } from "../Settings";
+
 
 const BUTTON_TYPE_OPTIONS: { value: NodeButtonButtonType; label: string }[] = [
   { value: "button", label: "Bouton" },
@@ -23,6 +26,8 @@ const Settings: FC<NodeSettingsProps> = () => {
   const buttonType = buttonNode.content?.buttonType ?? "button";
   const href = buttonNode.content?.href ?? "";
   const target = buttonNode.content?.target ?? "_self";
+  const variant = buttonNode.content?.variant ?? "default";
+  const size = buttonNode.content?.size ?? "medium";
 
   return (
     <NodeSettingsWrapper
@@ -58,6 +63,7 @@ const Settings: FC<NodeSettingsProps> = () => {
                   placeholder="https://..."
                 />
               </Form.Group>
+              
               <Form.Group>
                 <Form.Label text="Cible (target)" />
                 <Form.Select
@@ -73,6 +79,32 @@ const Settings: FC<NodeSettingsProps> = () => {
               </Form.Group>
             </>
           )}
+          <Form.Group>
+            <Form.Label text="Variant" />
+            <Form.Select
+              value={variant}
+              onChange={(value) =>
+                onChange({
+                  ...node,
+                  content: { ...node.content, variant: value as NodeButtonVariantType },
+                })
+              }
+              options={NODE_BUTTON_VARIANT_OPTIONS}
+            />
+          </Form.Group>
+          <Form.Group>
+            <Form.Label text="Size" />
+            <Form.Select
+              value={size}
+              onChange={(value) =>
+                onChange({
+                  ...node,
+                  content: { ...node.content, size: value as NodeButtonSizeType },
+                })
+              }
+              options={NODE_BUTTON_SIZE_OPTIONS}
+            />
+          </Form.Group>
           <Base2Settings
             attributes={node.attributes}
             onChange={(attributes: { className?: string; id?: string }) =>

@@ -1,0 +1,14 @@
+.ce-container {
+    display: block;
+    margin:0 auto;
+    padding:0;
+}
+
+.ce-container-fluid {
+    width: 100%;
+}
+
+.ce-container-no-fluid {
+    max-width: 1280px;
+    margin: 0 auto;
+}

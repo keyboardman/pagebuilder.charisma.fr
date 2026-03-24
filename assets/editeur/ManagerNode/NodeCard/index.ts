@@ -5,13 +5,37 @@ import Edit from "./Edit";
 import Settings from "./Settings";
 import { IoCard } from "react-icons/io5";
 
+export type ContainerPosition = "left" | "right" | "top" | "overlay";
+export type ContainerTextPositionApi = "bottom" | "top" | "center";
+export type ContainerAlign = "start" | "center" | "end" | "stretch";
+export type ContainerRatio = "1_4" | "1_3"| "2_5" | "1_2" | "2_3" | "full";
+
+export const ContainerPositionOptions = [
+  { label: "Gauche", value: "left" },
+  { label: "Droite", value: "right" },
+  { label: "Haut", value: "top" },
+  { label: "Overlay", value: "overlay" },
+];
+
+export const ContainerAlignOptions = [
+  { label: "Début", value: "start" },
+  { label: "Centre", value: "center" },
+  { label: "Fin", value: "end" },
+  { label: "Étirer", value: "stretch" },
+];
+
+export const ContainerRatioOptions = [
+  { label: "1/4", value: "1_4" },
+  { label: "1/3", value: "1_3" },
+  { label: "1/2", value: "1_2" },
+  { label: "Plein", value: "full" },
+];
+
+
 export const NODE_CARD_TYPE = "node-card" as const;
 
 export type CardElementType = "image" | "title" | "text" | "labels" | null;
 
-export type ContainerPosition = "left" | "top" | "right" | "overlay";
-export type ContainerAlign = "start" | "center" | "end" | "stretch";
-export type ContainerRatio = "1/4" | "1/3"| "2/5" | "1/2" | "2/3" | "full";
 
 export interface NodeCardType extends NodeType {
   type: "node-card";
@@ -32,13 +56,6 @@ export interface NodeCardType extends NodeType {
       ratio: ContainerRatio;
       link?: string;
       style?: React.CSSProperties;
-      textOverlay?: {
-        position?: "bottom" | "top" | "center";
-        background?: {
-          gradient?: string;
-          color?: string | null;
-        };
-      };
     };
 
     // image
@@ -67,21 +84,6 @@ export interface NodeCardType extends NodeType {
       style?: React.CSSProperties;
       items?: string[];
     };
-
-
-    //labels?: string[]; // Tableau de labels pour l'affichage
-    //labelsInput?: string; // Valeur brute de l'input pour permettre la saisie
-
-    
-    // Élément sélectionné (pour l'affichage des settings)
-    selectedElement?: CardElementType;
-    
-    // Styles pour chaque élément
-
-    //labelsStyle?: React.CSSProperties;
-    //labelsClassName?: string;
-    //labelClassName?: string;
-    contentClassName?: string;
   };
 }
 
@@ -110,8 +112,9 @@ export const NodeCard: NodeConfigurationType = {
         container: {
           position: "top",
           align: "start",
-          ratio: "1/3",
+          ratio: "1_3",
           link: "#",
+          style: {},
         },
         image: {
           src: "",
@@ -133,8 +136,7 @@ export const NodeCard: NodeConfigurationType = {
           items: [],
           className: "",
           style: {},
-        },
-        //labelsInput: "",
+        }
       }
     }
 };

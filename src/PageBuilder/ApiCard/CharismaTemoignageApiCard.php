@@ -15,8 +15,7 @@ final class CharismaTemoignageApiCard implements ApiCardArticleInterface
 
     public function __construct(
         private readonly HttpClientInterface $httpClient,
-    ) {
-    }
+    ) {}
 
     public function getId(): string
     {
@@ -51,20 +50,27 @@ final class CharismaTemoignageApiCard implements ApiCardArticleInterface
             $query['order[' . (string) $params['sort'] . ']'] = 'asc';
         }
 
-        $response = $this->httpClient->request('GET', self::BASE_URL . '/api/charisma/temoignages', [
-            'query' => $query,
-        ]);
-        $data = $response->toArray();
-        $member = $data['member'] ?? [];
-        $totalItems = (int) ($data['totalItems'] ?? 0);
-        $items = array_map(static fn (mixed $item): object => (object) (is_array($item) ? $item : []), $member);
+        try {       
+            $response = $this->httpClient->request('GET', self::BASE_URL . '/api/charisma/temoignages', [
+                'query' => $query,
+                'timeout' => 30,
+            ]);
+            $data = $response->toArray();
+            $member = $data['member'] ?? [];
+            $totalItems = (int) ($data['totalItems'] ?? 0);
+            $items = array_map(static fn(mixed $item): object => (object) (is_array($item) ? $item : []), $member);
 
-        return ['items' => $items, 'total' => $totalItems];
+            return ['items' => $items, 'total' => $totalItems];
+        } catch (\Exception $e) {
+            return ['items' => [], 'total' => 0];
+        }
     }
 
     public function fetchItem(string $id): object
     {
-        $response = $this->httpClient->request('GET', self::BASE_URL . '/api/charisma/temoignages/' . rawurlencode($id));
+        $response = $this->httpClient->request('GET', self::BASE_URL . '/api/charisma/temoignages/' . rawurlencode($id), [
+            'timeout' => 30,
+        ]);
         $data = $response->toArray();
         return (object) $data;
     }
@@ -78,17 +84,16 @@ final class CharismaTemoignageApiCard implements ApiCardArticleInterface
         $link = $item->url ?? null;
         $thumbnails = $item->thumbnails ?? null;
 
-        
         $labels = [];
         if (!empty($theme)) {
-            $labels[] = $theme->nom;    
+            $labels[] = $theme['nom'];
         }
         $image = null;
         if (!empty($thumbnails)) {
             $image = (string) $thumbnails['normal'];
         }
 
-        return [
+        $article = [
             'id' => $id !== null ? (string) $id : '',
             'title' => (string) $titre,
             'description' => null,
@@ -98,6 +103,9 @@ final class CharismaTemoignageApiCard implements ApiCardArticleInterface
             'text' => $resume !== null ? (string) $resume : null,
             'raw' => $item,
         ];
+
+
+        return $article;
     }
 
     public function fetchCategories(): ?array

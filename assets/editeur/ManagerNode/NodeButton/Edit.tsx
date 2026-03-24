@@ -4,6 +4,7 @@ import { useNodeBuilderContext } from "../../services/providers/NodeBuilderConte
 import type { NodeButtonType } from "./index";
 import TagNameEditable from "./components/TagNameEditable";
 import { styleForView } from "../../utils/styleHelper";
+import { cn } from "@/editeur/lib/utils";
 
 const Edit: FC<NodeEditProps> = () => {
   const { node, onChange } = useNodeBuilderContext();
@@ -14,7 +15,8 @@ const Edit: FC<NodeEditProps> = () => {
   const target = buttonNode.content?.target ?? "_self";
   const style = styleForView(node?.attributes?.style ?? {});
 
-  const className = node?.attributes?.className ?? "";
+  const className = cn(`ce-button ce-button-${buttonNode.content?.size ?? "medium"} ce-button-${buttonNode.content?.variant ?? "default"}`, node?.attributes?.className ?? "");
+
   const commonProps = {
     "data-ce-id": node.id,
     "data-ce-type": node.type,

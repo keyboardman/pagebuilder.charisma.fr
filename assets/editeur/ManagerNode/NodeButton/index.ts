@@ -5,9 +5,24 @@ import Settings from "./Settings";
 import { defaultNodeConfiguration, type NodeConfigurationType } from "../NodeConfigurationType";
 import { IoEllipseOutline } from "react-icons/io5";
 
+export type NodeButtonButtonType = "button" | "submit" | "link";
+export type NodeButtonSizeType = "small" | "medium" | "large";
+export type NodeButtonVariantType = "default" | "primary" | "secondary";
+
 export const NODE_BUTTON_TYPE = "node-button" as const;
 
-export type NodeButtonButtonType = "button" | "submit" | "link";
+export const NODE_BUTTON_SIZE_OPTIONS: { value: NodeButtonSizeType; label: string }[] = [
+  { value: "small", label: "Small" },
+  { value: "medium", label: "Medium" },
+  { value: "large", label: "Large" },
+];
+
+export const NODE_BUTTON_VARIANT_OPTIONS: { value: NodeButtonVariantType; label: string }[] = [ 
+  { value: "default", label: "Default" },
+  { value: "primary", label: "Primary" },
+  { value: "secondary", label: "Secondary" },
+];
+
 
 export interface NodeButtonType extends NodeType {
   type: "node-button";
@@ -16,6 +31,8 @@ export interface NodeButtonType extends NodeType {
     label: string;
     href?: string;
     target?: string;
+    variant?: NodeButtonVariantType;
+    size?: NodeButtonSizeType;
   };
 }
 
@@ -39,6 +56,8 @@ export const NodeButton: NodeConfigurationType = {
       label: "Bouton",
       href: "",
       target: "_self",
+      variant: "default" as NodeButtonVariantType,
+      size: "medium" as NodeButtonSizeType,
     },
   },
 };

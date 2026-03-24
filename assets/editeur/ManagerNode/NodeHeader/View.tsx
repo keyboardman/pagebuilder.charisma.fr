@@ -10,7 +10,7 @@ const View: FC<NodeViewProps> = () => {
   const headerNode = node as NodeHeaderType;
   const tag = headerNode.content?.tag ?? "h1";
   const text = headerNode.content?.html ?? "";
-  const className = cn(tag, node?.attributes?.className || "");
+  const className = cn("ce-header", `ce-header-${tag.toLowerCase()}`, node?.attributes?.className || "");
 
   return React.createElement(
     tag,

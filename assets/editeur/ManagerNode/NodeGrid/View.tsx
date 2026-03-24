@@ -5,6 +5,7 @@ import { useAppContext, APP_MODE } from "../../services/providers/AppContext";
 import { type NodeEditProps, type NodeViewProps } from "../NodeConfigurationType";
 import type { NodeGridType, NodeGridLayout } from "./index";
 import { styleForView } from "../../utils/styleHelper";
+import { cn } from "@/editeur/lib/utils";
 
 type BreakpointKey = "mobile" | "tablet" | "desktop";
 
@@ -167,7 +168,7 @@ const View: FC<NodeViewProps | NodeEditProps> = () => {
       data-ce-id={node.id}
       data-ce-type={node.type}
       id={node?.attributes?.id}
-      className={node?.attributes?.className}
+      className={cn("ce-grid", node?.attributes?.className)}
       style={styleForView(node?.attributes?.style)}
       {...dataAttributes}
     >

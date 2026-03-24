@@ -1,0 +1,16 @@
+.ce-nav-item {   
+    padding: 0.5rem;
+    border-radius: 0.5rem;
+    font-weight: normal;
+    font-size: 1rem;
+    line-height: 1.25rem;
+    text-decoration: none;
+    color: inherit;
+    cursor: pointer;
+    transition: background-color 0.2s ease-in-out;
+}
+
+.ce-nav-item:hover {
+    background-color: rgba(0, 0, 0, 0.05);
+    text-decoration: none;
+}

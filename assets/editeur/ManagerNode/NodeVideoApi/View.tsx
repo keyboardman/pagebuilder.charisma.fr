@@ -3,14 +3,17 @@ import { type NodeEditProps, type NodeViewProps } from "../NodeConfigurationType
 import type { NodeVideoApiType } from ".";
 import { useNodeContext } from "../../services/providers/NodeContext";
 import { useAppContext, APP_MODE } from "../../services/providers/AppContext";
-import { Play, Video as VideoIcon, X } from "lucide-react";
+import {  Video as VideoIcon, X } from "lucide-react";
 import { cn } from "@/editeur/lib/utils";
 //import { Card, CardImage, CardContent } from "@editeur/components/card";
+import { styleForView } from "../../utils/styleHelper";
 
 import {
   Dialog,
   DialogContent,
+  DialogTitle,
 } from "@/editeur/components/ui/dialog";
+import { VisuallyHidden } from "@/editeur/components/ui/visually-hidden";
 
 const ViewTitle: FC<{
   title: string;
@@ -22,11 +25,80 @@ const ViewTitle: FC<{
       role="heading"
       aria-level={3}
       dangerouslySetInnerHTML={{ __html: title }}
-      className={cn("node-block-title w-full leading-1.2 text-xl font-bold", className)}
+      className={className}
       style={style}
     />
   );
 };
+
+const VideoWrapper = ({ children, className, style, onClick, onKeyDown }: { children: React.ReactNode, className?: string, style?: React.CSSProperties, onClick?: () => void, onKeyDown?: (e: React.KeyboardEvent<HTMLDivElement>) => void }) => {
+  return (
+    <div
+      className={className}
+      style={styleForView(style ?? {})}
+      onClick={onClick}
+      onKeyDown={onKeyDown}
+    >
+      {children}
+    </div>
+  );
+}
+
+const IconPlayer = () => {
+  return (
+    <div className="ce-video-icon-player">
+      <div className="ce-video-icon-player-inner">
+        <div className="ce-icon" />
+      </div>
+    </div>
+  );
+}
+
+const VideoPoster = ({ poster, alt = "", style }: { poster: string, alt?: string, style?: React.CSSProperties }) => {
+  return (
+    <img
+      src={poster}
+      alt={alt}
+      className="ce-card-video-poster"
+      style={style}
+    />
+  );
+}
+
+const VideoPlaceholder: FC<{ text?: string }> = ({ text = "Aucune vidéo" }) => {
+  return (
+    <div className="ce-card-video-placeholder" >
+      <div className="ce-icon" />
+      <p>{text}</p>
+    </div>
+  );
+};
+
+const ModalPlayer = ({ modalOpen, setModalOpen, src, poster }: { modalOpen: boolean, setModalOpen: (open: boolean) => void, src: string, poster: string }) => {
+  return (
+    <Dialog open={modalOpen} onOpenChange={setModalOpen}>
+      <DialogContent className="fixed left-[50%] top-[50%] z-50 w-full max-w-4xl translate-x-[-50%] translate-y-[-50%] p-0 bg-transparent border-0 shadow-none [&>button]:hidden">
+        <VisuallyHidden>
+          <DialogTitle>Vidéo</DialogTitle>
+        </VisuallyHidden>
+        <div className="relative w-full aspect-video bg-black rounded-lg overflow-hidden">
+          <video className="w-full h-full" src={src} poster={poster} controls={true} autoPlay={true} />
+          <button
+          onClick={() => setModalOpen(false)}
+          className="absolute right-4 top-4 z-50
+             rounded-full bg-black/70 text-white
+             p-2 hover:bg-black
+             focus:outline-none focus:ring-2 focus:ring-white"
+          aria-label="Fermer"
+        >
+          <X className="h-4 w-4" />
+        </button>
+        </div>
+        
+      </DialogContent>
+    </Dialog>
+  );
+}
 
 const View: FC<NodeViewProps | NodeEditProps> = () => {
   const { node } = useNodeContext() as { node: NodeVideoApiType };
@@ -43,17 +115,8 @@ const View: FC<NodeViewProps | NodeEditProps> = () => {
 
   // Afficher un message si aucun item n'est sélectionné
   if (!content.apiId || !content.itemId) {
-    return (
-      <div
-        data-ce-id={node.id}
-        data-ce-type={node.type}
-        className={cn(className ?? "", "p-8 border-2 border-dashed border-border/50 rounded-lg text-center text-muted-foreground")}
-        style={style ?? {}}
-        id={id ?? ""}
-      >
-        <p className="text-sm">Aucune vidéo sélectionnée</p>
-      </div>
-    );
+    return <VideoPlaceholder />;
+
   }
 
   const handleImageClick = () => {
@@ -72,119 +135,39 @@ const View: FC<NodeViewProps | NodeEditProps> = () => {
   //const contentStyle = content.content?.style || {};
   return (
     <>
-    {/* 
-      <Card 
-        data-ce-id={node.id}
-        data-ce-type={node.type}
-        variant="overlay" 
-        align="end"
-        className={className} 
-        style={cardStyle} 
-        id={id ?? ""}
-      >
-        <CardImage src={content.poster} alt="Video thumbnail"  style={imageStyle} />
-        <CardContent >
-          <CardContent.Title text={titleText}  style={titleStyle} className={cn(content.title?.className || "p-2")}/>
-        </CardContent>
-      </Card>
-*/}
       <div
         data-ce-id={node.id}
         data-ce-type={node.type}
-        className={cn(className ?? "", "relative overflow-hidden")}
+        className={cn("ce-card-video", className ?? "")}
         style={cardStyle}
         id={id ?? ""}
       >
-        {hasPoster ? (
-          <div
-            className={cn("relative group", !isEditMode && hasVideo && "cursor-pointer")}
-            onClick={handleImageClick}
-            role={!isEditMode && hasVideo ? "button" : undefined}
-            tabIndex={!isEditMode && hasVideo ? 0 : undefined}
-            data-video-src={hasVideo ? content.src : undefined}
-            data-video-poster={content.poster ? content.poster : undefined}
-            onKeyDown={(e) => {
-              if (!isEditMode && hasVideo && (e.key === "Enter" || e.key === " ")) {
-                e.preventDefault();
-                handleImageClick();
-              }
-            }}
-          >
-            <img
-              src={content.poster}
-              alt="Video thumbnail"
-              className="w-full h-auto transition-opacity group-hover:opacity-90"
-              style={imageStyle}
-            />
-            {hasVideo && !isEditMode && (
-              <div className="absolute inset-0 flex items-center justify-center bg-black/20 rounded-lg group-hover:bg-black/30 transition-colors">
-                <div className="bg-white/90 rounded-full p-4 group-hover:bg-white transition-colors">
-                  <Play className="h-8 w-8 text-foreground ml-1" fill="currentColor" />
-                </div>
-              </div>
-            )}
-          </div>
-        ) : (
-          <div
-            className={cn(
-              "relative group p-16 border-2 border-dashed border-border/50 rounded-lg flex flex-col items-center justify-center bg-muted/50",
-              !isEditMode && hasVideo && "cursor-pointer",
-              !hasVideo && "cursor-not-allowed opacity-50"
-            )}
-            onClick={!isEditMode && hasVideo ? handleImageClick : undefined}
-            role={!isEditMode && hasVideo ? "button" : undefined}
-            tabIndex={!isEditMode && hasVideo ? 0 : undefined}
-            data-video-src={hasVideo ? content.src : undefined}
-            data-video-poster={content.poster ? content.poster : undefined}
-            onKeyDown={(e) => {
-              if (!isEditMode && hasVideo && (e.key === "Enter" || e.key === " ")) {
-                e.preventDefault();
-                handleImageClick();
-              }
-            }}
-          >
-            <VideoIcon className="h-12 w-12 text-muted-foreground mb-2" />
-            <p className="text-sm text-muted-foreground">Vidéo</p>
-            {hasVideo && !isEditMode && (
-              <div className="absolute inset-0 flex items-center justify-center">
-                <div className="bg-white/90 rounded-full p-4 group-hover:bg-white transition-colors">
-                  <Play className="h-8 w-8 text-foreground ml-1" fill="currentColor" />
-                </div>
-              </div>
-            )}
-          </div>
-        )}
+        <VideoWrapper 
+          className={cn("ce-card-video-wrapper")} 
+          onClick={handleImageClick}
+          onKeyDown={(e) => {
+            if (!isEditMode && hasVideo && (e.key === "Enter" || e.key === " ")) {
+              e.preventDefault();
+              handleImageClick();
+            }
+          }}
+        >
+          {hasPoster && (
+            <VideoPoster poster={content.poster} alt="Video thumbnail" style={imageStyle} />
+          )}
+          <IconPlayer />
+        </VideoWrapper>
+        
         {shouldShowTitle && (
           <ViewTitle
             title={titleText}
-            className={cn(content.title?.className || "", "mt-4")}
+            className={cn("ce-card-video-title", content.title?.className || "")}
             style={titleStyle}
           />
         )}
       </div>
 
-      {hasVideo && (
-        <Dialog open={modalOpen} onOpenChange={setModalOpen}>
-          <DialogContent className="fixed left-[50%] top-[50%] z-50 w-full max-w-4xl translate-x-[-50%] translate-y-[-50%] p-0 bg-transparent border-0 shadow-none [&>button]:hidden">
-            <div className="relative w-full aspect-video bg-black rounded-lg overflow-hidden">
-              <video
-                className="w-full h-full"
-                src={content.src}
-                poster={content.poster}
-                controls={content.controls ?? true}
-                autoPlay={content.autoplay ?? true}
-              />
-            </div>
-            <button
-              onClick={() => setModalOpen(false)}
-              className="absolute right-4 top-4 rounded-sm opacity-70 ring-offset-background transition-opacity hover:opacity-100 focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 disabled:pointer-events-none bg-background/80 text-foreground p-2 z-10"
-              aria-label="Fermer"
-            >
-              <X className="h-4 w-4" />
-            </button>
-          </DialogContent>
-        </Dialog>
-      )}
+      <ModalPlayer modalOpen={modalOpen} setModalOpen={setModalOpen} src={content.src} poster={content.poster} />      
     </>
   );
 }

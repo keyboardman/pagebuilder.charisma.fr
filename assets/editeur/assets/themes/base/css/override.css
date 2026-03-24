@@ -1,0 +1,107 @@
+.ce-text {
+    color: rgb(143, 156, 172);
+    font-family: Roboto, sans-serif;
+    margin-bottom: 1.5rem;
+}
+
+.ce-header-h1 {
+    color: rgb(0, 83, 149);
+    font-family: MonumentExtended, sans-serif;
+    font-weight: 800;
+    font-size: 1.875rem;
+    line-height: 1.2;
+}
+
+.ce-header-h2 {
+    color: #0763c0;
+    font-family: Montserrat, sans-serif;
+    font-weight: bold;
+    font-size: 1.25rem;
+    line-height: 1.2;
+}
+
+.ce-menu { 
+    background-image: linear-gradient(90deg, rgb(39, 123, 229), rgb(23, 84, 151));
+}
+
+.ce-menu-content {
+    padding-top: 8px;
+    padding-bottom: 8px;
+}
+
+.ce-nav-item {
+    color: white;
+    font-family: Montserrat, sans-serif;
+    font-size: 0.875rem;
+    font-weight: bold;
+    line-height: 1.25rem;
+    text-transform: uppercase;
+}
+
+.ce-card-video-title {
+    color: #213656;
+    font-size: 0.875rem;
+    font-family: Poppins, sans-serif;
+    font-weight: bold;
+    line-height: 1.25rem;
+    line-clamp: 2;
+}
+
+.ce-button {
+    border: transparent;
+    border-radius: 0.8125rem;
+    font-family: Poppins, sans-serif;
+    font-weight: 600;
+    font-size: 1rem;
+    line-height: 1.5;
+    text-decoration: none;
+}
+
+.ce-button-large {
+    border-radius: 0.8125rem;
+    padding: 0.875rem 1rem;
+}
+
+.ce-button-primary {
+    background-image: linear-gradient(270deg, rgb(111, 212, 214) 0%, rgb(56, 127, 217) 100%);
+    color: white;
+}
+
+.ce-button-secondary {
+    background-color: white;
+    border: 2px solid rgb(60, 187, 226);
+    color: rgb(80, 164, 216);
+}
+
+
+.ce-card-api-image {
+    aspect-ratio: 2.14;
+    border-radius: 0.375rem;
+    object-fit: fill;
+    overflow: hidden;
+}
+
+.ce-card-api-title {
+    box-orient: vertical;
+    color: rgb(33, 54, 86);
+    font-family: Poppins, sans-serif;
+    font-size: 0.875rem;
+    font-weight: 600;
+    line-clamp: 3;
+    line-height: 1.2;
+    
+    overflow: hidden;
+}
+
+.ce-card-api-position-overlay .ce-card-api-container-content {
+    border-radius: 0.375rem;
+    background-image: linear-gradient(rgba(0, 0, 0, 0), rgb(0, 0, 0));
+    padding: 2.25rem;
+}
+
+.ce-card-api-position-overlay .ce-card-api-title {  
+    color: white;
+    font-family: Poppins, sans-serif;
+    font-size: 1.5rem;
+    font-weight: bold;
+}

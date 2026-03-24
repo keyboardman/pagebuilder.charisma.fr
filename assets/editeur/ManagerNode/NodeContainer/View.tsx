@@ -3,6 +3,7 @@ import NodeCollection from "../components/NodeCollection";
 import { useNodeContext } from "../../services/providers/NodeContext";
 import { type NodeEditProps, type NodeViewProps } from "../NodeConfigurationType";
 import { styleForView } from "../../utils/styleHelper";
+import { cn } from "@/editeur/lib/utils";
 
 const View: FC<NodeViewProps|NodeEditProps> = () => {
 
@@ -23,9 +24,8 @@ const View: FC<NodeViewProps|NodeEditProps> = () => {
       data-ce-id={node.id}
       data-ce-type={node.type}
       id={node?.attributes?.id}
-      className={node?.attributes?.className}
+      className={cn(`ce-container ce-container-${node.attributes?.options?.fluid ? "fluid" : "no-fluid"}`, node?.attributes?.className)}
       style={styleForView(node?.attributes?.style)}
-
       {...dataAttributes}
     >
       <NodeCollection nodes={children} parentId={node.id} zone="main" />

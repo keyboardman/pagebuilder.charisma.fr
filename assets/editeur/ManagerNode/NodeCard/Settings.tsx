@@ -7,22 +7,9 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/editeur/components/u
 import { NodeSettingsWrapper } from "../components/NodeSettingsWrapper";
 import { ContainerSettings, CardSettings, ImageSettings, TitleSettings, TextSettings, LabelsSettings } from "./Settings/index";
 
-const TAB_VALUES = ["card", "container", "image", "title", "text", "labels"] as const;
-const ELEMENT_TABS = ["image", "title", "text", "labels"] as const;
-
 const Settings: FC<NodeSettingsProps> = () => {
   const { node, onChange } = useNodeBuilderContext();
   const cardNode = node as NodeCardType;
-  const content = cardNode.content || {};
-  const selectedElement = content.selectedElement || null;
-
-  const [activeTab, setActiveTab] = useState<string>(selectedElement || "card");
-
-  useEffect(() => {
-    if (selectedElement && ELEMENT_TABS.includes(selectedElement as typeof ELEMENT_TABS[number])) {
-      setActiveTab(selectedElement);
-    }
-  }, [selectedElement]);
 
   const baseProps = {
     attributes: node.attributes,
@@ -30,23 +17,8 @@ const Settings: FC<NodeSettingsProps> = () => {
       onChange({ ...node, attributes: { ...node.attributes, ...attributes } }),
   };
 
-  const onTabChange = (value: string) => {
-    if (TAB_VALUES.includes(value as typeof TAB_VALUES[number])) {
-      setActiveTab(value);
-      if (ELEMENT_TABS.includes(value as typeof ELEMENT_TABS[number])) {
-        onChange({
-          ...node,
-          content: {
-            ...cardNode.content,
-            selectedElement: value as NodeCardType["content"]["selectedElement"],
-          },
-        });
-      }
-    }
-  };
-
   return (
-    <Tabs value={activeTab} onValueChange={onTabChange} className="flex min-h-0 flex-1 flex-col overflow-hidden">
+    <Tabs className="flex min-h-0 flex-1 flex-col overflow-hidden" defaultValue="card">
       <div className="flex min-h-0 flex-1 flex-col overflow-hidden">
         <NodeSettingsWrapper
           header={
@@ -67,7 +39,6 @@ const Settings: FC<NodeSettingsProps> = () => {
           content={
             <>
               <TabsContent value="card">
-                
                 <CardSettings />
               </TabsContent>
               <TabsContent value="container">

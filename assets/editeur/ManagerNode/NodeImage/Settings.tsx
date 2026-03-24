@@ -22,7 +22,7 @@ const Settings: FC<NodeSettingsProps> = () => {
       header={
         <>
           <Base2Settings
-            attributes={node.attributes}
+            attributes={node.content?.nav ?? ""}
             onChange={(attributes: { className?: string; id?: string }) =>
               onChange({
                 ...node,

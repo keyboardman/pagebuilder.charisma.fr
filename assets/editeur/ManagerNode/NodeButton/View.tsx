@@ -3,6 +3,7 @@ import { type NodeViewProps } from "../NodeConfigurationType";
 import { useNodeContext } from "../../services/providers/NodeContext";
 import type { NodeButtonType } from "./index";
 import { styleForView } from "../../utils/styleHelper";
+import { cn } from "@/editeur/lib/utils";
 
 const View: FC<NodeViewProps> = () => {
   const { node } = useNodeContext();
@@ -17,7 +18,7 @@ const View: FC<NodeViewProps> = () => {
     "data-ce-id": node.id,
     "data-ce-type": node.type,
     id: node?.attributes?.id ?? undefined,
-    className: node?.attributes?.className ?? "",
+    className: cn(`ce-button ce-button-${buttonNode.content?.size ?? "medium"} ce-button-${buttonNode.content?.variant ?? "default"}`, node?.attributes?.className ?? ""),
     style,
   };
 

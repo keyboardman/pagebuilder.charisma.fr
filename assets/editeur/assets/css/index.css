@@ -1,6 +1,9 @@
+
 @import "./fixed.css";
 @import "./builder.css";
 @import "./theme.css";
+@import "./../themes/base/css/index.css";
+
 
 body {
   -webkit-font-smoothing: antialiased;

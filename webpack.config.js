@@ -28,6 +28,9 @@ Encore.setOutputPath('public/build/')
     .enableReactPreset()
     .enableTypeScriptLoader()
     .enableForkedTypeScriptTypesChecking()
+    .enableSassLoader(options => {
+        options.implementation = require('sass');
+    })
 
     .configureBabel(config => {
         config.plugins.push('@babel/plugin-transform-class-properties')

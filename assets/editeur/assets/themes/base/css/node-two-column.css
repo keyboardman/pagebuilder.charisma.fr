@@ -1,0 +1,14 @@
+.ce-two_columns {
+    display: block;
+    margin:0 auto;
+    padding:0;
+}
+
+.ce-two_columns-fluid {
+    width: 100%;
+}
+
+.ce-two_columns-no-fluid {
+    max-width: 1280px;
+    margin: 0 auto;
+}

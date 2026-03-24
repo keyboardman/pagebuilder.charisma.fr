@@ -5,6 +5,7 @@ import { useAppContext, APP_MODE } from "../../services/providers/AppContext";
 import { type NodeEditProps, type NodeViewProps } from "../NodeConfigurationType";
 import type { NodeTwoColumnsType, ColumnWidth } from "./index";
 import { styleForView } from "../../utils/styleHelper";
+import { cn } from "@/editeur/lib/utils";
 
 // Classes Tailwind par largeur — noms complets + variantes responsives pour le JIT
 const GRID_COLS: Record<ColumnWidth, string> = {
@@ -155,7 +156,7 @@ const View: FC<NodeViewProps | NodeEditProps> = () => {
       data-ce-id={node.id}
       data-ce-type={node.type}
       id={node?.attributes?.id}
-      className={node?.attributes?.className}
+      className={cn(`ce-two_columns ce-two_columns-${node.attributes?.options?.fluid ? "fluid" : "no-fluid"}`, node?.attributes?.className)}
       style={styleForView(node?.attributes?.style)}
       {...dataAttributes}
     >

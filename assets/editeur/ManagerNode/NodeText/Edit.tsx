@@ -26,7 +26,7 @@ const Edit: FC<NodeEditProps> = () => {
 
       tagName={tag}
       id={node?.attributes?.id ?? ""}
-      className={cn(node?.attributes?.className || "")}
+      className={cn("ce-text", node?.attributes?.className || "")}
       style={viewStyle}
     />
   ) : (
@@ -34,7 +34,7 @@ const Edit: FC<NodeEditProps> = () => {
       "data-ce-id": node.id,
       "data-ce-type": node.type,
       id: node?.attributes?.id ?? undefined,
-      className: node?.attributes?.className ?? undefined,
+      className: cn("ce-text", node?.attributes?.className ?? ""),
       style: viewStyle,
       dangerouslySetInnerHTML: { __html: html },
     })

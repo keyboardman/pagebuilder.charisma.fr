@@ -1,0 +1,33 @@
+.ce-menu-content {
+    display: flex;
+    flex-direction: row;
+    justify-content: flex-start;
+    gap: 1rem;
+}
+
+.ce-menu-burger {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    flex: 1;
+    justify-content: flex-end;
+    min-width: 0;
+    padding-left: 1rem;
+    padding-right: 1rem;    
+}
+
+.ce-menu-burger-item {
+    display: block;
+    font-family: var(--font-sans);
+    font-weight: normal;
+    font-size: 1rem;
+    line-height: 1.25rem;
+    width: 100%;
+    padding: 0.25rem;
+    
+}
+
+.ce-menu-burger-item:hover {
+    background-color: rgba(0, 0, 0, 0.05);
+    text-decoration: none;
+}

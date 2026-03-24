@@ -72,7 +72,6 @@ function calculateRatio(ratio: string | number | undefined): number {
 
 const View: FC<NodeViewProps | NodeEditProps> = () => {
   const { node, getChildren } = useNodeContext();
-  const { mode } = useAppContext();
 
   const containerNode = node as NodeHeroType;
   const options = { ...defaultOptions, ...containerNode?.attributes?.options };
@@ -83,8 +82,6 @@ const View: FC<NodeViewProps | NodeEditProps> = () => {
   const src = options.src?.trim() ?? "";
 
   const containerStyle: React.CSSProperties = {
-    width: "100%",
-    position: "relative",
     minHeight: calculateRatio(ratio) * 100 + "cqw",
     ...(src
       ? {
@@ -125,7 +122,7 @@ const View: FC<NodeViewProps | NodeEditProps> = () => {
         data-ce-id={node.id}
         data-ce-type={node.type}
         id={node?.attributes?.id}
-        className={cn(node?.attributes?.className)}
+        className={cn("ce-hero", node?.attributes?.className)}
         style={containerStyle}
         {...dataAttributes}
       >

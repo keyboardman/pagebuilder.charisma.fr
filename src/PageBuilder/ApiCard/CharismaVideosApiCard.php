@@ -54,22 +54,35 @@ final class CharismaVideosApiCard implements ApiCardVideoInterface
             $query['categoriesWebTV'] = (string) $params['category'];
         }
 
-        $response = $this->httpClient->request('GET', self::BASE_URL . '/media.jsonld', [
+        try {
+            $response = $this->httpClient->request('GET', self::BASE_URL . '/media.jsonld', [
             'query' => $query,
+            'timeout' => 30,
         ]);
-        $data = $response->toArray();
-        $member = $data['hydra:member'] ?? [];
-        $totalItems = (int) ($data['hydra:totalItems'] ?? 0);
-        $items = array_map(static fn (mixed $item): object => (object) (is_array($item) ? $item : []), $member);
+            $data = $response->toArray();
+            $member = $data['hydra:member'] ?? [];
+            $totalItems = (int) ($data['hydra:totalItems'] ?? 0);
+            $items = array_map(static fn (mixed $item): object => (object) (is_array($item) ? $item : []), $member);
 
-        return ['items' => $items, 'total' => $totalItems];
+            return ['items' => $items, 'total' => $totalItems];
+        } catch (\Exception $e) {
+            return ['items' => [], 'total' => 0];
+        }
     }
 
     public function fetchItem(string $id): object
     {
-        $response = $this->httpClient->request('GET', self::BASE_URL . '/media/' . rawurlencode($id) . '.json');
-        $data = $response->toArray();
-        return (object) $data;
+        try {
+            $response = $this->httpClient->request('GET', self::BASE_URL . '/media/' . rawurlencode($id) . '.json', [
+            'timeout' => 30,
+        ]);
+            $data = $response->toArray();
+            return (object) $data;
+        } catch (\Exception $e) {
+            return (object) [
+                'error' => $e->getMessage(),
+            ];
+        }
     }
 
     public function mapItem(object $item): array
@@ -104,7 +117,8 @@ final class CharismaVideosApiCard implements ApiCardVideoInterface
     {
         try {
             $response = $this->httpClient->request('GET', self::BASE_URL . '/categories.json', [
-                'query' => ['order[nom]' => 'asc', 'pagination' => 'false'],
+                'query' => ['order[nom]' => 'asc', 'pagination' => 'false',],
+                'timeout' => 30,
             ]);
             $data = $response->toArray();
             if (!is_array($data)) {
