@@ -2,6 +2,7 @@ import { useAppContext } from "../services/providers/AppContext";
 import { useBuilderContext } from "../services/providers/BuilderContext";
 import { type ParentProps } from "../types/NodeType";
 import nodeHelper from "../utils/nodeHelper";
+import { canPlaceUnderParent } from "../utils/formDnd";
 
 import type {DragDropEvents} from '@dnd-kit/abstract';
 import {DragDropManager} from '@dnd-kit/dom';
@@ -46,6 +47,9 @@ export default function useDnd() {
       if (addedType === "node-nav-item" && (!parentNode || parentNode.type !== "node-nav")) {
         return;
       }
+      if (!canPlaceUnderParent(nodes, addedType, parentId)) {
+        return;
+      }
 
       const _node = nodeHelper.createNode(
         addedType,
@@ -73,6 +77,9 @@ export default function useDnd() {
           return;
         }
       } else if (parentNode?.type === "node-nav") {
+        return;
+      }
+      if (!canPlaceUnderParent(nodes, movingNode.type, parentId)) {
         return;
       }
 

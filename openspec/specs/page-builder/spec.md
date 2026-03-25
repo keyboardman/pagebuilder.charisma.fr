@@ -320,3 +320,116 @@ Le nœud SHALL appliquer cet aspect ratio au conteneur de l’image afin que la 
 - **WHEN** l’utilisateur sélectionne l’option `auto` pour `aspect-ratio`
 - **THEN** le conteneur ne force pas un ratio fixe et le rendu suit la hauteur native (comportement par défaut)
 
+### Requirement: Nœud texte riche (NodeRichText)
+
+Le builder SHALL fournir un type de nœud **NodeRichText** (identifiant `node-rich-text`) permettant l’édition de texte riche sans saisie de HTML brut. Le nœud SHALL proposer un éditeur visuel (WYSIWYG) directement dans l’interface de configuration du nœud.
+
+#### Scenario: Ajout d’un NodeRichText depuis le panneau
+- **WHEN** l’utilisateur ajoute un bloc depuis le panneau des composants et choisit le nœud texte riche (NodeRichText)
+- **THEN** un nœud NodeRichText est inséré dans la page avec un contenu texte initial éditable
+
+### Requirement: Mise en forme riche de base
+
+Le nœud NodeRichText SHALL exposer au minimum les actions de mise en forme suivantes: **gras**, **italique**, **souligné**, **barré**, **liste à puces**, **liste numérotée** et **lien**. Les actions SHALL s’appliquer à la sélection courante dans l’éditeur.
+
+#### Scenario: Application d’un style inline
+- **WHEN** l’utilisateur sélectionne un texte dans NodeRichText puis active une action inline (ex. gras ou italique)
+- **THEN** la mise en forme est appliquée immédiatement au texte sélectionné dans l’éditeur et visible en preview
+
+#### Scenario: Création d’une liste
+- **WHEN** l’utilisateur sélectionne un ou plusieurs paragraphes et active une liste à puces ou numérotée
+- **THEN** le contenu est transformé en liste correspondante dans le rendu du NodeRichText
+
+#### Scenario: Insertion d’un lien
+- **WHEN** l’utilisateur sélectionne du texte puis renseigne une URL via l’action lien
+- **THEN** le texte est rendu comme lien cliquable avec l’URL configurée
+
+### Requirement: Persistance du contenu riche
+
+Le builder SHALL sérialiser le contenu de NodeRichText dans le format de persistance existant de page et SHALL le restaurer de manière éditable lors du rechargement.
+
+#### Scenario: Sauvegarde et rechargement du NodeRichText
+- **WHEN** l’utilisateur sauvegarde une page contenant un ou plusieurs NodeRichText
+- **THEN** le contenu riche (structure et formats) est conservé et restitué à l’identique lors de la réouverture de la page
+
+### Requirement: Conteneur formulaire (NodeForm)
+
+Le builder SHALL fournir un type de nœud conteneur **NodeForm** (identifiant `node-form`) représentant un élément HTML `<form>`. Le nœud SHALL être droppable (une zone unique, ex. `main`). Le NodeForm SHALL exposer au minimum les propriétés configurables **method** (méthode HTTP, ex. `GET` ou `POST`) et **action** (URL absolue ou relative de soumission). Le NodeForm SHALL soumettre le formulaire en **AJAX** via `fetch` lors du `submit` (interception de l’événement), et afficher un message d’alerte de retour (succès en fond vert, erreur en fond rouge) dans l’interface de l’éditeur. Le NodeForm SHALL autoriser comme descendants directs ou indirects : les nœuds **NodeFormInput**, **NodeFormSelect**, **NodeFormRadio**, les nœuds **NodeButton** (pour des actions comme “submit”), et les nœuds du builder dont la catégorie d’enregistrement est **container** (ex. NodeFlex, NodeGrid, NodeContainer), afin de permettre la mise en page à l’intérieur du formulaire. Le NodeForm SHALL refuser l’imbrication d’un second NodeForm en tant qu’enfant (formulaires non imbriqués).
+
+#### Scenario: Ajout d’un NodeForm depuis le panneau
+
+- **WHEN** l’utilisateur ajoute un bloc depuis le panneau des composants et choisit le conteneur formulaire (NodeForm)
+- **THEN** un nœud NodeForm est inséré dans la page ; l’utilisateur peut définir method et action, et déposer des champs formulaire et des conteneurs de mise en page dans la zone du formulaire
+
+#### Scenario: Composition avec conteneur interne
+
+- **WHEN** l’utilisateur place un conteneur (ex. NodeFlex) à l’intérieur d’un NodeForm puis y dépose des NodeFormInput
+- **THEN** la structure est acceptée par le builder et le rendu preview affiche le formulaire avec les champs à l’intérieur du conteneur
+
+#### Scenario: Ajout d’un NodeButton dans un NodeForm
+
+- **WHEN** l’utilisateur ajoute un bloc NodeButton à l’intérieur d’un NodeForm (directement ou via un conteneur interne)
+- **THEN** le builder autorise l’insertion et la preview restitue le bouton dans le rendu HTML du formulaire ; si le NodeButton est configuré en mode `submit`, il est rendu comme un bouton `<button type="submit">`
+
+#### Scenario: Champ formulaire refusé hors NodeForm
+
+- **WHEN** l’utilisateur tente d’ajouter ou de déplacer un NodeFormInput, NodeFormSelect ou NodeFormRadio sous un parent qui n’est pas dans le sous-arbre d’un NodeForm
+- **THEN** l’opération est refusée et le nœud ne peut pas y rester
+
+#### Scenario: Persistance du NodeForm
+
+- **WHEN** l’utilisateur sauvegarde une page contenant un NodeForm avec method, action et enfants
+- **THEN** le contenu sérialisé conserve ces propriétés et la hiérarchie afin de reproduire le même formulaire à l’affichage et à la réouverture de l’éditeur
+
+#### Scenario: Soumission AJAX avec succès
+
+- **WHEN** l’utilisateur soumet un NodeForm (via un bouton `submit`) et que la réponse HTTP est réussie (2xx) ou qu’un JSON retourne `{ success: true, message: "..." }`
+- **THEN** un bandeau d’alerte est affiché avec un style de succès (fond vert) et le message de retour
+
+#### Scenario: Soumission AJAX avec erreur
+
+- **WHEN** l’utilisateur soumet un NodeForm (via un bouton `submit`) et que la réponse HTTP échoue (non-2xx) ou qu’un JSON retourne `{ success: false, message: "..." }`
+- **THEN** un bandeau d’alerte est affiché avec un style d’erreur (fond rouge) et le message de retour
+
+### Requirement: Champ saisie (NodeFormInput)
+
+Le builder SHALL fournir un type de nœud **NodeFormInput** (identifiant `node-form-input`) rendu comme un champ de saisie unique avec libellé associé (ex. `<label>` lié au contrôle). Le nœud SHALL exposer au minimum : **name**, **label**, **type** de saisie parmi les types HTML usuels pour `<input>` (à minima `text`, `email`, `number`, `tel`, `password`, `hidden`), **placeholder** optionnel, **required** (booléen), **value** par défaut optionnel. Un NodeFormInput SHALL être placé uniquement dans le sous-arbre d’un NodeForm (éventuellement à travers un conteneur enfant).
+
+#### Scenario: Configuration et rendu d’un champ texte
+
+- **WHEN** l’utilisateur configure un NodeFormInput avec label, name et type `text`
+- **THEN** le rendu preview affiche un libellé et un champ texte avec les attributs `name` et, si renseignés, `placeholder`, `required` et `value` par défaut
+
+#### Scenario: Persistance du NodeFormInput
+
+- **WHEN** l’utilisateur sauvegarde une page contenant un ou plusieurs NodeFormInput
+- **THEN** les propriétés du champ sont conservées et restituées à l’identique lors du rechargement
+
+### Requirement: Liste déroulante (NodeFormSelect)
+
+Le builder SHALL fournir un type de nœud **NodeFormSelect** (identifiant `node-form-select`) rendu comme un élément `<select>` avec options. Le nœud SHALL exposer au minimum : **name**, **label**, **options** (liste ordonnée de paires valeur / libellé affiché), **required** (booléen), et optionnellement une **valeur** ou option vide initiale (placeholder). Un NodeFormSelect SHALL être placé uniquement dans le sous-arbre d’un NodeForm.
+
+#### Scenario: Configuration et rendu d’un select
+
+- **WHEN** l’utilisateur configure un NodeFormSelect avec plusieurs options
+- **THEN** le rendu preview affiche un libellé et une liste déroulante contenant une entrée par option avec les `value` attendues
+
+#### Scenario: Persistance du NodeFormSelect
+
+- **WHEN** l’utilisateur sauvegarde une page contenant un NodeFormSelect
+- **THEN** la liste d’options et les autres propriétés sont conservées et restituées à la réouverture
+
+### Requirement: Groupe boutons radio (NodeFormRadio)
+
+Le builder SHALL fournir un type de nœud **NodeFormRadio** (identifiant `node-form-radio`) représentant un groupe d’options exclusives : plusieurs entrées **value** / **label** partageant le même attribut **name**. Le nœud SHALL exposer au minimum : **name**, **label** du groupe, liste d’**options** (valeur et libellé par option), **required** (booléen) si au moins une option doit être choisie. Le rendu SHALL produire un ensemble de `<input type="radio">` avec le même `name` et des libellés associés. Un NodeFormRadio SHALL être placé uniquement dans le sous-arbre d’un NodeForm.
+
+#### Scenario: Configuration et rendu d’un groupe radio
+
+- **WHEN** l’utilisateur configure un NodeFormRadio avec name et au moins deux options
+- **THEN** le rendu preview affiche le libellé du groupe et une option radio par entrée, toutes avec le même `name`
+
+#### Scenario: Persistance du NodeFormRadio
+
+- **WHEN** l’utilisateur sauvegarde une page contenant un NodeFormRadio
+- **THEN** les options et le name du groupe sont conservés et restitués à la réouverture
+

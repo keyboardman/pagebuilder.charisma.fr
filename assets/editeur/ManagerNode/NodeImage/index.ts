@@ -12,6 +12,8 @@ export interface NodeImageType extends NodeType {
   content: {
     src: string;
     alt?: string;
+    href?: string;
+    target?: string;
   };
 };
 

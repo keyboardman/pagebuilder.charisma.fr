@@ -17,6 +17,11 @@ import NodeHtml from "../NodeHtml";
 import NodeNav from "../NodeNav";
 import NodeNavItem from "../NodeNavItem";
 import NodeSlideshow from "../NodeSlideshow";
+import NodeRichText from "../NodeRichText";
+import NodeForm from "../NodeForm";
+import NodeFormInput from "../NodeFormInput";
+import NodeFormSelect from "../NodeFormSelect";
+import NodeFormRadio from "../NodeFormRadio";
 import type { NodeType } from "../../types/NodeType";
 
 export const NodeRegistry = {
@@ -36,9 +41,14 @@ export const NodeRegistry = {
     [NodeVideoApi.type]: NodeVideoApi,
     [NodeYoutube.type]: NodeYoutube,
     [NodeHtml.type]: NodeHtml,
+    [NodeRichText.type]: NodeRichText,
     [NodeNav.type]: NodeNav,
     [NodeNavItem.type]: NodeNavItem,
     [NodeSlideshow.type]: NodeSlideshow,
+    [NodeForm.type]: NodeForm,
+    [NodeFormInput.type]: NodeFormInput,
+    [NodeFormSelect.type]: NodeFormSelect,
+    [NodeFormRadio.type]: NodeFormRadio,
 }
 
 export type NodeTypeFromRegistry<T extends Record<string, any>> =

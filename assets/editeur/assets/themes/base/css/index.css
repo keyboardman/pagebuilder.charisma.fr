@@ -5,12 +5,16 @@
 @import "./node-hero.css";
 @import "./node-two-column.css";
 
+/* FORM */
+@import "./node-form.css";
+
 /* NAV */
 @import "./node-nav.css";
 @import "./node-nav-item.css";
 
 /* CONTENT */
 @import "./node-text.css";
+@import "./node-rich-text.css";
 @import "./node-html.css";
 @import "./node-header.css";
 @import "./node-image.css";

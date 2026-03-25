@@ -13,16 +13,20 @@ import { type NodeSettingsProps } from "../NodeConfigurationType";
 import { useNodeBuilderContext } from "../../services/providers/NodeBuilderContext";
 import { NodeSettingsWrapper } from "../components/NodeSettingsWrapper";
 
+const TARGET_OPTIONS = [
+  { value: "_self", label: "Même fenêtre" },
+  { value: "_blank", label: "Nouvel onglet" },
+];
+
 const Settings: FC<NodeSettingsProps> = () => {
   const { node, onChange } = useNodeBuilderContext();
-  const content = node.content ?? { src: "", alt: "" };
-
+  const content = node.content ?? { src: "", alt: "", href: "", target: "_self" };
   return (
     <NodeSettingsWrapper
       header={
         <>
           <Base2Settings
-            attributes={node.content?.nav ?? ""}
+            attributes={node.attributes}
             onChange={(attributes: { className?: string; id?: string }) =>
               onChange({
                 ...node,
@@ -30,6 +34,35 @@ const Settings: FC<NodeSettingsProps> = () => {
               })
             }
           />
+          <Form.Group>
+            <Form.Label text="URL (href)" />
+            <Form.Input
+              type="text"
+              value={content.href}
+              onChange={(value) =>
+                onChange({
+                  ...node,
+                  content: { ...node.content, href: value ?? "" },
+                })
+              }
+              className="h-7 text-sm"
+              placeholder="https://..."
+            />
+          </Form.Group>
+
+          <Form.Group>
+            <Form.Label text="Cible (target)" />
+            <Form.Select
+              value={content.target}
+              onChange={(value) =>
+                onChange({
+                  ...node,
+                  content: { ...node.content, target: value ?? "_self" },
+                })
+              }
+              options={TARGET_OPTIONS}
+            />
+          </Form.Group>
           <div className="flex flex-col gap-1 mt-2">
             <p className="node-block-title text-sm font-medium mb-1">Image</p>
             <Form.Group className="mb-0">
