@@ -5,6 +5,7 @@
  * - "image" : pour les APIs fournissant des images
  */
 export type ApiAdapterType = "article" | "video" | "image";
+export type ApiCollectionMode = "normal" | "fixed";
 
 /**
  * Interface pour adapter des APIs externes au système de gestion de contenu.
@@ -20,6 +21,8 @@ export interface ApiAdapter<TItem = any> {
     type: ApiAdapterType;
     /** Catégorie optionnelle de l'API pour permettre un filtrage supplémentaire (ex: "news", "ecommerce", "cms") */
     category?: string;
+    /** Mode de collection: normal (recherche/pagination) ou fixed (collection éditoriale figée) */
+    collectionMode?: ApiCollectionMode;
   
     /**
      * Récupère une collection paginée d'items depuis l'API.

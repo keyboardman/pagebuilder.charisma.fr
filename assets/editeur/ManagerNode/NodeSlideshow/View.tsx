@@ -89,11 +89,21 @@ const View: FC = () => {
               className="ce-slideshow-image-wrapper"
               style={aspectRatio ? { aspectRatio } : undefined}
             >
-              <img
-                className="ce-slideshow-image"
-                src={slide.src}
-                alt={slide.alt ?? ""}
-              />
+              {slide.link && slide.link.trim().length > 0 ? (
+                <a href={slide.link} className="block h-full w-full">
+                  <img
+                    className="ce-slideshow-image"
+                    src={slide.src}
+                    alt={slide.alt ?? ""}
+                  />
+                </a>
+              ) : (
+                <img
+                  className="ce-slideshow-image"
+                  src={slide.src}
+                  alt={slide.alt ?? ""}
+                />
+              )}
             </div>
           </SwiperSlide>
         ))}

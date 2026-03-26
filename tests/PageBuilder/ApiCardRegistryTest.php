@@ -20,6 +20,7 @@ class ApiCardRegistryTest extends TestCase
         $this->assertSame('Articles (démo)', $list[0]['label']);
         $this->assertSame('article', $list[0]['type']);
         $this->assertNull($list[0]['category']);
+        $this->assertSame('normal', $list[0]['collectionMode']);
     }
 
     public function testGetReturnsCardById(): void

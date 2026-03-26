@@ -161,7 +161,7 @@ Le builder SHALL fournir un type de nœud **NodeHtml** (identifiant `node-html`)
 
 ### Requirement: Conteneur de navigation (NodeNav)
 
-Le builder SHALL fournir un type de nœud conteneur **NodeNav** (identifiant `node-nav`) qui n’accepte comme enfants que des nœuds de type **NodeNavItem**. Le nœud SHALL être droppable (une zone unique, ex. `main`). Le NodeNav SHALL exposer les options configurables suivantes : **direction** (horizontal, vertical) pour l’alignement des items, et **icône burger** (booléen) pour recenser tous les NodeNavItem dans un menu repliable (ex. menu burger sur mobile).
+Le builder SHALL fournir un type de nœud conteneur **NodeNav** (identifiant `node-nav`) qui n’accepte comme enfants que des nœuds de type **NodeNavItem**. Le nœud SHALL être droppable (une zone unique, ex. `main`). Le NodeNav SHALL exposer les options configurables suivantes : **direction** (horizontal, vertical) pour l’alignement des items, **icône burger** (booléen) pour recenser tous les NodeNavItem dans un menu repliable (ex. menu burger sur mobile), et **variante** (`navbar`, `liste`) afin de permettre le ciblage CSS via des hooks DOM (attribut `data-ce-variant` et classe CSS `ce-menu--{variant}` sur le conteneur `<nav>`).
 
 #### Scenario: Ajout d’un NodeNav depuis le panneau
 
@@ -175,13 +175,18 @@ Le builder SHALL fournir un type de nœud conteneur **NodeNav** (identifiant `no
 
 #### Scenario: Icône burger pour recenser les items
 
-- **WHEN** l’option « icône burger » est activée sur un NodeNav
+- **WHEN** l’utilisateur active l’option « icône burger » sur un NodeNav
 - **THEN** une icône burger est affichée et permet de recenser ou d’afficher tous les NodeNavItem (ex. liste déroulante ou overlay) ; le comportement est visible en prévisualisation et à l’export
+
+#### Scenario: Variante navbar ou liste pour le styling CSS
+
+- **WHEN** l’utilisateur modifie l’option « variante » du NodeNav sur `navbar` ou `liste` dans les paramètres du nœud
+- **THEN** le conteneur `<nav>` du NodeNav est rendu avec `data-ce-variant="{variant}"` et la classe CSS `ce-menu--{variant}` ; l’éditeur, la prévisualisation et le rendu final exposent ces hooks pour le styling
 
 #### Scenario: Persistance du NodeNav
 
-- **WHEN** l’utilisateur sauvegarde une page contenant un ou plusieurs NodeNav avec direction et option burger définies
-- **THEN** le contenu sérialisé conserve la structure, la direction, l’état de l’option burger et les références aux NodeNavItem enfants
+- **WHEN** l’utilisateur sauvegarde une page contenant un ou plusieurs NodeNav avec direction, icône burger et variante définies
+- **THEN** le contenu sérialisé conserve la structure, la direction, l’état de l’option burger, la variante, et les références aux NodeNavItem enfants
 
 ### Requirement: Item de menu (NodeNavItem)
 
@@ -227,30 +232,43 @@ Le nœud SHALL être éditable dans le panneau de propriétés du builder et SHA
 
 #### Scenario: Persistance de la configuration du node
 - **WHEN** l’utilisateur sauvegarde la page contenant un NodeSlideshow
-- **THEN** les images (dans leur ordre), ainsi que les options d’affichage Swiper définies, sont sérialisées et restituées lors d’un rechargement
+- **THEN** les images (dans leur ordre), leurs métadonnées de slide (dont `alt`, source d'image et lien éventuel), ainsi que les options d’affichage Swiper définies, sont sérialisées et restituées lors d’un rechargement
 
 ### Requirement: Gestion des slides images (ajout, tri, suppression, modification)
-Le nœud NodeSlideshow SHALL permettre à l’utilisateur de gérer la liste des slides images dans le panneau de propriétés, avec les actions suivantes :
-- ajouter une slide via le file manager de médiathèque existant
-- réordonner les slides (tri) via un mécanisme de drag-and-drop
-- supprimer une slide
-- sélectionner une slide et modifier son image (remplacement)
+Le nœud NodeSlideshow SHALL permettre à l’utilisateur de gérer la liste des slides images en choisissant un mode de source :
+- mode `manual` : la liste des slides est éditée directement dans le panneau (ajout, suppression, tri drag-and-drop, édition `src`/`alt`)
+- mode `api-endpoint` : la liste des slides est déterminée par la sélection d’un endpoint API image (collection fixe) dans le panneau ; le système charge automatiquement la collection et la mappe en slides.
+
+Dans les deux modes, le nœud SHALL exposer un champ `link` optionnel par slide ; lorsque `link` est renseigné, la slide SHALL être cliquable dans la preview et le rendu final.
 
 Après chaque action, l’ordre et le contenu SHALL être immédiatement reflétés dans la preview.
 
-#### Scenario: Ajout d’une image à la fin du diaporama
-- **WHEN** l’utilisateur clique sur “Ajouter une image” dans le NodeSlideshow
-- **THEN** il choisit une image via le file manager et celle-ci est ajoutée à la liste des slides
+Le changement de mode (`manual` <-> `api-endpoint`) SHALL réinitialiser la liste des slides affichée (et recharger depuis l’API lorsque `api-endpoint` est sélectionné).
 
 #### Scenario: Tri par drag-and-drop
 - **WHEN** l’utilisateur réordonne les slides par drag-and-drop
 - **THEN** l’ordre Swiper correspond à l’ordre visuel dans la liste
 
-#### Scenario: Suppression et modification de la slide sélectionnée
+#### Scenario: Ajout de slide en mode manuel (saisie d’URL)
+- **WHEN** l’utilisateur est en mode `manual`
+- **AND** l’utilisateur clique sur “Ajouter une slide”
+- **AND** l’utilisateur renseigne une URL dans le champ “Source (URL)”
+- **THEN** une nouvelle slide apparaît dans la liste et la preview est mise à jour
+
+#### Scenario: Suppression de la slide sélectionnée
 - **WHEN** l’utilisateur sélectionne une slide puis clique “Supprimer”
 - **THEN** la slide est retirée de la liste et la preview est mise à jour
-- **WHEN** l’utilisateur sélectionne une slide puis utilise “Modifier” pour remplacer l’image
-- **THEN** la slide affiche la nouvelle image dans la preview
+
+#### Scenario: Sélection d’un endpoint API pour charger les slides
+- **WHEN** l’utilisateur passe en mode `api-endpoint`
+- **AND** l’utilisateur sélectionne une API image fixe dans le sélecteur “Endpoint API (image fixed)”
+- **THEN** les slides sont chargées automatiquement depuis la collection de l’API sélectionnée
+
+#### Scenario: Lien optionnel par slide
+- **WHEN** l’utilisateur renseigne une URL de lien sur une slide
+- **THEN** la slide devient cliquable dans le rendu
+- **WHEN** l’utilisateur vide le champ de lien
+- **THEN** la slide redevient non cliquable
 
 ### Requirement: Réglages d’affichage Swiper (navigation, pagination, vitesse)
 Le nœud NodeSlideshow SHALL exposer des paramètres permettant de configurer :

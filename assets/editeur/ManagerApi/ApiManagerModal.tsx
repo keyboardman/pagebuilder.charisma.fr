@@ -1,6 +1,7 @@
 import { useState, useEffect, useCallback, useMemo } from "react";
 import { apiRegistry } from "./ApiRegistry";
 import type { ApiAdapterType } from "./ApiAdapter";
+import type { ApiCollectionMode } from "./ApiAdapter";
 import Form from "../components/form";
 import { Button } from "@/editeur/components/ui/button";
 import {
@@ -18,6 +19,7 @@ interface MappedItemData {
   title: string;
   description?: string;
   image?: string;
+  link?: string;
   raw: unknown;
 }
 
@@ -37,6 +39,8 @@ interface ApiManagerModalProps {
    * Les APIs sans catégorie définie sont incluses dans tous les filtres (rétrocompatibilité).
    */
   categoryFilter?: string;
+  /** Filtre optionnel pour le mode de collection (normal/fixed). */
+  collectionModeFilter?: ApiCollectionMode;
   onSelect: (apiId: string, itemId: string, mappedData: MappedItemData) => void;
 }
 
@@ -47,6 +51,7 @@ export function ApiManagerModal({
   itemId: initialItemId,
   typeFilter,
   categoryFilter,
+  collectionModeFilter,
   onSelect 
 }: ApiManagerModalProps) {
   const [selectedApiId, setSelectedApiId] = useState<string>(initialApiId || "");
@@ -81,15 +86,14 @@ export function ApiManagerModal({
       });
     }
     
-    // Debug: afficher les adapters filtrés
-    console.log(`ApiManagerModal: Filtrage par type "${typeFilter}" et catégorie "${categoryFilter}"`, {
-      total: allAdapters.length,
-      filtered: filtered.length,
-      adapters: filtered.map(a => ({ id: a.id, label: a.label, type: a.type, category: a.category }))
-    });
+    if (collectionModeFilter) {
+      filtered = filtered.filter(
+        adapter => (adapter.collectionMode ?? "normal") === collectionModeFilter
+      );
+    }
     
     return filtered;
-  }, [typeFilter, categoryFilter, open]); // Recalculer quand la modale s'ouvre
+  }, [typeFilter, categoryFilter, collectionModeFilter, open]); // Recalculer quand la modale s'ouvre
 
   // Charger les items quand l'API change ou la recherche change
   useEffect(() => {
@@ -109,6 +113,7 @@ export function ApiManagerModal({
           setLoading(false);
           return;
         }
+        const isFixedCollection = adapter.collectionMode === "fixed";
 
         // Déterminer le nom du paramètre de requête pour la catégorie
         const categoryQueryParam = adapter.categoryQueryParam || "category";
@@ -121,9 +126,9 @@ export function ApiManagerModal({
           sort?: string;
           [key: string]: string | number | undefined;
         } = {
-          page,
-          limit,
-          search: searchTerm.trim() || undefined,
+          page: isFixedCollection ? 1 : page,
+          limit: isFixedCollection ? 200 : limit,
+          search: isFixedCollection ? undefined : (searchTerm.trim() || undefined),
         };
         
         // Ajouter le paramètre de catégorie avec le nom personnalisé
@@ -177,6 +182,13 @@ export function ApiManagerModal({
           if (categoryFilter && adapter.category && adapter.category !== categoryFilter) {
             validApiId = "";
           }
+          // Vérifier le collectionModeFilter
+          if (
+            collectionModeFilter &&
+            (adapter.collectionMode ?? "normal") !== collectionModeFilter
+          ) {
+            validApiId = "";
+          }
         } else {
           validApiId = "";
         }
@@ -188,7 +200,7 @@ export function ApiManagerModal({
       setSelectedCategory(null);
       setCategories([]);
     }
-  }, [open, initialApiId, initialItemId, typeFilter, categoryFilter]);
+  }, [open, initialApiId, initialItemId, typeFilter, categoryFilter, collectionModeFilter]);
 
   const handleApiChange = (newApiId: string) => {
     setSelectedApiId(newApiId);
@@ -265,6 +277,7 @@ export function ApiManagerModal({
   }));
 
   const selectedAdapter = selectedApiId ? apiRegistry.get(selectedApiId) : null;
+  const isFixedCollection = selectedAdapter?.collectionMode === "fixed";
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
@@ -280,13 +293,13 @@ export function ApiManagerModal({
           {adapters.length === 0 ? (
             <div className="flex flex-col gap-2 p-4 border border-border/30 rounded-lg">
               <p className="text-sm text-muted-foreground text-center">
-                {typeFilter || categoryFilter
-                  ? `Aucune API ne correspond aux critères de filtrage${typeFilter ? ` (type: "${typeFilter}")` : ""}${categoryFilter ? ` (catégorie: "${categoryFilter}")` : ""}.`
+                {typeFilter || categoryFilter || collectionModeFilter
+                  ? `Aucune API ne correspond aux critères de filtrage${typeFilter ? ` (type: "${typeFilter}")` : ""}${categoryFilter ? ` (catégorie: "${categoryFilter}")` : ""}${collectionModeFilter ? ` (mode: "${collectionModeFilter}")` : ""}.`
                   : `Aucune API n'est enregistrée. Utilisez `}
-                {!typeFilter && !categoryFilter && (
+                {!typeFilter && !categoryFilter && !collectionModeFilter && (
                   <code className="text-xs bg-muted px-1 py-0.5 rounded">CharismaPageBuilder.registerApi()</code>
                 )}
-                {!typeFilter && !categoryFilter && " pour enregistrer une API."}
+                {!typeFilter && !categoryFilter && !collectionModeFilter && " pour enregistrer une API."}
               </p>
             </div>
           ) : (
@@ -322,19 +335,21 @@ export function ApiManagerModal({
                     </Form.Group>
                   )}
 
-                  <Form.Group>
-                    <Form.Label text="Rechercher" />
-                    <div className="relative">
-                      <Search className="absolute left-2 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-                      <Form.Input
-                        type="text"
-                        value={searchTerm}
-                        onChange={setSearchTerm}
-                        placeholder="Rechercher un item..."
-                        className="pl-8"
-                      />
-                    </div>
-                  </Form.Group>
+                  {!isFixedCollection && (
+                    <Form.Group>
+                      <Form.Label text="Rechercher" />
+                      <div className="relative">
+                        <Search className="absolute left-2 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                        <Form.Input
+                          type="text"
+                          value={searchTerm}
+                          onChange={setSearchTerm}
+                          placeholder="Rechercher un item..."
+                          className="pl-8"
+                        />
+                      </div>
+                    </Form.Group>
+                  )}
 
                   {loading && (
                     <div className="flex items-center justify-center py-8">
@@ -398,7 +413,7 @@ export function ApiManagerModal({
                         })}
                       </div>
 
-                      {totalPages > 1 && (
+                      {!isFixedCollection && totalPages > 1 && (
                         <div className="flex items-center justify-between gap-2 pt-2 border-t">
                           <Button
                             variant="outline"

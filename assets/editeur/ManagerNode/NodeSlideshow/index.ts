@@ -10,11 +10,26 @@ export const NODE_SLIDESHOW_TYPE = "node-slideshow" as const;
 export interface NodeSlideshowSlide {
   src: string;
   alt?: string;
+  /** Source d'ajout de l'image pour traçabilité éditoriale */
+  source?: "media" | "api-fixed";
+  /** URL de destination optionnelle de la slide */
+  link?: string;
+  /** Références optionnelles pour les slides issues d'API */
+  apiId?: string;
+  itemId?: string;
 }
 
 export interface NodeSlideshowType extends NodeType {
   type: "node-slideshow";
   content: {
+    /**
+     * Mode de source des slides :
+     * - `manual` : liste éditée directement (src/alt/lien) côté éditeur
+     * - `api-endpoint` : liste déterminée par la sélection d'une API image fixe
+     */
+    slidesMode: "manual" | "api-endpoint";
+    /** API endpoint sélectionnée (quand `slidesMode="api-endpoint"`) */
+    apiId?: string;
     slides: NodeSlideshowSlide[];
     navigationEnabled: boolean;
     paginationEnabled: boolean;
@@ -51,7 +66,9 @@ export const NodeSlideshow: NodeConfigurationType = {
   default: {
     ...defaultNodeConfiguration.default,
     content: {
-      slides: [{ src: "https://placehold.net/3-800x600.png", alt: "" }],
+      slidesMode: "manual",
+      apiId: undefined,
+      slides: [{ src: "https://placehold.net/3-800x600.png", alt: "", source: "media", link: "" }],
       navigationEnabled: true,
       paginationEnabled: true,
       speedMs: 300,

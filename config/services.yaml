@@ -85,4 +85,10 @@ services:
     App\PageBuilder\ApiCard\CharismaTemoignageApiCard:
         tags: [app.builder_api_card]
 
-  
+    App\PageBuilder\ApiCard\CharismaEvenementApiCard:
+        tags: [app.builder_api_card]
+
+    App\PageBuilder\ApiCard\CharismaEvenementHomeApiCard:
+        tags: [app.builder_api_card]
+
+

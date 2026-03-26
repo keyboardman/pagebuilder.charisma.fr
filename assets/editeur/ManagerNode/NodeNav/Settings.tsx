@@ -11,12 +11,17 @@ import Form from "../../components/form";
 import { type NodeSettingsProps } from "../NodeConfigurationType";
 import { useNodeBuilderContext } from "../../services/providers/NodeBuilderContext";
 import { NodeSettingsWrapper } from "../components/NodeSettingsWrapper";
-import type { NodeNavType, NodeNavDirection } from "./index";
+import type { NodeNavType, NodeNavDirection, NodeNavVariant } from "./index";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/editeur/components/ui/tabs";
 
 const DIRECTION_OPTIONS: { value: NodeNavDirection; label: string }[] = [
   { value: "horizontal", label: "Horizontal" },
   { value: "vertical", label: "Vertical" },
+];
+
+const VARIANT_OPTIONS: { value: NodeNavVariant; label: string }[] = [
+  { value: "navbar", label: "Navbar" },
+  { value: "liste", label: "Liste" },
 ];
 
 const Settings: FC<NodeSettingsProps> = () => {
@@ -49,6 +54,18 @@ const Settings: FC<NodeSettingsProps> = () => {
                       content: { ...node.content, options: { ...node.content?.options, direction: v as NodeNavDirection } }
                     })}
                     options={DIRECTION_OPTIONS}
+                    className="h-7 flex-1 min-w-0 text-[0.75rem]"
+                  />
+                </div>
+                <div className="flex items-center gap-2">
+                  <span className="node-block-title w-14 shrink-0 text-foreground text-sm">Variante</span>
+                  <Form.Select
+                    value={(node.content?.options?.variant as string) ?? "navbar"}
+                    onChange={(v) => onChange({
+                      ...node,
+                      content: { ...node.content, options: { ...node.content?.options, variant: v as NodeNavVariant } }
+                    })}
+                    options={VARIANT_OPTIONS}
                     className="h-7 flex-1 min-w-0 text-[0.75rem]"
                   />
                 </div>

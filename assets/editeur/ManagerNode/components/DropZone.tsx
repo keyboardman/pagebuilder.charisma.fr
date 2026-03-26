@@ -7,9 +7,14 @@ import { defaultCollisionDetection } from "@dnd-kit/collision";
 
 type DropZoneProps = PropsWithChildren & {
   parent: ParentProps;
+  /**
+   * When there are no nodes in the container, the dropzone should be visible
+   * and fill the available space so users understand where they can drop.
+   */
+  isEmptyZone?: boolean;
 };
 
-export default function DropZone({ parent }: DropZoneProps) {
+export default function DropZone({ parent, isEmptyZone = false }: DropZoneProps) {
   //const dropZoneId = `${parent?.id ?? 'root' }-${parent.zone}-${parent.order}`;
   const dropZoneId = useRef(shortid.generate()).current;
 
@@ -22,12 +27,19 @@ export default function DropZone({ parent }: DropZoneProps) {
   });
 
   const { ref, isDropTarget } = droppable;
-  const isHover = isDropTarget ? "p-5 border-2 border-dashed border-primary bg-blue-900/20" : "p-1 border-none bg-transparent";
+  const hoverClass = "p-5 border-2 border-dashed border-primary bg-blue-900/20";
+  const idleEmptyClass =
+    // Full/obvious drop area when the container has no children.
+    "p-5 border-2 border-dashed border-primary bg-blue-900/10 flex-1 w-full basis-full min-h-[2.5rem]";
+  const idleClass = "p-1 border-none bg-transparent";
+
+  const dropzoneClass = isDropTarget ? hoverClass : (isEmptyZone ? idleEmptyClass : idleClass);
+  const marginClass = isEmptyZone ? "m-0" : "m-1";
 
   return (
     <div
       ref={ref}
-      className={`${isHover} m-1 duration-300 ease-in-out`}
+      className={`${dropzoneClass} ${marginClass} duration-300 ease-in-out`}
     />
   );
 }

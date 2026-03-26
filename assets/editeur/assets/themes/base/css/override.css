@@ -20,22 +20,36 @@
     line-height: 1.2;
 }
 
-.ce-menu { 
+.ce-menu--navbar { 
     background-image: linear-gradient(90deg, rgb(39, 123, 229), rgb(23, 84, 151));
 }
 
-.ce-menu-content {
+.ce-menu--navbar .ce-menu-content {
     padding-top: 8px;
     padding-bottom: 8px;
 }
 
-.ce-nav-item {
+.ce-menu--navbar .ce-nav-item {
     color: white;
     font-family: Montserrat, sans-serif;
     font-size: 0.875rem;
     font-weight: bold;
     line-height: 1.25rem;
     text-transform: uppercase;
+}
+
+.ce-menu--liste {
+    background-color: white;
+    gap: 0.5rem;
+}
+
+.ce-menu--liste .ce-nav-item {
+    color: #989898;
+    font-family: Poppins, sans-serif;
+    font-size: 0.875rem;
+    font-weight: normal;
+    line-height: 1.25rem;
+    padding: .25rem .75rem;
 }
 
 .ce-card-video-title {

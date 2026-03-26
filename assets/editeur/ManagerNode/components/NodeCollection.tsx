@@ -14,13 +14,19 @@ export function NodeCollection({
   zone: string;
 }) {
 
-  const { mode} = useAppContext();
+  const { mode } = useAppContext();
+  const nodeCount = _.entries(nodes).length;
   return (
     <>
-      {_.map(_.sortBy(nodes, ['parent.order']), (node, key) => (<Node key={key} node={node} index={node.parent.order} />) )}
-      {mode === APP_MODE.EDIT && (<DropZone
-        parent={{ id: parentId ?? "root", zone, order: _.entries(nodes).length }}
-      />)}
+      {_.map(_.sortBy(nodes, ["parent.order"]), (node, key) => (
+        <Node key={key} node={node} index={node.parent.order} />
+      ))}
+      {mode === APP_MODE.EDIT && (
+        <DropZone
+          parent={{ id: parentId ?? "root", zone, order: nodeCount }}
+          isEmptyZone={nodeCount === 0}
+        />
+      )}
 
     </>
   );

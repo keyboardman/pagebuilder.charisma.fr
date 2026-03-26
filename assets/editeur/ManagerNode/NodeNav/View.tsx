@@ -12,6 +12,7 @@ import _ from "lodash";
 
 const defaultOptions: NodeNavOptions = {
   direction: "horizontal",
+  variant: "navbar",
   showBurger: false,
 };
 
@@ -34,6 +35,7 @@ const View: FC<NodeViewProps | NodeEditProps> = () => {
   const children = getChildren("main");
   
   const isVertical = options.direction === "vertical";
+  const variant = options.variant ?? "navbar";
   const showBurger = options.showBurger === true;
   const showBurgerLayout = showBurger && isTabletOrSmaller;
 
@@ -57,8 +59,9 @@ const View: FC<NodeViewProps | NodeEditProps> = () => {
         data-ce-type={node.type}
         data-ce-direction={options.direction}
         data-ce-justify={options.justify}
+        data-ce-variant={variant}
         style={navStyle}
-        className={cn("ce-menu", navClassName)}
+        className={cn("ce-menu", navClassName, `ce-menu--${variant}`)}
       >
         {/** Menu desktop*/}
         <div

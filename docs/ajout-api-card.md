@@ -12,6 +12,8 @@ Une **ApiCard** est un service PHP qui :
 
 L’éditeur récupère la liste des cartes via cette API et propose chaque carte comme source dans l’interface.
 
+> Note: les variantes d’affichage visuel image (ex. `list` / `slider`) sont gérées uniquement dans l’éditeur page builder. Elles ne font pas partie du contrat `ApiCard` backend.
+
 ---
 
 ## Étapes
@@ -144,16 +146,18 @@ Transforme un objet brut (réponse API) en format standard utilisé par le build
 
 **Clés attendues :**
 
-| Clé           | Type   | Obligatoire | Description                          |
-|---------------|--------|-------------|--------------------------------------|
-| `id`          | string | oui         | Identifiant unique de l’élément      |
-| `title`       | string | oui         | Titre affiché                        |
-| `description` | string | non         | Sous-titre / description courte     |
-| `image`       | string | non         | URL de l’image (aperçu)              |
-| `labels`      | array  | non         | Liste de libellés (tags, thèmes…)    |
-| `link`        | string | non         | URL de la page détail                |
-| `text`        | string | non         | Extrait / résumé texte               |
-| `raw`         | object | oui         | Objet brut (pour usage avancé)       |
+
+| Clé           | Type   | Obligatoire | Description                       |
+| ------------- | ------ | ----------- | --------------------------------- |
+| `id`          | string | oui         | Identifiant unique de l’élément   |
+| `title`       | string | oui         | Titre affiché                     |
+| `description` | string | non         | Sous-titre / description courte   |
+| `image`       | string | non         | URL de l’image (aperçu)           |
+| `labels`      | array  | non         | Liste de libellés (tags, thèmes…) |
+| `link`        | string | non         | URL de la page détail             |
+| `text`        | string | non         | Extrait / résumé texte            |
+| `raw`         | object | oui         | Objet brut (pour usage avancé)    |
+
 
 Exemple :
 
@@ -175,6 +179,37 @@ return [
 - `fetchCategories(): ?array` : si la source a des catégories, retourner une liste de `['id' => string, 'label' => string]`, sinon `null`.
 - `getCategoryQueryParam(): string` : nom du paramètre envoyé à l’API pour filtrer par catégorie (souvent `'category'`).
 
+#### `ApiCardBehaviorInterface` (optionnel)
+
+`ApiCardBehaviorInterface` permet de déclarer le mode de collection attendu par l’éditeur:
+
+- `normal` : comportement standard (recherche/pagination activées côté UI).
+- `fixed` : collection éditoriale fixe (UI simplifiée, sans recherche/pagination côté sélection).
+
+Si votre classe **n’implémente pas** `ApiCardBehaviorInterface`, le registre applique `collectionMode = "normal"` par défaut.
+
+Exemple:
+
+```php
+<?php
+
+declare(strict_types=1);
+
+namespace App\PageBuilder\ApiCard;
+
+final class MaSourceApiCard implements ApiCardImageInterface, ApiCardBehaviorInterface
+{
+    // ... autres méthodes ApiCardInterface
+
+    public function getCollectionMode(): string
+    {
+        return 'fixed'; // ou 'normal'
+    }
+}
+```
+
+Dans la réponse `GET /page-builder/api/cards`, ce mode est exposé via le champ `collectionMode`.
+
 ---
 
 ### 4. Enregistrer le service
@@ -192,7 +227,7 @@ Sans ce tag, la carte ne sera pas injectée dans `ApiCardRegistry` et n’appara
 
 ### 5. Vérifier
 
-- L’API liste les cartes : `GET /page-builder/api/cards` → la nouvelle carte doit apparaître avec son `id`, `label`, `type`, `category`.
+- L’API liste les cartes : `GET /page-builder/api/cards` → la nouvelle carte doit apparaître avec son `id`, `label`, `type`, `category` (et éventuellement `collectionMode`).
 - Liste d’éléments : `GET /page-builder/api/cards/{id}/items?page=1&limit=20`.
 - Détail d’un élément : `GET /page-builder/api/cards/{id}/items/{itemId}`.
 
@@ -203,7 +238,9 @@ Recharger la page de l’éditeur (ou vider le cache Symfony si besoin) pour voi
 ## Fichiers de référence
 
 - **Contrat** : `src/PageBuilder/ApiCard/ApiCardInterface.php`
-- **Types** : `ApiCardArticleInterface`, `ApiCardVideoInterface`
+- **Comportement optionnel** : `src/PageBuilder/ApiCard/ApiCardBehaviorInterface.php`
+- **Types** : `ApiCardArticleInterface`, `ApiCardVideoInterface`, `ApiCardImageInterface`
 - **Exemples** : `CharismaArticleAuteurApiCard.php`, `CharismaTemoignageApiCard.php`, `FlashnewsApiCard.php`, `CharismaVideosApiCard.php`
 - **Registre** : `src/PageBuilder/ApiCard/ApiCardRegistry.php`
 - **API HTTP** : `src/Controller/PageBuilderApiController.php`
+

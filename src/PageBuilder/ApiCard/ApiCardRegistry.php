@@ -25,17 +25,28 @@ final class ApiCardRegistry
     /**
      * Liste des APIs (métadonnées pour exposition JSON).
      *
-     * @return list<array{id: string, label: string, type: string, category: string|null}>
+     * @return list<array{
+     *   id: string,
+     *   label: string,
+     *   type: string,
+     *   category: string|null,
+     *   collectionMode: string
+     * }>
      */
     public function list(): array
     {
         $out = [];
         foreach ($this->cards as $card) {
+            $collectionMode = 'normal';
+            if ($card instanceof ApiCardBehaviorInterface) {
+                $collectionMode = $card->getCollectionMode();
+            }
             $out[] = [
                 'id' => $card->getId(),
                 'label' => $card->getLabel(),
                 'type' => $card->getType(),
                 'category' => $card->getCategory(),
+                'collectionMode' => $collectionMode,
             ];
         }
         return $out;

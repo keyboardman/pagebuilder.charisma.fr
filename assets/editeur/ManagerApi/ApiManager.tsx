@@ -50,11 +50,12 @@ export function ApiManager({ apiId: initialApiId, itemId: initialItemId, onSelec
           setLoading(false);
           return;
         }
+        const isFixedCollection = adapter.collectionMode === "fixed";
 
         const result = await adapter.fetchCollection({
-          page,
-          limit,
-          search: searchTerm || undefined,
+          page: isFixedCollection ? 1 : page,
+          limit: isFixedCollection ? 200 : limit,
+          search: isFixedCollection ? undefined : (searchTerm || undefined),
         });
 
         setItems(result.items || []);
@@ -116,6 +117,7 @@ export function ApiManager({ apiId: initialApiId, itemId: initialItemId, onSelec
   }));
 
   const selectedAdapter = selectedApiId ? apiRegistry.get(selectedApiId) : null;
+  const isFixedCollection = selectedAdapter?.collectionMode === "fixed";
 
   return (
     <div className="flex flex-col gap-4">
@@ -131,19 +133,21 @@ export function ApiManager({ apiId: initialApiId, itemId: initialItemId, onSelec
 
       {selectedAdapter && (
         <>
-          <Form.Group>
-            <Form.Label text="Rechercher" />
-            <div className="relative">
-              <Search className="absolute left-2 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-              <Form.Input
-                type="text"
-                value={searchTerm}
-                onChange={setSearchTerm}
-                placeholder="Rechercher un item..."
-                className="pl-8"
-              />
-            </div>
-          </Form.Group>
+          {!isFixedCollection && (
+            <Form.Group>
+              <Form.Label text="Rechercher" />
+              <div className="relative">
+                <Search className="absolute left-2 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                <Form.Input
+                  type="text"
+                  value={searchTerm}
+                  onChange={setSearchTerm}
+                  placeholder="Rechercher un item..."
+                  className="pl-8"
+                />
+              </div>
+            </Form.Group>
+          )}
 
           {loading && (
             <div className="flex items-center justify-center py-8">
@@ -203,7 +207,7 @@ export function ApiManager({ apiId: initialApiId, itemId: initialItemId, onSelec
                 })}
               </div>
 
-              {totalPages > 1 && (
+              {!isFixedCollection && totalPages > 1 && (
                 <div className="flex items-center justify-between gap-2">
                   <Button
                     variant="outline"

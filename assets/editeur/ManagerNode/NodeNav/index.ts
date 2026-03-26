@@ -9,8 +9,11 @@ export const NODE_NAV_TYPE = "node-nav" as const;
 
 export type NodeNavDirection = "horizontal" | "vertical";
 
+export type NodeNavVariant = "navbar" | "liste";
+
 export interface NodeNavOptions {
   direction?: NodeNavDirection;
+  variant?: NodeNavVariant;
   showBurger?: boolean;
   burgerStyle?: CSSProperties;
   justify?: "flex-start" | "center" | "flex-end" | "space-between" | "space-around" | "space-evenly";
@@ -54,6 +57,7 @@ export const NodeNav: NodeConfigurationType = {
     content: {
       options: {
         direction: "horizontal",
+        variant: "navbar",
         showBurger: false,
         justify: "flex-start",
         gap: 0,

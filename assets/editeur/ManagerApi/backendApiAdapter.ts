@@ -5,6 +5,7 @@ export interface BackendApiMeta {
   label: string;
   type: string;
   category?: string | null;
+  collectionMode?: "normal" | "fixed";
 }
 
 /**
@@ -18,6 +19,7 @@ export function createBackendApiAdapter(meta: BackendApiMeta, baseUrl: string): 
     label: meta.label,
     type: meta.type as "article" | "video" | "image",
     category: meta.category ?? undefined,
+    collectionMode: meta.collectionMode ?? "normal",
     categoryQueryParam: "category",
 
     async fetchCollection(params: {
