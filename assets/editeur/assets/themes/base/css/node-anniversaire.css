@@ -1,0 +1,33 @@
+.ce-anniversaire {
+  width: 100%;
+}
+
+.ce-anniversaire-title {
+  margin: 0 0 0.75rem;
+  font-size: 1.1rem;
+  font-weight: 700;
+}
+
+.ce-anniversaire-status {
+  margin: 0.5rem 0;
+  opacity: 0.8;
+}
+
+.ce-anniversaire-group {
+  margin: 0 0 1rem;
+}
+
+.ce-anniversaire-date {
+  margin: 0 0 0.35rem;
+  font-size: 1rem;
+  font-weight: 700;
+}
+
+.ce-anniversaire-list {
+  margin: 0;
+  padding-left: 1.1rem;
+}
+
+.ce-anniversaire-item {
+  margin: 0.2rem 0;
+}

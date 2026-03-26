@@ -11,7 +11,8 @@ const CATEGORY_CONFIG = [
     { key: 'form', label: 'Formulaire' },
     { key: 'nav', label: 'Nav' },
     { key: 'content', label: 'Content' },
-    { key: 'api', label: 'Api' }
+    { key: 'api', label: 'Api' },
+    { key: 'custom', label: 'Custom' }
 ] as const;
 
 export default function PanelButtons() {

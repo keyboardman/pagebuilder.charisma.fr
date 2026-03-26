@@ -22,6 +22,7 @@ import NodeForm from "../NodeForm";
 import NodeFormInput from "../NodeFormInput";
 import NodeFormSelect from "../NodeFormSelect";
 import NodeFormRadio from "../NodeFormRadio";
+import NodeAnniversaire from "../NodeAnniversaire";
 import type { NodeType } from "../../types/NodeType";
 
 export const NodeRegistry = {
@@ -49,6 +50,7 @@ export const NodeRegistry = {
     [NodeFormInput.type]: NodeFormInput,
     [NodeFormSelect.type]: NodeFormSelect,
     [NodeFormRadio.type]: NodeFormRadio,
+    [NodeAnniversaire.type]: NodeAnniversaire,
 }
 
 export type NodeTypeFromRegistry<T extends Record<string, any>> =
