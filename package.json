@@ -53,6 +53,7 @@
         "@dnd-kit/abstract": "^0.2.3",
         "@dnd-kit/helpers": "^0.2.3",
         "@dnd-kit/react": "^0.2.3",
+        "@fortawesome/free-solid-svg-icons": "^7.2.0",
         "@fortawesome/react-fontawesome": "^3.3.0",
         "@lexical/code": "^0.42.0",
         "@lexical/html": "^0.42.0",
