@@ -36,7 +36,7 @@ export const NodeAnniversaire: NodeConfigurationType = {
   type: NODE_ANNIVERSAIRE_TYPE,
   button: {
     ...defaultNodeConfiguration.button,
-    label: "Anniversaire",
+    label: "Anniv.",
     icon: IoGiftOutline,
     category: "custom",
     order: 1,

@@ -59,7 +59,7 @@
 
 .ce-video-icon-player {
     align-items: center;
-    background-color: rgba(0, 0, 0, 0.2);
+    /* background-color: rgba(0, 0, 0, 0.2); */ /* on commente impacte le broder-radius j'ai un fond carré */
     display: flex;
     inset: 0;
     justify-content: center;

@@ -23,6 +23,8 @@ import NodeFormInput from "../NodeFormInput";
 import NodeFormSelect from "../NodeFormSelect";
 import NodeFormRadio from "../NodeFormRadio";
 import NodeAnniversaire from "../NodeAnniversaire";
+import NodeVideoHome from "../NodeVideoHome";
+import NodePureMusicTopSemaine from "../NodePureMusicTopSemaine";
 import type { NodeType } from "../../types/NodeType";
 
 export const NodeRegistry = {
@@ -51,6 +53,8 @@ export const NodeRegistry = {
     [NodeFormSelect.type]: NodeFormSelect,
     [NodeFormRadio.type]: NodeFormRadio,
     [NodeAnniversaire.type]: NodeAnniversaire,
+    [NodeVideoHome.type]: NodeVideoHome,
+    [NodePureMusicTopSemaine.type]: NodePureMusicTopSemaine,
 }
 
 export type NodeTypeFromRegistry<T extends Record<string, any>> =

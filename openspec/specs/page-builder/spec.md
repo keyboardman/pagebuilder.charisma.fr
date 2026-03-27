@@ -515,3 +515,86 @@ Le rendu du titre SHALL utiliser la valeur éditée par l'utilisateur lorsqu'ell
 - **THEN** le nœud affiche un état de repli non bloquant
 - **AND** l'éditeur reste fonctionnel sans erreur bloquante
 
+### Requirement: Nœud vidéos home (NodeVideoHome) en catégorie custom
+Le builder MUST proposer un nœud `NodeVideoHome` dans la catégorie custom pour afficher une sélection vidéo home.
+
+#### Scenario: Ajout du nœud depuis le panneau
+- **WHEN** l'utilisateur ouvre la catégorie custom du builder
+- **THEN** le nœud `NodeVideoHome` est disponible
+- **AND** l'insertion crée une structure de contenu compatible avec le rendu vidéo home
+
+### Requirement: Source de données vidéos home distante
+Le nœud `NodeVideoHome` MUST récupérer les vidéos depuis `https://api.charisma.fr/api/charisma/videos/homes` et utiliser exactement 7 vidéos pour le rendu de la section.
+
+#### Scenario: Chargement de la liste vidéos home
+- **WHEN** le nœud `NodeVideoHome` effectue le chargement des données
+- **THEN** la source utilisée est `https://api.charisma.fr/api/charisma/videos/homes`
+- **AND** 7 vidéos sont affichées dans la grille finale
+
+### Requirement: Rendu des vidéos home en card vidéo type API
+Le nœud `NodeVideoHome` MUST afficher chaque vidéo avec le même format de card vidéo que le rendu des vidéos API.
+
+#### Scenario: Affichage homogène avec les cards vidéo API
+- **WHEN** une vidéo home est rendue dans `NodeVideoHome`
+- **THEN** son rendu visuel et sa structure de card correspondent au format `card video` déjà utilisé pour les vidéos API
+
+### Requirement: Grille responsive imposée pour 7 vidéos home
+Le nœud `NodeVideoHome` MUST appliquer la grille suivante:
+- desktop: 3 colonnes sur 2 lignes, puis la 7e vidéo seule sur une 3e ligne occupant toute la largeur
+- tablette: 2 colonnes sur 3 lignes, puis la 7e vidéo seule sur une 4e ligne occupant toute la largeur
+- mobile: 1 colonne sur 7 lignes
+
+#### Scenario: Rendu desktop
+- **WHEN** la section est affichée en viewport desktop
+- **THEN** les 6 premières vidéos occupent une grille `3x2`
+- **AND** la 7e vidéo occupe la ligne suivante sur toute la largeur
+
+#### Scenario: Rendu tablette
+- **WHEN** la section est affichée en viewport tablette
+- **THEN** les 6 premières vidéos occupent une grille `2x3`
+- **AND** la 7e vidéo occupe la ligne suivante sur toute la largeur
+
+#### Scenario: Rendu mobile
+- **WHEN** la section est affichée en viewport mobile
+- **THEN** les 7 vidéos sont affichées sur une seule colonne
+
+### Requirement: Nœud PureMusic Top Semaine (NodePureMusicTopSemaine) en catégorie custom
+Le builder MUST proposer un nœud `NodePureMusicTopSemaine` dans la catégorie `custom` afin d'afficher le classement hebdomadaire PureMusic.
+
+Le nœud MUST être insérable, duplicable, supprimable et persistant dans le JSON du builder.
+
+#### Scenario: Ajout du nœud depuis le panneau
+- **WHEN** l'utilisateur ouvre la catégorie `custom` du builder
+- **THEN** le nœud `NodePureMusicTopSemaine` est disponible
+- **AND** l'insertion crée une structure de contenu compatible avec le rendu "top semaine"
+
+### Requirement: Source de données hebdomadaire PureMusic distante
+Le nœud `NodePureMusicTopSemaine` MUST charger les données depuis l'endpoint `https://api.charisma.fr/api/puremusic/musiques/tops/semaine`.
+
+Le nœud MUST consommer la collection renvoyée dans `member` et utiliser les champs nécessaires au rendu (au minimum: `titre`, `album.name`, `album.artiste.nom`, `album.vignette`, `source`).
+
+#### Scenario: Chargement de la liste hebdomadaire
+- **WHEN** le nœud `NodePureMusicTopSemaine` effectue le chargement des données
+- **THEN** la source utilisée est `https://api.charisma.fr/api/puremusic/musiques/tops/semaine`
+- **AND** les éléments de `member` sont mappés dans la liste rendue du nœud
+
+### Requirement: Rendu conforme à la page de référence PureMusic Top Semaine
+Le nœud `NodePureMusicTopSemaine` MUST reproduire la structure visuelle et éditoriale de référence de `https://api.charisma.fr/puremusic/tops/semaine` (section "top semaine"), en utilisant les données de l'endpoint API hebdomadaire.
+
+Le rendu MUST conserver l'ordre de la collection retournée par l'API.
+
+#### Scenario: Affichage de la liste au format de référence
+- **WHEN** les données hebdomadaires sont chargées avec succès
+- **THEN** chaque entrée est affichée avec le même format de card/liste que la page de référence "top semaine"
+- **AND** l'ordre des entrées respecte l'ordre renvoyé par l'API
+
+### Requirement: Résilience en cas d'indisponibilité de l'API PureMusic
+Le nœud `NodePureMusicTopSemaine` MUST afficher un état de repli non bloquant en cas d'échec de chargement (erreur réseau, timeout, réponse invalide).
+
+L'éditeur MUST rester utilisable sans erreur bloquante.
+
+#### Scenario: Endpoint indisponible
+- **WHEN** le chargement de `https://api.charisma.fr/api/puremusic/musiques/tops/semaine` échoue
+- **THEN** le nœud affiche un état de repli
+- **AND** le reste de l'éditeur continue de fonctionner normalement
+

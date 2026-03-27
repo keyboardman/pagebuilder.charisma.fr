@@ -37,6 +37,8 @@ iframe {
 @import "./node-button.css";
 @import "./node-card.css";
 @import "./node-anniversaire.css";
+@import "./node-video-home.css";
+@import "./node-puremusic-top-semaine.css";
 
 /* API */
 @import "./node-card-video.css";
