@@ -57,7 +57,7 @@ export const NodePureMusicTopSemaine: NodeConfigurationType = {
   type: NODE_PUREMUSIC_TOP_SEMAINE_TYPE,
   button: {
     ...defaultNodeConfiguration.button,
-    label: "Top musique",
+    label: "Top PM",
     icon: IoMusicalNotesOutline,
     category: "custom",
     order: 3,
