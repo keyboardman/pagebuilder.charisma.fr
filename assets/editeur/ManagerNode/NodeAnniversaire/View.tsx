@@ -23,7 +23,13 @@ type AnniversaireResponse = {
 const View: FC<NodeViewProps> = () => {
   const { node } = useNodeContext();
   const anniversaireNode = node as NodeAnniversaireType;
-  const endpoint = anniversaireNode.content.endpoint;
+  const endpoint =
+    anniversaireNode.content.endpoint || "https://api.charisma.fr/charisma/anniversaire/mariage";
+  const containerStyle = anniversaireNode.content.container?.style ?? {};
+  const titleStyle = anniversaireNode.content.title?.style ?? {};
+  const dayStyle = anniversaireNode.content.day?.style ?? {};
+  const anniversairesStyle = anniversaireNode.content.anniversaires?.style ?? {};
+  const titleText = anniversaireNode.content.title?.text?.trim() || "Anniversaires de mariage";
   const [groups, setGroups] = useState<AnniversaireGroup[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(false);
@@ -76,8 +82,14 @@ const View: FC<NodeViewProps> = () => {
       data-ce-type={node.type}
       id={node?.attributes?.id ?? undefined}
       className={cn("ce-anniversaire", node?.attributes?.className ?? "")}
-      style={styleForView(node?.attributes?.style ?? {})}
+      style={{
+        ...styleForView(node?.attributes?.style ?? {}),
+        ...styleForView(containerStyle),
+      }}
     >
+      <h3 className="ce-anniversaire-title" style={styleForView(titleStyle)}>
+        {titleText}
+      </h3>
       {loading ? <p className="ce-anniversaire-status">Chargement...</p> : null}
       {error ? <p className="ce-anniversaire-status">Impossible de charger les anniversaires.</p> : null}
       {!loading && !error && groups.length === 0 ? (
@@ -88,10 +100,16 @@ const View: FC<NodeViewProps> = () => {
         <div className="ce-anniversaire-groups">
           {groups.map((group) => (
             <div className="ce-anniversaire-group" key={group.date}>
-              <h4 className="ce-anniversaire-date">{group.date}</h4>
+              <h4 className="ce-anniversaire-date" style={styleForView(dayStyle)}>
+                {group.date}
+              </h4>
               <ul className="ce-anniversaire-list">
                 {group.items.map((item, index) => (
-                  <li className="ce-anniversaire-item" key={`${group.date}-${item.couple}-${index}`}>
+                  <li
+                    className="ce-anniversaire-item"
+                    key={`${group.date}-${item.couple}-${index}`}
+                    style={styleForView(anniversairesStyle)}
+                  >
                     <span>{item.couple}</span> - <strong>{item.label || `${item.years} ans`}</strong>
                   </li>
                 ))}

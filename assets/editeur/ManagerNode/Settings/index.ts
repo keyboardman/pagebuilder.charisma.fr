@@ -1,4 +1,3 @@
-import { BackgroundSettings } from "./BackgroundSettings";
 import { Text2Settings } from "./Text2Settings";
 import { Background2Settings } from "./Background2Settings";
 import { Spacing2Settings } from "./Spacing2Settings";
@@ -8,4 +7,4 @@ import { Object2Settings } from "./Object2Settings";
 import { Base2Settings } from "./Base2Settings";
 import { Size2Settings } from "./Size2Settings";
 
-export { BackgroundSettings, Text2Settings, Background2Settings, Spacing2Settings, ClassName2Settings, Border2Settings, Object2Settings, Base2Settings, Size2Settings };
+export { Text2Settings, Background2Settings, Spacing2Settings, ClassName2Settings, Border2Settings, Object2Settings, Base2Settings, Size2Settings };
