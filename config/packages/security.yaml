@@ -38,7 +38,7 @@ security:
     access_control:
         - { path: ^/login, roles: PUBLIC_ACCESS }
         - { path: ^/page/render/.*, roles: PUBLIC_ACCESS }
-        - { path: ^/font/file/.*, roles: PUBLIC_ACCESS }
+        - { path: ^/font, roles: PUBLIC_ACCESS }
         - { path: ^/, roles: IS_AUTHENTICATED_FULLY }
         
         # - { path: ^/profile, roles: ROLE_USER }

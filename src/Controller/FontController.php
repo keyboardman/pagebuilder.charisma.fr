@@ -36,6 +36,7 @@ class FontController extends AbstractController
     #[Route('/file/{path}', name: 'file', methods: ['GET'], requirements: ['path' => '.+'])]
     public function serveFile(string $path): Response
     {
+
         $path = str_replace(['..', "\0"], ['', ''], $path);
 
         if ($path === '' || !$this->fontStorage->fileExists($path)) {

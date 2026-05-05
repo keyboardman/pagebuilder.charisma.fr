@@ -4,6 +4,8 @@ import { ThemeVar } from '../types';
 export const NodeVarsForm = () => {
     const { getVars, setVars, themeState } = useTheme();
 
+    console.log('themeState', getVars());
+
     const nextVarId = useRef<number>(themeState.vars.length + 1);
     
     const vars = getVars();

@@ -76,13 +76,16 @@ class ThemeController extends AbstractController
     {
        
         $fonts = $this->em->getRepository(Font::class)->findBy([], ['name' => 'ASC']);
+        dump($theme->getConfig());
         $configDto = $theme->getConfigDto();
         $configArray = $configDto !== null ? $configDto->toArray() : [];
 
 
         if ($request->isMethod('POST')) {
             $post = json_decode($request->request->getString('config'), true);
+            
             $dto = ThemeConfigDTO::fromArray($post);
+         
             $theme->setName($dto->getName());
             $theme->setSlug($this->slugger->slug($dto->getName())->toString());
             $theme->setConfigDto($dto);

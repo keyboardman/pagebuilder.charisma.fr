@@ -1,12 +1,7 @@
-import React, { useRef, useState } from 'react';
+import { useState } from 'react';
 
 import type { ThemeFormProps } from './types';
-import {
-  buildInitialVars,
-  normalizeVarNameForSubmit,
-  configToSelectedFontValues,
-  stringCssToMap,
-} from './utils';
+import { buildInitialVars, stringCssToMap } from './utils';
 import { ThemeName } from './components/ThemeName';
 import { NodeThemeNameForm } from './components/NodeThemeNameForm';
 import { NodeVarsForm } from './components/NodeVarsForm';
@@ -30,7 +25,6 @@ export function ThemeFormComponent({ fonts, postUrl, initialConfig }: ThemeFormP
   const [customCss, setCustomCss] = useState<string>(() =>
     typeof initialConfig?.custom_css === 'string' ? initialConfig.custom_css : ''
   );
-
 
   let _config = {
     name: initialConfig?.name ?? '',

@@ -1,4 +1,5 @@
 import type React from 'react'
+import _ from 'lodash';
 import type {
     BodyConfig,
     ButtonConfig,
@@ -323,16 +324,16 @@ export function buildInitialNodeOverrides (
 export function buildInitialVars (
     initial: Record<string, string> | null | undefined
 ): ThemeVar[] {
-    const source =
-        initial && Object.keys(initial).length > 0
+    const source = initial && Object.keys(initial).length > 0
             ? initial
-            : TAILWIND_DEFAULT_VARS
-
-    return Object.entries(source).map(([name, value], index) => ({
-        id: index + 1,
-        name,
-        value: String(value ?? '')
-    }))
+            : _.mapValues(TAILWIND_DEFAULT_VARS, (value: string, key: string, index: number) => {
+                return {
+                    id: index,
+                    name: key,
+                    value: value
+                }
+            });
+    return source as unknown as ThemeVar[];
 }
 
 export function normalizeVarNameForSubmit (raw: string): string {
