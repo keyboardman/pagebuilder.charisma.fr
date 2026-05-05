@@ -30,7 +30,7 @@
                     Thèmes
                 </a>
                 <a href="{{ path('app_theme_showcase') }}" class="nav-link {{ app.request.attributes.get('_route') == 'app_theme_showcase' ? 'active' : '' }}">
-                    Présentation
+                    Prévisualisation thèmes
                 </a>
                 
                 <a href="{{ path('keyboardman_filemanager') }}" class="nav-link {{ (app.request.attributes.get('_route')|default('')) == 'keyboardman_filemanager' ? 'active' : '' }}" target="_blank">

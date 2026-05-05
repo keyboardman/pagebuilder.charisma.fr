@@ -17,7 +17,7 @@ export const ViewText: FC<ViewTextProps> = ({ className, show, style, text, onCl
     return (
         <div
             dangerouslySetInnerHTML={{ __html: text }}
-            className={cn("ce-card-api-text", className)}
+            className={cn("ce-card-text", className)}
             style={styleForView(style)}
             onClick={onClick}
         />

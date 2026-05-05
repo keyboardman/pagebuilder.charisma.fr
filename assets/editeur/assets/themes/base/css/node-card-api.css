@@ -9,21 +9,6 @@
     width: 100%;
 }
 
-.ce-card-api a.ce-card-api-link {
-    display: block;
-    width: 100%;
-    height: auto;
-}
-
-
-
-.ce-card-api a.ce-card-api-link img.ce-card-api-image {
-    width: 100%;    /* prend 100% du lien */
-    height: auto;   /* ratio conservé */
-    object-fit: cover;
-}
-
-
 .ce-card-api-position-top {
     flex-direction: column;
 }
@@ -43,6 +28,19 @@
     height: auto;
 }
 
+.ce-card-api-link {
+    display: block;
+    width: 100%;
+    height: auto;
+}
+
+.ce-card-api-image {
+    width: 100%;    /* prend 100% du lien */
+    height: 100%;   /* ratio conservé */
+    object-fit: cover;
+}
+
+
 .ce-card-api-align-start {
     align-items: flex-start;
 }
@@ -59,11 +57,10 @@
     align-items: stretch;
 }
 
-
 /* image */
 .ce-card-api-image {
     width: 100%;
-    height: auto;
+    height: 100%;
     object-fit: cover;
 }
 
@@ -95,9 +92,6 @@
     width: 100%;
     height: auto;
 }
-
-/* HasLink */
-
 
 
 /* content */

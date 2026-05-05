@@ -45,6 +45,8 @@ class ThemeCssGeneratorListener
     private function generateCssAndUpdateTheme(Theme $theme): void
     {
         $configDto = $theme->getConfigDto();
+
+      
         if ($configDto === null) {
             return;
         }

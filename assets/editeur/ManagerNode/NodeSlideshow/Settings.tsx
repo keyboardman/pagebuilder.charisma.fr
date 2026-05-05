@@ -83,8 +83,39 @@ const Settings: FC<NodeSettingsProps> = () => {
       slideshowNode.content?.aspectRatio.trim().length > 0
       ? slideshowNode.content.aspectRatio
       : "16/9";
+  const effect =
+    typeof slideshowNode.content?.effect === "string" &&
+      slideshowNode.content.effect.trim().length > 0
+      ? slideshowNode.content.effect
+      : "slide";
+  const imageBorderRadius =
+    typeof slideshowNode.content?.imageBorderRadius === "string"
+      ? slideshowNode.content.imageBorderRadius
+      : "0px";
+  const gap =
+    typeof slideshowNode.content?.gap === "number" && slideshowNode.content.gap >= 0
+      ? slideshowNode.content.gap
+      : 10;
 
   const selectedSlide = slidesSafe[selectedIndex];
+  const updateSlidesPerView = (
+    key: keyof NodeSlideshowType["content"]["slidesPerViewByBreakpoint"],
+    rawValue: string
+  ) => {
+    const num = parseInt(rawValue, 10);
+    if (Number.isNaN(num) || num < 1) return;
+
+    updateContent({
+      slidesPerViewByBreakpoint: {
+        ...(slidesPerViewByBreakpoint ?? {
+          desktop: 1,
+          tablet: 1,
+          mobile: 1,
+        }),
+        [key]: num,
+      },
+    });
+  };
 
   const imageFixedApiAdapters = useMemo(() => {
     // On limite aux APIs image en collection fixe (les items deviennent un “endpoint” de slides).
@@ -246,21 +277,7 @@ const Settings: FC<NodeSettingsProps> = () => {
                             min={1}
                             step={1}
                             value={String(slidesPerViewByBreakpoint.desktop ?? 1)}
-                            onChange={(value) => {
-                              const num = parseInt(value, 10);
-                              if (!Number.isNaN(num) && num >= 1) {
-                                updateContent({
-                                  slidesPerViewByBreakpoint: {
-                                    ...(slidesPerViewByBreakpoint ?? {
-                                      desktop: 1,
-                                      tablet: 1,
-                                      mobile: 1,
-                                    }),
-                                    desktop: num,
-                                  },
-                                });
-                              }
-                            }}
+                            onChange={(value) => updateSlidesPerView("desktop", value)}
                             className="h-7"
                           />
                         </TableCell>
@@ -269,22 +286,8 @@ const Settings: FC<NodeSettingsProps> = () => {
                             type="number"
                             min={1}
                             step={1}
-                            value={String(slidesPerViewByBreakpoint.desktop ?? 1)}
-                            onChange={(value) => {
-                              const num = parseInt(value, 10);
-                              if (!Number.isNaN(num) && num >= 1) {
-                                updateContent({
-                                  slidesPerViewByBreakpoint: {
-                                    ...(slidesPerViewByBreakpoint ?? {
-                                      desktop: 1,
-                                      tablet: 1,
-                                      mobile: 1,
-                                    }),
-                                    tablet: num,
-                                  },
-                                });
-                              }
-                            }}
+                            value={String(slidesPerViewByBreakpoint.tablet ?? 1)}
+                            onChange={(value) => updateSlidesPerView("tablet", value)}
                             className="h-7"
                           />
                         </TableCell>
@@ -293,22 +296,8 @@ const Settings: FC<NodeSettingsProps> = () => {
                             type="number"
                             min={1}
                             step={1}
-                            value={String(slidesPerViewByBreakpoint.desktop ?? 1)}
-                            onChange={(value) => {
-                              const num = parseInt(value, 10);
-                              if (!Number.isNaN(num) && num >= 1) {
-                                updateContent({
-                                  slidesPerViewByBreakpoint: {
-                                    ...(slidesPerViewByBreakpoint ?? {
-                                      desktop: 1,
-                                      tablet: 1,
-                                      mobile: 1,
-                                    }),
-                                    mobile: num,
-                                  },
-                                });
-                              }
-                            }}
+                            value={String(slidesPerViewByBreakpoint.mobile ?? 1)}
+                            onChange={(value) => updateSlidesPerView("mobile", value)}
                             className="h-7"
                           />
                         </TableCell>
@@ -334,6 +323,45 @@ const Settings: FC<NodeSettingsProps> = () => {
                 </Form.Group>
 
                 <Form.Group>
+                  <Form.Label text="Effet de transition" />
+                  <Form.Select
+                    value={effect}
+                    onChange={(value) =>
+                      updateContent({
+                        effect: (value as NodeSlideshowType["content"]["effect"]) || "slide",
+                      })
+                    }
+                    options={[
+                      { value: "slide", label: "Slide (défaut)" },
+                      { value: "fade", label: "Fade" },
+                      { value: "cube", label: "Cube" },
+                      { value: "coverflow", label: "Coverflow" },
+                      { value: "flip", label: "Flip" },
+                      { value: "cards", label: "Cards" },
+                      { value: "creative", label: "Creative" },
+                    ]}
+                    className="h-7"
+                  />
+                </Form.Group>
+
+                <Form.Group>
+                  <Form.Label text="Gap entre images (px)" />
+                  <Form.Input
+                    type="number"
+                    min={0}
+                    step={1}
+                    value={String(gap)}
+                    onChange={(value) => {
+                      const num = parseInt(value, 10);
+                      if (!Number.isNaN(num) && num >= 0) {
+                        updateContent({ gap: num });
+                      }
+                    }}
+                    className="h-7"
+                  />
+                </Form.Group>
+
+                <Form.Group>
                   <Form.Label text="Aspect ratio" />
                   <Form.Input
                     type="text"
@@ -343,6 +371,16 @@ const Settings: FC<NodeSettingsProps> = () => {
                     className="h-7"
                   />
 
+                </Form.Group>
+                <Form.Group>
+                  <Form.Label text="Arrondi image (border-radius)" />
+                  <Form.Input
+                    type="text"
+                    value={imageBorderRadius}
+                    placeholder="Ex: 12px, 1rem, 20%"
+                    onChange={(value) => updateContent({ imageBorderRadius: value ?? "0px" })}
+                    className="h-7"
+                  />
                 </Form.Group>
               </div>
             </TabsContent>

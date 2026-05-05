@@ -41,38 +41,11 @@ export type ButtonColorOnly = {
 
 /** JSON du DTO (route /theme/font/{id}) : nom, fonts, vars, body, h1..p, ch_btn… */
 export type ThemeConfigJson = {
-  nom?: string;
+  name?: string;
   fonts?: number[];
   vars?: Record<string, string>;
+  node_overrides?: Record<string, string>;
   body?: Record<string, string>;
-  h1?: Record<string, string>;
-  h2?: Record<string, string>;
-  h3?: Record<string, string>;
-  h4?: Record<string, string>;
-  h5?: Record<string, string>;
-  h6?: Record<string, string>;
-  div?: Record<string, string>;
-  p?: Record<string, string>;
-  ch_btn?: Record<string, string>;
-  ch_btn_primary?: Record<string, string>;
-  ch_btn_info?: Record<string, string>;
-  ch_btn_warning?: Record<string, string>;
-  ch_btn_success?: Record<string, string>;
-  ch_btn_danger?: Record<string, string>;
-  ch_btn_hover?: Record<string, string>;
-  ch_btn_disabled?: Record<string, string>;
-  ch_btn_primary_hover?: Record<string, string>;
-  ch_btn_primary_disabled?: Record<string, string>;
-  ch_btn_info_hover?: Record<string, string>;
-  ch_btn_info_disabled?: Record<string, string>;
-  ch_btn_warning_hover?: Record<string, string>;
-  ch_btn_warning_disabled?: Record<string, string>;
-  ch_btn_success_hover?: Record<string, string>;
-  ch_btn_success_disabled?: Record<string, string>;
-  ch_btn_danger_hover?: Record<string, string>;
-  ch_btn_danger_disabled?: Record<string, string>;
-  ch_btn_sm?: Record<string, string>;
-  ch_btn_lg?: Record<string, string>;
   /** CSS personnalisé ajouté à la fin du fichier généré */
   custom_css?: string;
 };

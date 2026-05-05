@@ -45,6 +45,7 @@ class FontStorage
 
     public function fileExists(string $path): bool
     {
+
         return $this->filesystem->fileExists($path);
     }
 

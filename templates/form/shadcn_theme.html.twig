@@ -5,7 +5,7 @@
     {%- if help is not empty -%}
         {%- set widget_attr = widget_attr|merge({attr: {'aria-describedby': id ~ '_help'}}) -%}
     {%- endif -%}
-    {%- set row_attr = row_attr|default({})|merge({class: (row_attr.class|default('') ~ ' grid w-full gap-2')|trim}) -%}
+    {%- set row_attr = row_attr|default({})|merge({class: (row_attr.class|default('') ~ ' grid w-full mb-2 gap-2')|trim}) -%}
     <div{% with {attr: row_attr} %}{{ block('attributes') }}{% endwith %}>
         {{- form_label(form) -}}
         {{- form_widget(form, widget_attr) -}}

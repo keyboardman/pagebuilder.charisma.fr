@@ -139,4 +139,17 @@ class Font
         $this->variants->removeElement($variant);
         return $this;
     }
+
+    public function getFontFamily(): string
+    {
+        $name = trim($this->name);
+
+        // Si le nom contient un espace ou des caractères spéciaux → on quote
+        if (preg_match('/\s/', $name)) {
+            // On échappe les quotes éventuelles
+            $name = '"' . addslashes($name) . '"';
+        }
+
+        return "{$name}, {$this->fallback}";
+    }
 }

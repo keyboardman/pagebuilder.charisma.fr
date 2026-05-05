@@ -37,6 +37,7 @@ class FontController extends AbstractController
     public function serveFile(string $path): Response
     {
         $path = str_replace(['..', "\0"], ['', ''], $path);
+
         if ($path === '' || !$this->fontStorage->fileExists($path)) {
             throw $this->createNotFoundException('Fichier police introuvable.');
         }
@@ -165,9 +166,11 @@ class FontController extends AbstractController
 
     private function processVariantFiles(\Symfony\Component\Form\FormInterface $form, Font $font): void
     {
+        /* Si la police n'est pas custom, on ne fait rien */
         if ($font->getType() !== FontTypeEnum::Custom) {
             return;
         }
+        /* On récupère les variantes */
         $variantsForm = $form->get('variants');
         foreach ($variantsForm as $child) {
             $file = $child->get('file')->getData();

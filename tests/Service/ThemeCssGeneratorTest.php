@@ -43,6 +43,7 @@ class ThemeCssGeneratorTest extends TestCase
         $css = $gen->buildCss($config);
         $this->assertStringContainsString(':root', $css);
         $this->assertStringContainsString('--color-white', $css);
+        $this->assertStringContainsString('.ce-container', $css);
         $this->assertStringContainsString('.text-blue-100', $css);
         $this->assertStringContainsString('.bg-blue-900', $css);
         $this->assertStringContainsString('body {', $css);
@@ -101,5 +102,22 @@ class ThemeCssGeneratorTest extends TestCase
         $this->assertStringContainsString('.ch_btn:disabled', $css);
         $this->assertStringContainsString('.ch_btn.disabled', $css);
         $this->assertStringContainsString('.ch_btn_sm {', $css);
+    }
+
+    public function testBuildCssIncludesNodeOverridesAfterBaseCss(): void
+    {
+        $gen = new ThemeCssGenerator($this->projectDir, new OklchScale());
+        $config = [
+            'node_overrides' => [
+                'node-container' => 'max-width: 1280px; padding: 0 24px;',
+                'node-button' => ".ce-button { border-radius: 9999px; }\n",
+            ],
+        ];
+
+        $css = $gen->buildCss($config);
+        $this->assertStringContainsString('.ce-container {', $css);
+        $this->assertStringContainsString('max-width: 1280px;', $css);
+        $this->assertStringContainsString('.ce-button {', $css);
+        $this->assertStringContainsString('border-radius: 9999px;', $css);
     }
 }

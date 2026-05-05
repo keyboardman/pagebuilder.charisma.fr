@@ -16,7 +16,7 @@ export const ViewLabel: FC<ViewLabelProps> = ({ label, className, style, show, o
 
     return (
         <div className="flex flex-wrap gap-2"  onClick={onClick}>
-            <span dangerouslySetInnerHTML={{ __html: label }} className={cn("ce-card-api-label", className)} style={styleForView(style)} />
+            <span dangerouslySetInnerHTML={{ __html: label }} className={cn("ce-card-label", className)} style={styleForView(style)} />
         </div>
     );
 }

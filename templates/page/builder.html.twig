@@ -3,11 +3,14 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="{{ page.description|default('') }}">
     <title>Builder — {{ page.title }}</title>
+    
     {% if page.theme.generatedCssPath %}
         <link rel="stylesheet" href="{{ path('app_theme_css', { id: page.theme.id }) }}">
     {% endif %}
     {{ encore_entry_link_tags('pageBuilderStandalone') }}
+    
 </head>
 <body class="h-screen flex flex-col overflow-hidden m-0">
 
@@ -17,7 +20,6 @@
         {% set base_url = app.request.schemeAndHttpHost ~ app.request.basePath %}
         {% set render_css_paths = encore_entry_css_files('pagePreview') %}
         {% set render_css_urls = render_css_paths|map(p => base_url ~ p)|default([]) %}
-
         <script type="application/json" id="page-builder-data">
         {{ {
             content: content_json,
@@ -35,30 +37,9 @@
             resolveUrl: path('keyboardman_filemanager') 
         }|json_encode|raw }}
         </script>
-        {#
-        <script type="application/json" id="page-builder-data">
-            {{ { 
-                    content: content_json, 
-                    csrfToken: csrf_token('page_form'), 
-                    saveUrl: path('app_page_api_content', { id: page.id }), 
-                    backUrl: path('app_page_edit', { id: page.id }), 
-                    pageTitle: page.title, 
-                    pageDescription: page.description|default(''), 
-                    baseUrl: base_url, 
-                    themeCssUrl: page.theme.generatedCssPath ? path('app_theme_css', { id: page.theme.id }) : '', 
-                    renderCssUrls: render_css_urls, 
-                    themeFonts: theme_fonts|default([]), 
-                    apiCardsBaseUrl: path('app_page_builder_api_cards_list')|replace({'/cards': ''}), 
-                    
-                }
-            }}
-            
-        </script>
-        #}
+        
         <div id="page-builder-standalone-root" class="h-full"></div>
     </main>
     {{ encore_entry_script_tags('pageBuilderStandalone') }}
-    {#  filemanagerUrl: path('keyboardman_filemanager'), 
-                     resolveUrl: path('keyboardman_filemanager') #}
 </body>
 </html>

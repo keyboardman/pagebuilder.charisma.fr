@@ -90,7 +90,7 @@ class Theme
             return null;
         }
 
-        return ThemeConfigDTO::fromArray($this->config);
+        return ThemeConfigDTO::fromEntity($this);
     }
 
     public function setConfigDto(?ThemeConfigDTO $dto): static

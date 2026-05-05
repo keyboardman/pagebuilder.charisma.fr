@@ -47,6 +47,12 @@ export interface NodeSlideshowType extends NodeType {
     };
     /** Aspect ratio CSS appliqué au média (ex: "16/9", "4/3", "1/1", "auto") */
     aspectRatio: string;
+    /** Effet de transition Swiper */
+    effect: "slide" | "fade" | "cube" | "coverflow" | "flip" | "cards" | "creative";
+    /** Border radius CSS appliqué aux images (ex: "12px", "1rem", "20%") */
+    imageBorderRadius: string;
+    /** Espace horizontal entre slides (px) */
+    gap: number;
   };
 }
 
@@ -76,6 +82,9 @@ export const NodeSlideshow: NodeConfigurationType = {
       autoplayDelayMs: 3000,
       slidesPerViewByBreakpoint: { desktop: 1, tablet: 1, mobile: 1 },
       aspectRatio: "16/9",
+      effect: "slide",
+      imageBorderRadius: "0px",
+      gap: 10,
     },
   },
 };

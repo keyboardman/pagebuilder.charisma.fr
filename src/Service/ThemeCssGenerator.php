@@ -8,6 +8,7 @@ use App\Entity\Font;
 use App\Entity\FontType as FontTypeEnum;
 use App\Entity\FontVariant;
 use App\Theme\ThemeSchema;
+use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 
 /**
  * Génère un fichier CSS à partir de la config thème (JSON) et met à jour le chemin.
@@ -16,9 +17,7 @@ use App\Theme\ThemeSchema;
  */
 class ThemeCssGenerator
 {
-    /** Clés des variantes bouton (uniquement couleurs). */
-    private const BUTTON_VARIANT_KEYS = ['ch_btn_primary', 'ch_btn_info', 'ch_btn_warning', 'ch_btn_success', 'ch_btn_danger'];
-
+    
     private const WEIGHT_MAP = [
         'thin' => '100',
         'extra_light' => '200',
@@ -31,11 +30,14 @@ class ThemeCssGenerator
         'black' => '900',
     ];
 
+    private const BASE_THEME_CSS_ENTRY = 'assets/editeur/assets/themes/base/css/index.css';
+
+    private array $fonts = [];
     public function __construct(
         private readonly string $projectDir,
         private readonly OklchScale $oklchScale,
-    ) {
-    }
+        private readonly UrlGeneratorInterface $urlGenerator
+    ) {}
 
     /**
      * Génère le CSS à partir du tableau de config (structure theme.yaml) et l'écrit.
@@ -46,7 +48,9 @@ class ThemeCssGenerator
      */
     public function generate(array $config, string $themeDir, ?string $oldCssPath = null, array $fontsToImport = []): string
     {
+
         $css = $this->buildCss($config, $fontsToImport);
+
         $version = substr(hash('sha256', json_encode($config) . (string) microtime(true)), 0, 8);
         $filename = 'theme.' . $version . '.css';
         $fullDir = $this->projectDir . '/' . trim($themeDir, '/');
@@ -73,7 +77,7 @@ class ThemeCssGenerator
     public function buildCss(array $config, array $fontsToImport = []): string
     {
         $lines = [];
-
+        
         foreach ($fontsToImport as $font) {
             if ($font->getType() === FontTypeEnum::Google && $font->getGoogleFontUrl() !== null && $font->getGoogleFontUrl() !== '') {
                 $lines[] = "@import url('" . str_replace("'", "\\'", $font->getGoogleFontUrl()) . "');";
@@ -85,9 +89,23 @@ class ThemeCssGenerator
                 }
             }
         }
+        
+        $this->fonts = array_reduce($fontsToImport, function (array $acc, Font $font) {
+            $acc[$font->getName()] = $font->getFontFamily();
+            return $acc;
+        }, []);
+
         if ($fontsToImport !== []) {
             $lines[] = '';
         }
+
+        $baseCss = $this->buildBaseBuilderCss();
+        if ($baseCss !== '') {
+            $lines[] = $baseCss;
+            $lines[] = '';
+        }
+
+        /*
 
         $vars = $config['vars'] ?? [];
         if (!empty($vars)) {
@@ -105,122 +123,108 @@ class ThemeCssGenerator
             }
         }
 
-        foreach (ThemeSchema::BLOCKS as $block) {
-            $data = $config[$block] ?? [];
-            if (!is_array($data)) {
-                continue;
-            }
-            $rules = [];
-            foreach ($data as $prop => $value) {
-                // Ne pas émettre background sur body : le builder (canvas) contrôle le fond.
-                if ($block === 'body' && ($prop === 'background' || $prop === 'background-color')) {
-                    continue;
-                }
-                if ($value !== '' && $value !== null) {
-                    $rules[] = '  ' . $prop . ': ' . $this->formatCssValue($this->resolveColorValue($this->valueToString($value), $vars), $prop) . ';';
-                }
-            }
-            if ($rules !== []) {
-                $lines[] = $block . ' {';
-                $lines[] = implode("\n", $rules);
-                $lines[] = '}';
-                $lines[] = '';
-            }
-        }
+        */
 
-        $lines = array_merge($lines, $this->buildButtonCss($config, $vars));
+        $lines = array_merge($lines, $this->buildNodeOverrideCss($config));
 
+        /*
         $customCss = trim((string) ($config['custom_css'] ?? ''));
         if ($customCss !== '') {
             $lines[] = '';
             $lines[] = $customCss;
         }
+            */
 
         return trim(implode("\n", $lines)) . "\n";
     }
 
     /**
-     * Génère les règles CSS pour les classes boutons (.ch_btn, variantes, hover, disabled, tailles).
-     *
      * @param array<string, mixed> $config
-     * @param array<string, mixed> $vars
      * @return list<string>
      */
-    private function buildButtonCss(array $config, array $vars = []): array
+    private function buildNodeOverrideCss(array $config): array
     {
         $lines = [];
-        $base = $config['ch_btn'] ?? [];
-        if (is_array($base) && $base !== []) {
-            $rules = $this->buttonRulesFromArray($base, true, $vars);
-            if ($rules !== []) {
-                $lines[] = '.ch_btn {';
-                $lines[] = implode("\n", $rules);
-                $lines[] = '}';
-                $lines[] = '';
-            }
+        $overrides = $config['node_overrides'] ?? [];
+        if (!is_array($overrides) || $overrides === []) {
+            return $lines;
         }
 
-        foreach (self::BUTTON_VARIANT_KEYS as $variant) {
-            if ($variant === 'ch_btn') {
+        $declaration = [];
+        foreach ($overrides as $selector => $raw) {
+            if (!str_starts_with($selector, '.')) {
                 continue;
             }
-            $data = $config[$variant] ?? [];
-            if (!is_array($data) || $data === []) {
-                continue;
-            }
-            $rules = $this->buttonRulesFromArray($data, false, $vars);
-            if ($rules !== []) {
-                $lines[] = '.' . $variant . ' {';
-                $lines[] = implode("\n", $rules);
-                $lines[] = '}';
-                $lines[] = '';
-            }
-        }
 
-        $hoverDisabled = [
-            'ch_btn_hover' => ['.ch_btn:hover'],
-            'ch_btn_disabled' => ['.ch_btn:disabled', '.ch_btn.disabled'],
-            'ch_btn_primary_hover' => ['.ch_btn_primary:hover'],
-            'ch_btn_primary_disabled' => ['.ch_btn_primary:disabled', '.ch_btn_primary.disabled'],
-            'ch_btn_info_hover' => ['.ch_btn_info:hover'],
-            'ch_btn_info_disabled' => ['.ch_btn_info:disabled', '.ch_btn_info.disabled'],
-            'ch_btn_warning_hover' => ['.ch_btn_warning:hover'],
-            'ch_btn_warning_disabled' => ['.ch_btn_warning:disabled', '.ch_btn_warning.disabled'],
-            'ch_btn_success_hover' => ['.ch_btn_success:hover'],
-            'ch_btn_success_disabled' => ['.ch_btn_success:disabled', '.ch_btn_success.disabled'],
-            'ch_btn_danger_hover' => ['.ch_btn_danger:hover'],
-            'ch_btn_danger_disabled' => ['.ch_btn_danger:disabled', '.ch_btn_danger.disabled'],
-        ];
-        foreach ($hoverDisabled as $key => $selectors) {
-            $data = $config[$key] ?? [];
-            if (!is_array($data) || $data === []) {
+            if($this->declarationIsEmpty($raw)) {
                 continue;
             }
-            $rules = $this->buttonRulesFromArray($data, false, $vars);
-            if ($rules !== []) {
-                $lines[] = implode(', ', $selectors) . ' {';
-                $lines[] = implode("\n", $rules);
-                $lines[] = '}';
-                $lines[] = '';
-            }
-        }
 
-        foreach (['ch_btn_sm' => '.ch_btn_sm', 'ch_btn_lg' => '.ch_btn_lg'] as $key => $selector) {
-            $data = $config[$key] ?? [];
-            if (!is_array($data) || $data === []) {
-                continue;
-            }
-            $rules = $this->buttonRulesFromArray($data, false, $vars);
-            if ($rules !== []) {
-                $lines[] = $selector . ' {';
-                $lines[] = implode("\n", $rules);
-                $lines[] = '}';
-                $lines[] = '';
-            }
+            $this->buildDeclaration($declaration, $selector, $raw);   
         }
-
+    
+        $lines[] = implode("\n", $declaration);
         return $lines;
     }
+
+    private function normalizeCssDeclarations(string $raw): string
+    {
+        $value = trim($raw);
+        if ($value === '') {
+            return '';
+        }
+
+        $value = preg_replace('/^\s*[^{}]+\{\s*/', '', $value) ?? $value;
+        $value = preg_replace('/\s*\}\s*$/', '', $value) ?? $value;
+        $value = str_replace(["\r\n", "\r"], "\n", $value);
+
+        return trim($value);
+    }
+
+    private function buildBaseBuilderCss(): string
+    {
+        $entryPath = $this->projectDir . '/' . self::BASE_THEME_CSS_ENTRY;
+        if (!is_file($entryPath)) {
+            return '';
+        }
+
+        return trim($this->readCssWithImports($entryPath, []));
+    }
+
+    /**
+     * @param array<string, bool> $visited
+     */
+    private function readCssWithImports(string $filePath, array $visited): string
+    {
+        $realPath = realpath($filePath);
+        if ($realPath === false || isset($visited[$realPath])) {
+            return '';
+        }
+        $visited[$realPath] = true;
+
+        $content = file_get_contents($realPath);
+        if ($content === false) {
+            return '';
+        }
+
+        $dir = dirname($realPath);
+        $pattern = '/^\s*@import\s+["\']([^"\']+)["\']\s*;\s*$/m';
+        return preg_replace_callback(
+            $pattern,
+            function (array $matches) use ($dir, $visited): string {
+                $importPath = $dir . '/' . $matches[1];
+                $importRealPath = realpath($importPath);
+                if ($importRealPath === false) {
+                    return '';
+                }
+
+                return $this->readCssWithImports($importRealPath, $visited);
+            },
+            $content
+        ) ?? $content;
+    }
+
+
 
     /**
      * @param array<string, mixed> $data
@@ -323,24 +327,8 @@ class ThemeCssGenerator
     /**
      * Formate une valeur pour le CSS. Padding et margin sans guillemets.
      */
-    private function formatCssValue(string $value, string $prop): string
-    {
-        $v = trim($value);
-        if ($v === '') {
-            return '""';
-        }
-        if ($prop === 'padding' || $prop === 'margin') {
-            return $v;
-        }
-        if (str_contains($v, ' ') || str_contains($v, ',') || str_contains($v, ';')) {
-            return '"' . str_replace('"', '\\22', $v) . '"';
-        }
-        return $v;
-    }
+    
 
-    /**
-     * @return list<string>
-     */
     private function fontFaceLines(string $family, FontVariant $v): array
     {
         $path = $v->getPath();
@@ -351,7 +339,12 @@ class ThemeCssGenerator
             'ttf' => 'truetype',
             default => 'woff2',
         };
-        $url = '/font/file/' . $path;
+        
+        $url = $this->urlGenerator->generate(
+            'app_font_file',
+            ['path' => $path],
+            UrlGeneratorInterface::ABSOLUTE_URL
+        );
         $weight = self::WEIGHT_MAP[$v->getWeight()] ?? '400';
         $style = $v->getStyle();
         $quoted = (str_contains($family, ' ') || str_contains($family, "'")) ? "'" . str_replace("'", "\\'", $family) . "'" : $family;
@@ -364,5 +357,56 @@ class ThemeCssGenerator
             '  font-style: ' . $style . ';',
             '}',
         ];
+    }
+
+    private function declarationIsEmpty(mixed $properties): bool
+    {
+        // Si properties est vide, on retourne true
+        if($properties === ''|| empty($properties)) {
+            return true;
+        }
+
+        // Si properties n'est pas un array, on retourne true
+        if(!is_array($properties)) {
+            return true;
+        }
+
+        $arrayProperties = array_filter($properties, fn ($value) => $value !== '' && $value !== null);
+        if(empty($arrayProperties)) {
+            return true;
+        }
+
+        return false;
+    }
+
+    private function buildDeclaration(array& $declaration, string $selector,mixed $properties):void
+    {
+
+        $declaration[] = $selector . ' {';
+        foreach ($properties as $property => $value) {
+            if ($value === '' || $value === null) {
+                continue;
+            }
+            $declaration[] = '  ' . $property . ': ' . $this->formatCssValue($value, $property) . ';';
+        }
+        $declaration[] = '}';
+        $declaration[] = '';
+    }
+
+    private function formatCssValue(string $value, string|int $prop): string
+    {
+        $v = trim($value);
+        if ($v === '') {
+            return '""';
+        }
+        if ($prop === 'padding' || $prop === 'margin') {
+            return $v;
+        }
+
+        if($prop === 'font-family') {
+            return $this->fonts[$value] ?? $value;
+        }
+        
+        return $v;
     }
 }

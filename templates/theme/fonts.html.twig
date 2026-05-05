@@ -14,17 +14,18 @@
         <link rel="stylesheet" href="{{ url }}">
     {% endfor %}
     {{ parent() }}
+    {{ encore_entry_link_tags('ThemeForm2') }}
 {% endblock %}
 
 {% block body %}
 {% if theme_config_json is defined and theme_config_json is not null %}
 <script type="application/json" id="theme-config-json">{{ theme_config_json|json_encode|raw }}</script>
 {% endif %}
+
 <div
   id="theme-form-2"
   data-fonts="{{ fonts_for_js|default([])|json_encode|e('html_attr') }}"
   data-post-url="{{ post_url|default(path('app_theme_index')) }}"
   data-field-name="config[fonts]"
 ></div>
-
 {% endblock %}

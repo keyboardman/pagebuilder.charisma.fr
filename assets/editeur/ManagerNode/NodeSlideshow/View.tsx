@@ -6,10 +6,26 @@ import { styleForView } from "../../utils/styleHelper";
 import { cn } from "@/editeur/lib/utils";
 
 import { Swiper, SwiperSlide } from "swiper/react";
-import { Autoplay, Navigation, Pagination } from "swiper/modules";
+import {
+  Autoplay,
+  Navigation,
+  Pagination,
+  EffectFade,
+  EffectCube,
+  EffectCoverflow,
+  EffectFlip,
+  EffectCards,
+  EffectCreative,
+} from "swiper/modules";
 import "swiper/css";
 import "swiper/css/navigation";
 import "swiper/css/pagination";
+import "swiper/css/effect-fade";
+import "swiper/css/effect-cube";
+import "swiper/css/effect-coverflow";
+import "swiper/css/effect-flip";
+import "swiper/css/effect-cards";
+import "swiper/css/effect-creative";
 
 const DEFAULT_SLIDE_SRC = "https://placehold.net/3-800x600.png";
 
@@ -39,6 +55,14 @@ const View: FC = () => {
       : "16/9";
   const aspectRatio =
     aspectRatioRaw === "auto" ? undefined : aspectRatioRaw;
+  const effect =
+    typeof content.effect === "string" && content.effect.trim().length > 0
+      ? content.effect
+      : "slide";
+  const imageBorderRadiusRaw =
+    typeof content.imageBorderRadius === "string" ? content.imageBorderRadius.trim() : "";
+  const imageBorderRadius = imageBorderRadiusRaw.length > 0 ? imageBorderRadiusRaw : "0px";
+  const gap = typeof content.gap === "number" && content.gap >= 0 ? content.gap : 10;
   type BreakpointKey = "mobile" | "tablet" | "desktop";
   const currentBreakpoint: BreakpointKey = (breakpoint as BreakpointKey) || "desktop";
   const slidesPerViewCurrent =
@@ -56,9 +80,15 @@ const View: FC = () => {
     ...(autoplayEnabled ? [Autoplay] : []),
     ...(navigationEnabled ? [Navigation] : []),
     ...(paginationEnabled ? [Pagination] : []),
+    ...(effect === "fade" ? [EffectFade] : []),
+    ...(effect === "cube" ? [EffectCube] : []),
+    ...(effect === "coverflow" ? [EffectCoverflow] : []),
+    ...(effect === "flip" ? [EffectFlip] : []),
+    ...(effect === "cards" ? [EffectCards] : []),
+    ...(effect === "creative" ? [EffectCreative] : []),
   ];
 
-  const swiperKey = `${navigationEnabled ? 1 : 0}-${paginationEnabled ? 1 : 0}-${speedMs}-${slides.length}-${slidesPerViewCurrent}-${autoplayEnabled ? 1 : 0}-${autoplayDelayMs}-${aspectRatioRaw}`;
+  const swiperKey = `${navigationEnabled ? 1 : 0}-${paginationEnabled ? 1 : 0}-${speedMs}-${slides.length}-${slidesPerViewCurrent}-${autoplayEnabled ? 1 : 0}-${autoplayDelayMs}-${aspectRatioRaw}-${effect}-${imageBorderRadius}-${gap}`;
 
   return (
     <div
@@ -78,10 +108,32 @@ const View: FC = () => {
             ? { delay: autoplayDelayMs, disableOnInteraction: false }
             : false
         }
+        effect={effect}
+        fadeEffect={effect === "fade" ? { crossFade: true } : undefined}
+        cubeEffect={
+          effect === "cube"
+            ? { shadow: false, slideShadows: true, shadowOffset: 20, shadowScale: 0.94 }
+            : undefined
+        }
+        coverflowEffect={
+          effect === "coverflow"
+            ? { rotate: 30, stretch: 0, depth: 100, modifier: 1, slideShadows: true }
+            : undefined
+        }
+        flipEffect={effect === "flip" ? { slideShadows: true, limitRotation: true } : undefined}
+        cardsEffect={effect === "cards" ? { slideShadows: true, rotate: true } : undefined}
+        creativeEffect={
+          effect === "creative"
+            ? {
+              prev: { shadow: true, translate: ["-20%", 0, -1] },
+              next: { translate: ["100%", 0, 0] },
+            }
+            : undefined
+        }
         slidesPerView={slidesPerViewCurrent}
         loop={loopEnabled}
         className="ce-slideshow-swiper"
-        spaceBetween={10}
+        spaceBetween={slidesPerViewCurrent > 1 ? gap : 0}
       >
         {slides.map((slide, idx) => (
           <SwiperSlide key={`${slide.src}-${idx}`} className="ce-slideshow-slide">
@@ -95,6 +147,7 @@ const View: FC = () => {
                     className="ce-slideshow-image"
                     src={slide.src}
                     alt={slide.alt ?? ""}
+                    style={{ borderRadius: imageBorderRadius }}
                   />
                 </a>
               ) : (
@@ -102,6 +155,7 @@ const View: FC = () => {
                   className="ce-slideshow-image"
                   src={slide.src}
                   alt={slide.alt ?? ""}
+                  style={{ borderRadius: imageBorderRadius }}
                 />
               )}
             </div>

@@ -10,6 +10,12 @@
 8. Menu Nav
     1. OK la dropzone ne prend pas tout l'espace. On croit que cela ne fonctionne pas alors qu'il est juste à gauche
     2. OK ajouter variante (Navbar, liste, ) pour permettre différent style css.
-9. Custom PureMusic
-10. Custom Video
+9. OK Custom PureMusic
+10. OK Custom Video
 11. OK Anniversaire
+12. css pour card image ratio (override)
+13. OK icone TOP
+14. gestion des icones
+15. extraire le theme globale css et creer le générateur
+16. Suppression compte utilisateur
+17. generateur css  (verifier si il y une erreur de typo)

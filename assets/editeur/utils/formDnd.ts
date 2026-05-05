@@ -2,6 +2,8 @@ import NodeRegistry from "../ManagerNode/components/NodeRegistry";
 import type { NodeID, NodesType } from "../types/NodeType";
 
 export const NODE_FORM_TYPE = "node-form" as const;
+export const NODE_ROOT_TYPE = "node-root" as const;
+export const NODE_TOP_BUTTON_TYPE = "node-top-button" as const;
 
 export const FORM_FIELD_TYPES = [
   "node-form-input",
@@ -47,6 +49,12 @@ export function canPlaceUnderParent(
   nodeType: string,
   targetParentId: NodeID | null
 ): boolean {
+  if (nodeType === NODE_TOP_BUTTON_TYPE) {
+    if (!targetParentId) return false;
+    const parentNode = nodes[targetParentId];
+    return parentNode?.type === NODE_ROOT_TYPE;
+  }
+
   const inForm = hasFormAncestor(nodes, targetParentId);
 
   if (nodeType === NODE_FORM_TYPE) {

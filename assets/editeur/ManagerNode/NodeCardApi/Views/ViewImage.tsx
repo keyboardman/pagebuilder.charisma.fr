@@ -23,7 +23,7 @@ export const ViewImage: FC<ViewImageProps> = ({ alt, className, image, style, on
         <img 
             src={image} 
             alt={alt} 
-            className={cn("ce-card-api-image", className, onClick ? "cursor-pointer" : "")} 
+            className={cn("ce-card-image", className, onClick ? "cursor-pointer" : "")} 
             style={style} 
             onClick={onClick}
         />

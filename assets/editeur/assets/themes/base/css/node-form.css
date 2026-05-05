@@ -95,7 +95,7 @@
 
 /* Bootstrap-like radio spacing */
 .ce-form-radio-row input[type="radio"] {
-  margin-top: 0.25rem;
+  margin-top: 0;
 }
 
 .ce-form-radio-row label {

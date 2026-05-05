@@ -1,0 +1,6 @@
+.ce-top-button--fixed {
+  position: fixed;
+  bottom: 0;
+  right: 24px;
+  z-index: 1000;
+}

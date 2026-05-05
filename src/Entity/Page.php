@@ -5,11 +5,13 @@ declare(strict_types=1);
 namespace App\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\String\Slugger\AsciiSlugger;
 use Symfony\Component\Validator\Constraints as Assert;
 
 #[ORM\Entity]
 #[ORM\Table(name: 'page')]
 #[ORM\UniqueConstraint(name: 'uniq_page_slug', columns: ['slug'])]
+#[ORM\HasLifecycleCallbacks]
 class Page
 {
     #[ORM\Id]
@@ -22,7 +24,6 @@ class Page
     private string $title = '';
 
     #[ORM\Column(type: 'string', length: 255)]
-    #[Assert\NotBlank]
     private string $slug = '';
 
     #[ORM\ManyToOne(targetEntity: Theme::class)]
@@ -38,6 +39,15 @@ class Page
 
     #[ORM\Column(type: 'text', nullable: true)]
     private ?string $render = null;
+
+    #[ORM\PrePersist]
+    public function generateSlug(): void
+    {
+        if (!$this->slug && $this->title) {
+            $slugger = new AsciiSlugger();
+            $this->slug = strtolower($slugger->slug($this->title)->toString());
+        }
+    }
 
     public function getId(): ?int
     {

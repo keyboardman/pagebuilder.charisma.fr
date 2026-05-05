@@ -5,9 +5,11 @@ declare(strict_types=1);
 namespace App\Controller;
 
 use App\Entity\Font;
+use App\Entity\FontType as FontTypeEnum;
 use App\Entity\Page;
 use App\Entity\Theme;
-use App\Entity\FontType as FontTypeEnum;
+use App\Form\AdminPageFormType;
+use App\Service\ThemeFontBuilderService;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
@@ -35,154 +37,76 @@ class PageController extends AbstractController
     #[Route('/new', name: 'new', methods: ['GET', 'POST'])]
     public function new(Request $request): Response
     {
-        if ($request->isMethod('POST')) {
-            if (!$this->isCsrfTokenValid('page_form', $request->request->getString('_token'))) {
-                $this->addFlash('error', 'Token de sécurité invalide.');
-                return $this->redirectToRoute('app_page_new');
-            }
-            $title = $request->request->getString('title');
-            $themeId = $request->request->getInt('theme_id');
-            $description = $request->request->get('description');
+        $form = $this->createForm(AdminPageFormType::class);
+        $form->handleRequest($request);
 
-            if ($title === '') {
-                $this->addFlash('error', 'Le titre est obligatoire.');
-                return $this->redirectToRoute('app_page_new');
-            }
-
-            $slug = $this->slugger->slug($title)->lower()->toString();
-            $theme = $this->em->getRepository(Theme::class)->find($themeId);
-            if ($theme === null) {
-                $this->addFlash('error', 'Veuillez choisir un thème.');
-                return $this->redirectToRoute('app_page_new');
-            }
-
-            $page = new Page();
-            $page->setTitle($title);
-            $page->setSlug($slug);
-            $page->setTheme($theme);
-            $page->setDescription(\is_string($description) ? $description : null);
-            $page->setContent(['cylsqgudkwtz' => ['id' => 'cylsqgudkwtz', 'type' => 'node-root', 'parent' => null, 'content' => ['title' => '']]]);
-
+        if ($form->isSubmitted() && $form->isValid()) {
+            $page = $form->getData();
+            $description = $page->getDescription() ?? null;
+            $content = ['cylsqgudkwtz' => ['id' => 'cylsqgudkwtz', 'type' => 'node-root', 'parent' => null, 'content' => ['title' => '']]];
+            $page->setDescription($description);
+            $page->setContent($content);
             $this->em->persist($page);
-            try {
-                $this->em->flush();
-            } catch (\Doctrine\DBAL\Exception\UniqueConstraintViolationException) {
-                $this->addFlash('error', 'Ce slug est déjà utilisé.');
-                return $this->redirectToRoute('app_page_new');
-            }
-
-            $this->addFlash('success', sprintf('Page « %s » créée.', $page->getTitle()));
-            return $this->redirectToRoute('app_page_edit', ['id' => $page->getId()]);
+            $this->em->flush();
+            return $this->redirectToRoute('app_page_index');
         }
 
-        $themes = $this->em->getRepository(Theme::class)->findBy([], ['name' => 'ASC']);
-        $themesForJs = array_map(
-            static fn (Theme $t): array => ['id' => $t->getId(), 'name' => $t->getName()],
-            $themes
-        );
         return $this->render('page/new.html.twig', [
             'page' => null,
-            'themes' => $themes,
-            'themes_for_js' => $themesForJs,
-            'post_url' => $this->generateUrl('app_page_new'),
+            'form' => $form->createView(),
         ]);
     }
 
     #[Route('/edit/{id}', name: 'edit', methods: ['GET', 'POST'], requirements: ['id' => '\d+'])]
     public function edit(Request $request, Page $page): Response
     {
-        if ($request->isMethod('POST')) {
-            if (!$this->isCsrfTokenValid('page_form', $request->request->getString('_token'))) {
-                $this->addFlash('error', 'Token de sécurité invalide.');
-                return $this->redirectToRoute('app_page_edit', ['id' => $page->getId()]);
-            }
-            $title = $request->request->getString('title');
-            $themeId = $request->request->getInt('theme_id');
-            $description = $request->request->get('description');
+        $form = $this->createForm(AdminPageFormType::class, $page);
+        $form->handleRequest($request);
+        if ($form->isSubmitted() && $form->isValid()) {
+            $page = $form->getData();
 
-            if ($title === '') {
-                $this->addFlash('error', 'Le titre est obligatoire.');
-                return $this->redirectToRoute('app_page_edit', ['id' => $page->getId()]);
-            }
-
-            $slug = $this->slugger->slug($title)->lower()->toString();
-            $theme = $this->em->getRepository(Theme::class)->find($themeId);
-            if ($theme === null) {
-                $this->addFlash('error', 'Veuillez choisir un thème.');
-                return $this->redirectToRoute('app_page_edit', ['id' => $page->getId()]);
-            }
-
-            $page->setTitle($title);
-            $page->setSlug($slug);
-            $page->setTheme($theme);
-            $page->setDescription(\is_string($description) ? $description : null);
-
-            try {
-                $this->em->flush();
-            } catch (\Doctrine\DBAL\Exception\UniqueConstraintViolationException) {
-                $this->addFlash('error', 'Ce slug est déjà utilisé.');
-                return $this->redirectToRoute('app_page_edit', ['id' => $page->getId()]);
-            }
-
+            $description = $page->getDescription() ?? null;
+            $page->setDescription($description);
+            $this->em->persist($page);
+            $this->em->flush();
             $this->addFlash('success', sprintf('Page « %s » mise à jour.', $page->getTitle()));
             return $this->redirectToRoute('app_page_edit', ['id' => $page->getId()]);
         }
 
-        $themes = $this->em->getRepository(Theme::class)->findBy([], ['name' => 'ASC']);
-        $themesForJs = array_map(
-            static fn (Theme $t): array => ['id' => $t->getId(), 'name' => $t->getName()],
-            $themes
-        );
         return $this->render('page/edit.html.twig', [
             'page' => $page,
-            'themes' => $themes,
-            'themes_for_js' => $themesForJs,
-            'post_url' => $this->generateUrl('app_page_edit', ['id' => $page->getId()]),
+            'form' => $form->createView(),
         ]);
     }
 
-    #[Route('/{id}/builder', name: 'builder', methods: ['GET'], requirements: ['id' => '\d+'])]
-    public function builder(Page $page, Request $request): Response
+    #[Route('/delete/{id}', name: 'delete', methods: ['POST'], requirements: ['id' => '\d+'])]
+    public function delete(Request $request, Page $page): Response
     {
-        $themeFonts = $this->buildThemeFontsForBuilder($page->getTheme(), $request);
+        $token = $request->request->getString('_token');
+        if ($this->isCsrfTokenValid('delete' . $page->getId(), $token)) {
+            $this->em->remove($page);
+            $this->em->flush();
+            $this->addFlash('success', sprintf('Page « %s » a été supprimée.', $page->getTitle()));
+        }
+
+        return $this->redirectToRoute('app_page_index');
+    }
+
+    
+    #[Route('/{id}/builder', name: 'builder', methods: ['GET'], requirements: ['id' => '\d+'])]
+    public function builder(Page $page, ThemeFontBuilderService $themeFontBuilderService): Response
+    {
+        $themeFonts = $themeFontBuilderService->build($page->getTheme());
 
         return $this->render('page/builder.html.twig', ['page' => $page, 'theme_fonts' => $themeFonts]);
     }
 
-    /**
-     * Construit la liste des polices du thème pour le builder (format attendu par registerFont).
-     *
-     * @return list<array{name: string, href: string, fontFamily: string}>
-     */
-    private function buildThemeFontsForBuilder(Theme $theme, Request $request): array
+    #[Route('/preview/{id}', name: 'preview', methods: ['GET'], requirements: ['id' => '\d+'])]
+    public function preview(Page $page): Response
     {
-        $config = $theme->getConfigDto()?->toArray() ?? [];
-        $fontIds = array_map('intval', (array) ($config['fonts'] ?? []));
-        $fontIds = array_values(array_filter($fontIds, fn (int $id): bool => $id > 0));
-        if ($fontIds === []) {
-            return [];
-        }
-        $fonts = $this->em->getRepository(Font::class)->findBy(['id' => $fontIds]);
-        $baseUrl = $request->getSchemeAndHttpHost() . $request->getBasePath();
-        $result = [];
-        foreach ($fonts as $font) {
-            $name = $font->getName();
-            $fontFamily = $name . ', ' . ($font->getFallback() ?: 'sans-serif');
-            if ($font->getType() === FontTypeEnum::Google && $font->getGoogleFontUrl() !== null && $font->getGoogleFontUrl() !== '') {
-                $result[] = ['name' => $name, 'href' => $font->getGoogleFontUrl(), 'fontFamily' => $fontFamily];
-            } elseif ($font->getType() === FontTypeEnum::Custom) {
-                $variant = $font->getVariants()->first();
-                if ($variant) {
-                    $path = $variant->getPath();
-                    $href = $baseUrl . $this->generateUrl('app_font_file', ['path' => $path]);
-                    $result[] = ['name' => $name, 'href' => $href, 'fontFamily' => $fontFamily];
-                }
-            } elseif ($font->getType() === FontTypeEnum::Native) {
-                $result[] = ['name' => $name, 'href' => 'builtin:native-' . $font->getSlug(), 'fontFamily' => $fontFamily];
-            }
-        }
-        return $result;
+        return $this->render('page/preview.html.twig', ['page' => $page]);
     }
+
 
     #[Route('/{id}/content', name: 'api_content', methods: ['PATCH', 'PUT'], requirements: ['id' => '\d+'])]
     public function apiContent(Request $request, Page $page): Response
@@ -213,11 +137,7 @@ class PageController extends AbstractController
         }
     }
 
-    #[Route('/preview/{id}', name: 'preview', methods: ['GET'], requirements: ['id' => '\d+'])]
-    public function preview(Page $page): Response
-    {
-        return $this->render('page/preview.html.twig', ['page' => $page]);
-    }
+    
 
     /**
      * GET contenu render par id ou slug : /page/render/1 ou /page/render/mon-slug
@@ -274,16 +194,5 @@ class PageController extends AbstractController
         }
     }
 
-    #[Route('/delete/{id}', name: 'delete', methods: ['POST'], requirements: ['id' => '\d+'])]
-    public function delete(Request $request, Page $page): Response
-    {
-        $token = $request->request->getString('_token');
-        if ($this->isCsrfTokenValid('delete' . $page->getId(), $token)) {
-            $this->em->remove($page);
-            $this->em->flush();
-            $this->addFlash('success', sprintf('Page « %s » a été supprimée.', $page->getTitle()));
-        }
-
-        return $this->redirectToRoute('app_page_index');
-    }
+    
 }

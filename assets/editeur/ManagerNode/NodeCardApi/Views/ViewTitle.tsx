@@ -25,7 +25,7 @@ export const ViewTitle: FC<ViewTitleProps> = ({ title, className, style, onClick
             role="heading"
             aria-level={3}
             dangerouslySetInnerHTML={{ __html: title }}
-            className={cn("ce-card-api-title", className)}
+            className={cn("ce-card-title", className)}
             style={styleForView(style)}
             onClick={onClick}
         />

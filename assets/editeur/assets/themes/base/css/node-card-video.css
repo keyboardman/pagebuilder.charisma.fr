@@ -5,7 +5,7 @@
     height: auto;
 }
 
-.ce-card-video-wrapper {
+.ce-video-wrapper {
     position: relative;
     overflow: hidden;
     width: 100%;
@@ -29,7 +29,7 @@
 }
 
 .ce-card-video-placeholder .ce-icon {
-    --player-icon-mask: url("./../icons/video.svg");
+    --player-icon-mask: /* webpackIgnore: true */ url("/assets/icons/video.svg");
     --player-icon-size: 3rem;
 
     display: block;

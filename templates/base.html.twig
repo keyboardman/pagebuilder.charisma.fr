@@ -30,9 +30,6 @@
                 <a href="{{ path('app_theme_index') }}" class="nav-link {{ (app.request.attributes.get('_route')|default(''))|slice(0, 10) == 'app_theme' and app.request.attributes.get('_route') != 'app_theme_showcase' ? 'active' : '' }}">
                     Thèmes
                 </a>
-                <a href="{{ path('app_theme_showcase') }}" class="nav-link {{ app.request.attributes.get('_route') == 'app_theme_showcase' ? 'active' : '' }}">
-                    Présentation
-                </a>
                 
                 <a href="{{ path('keyboardman_filemanager') }}" class="nav-link {{ (app.request.attributes.get('_route')|default('')) == 'keyboardman_filemanager' ? 'active' : '' }}" target="_blank">
                     Médias

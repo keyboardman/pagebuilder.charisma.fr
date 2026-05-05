@@ -10,13 +10,15 @@ console.log('webpack.config.js', process.env.NODE_ENV || 'dev') //
 Encore.setOutputPath('public/build/')
     .setPublicPath('/build')
     .addEntry('app', './assets/app.js')
-    .addEntry('dashboard', './assets/dashboard.jsx')
     .addEntry('themeForm', './assets/themeForm.jsx')
     .addEntry('ThemeForm2', './assets/ThemeForm2.tsx')
-    //.addEntry('fileManager', './assets/fileManager.jsx')
-    .addEntry('pageForm', './assets/pageForm.jsx')
-    .addEntry('pagePreview', './assets/pagePreview.jsx')
+
+
+    // builder standalone
     .addEntry('pageBuilderStandalone', './assets/pageBuilderStandalone.jsx')
+    // preview standalone
+    .addEntry('pagePreview', './assets/pagePreview.jsx')
+    
     .enableStimulusBridge('./assets/controllers.json')
     .splitEntryChunks()
     .enableSingleRuntimeChunk()
@@ -31,6 +33,7 @@ Encore.setOutputPath('public/build/')
     .enableSassLoader(options => {
         options.implementation = require('sass');
     })
+    
 
     .configureBabel(config => {
         config.plugins.push('@babel/plugin-transform-class-properties')
@@ -44,6 +47,7 @@ Encore.setOutputPath('public/build/')
             preset: ['default', { calc: false }]
         }
     })
+;
 
 const config = Encore.getWebpackConfig()
 config.watchOptions = config.watchOptions || {}

@@ -31,14 +31,14 @@ const View: FC<NodeViewProps> = () => {
         <article 
             data-ce-id={node.id}
             data-ce-type={node.type}
-            className={cn(`ce-card-api ce-card-api-position-${node.content?.container?.position ?? "top"} ce-card-api-align-${node.content?.container?.align ?? "start"}`, node?.attributes?.className)} 
+            className={cn(`ce-card ce-card-position-${node.content?.container?.position ?? "top"} ce-card-align-${node.content?.container?.align ?? "start"}`, node?.attributes?.className)} 
             id={node?.attributes?.id ?? ""}
             style={cardStyle}
         >   
             <ViewImage
                 image={_image.src}
                 alt={_image.alt}
-                className={cn(`ce-card-api-image ce-card-api-image-ratio-${node.content?.container?.ratio ?? "1_3"}`, _image.className) }
+                className={cn(`ce-card-image ce-card-image-ratio-${node.content?.container?.ratio ?? "1_3"}`, _image.className) }
                 style={_image.style}
                 onClick={() => {
                     if (link) {
@@ -47,7 +47,7 @@ const View: FC<NodeViewProps> = () => {
                 }}
             />
             <div 
-                className={cn(`ce-card-api-container-content`)}
+                className={cn(`ce-card-container-content`)}
                 style={styleForView(node.content?.container?.style ?? {})}
             >
                 <HasLink link={link}>                

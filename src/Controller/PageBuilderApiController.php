@@ -109,7 +109,7 @@ class PageBuilderApiController extends AbstractController
         ];
         $raw = $mapped['raw'] ?? null;
         if ($raw !== null) {
-            $out['raw'] = is_object($raw) ? (array) $raw : $raw;
+            $out['raw'] = \is_object($raw) ? (array) $raw : $raw;
         }
         return $out;
     }

@@ -1,4 +1,3 @@
-export { ThemeFormComponent } from './ThemeFormComponent';
 export type { ThemeFormProps, ThemeConfigJson, FontOption, BodyConfig, ButtonConfig, ButtonSizeConfig, ButtonColorOnly, ThemeVar } from './types';
 export {
   resolveColorValue,

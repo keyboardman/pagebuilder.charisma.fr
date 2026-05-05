@@ -59,7 +59,7 @@ const VideoPoster = ({ poster, alt = "", style }: { poster: string, alt?: string
     <img
       src={poster}
       alt={alt}
-      className="ce-card-video-poster"
+      className="ce-card-image ce-video-poster"
       style={style}
     />
   );
@@ -138,12 +138,12 @@ const View: FC<NodeViewProps | NodeEditProps> = () => {
       <div
         data-ce-id={node.id}
         data-ce-type={node.type}
-        className={cn("ce-card-video", className ?? "")}
+        className={cn("ce-card ce-card-position-top ce-card-align-top", className ?? "")}
         style={cardStyle}
         id={id ?? ""}
       >
         <VideoWrapper 
-          className={cn("ce-card-video-wrapper")} 
+          className={cn("ce-card-wrapper ce-video")} 
           onClick={handleImageClick}
           onKeyDown={(e) => {
             if (!isEditMode && hasVideo && (e.key === "Enter" || e.key === " ")) {
@@ -161,7 +161,7 @@ const View: FC<NodeViewProps | NodeEditProps> = () => {
         {shouldShowTitle && (
           <ViewTitle
             title={titleText}
-            className={cn("ce-card-video-title", content.title?.className || "")}
+            className={cn("ce-card-title", content.title?.className || "")}
             style={titleStyle}
           />
         )}

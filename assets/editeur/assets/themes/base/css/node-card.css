@@ -1,5 +1,6 @@
 /* container et global */
-.ce-card {
+.ce-card,
+.ce-card-api {
     align-items: center;
     display: flex;
     height: auto;
@@ -9,123 +10,135 @@
     width: 100%;
 }
 
-.ce-card a.ce-card-link {
-    display: block;
-    width: 100%;
-    height: auto;
-}
-
-
-
-.ce-card a.ce-card-link img.ce-card-image {
-    width: 100%;    /* prend 100% du lien */
-    height: auto;   /* ratio conservé */
-    object-fit: cover;
-}
-
-
-.ce-card-position-top {
+/* positions image */
+.ce-card-position-top,
+.ce-card-api-position-top {
     flex-direction: column;
 }
 
-.ce-card-position-left {
+.ce-card-position-left,
+.ce-card-api-position-left {
     flex-direction: row;
 }
 
-.ce-card-position-right {
+.ce-card-position-right,
+.ce-card-api-position-right {
     flex-direction: row-reverse;
 }
 
-.ce-card-position-overlay {
+.ce-card-position-overlay,
+.ce-card-api-position-overlay {
     display: block;
     position: relative;
     width: 100%;
     height: auto;
 }
 
-.ce-card-align-start {
+/* alignements image */
+
+.ce-card-align-start,
+.ce-card-api-align-start {
     align-items: flex-start;
 }
 
-.ce-card-align-center {
+.ce-card-align-center,
+.ce-card-api-align-center {
     align-items: center;
 }
 
-.ce-card-align-end {
+.ce-card-align-end,
+.ce-card-api-align-end {
     align-items: flex-end;
 }
 
-.ce-card-align-stretch {
+.ce-card-align-stretch,
+.ce-card-api-align-stretch {
     align-items: stretch;
 }
 
-
-/* image */
-.ce-card-image {
+.ce-card-link,
+.ce-card-api-link {
+    display: block;
     width: 100%;
     height: auto;
-    object-fit: cover;
 }
 
-.ce-card-position-overlay .ce-card-image {
+/* image */
+.ce-card-image,
+.ce-card-api-image {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    overflow: hidden;
+}
+
+.ce-card-position-overlay .ce-card-image,
+.ce-card-api-position-overlay .ce-card-api-image {
     height: auto;
     z-index: 1;
 }
 
-.ce-card-image.ce-card-image-ratio-1_4 {
+.ce-card-image.ce-card-image-ratio-1_4,
+.ce-card-api-image.ce-card-api-image-ratio-1_4 {
     flex: 0 0 25%;
     width: 25%;
     height: auto;
 }
 
-.ce-card-image.ce-card-image-ratio-1_3 {
+.ce-card-image.ce-card-image-ratio-1_3,
+.ce-card-api-image.ce-card-api-image-ratio-1_3 {
     flex: 0 0 33%;
     width: 33%;
     height: auto;
 }
 
-.ce-card-image.ce-card-image-ratio-1_2 {
+.ce-card-image.ce-card-image-ratio-1_2,
+.ce-card-api-image.ce-card-api-image-ratio-1_2 {
     flex: 0 0 50%;
     width: 50%;
     height: auto;
 }
 
-.ce-card-image.ce-card-image-ratio-full {
+.ce-card-image.ce-card-image-ratio-full,
+.ce-card-api-image.ce-card-api-image-ratio-full {
     flex: 0 0 100%;
     width: 100%;
     height: auto;
 }
 
-/* HasLink */
-
 
 
 /* content */
-.ce-card-container-content {
+.ce-card-container-content,
+.ce-card-api-container-content {
     display: flex;
     flex-direction: column;
     gap: 1rem;
 }
 
-.ce-card-align-start .ce-card-container-content {
+.ce-card-align-start .ce-card-container-content,
+.ce-card-api-align-start .ce-card-api-container-content {
     display: flex;
     flex-direction: column;
     justify-content: start;
 }
 
-.ce-card-align-center .ce-card-container-content {
+.ce-card-align-center .ce-card-container-content,
+.ce-card-api-align-center .ce-card-api-container-content {
     display: flex;
     flex-direction: column;
     justify-content: center;
 }
 
-.ce-card-align-end .ce-card-container-content {
+.ce-card-align-end .ce-card-container-content,
+.ce-card-api-align-end .ce-card-api-container-content {
     display: flex;
     flex-direction: column;
     justify-content: end;
 }
 
-.ce-card-position-overlay .ce-card-container-content {
+.ce-card-position-overlay .ce-card-container-content,
+.ce-card-api-position-overlay .ce-card-api-container-content {
     display: flex;
     flex-direction: column;
     position: absolute;
@@ -134,24 +147,43 @@
     width: 100%;
     height: 100%;
     z-index: 2;
+
+    background-image: linear-gradient(rgba(0, 0, 0, 0), rgb(0, 0, 0));
+    overflow: hidden;
+    padding: 2.25rem;
 }
 
 /* content items */
 
-.ce-card-title {
+.ce-card-title,
+.ce-card-api-title {
+    display: -webkit-box;
+    -webkit-line-clamp: 3;
+    -webkit-box-orient: vertical;
+    line-clamp: 3;
     font-weight: bold;
     font-size: 1.25rem;
     line-height: 1.5rem;
     width: 100%;
+    text-overflow: ellipsis;
+    overflow: hidden;
 }
 
-.ce-card-text {
+.ce-card-text,
+.ce-card-api-text {
+    display: -webkit-box;
+    -webkit-line-clamp: 3;
+    -webkit-box-orient: vertical;
+    line-clamp: 3;
     font-size: 1rem;
     line-height: 1.5rem;
     width: 100%;
+    text-overflow: ellipsis;
+    overflow: hidden;
 }
 
-.ce-card-label {
+.ce-card-label,
+.ce-card-api-label {
     display: inline-flex;
     align-items: center;
 
@@ -170,20 +202,24 @@
 }
 
 /* Couleurs (dépendent de ton thème Tailwind/shadcn) */
-.ce-card-label {
+.ce-card-label,
+.ce-card-api-label {
     background-color: var(--secondary);
     color: var(--secondary-foreground);
 }
 
-.ce-card-label:hover {
+.ce-card-label:hover,
+.ce-card-api-label:hover {
     background-color: color-mix(in srgb, var(--secondary) 80%, transparent);
 }
 
-.ce-card-label:focus {
+.ce-card-label:focus,
+.ce-card-api-label:focus {
     outline: none;
 }
 
-.ce-card-label:focus-visible {
+.ce-card-label:focus-visible,
+.ce-card-api-label:focus-visible {
     box-shadow:
         0 0 0 2px var(--ring),
         0 0 0 4px var(--background);

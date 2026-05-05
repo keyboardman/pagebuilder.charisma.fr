@@ -23,6 +23,16 @@ final class ThemeSchema
     public const BLOCKS = ['body', 'h1', 'h2', 'h3', 'h4', 'h5', 'h6', 'div', 'p'];
 
     /**
+     * Contrat des overrides CSS par node du builder.
+     * La clé est persistée dans config[node_overrides], la valeur est un sélecteur CSS racine stable.
+     *
+     * @var array<string, string>
+     */
+    public const NODE_OVERRIDE_SELECTORS = [
+        '.ce-image' => '.ce-image',
+    ];
+
+    /**
      * Convertit un nom de variable CSS (ex. --color-white) en nom de champ de formulaire valide.
      * Les noms de champs doivent commencer par une lettre, un chiffre ou _.
      */

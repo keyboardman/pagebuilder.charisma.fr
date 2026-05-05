@@ -12,6 +12,7 @@ import NodeCard from "../NodeCard";
 import NodeCardApi from "../NodeCardApi";
 import NodeVideoApi from "../NodeVideoApi";
 import NodeButton from "../NodeButton";
+import NodeTopButton from "../NodeTopButton";
 import NodeHero from "../NodeHero";
 import NodeHtml from "../NodeHtml";
 import NodeNav from "../NodeNav";
@@ -31,6 +32,7 @@ export const NodeRegistry = {
     [NodeHeader.type]: NodeHeader,
     [NodeText.type]: NodeText,
     [NodeButton.type]: NodeButton,
+    [NodeTopButton.type]: NodeTopButton,
     [NodeRoot.type]: NodeRoot,
     [NodeContainer.type]: NodeContainer,
     [NodeFlex.type]: NodeFlex,

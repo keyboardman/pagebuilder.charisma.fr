@@ -1,5 +1,5 @@
 import { createRoot } from 'react-dom/client';
-import { ThemeFormComponent } from './components/ThemeFormComponent';
+import { ThemeFormComponent } from './components/ThemeFormComponent/ThemeFormComponent';
 
 function mountThemeForm(): void {
   const el = document.getElementById('theme-form-2');
