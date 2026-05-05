@@ -19,3 +19,4 @@
 15. extraire le theme globale css et creer le générateur
 16. Suppression compte utilisateur
 17. generateur css  (verifier si il y une erreur de typo)
+18. Gestionnaire de média (création de dossier)
