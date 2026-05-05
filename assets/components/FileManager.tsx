@@ -82,7 +82,8 @@ function ItemIcon({
         width={40}
         height={40}
         className={cn(ICON_SIZE, 'rounded object-cover border border-border')}
-        onError={() => setThumbError(true)}
+        onError={() => setThumbError(true)} 
+        loading="lazy"
       />
     );
   }
