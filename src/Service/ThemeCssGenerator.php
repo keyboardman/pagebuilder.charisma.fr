@@ -29,7 +29,14 @@ class ThemeCssGenerator
         'black' => '900',
     ];
 
-    private const BASE_THEME_CSS_ENTRY = 'assets/editeur/assets/themes/base/css/index.css';
+    /**
+     * Plusieurs emplacements possibles selon l'historique du projet (assets/builder).
+     *
+     * @var list<string>
+     */
+    private const BASE_THEME_CSS_ENTRIES = [
+        'assets/editeur/assets/themes/base/css/index.css'
+    ];
 
     private array $fonts = [];
     public function __construct(
@@ -100,12 +107,13 @@ class ThemeCssGenerator
         }
 
         $baseCss = $this->buildBaseBuilderCss();
+
         if ($baseCss !== '') {
             $lines[] = $baseCss;
             $lines[] = '';
         }
 
-        /*
+    
 
         $vars = $config['vars'] ?? [];
         if (!empty($vars)) {
@@ -123,17 +131,14 @@ class ThemeCssGenerator
             }
         }
 
-        */
-
         $lines = array_merge($lines, $this->buildNodeOverrideCss($config));
 
-        /*
+        
         $customCss = trim((string) ($config['custom_css'] ?? ''));
         if ($customCss !== '') {
             $lines[] = '';
             $lines[] = $customCss;
         }
-            */
 
         return trim(implode("\n", $lines)) . "\n";
     }
@@ -183,12 +188,29 @@ class ThemeCssGenerator
 
     private function buildBaseBuilderCss(): string
     {
-        $entryPath = $this->projectDir . '/' . self::BASE_THEME_CSS_ENTRY;
-        if (!is_file($entryPath)) {
+        $chunks = [];
+        foreach (self::BASE_THEME_CSS_ENTRIES as $entry) {
+            $entryPath = $this->projectDir . '/' . $entry;
+            ;
+            if (!is_file($entryPath)) {
+                continue;
+            }
+
+            $css = trim($this->readCssWithImports($entryPath, []));
+
+            if ($css === '') {
+                continue;
+            }
+
+            $chunks[] = $css;
+        }
+
+        if ($chunks === []) {
             return '';
         }
 
-        return trim($this->readCssWithImports($entryPath, []));
+
+        return implode("\n\n", array_values(array_unique($chunks)));
     }
 
     /**
@@ -209,51 +231,24 @@ class ThemeCssGenerator
 
         $dir = dirname($realPath);
         $pattern = '/^\s*@import\s+["\']([^"\']+)["\']\s*;\s*$/m';
+    
         return preg_replace_callback(
             $pattern,
             function (array $matches) use ($dir, $visited): string {
                 $importPath = $dir . '/' . $matches[1];
+                
                 $importRealPath = realpath($importPath);
+                
                 if ($importRealPath === false) {
                     return '';
                 }
-
+                
                 return $this->readCssWithImports($importRealPath, $visited);
             },
             $content
         ) ?? $content;
-    }
 
 
-
-    /**
-     * @param array<string, mixed> $data
-     * @param array<string, mixed> $vars
-     * @return list<string>
-     */
-    private function buttonRulesFromArray(array $data, bool $isBase, array $vars = []): array
-    {
-        $rules = [];
-        $hasBorderWidth = false;
-        foreach ($data as $prop => $value) {
-            if ($value === '' || $value === null) {
-                continue;
-            }
-            if ($prop === 'border-width') {
-                $hasBorderWidth = true;
-            }
-            $cssProp = ($prop === 'background-color' || $prop === 'background') ? 'background' : $prop;
-            $str = $this->valueToString($value);
-            $resolved = $this->resolveColorValue($str, $vars);
-            $rules[] = '  ' . $cssProp . ': ' . $this->formatCssValue($resolved, $prop) . ';';
-        }
-        if ($isBase && $hasBorderWidth) {
-            $rules[] = '  border-style: solid;';
-        }
-        if ($isBase) {
-            $rules[] = '  text-decoration: none;';
-        }
-        return $rules;
     }
 
     /**
