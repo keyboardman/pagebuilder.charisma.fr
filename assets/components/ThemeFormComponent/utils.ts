@@ -1,5 +1,5 @@
 import type React from 'react'
-import _ from 'lodash';
+import _ from 'lodash'
 import type {
     BodyConfig,
     ButtonConfig,
@@ -324,16 +324,18 @@ export function buildInitialNodeOverrides (
 export function buildInitialVars (
     initial: Record<string, string> | null | undefined
 ): ThemeVar[] {
-    const source = initial && Object.keys(initial).length > 0
+    const _initial = Object.fromEntries(
+        Object.entries(TAILWIND_DEFAULT_VARS).map(([key, value], index) => [
+            index,
+            { id: index, name: key, value }
+        ])
+    )
+
+    const source =
+        initial && Object.keys(initial).length > 0
             ? initial
-            : _.mapValues(TAILWIND_DEFAULT_VARS, (value: string, key: string, index: number) => {
-                return {
-                    id: index,
-                    name: key,
-                    value: value
-                }
-            });
-    return source as unknown as ThemeVar[];
+            : _initial;
+    return source as unknown as ThemeVar[]
 }
 
 export function normalizeVarNameForSubmit (raw: string): string {
@@ -609,10 +611,10 @@ export function mapToCssString (map: Record<string, string>): string {
 export function stringCssToMap (raw: string): Record<string, string> {
     const out: Record<string, string> = {}
 
-    if (typeof raw !== "string") {
-        return raw;
+    if (typeof raw !== 'string') {
+        return raw
     }
-    
+
     const clean = raw.trim()
     if (!clean) return out
     const withoutBlockMap = clean

@@ -1,33 +1,56 @@
 import { useRef } from 'react';
 import { useTheme } from '../ThemeContext';
 import { ThemeVar } from '../types';
+import _ from 'lodash';
 export const NodeVarsForm = () => {
     const { getVars, setVars, themeState } = useTheme();
 
-    console.log('themeState', getVars());
 
-    const nextVarId = useRef<number>(themeState.vars.length + 1);
-    
+
+    const nextVarId = useRef<number>(
+        Math.max(0, ...Object.keys(themeState.vars).map(Number)) + 1
+    );
+
     const vars = getVars();
 
-    const addVar = () => {
-        const _vars = [...themeState.vars, { id: nextVarId.current + 1, name: '--', value: '' }];
-        nextVarId.current += 1;
-        setVars(_vars);
-    };   
 
-    const updateVar = (id: number, patch: Partial<{ name: string; value: string }>) => {
-        const _vars = themeState.vars.map((v) => (v.id === id ? { ...v, ...patch } : v));
+    const addVar = () => {
+        const id = nextVarId.current + 1;
+
+        const _vars = {
+            ...themeState.vars,
+            [id]: { id, name: '--', value: '' }
+        };
+
+        nextVarId.current = id;
+        setVars(_vars);
+    };
+
+    const updateVar = (
+        id: number,
+        patch: Partial<{ name: string; value: string }>
+    ) => {
+        const _vars = {
+            ...themeState.vars,
+            [id]: {
+                ...themeState.vars[id],
+                ...patch
+            }
+        };
+
         setVars(_vars);
     };
 
     const removeVar = (id: number, name?: string) => {
         const label = name && name.trim() ? name.trim() : 'cette variable';
+
         if (!window.confirm(`Supprimer la variable « ${label} » ?`)) {
             return;
         }
 
-        const _vars = themeState.vars.filter((v) => v.id !== id);
+        const _vars = { ...themeState.vars };
+        delete _vars[id];
+
         setVars(_vars);
     };
 
@@ -43,7 +66,7 @@ export const NodeVarsForm = () => {
                     supprimer.
                 </p>
                 <div className="grid gap-2 sm:grid-cols-2">
-                    {vars.map((v) => (
+                    {_.map(vars, (v) => (
                         <div key={v.id} className="flex flex-col gap-1 sm:flex-row sm:items-center sm:gap-2">
                             <input
                                 type="text"
