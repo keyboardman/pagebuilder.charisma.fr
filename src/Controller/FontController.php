@@ -16,6 +16,7 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\String\Slugger\SluggerInterface;
+use Symfony\Component\Form\FormInterface;
 
 #[Route('/font', name: 'app_font_')]
 class FontController extends AbstractController
@@ -118,6 +119,7 @@ class FontController extends AbstractController
         if ($form->isSubmitted() && $form->isValid()) {
             $this->normalizeFont($font);
             $this->processVariantFiles($form, $font);
+ 
             $this->em->persist($font);
             $this->em->flush();
             return $this->redirectToRoute('app_font_index');
@@ -165,7 +167,7 @@ class FontController extends AbstractController
         }
     }
 
-    private function processVariantFiles(\Symfony\Component\Form\FormInterface $form, Font $font): void
+    private function processVariantFiles(FormInterface $form, Font $font): void
     {
         /* Si la police n'est pas custom, on ne fait rien */
         if ($font->getType() !== FontTypeEnum::Custom) {
