@@ -7,7 +7,6 @@ namespace App\Service;
 use App\Entity\Font;
 use App\Entity\FontType as FontTypeEnum;
 use App\Entity\FontVariant;
-use App\Theme\ThemeSchema;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 
 /**
@@ -50,6 +49,7 @@ class ThemeCssGenerator
     {
 
         $css = $this->buildCss($config, $fontsToImport);
+
 
         $version = substr(hash('sha256', json_encode($config) . (string) microtime(true)), 0, 8);
         $filename = 'theme.' . $version . '.css';

@@ -33,6 +33,7 @@ class ThemeCssGeneratorListener
     {
         $uow = $this->em->getUnitOfWork();
         $changeSet = $uow->getEntityChangeSet($theme);
+        
 
         // Évite une boucle : si seul le chemin CSS a changé, c’est nous qui venons de le mettre à jour
         if (array_keys($changeSet) === ['generatedCssPath']) {
@@ -46,7 +47,7 @@ class ThemeCssGeneratorListener
     {
         $configDto = $theme->getConfigDto();
 
-      
+        
         if ($configDto === null) {
             return;
         }
