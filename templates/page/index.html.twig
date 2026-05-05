@@ -3,7 +3,7 @@
 {% block title %}Pages{% endblock %}
 
 {% block body %}
-<div class="max-w-4xl space-y-6">
+<div class="space-y-6">
     <div class="flex items-center justify-between">
         <h1 class="text-2xl font-bold tracking-tight">Pages</h1>
         <div class="flex gap-2">
@@ -18,6 +18,7 @@
                     <tr>
                         <th>Titre</th>
                         <th>Slug</th>
+                        <th>Lien</th>
                         <th>Thème</th>
                         <th></th>
                     </tr>
@@ -27,6 +28,11 @@
                     <tr>
                         <td>{{ page.title }}</td>
                         <td><code class="text-xs">{{ page.slug }}</code></td>
+                        <td>
+                            <a href="{{ absolute_url(path('app_page_render', { idOrSlug: page.slug })) }}" target="_blank" rel="noopener">
+                                {{ absolute_url(path('app_page_render', { idOrSlug: page.slug })) }}
+                            </a>
+                        </td>
                         <td>{{ page.theme.name }}</td>
                         <td class="text-end">
                             <div class="flex gap-2 justify-end items-center">
