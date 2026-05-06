@@ -28,9 +28,6 @@ export interface BuilderType {
 
   save: () => void;
 
-  // autosave
-  isAutoSaveActive: boolean;
-
   // iframe
   iframeRef: React.RefObject<HTMLIFrameElement | null> | null;
   setIframeRef: (ref: React.RefObject<HTMLIFrameElement | null>) => void;

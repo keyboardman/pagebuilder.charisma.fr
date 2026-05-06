@@ -65,8 +65,7 @@ function Builder() {
     canUndo,
     sidebarLeftCollapsed,
     setSidebarLeftCollapsed,
-    save,
-    isAutoSaveActive
+    save
   } = useBuilderContext();
 
   const { onDragEnd } = useDnd();
@@ -298,18 +297,7 @@ function Builder() {
           </Layout.SidebarRight>
         )}
         
-        {mode === APP_MODE.EDIT && !isAutoSaveActive && (
-          <Layout.Footer>
-            <div className="flex w-full flex-wrap items-center justify-between gap-3">
-              <span className="text-muted-foreground">
-                Les modifications sont sauvegardées automatiquement.
-              </span>
-              <Button size="sm" onClick={save} variant="outline" className="gap-1">
-                Sauvegarder maintenant
-              </Button>
-            </div>
-          </Layout.Footer>
-        )}
+        
         </div>
     </DragDropProvider>
   );

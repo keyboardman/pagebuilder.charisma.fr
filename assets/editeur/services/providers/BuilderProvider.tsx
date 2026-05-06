@@ -47,9 +47,7 @@ export const BuilderProvider: FC<BuilderContextProviderProps> = ({
     future: [],
   });
 
-  const autoSaveControllerRef = useRef<AutoSaveController | null>(null);
   const nodesRef = useRef<NodesType>(nodes);
-  const [isAutoSaveActive, setIsAutoSaveActive] = useState<boolean>(false);
 
   // ✅ applique la mise à jour après le render
   useEffect(() => {
@@ -63,46 +61,6 @@ export const BuilderProvider: FC<BuilderContextProviderProps> = ({
   useEffect(() => {
     nodesRef.current = nodes;
   }, [nodes]);
-
-  // Gestion de l'autosave
-  useEffect(() => {
-    // Récupérer la configuration d'autosave depuis le contexte global
-    const context = (window as any).__CharismaPageBuilderContext;
-    const autoSaveConfig = context?.autoSaveConfig;
-
-    if (autoSaveConfig) {
-      // Utiliser une ref pour toujours accéder aux nodes les plus récents
-      // La fonction getCurrentNodes lit depuis la ref qui est mise à jour à chaque changement de nodes
-      const getCurrentNodes = () => nodesRef.current;
-
-      // Démarrer l'autosave avec une fonction qui récupère les nodes actuels depuis la ref
-      const controller = startAutoSave(autoSaveConfig, getCurrentNodes);
-      autoSaveControllerRef.current = controller;
-      setIsAutoSaveActive(true);
-
-      // Stocker le contrôleur dans le contexte global pour permettre l'arrêt depuis registerAutoSave
-      if (context) {
-        context.autoSaveController = controller;
-      }
-
-      // Nettoyer l'autosave lors du démontage
-      return () => {
-        controller.stop();
-        autoSaveControllerRef.current = null;
-        setIsAutoSaveActive(false);
-        if (context) {
-          context.autoSaveController = null;
-        }
-      };
-    } else {
-      // Si pas de config, arrêter l'autosave précédent s'il existe
-      setIsAutoSaveActive(false);
-      if (autoSaveControllerRef.current) {
-        autoSaveControllerRef.current.stop();
-        autoSaveControllerRef.current = null;
-      }
-    }
-  }, []); // Seulement au montage/démontage - la ref est mise à jour séparément
 
   const onSave = useCallback(() => {
     if (onSaveCallback) {
@@ -226,9 +184,6 @@ export const BuilderProvider: FC<BuilderContextProviderProps> = ({
         nodeSelected,
 
         save: onSave,
-
-        // autosave
-        isAutoSaveActive,
 
         // iframe
         iframeRef,

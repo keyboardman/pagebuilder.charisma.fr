@@ -8,9 +8,9 @@ import _ from "lodash";
 // Définir l'ordre des catégories avec leurs labels
 const CATEGORY_CONFIG = [
     { key: 'container', label: 'Container' },
-    { key: 'form', label: 'Formulaire' },
-    { key: 'nav', label: 'Nav' },
     { key: 'content', label: 'Content' },
+    { key: 'nav', label: 'Nav' },
+    { key: 'form', label: 'Formulaire' },   
     { key: 'api', label: 'Api' },
     { key: 'custom', label: 'Custom' }
 ] as const;

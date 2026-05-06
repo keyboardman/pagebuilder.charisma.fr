@@ -13,6 +13,6 @@
 - [x] 3.2 Vérifier que les personnalisations ThemeBuilder s'appliquent à tous les nodes pris en charge.
 
 ## 4. Validation
-- [ ] 4.1 Valider manuellement un jeu de nodes représentatif (container, contenu, navigation, formulaire, custom, API).
+- [x] 4.1 Valider manuellement un jeu de nodes représentatif (container, contenu, navigation, formulaire, custom, API).
 - [x] 4.2 Vérifier qu'une modification ThemeBuilder sur un node est persistée et restituée après régénération.
 - [x] 4.3 Ajouter/adapter les tests de génération CSS pour couvrir la composition base + overrides.
