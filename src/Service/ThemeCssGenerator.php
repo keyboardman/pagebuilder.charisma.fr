@@ -16,7 +16,12 @@ use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
  */
 class ThemeCssGenerator
 {
-    
+    /**
+     * Whitelist des caractères autorisés dans les valeurs CSS dynamiques.
+     * On garde les formats usuels: var(--x), url("https://..."), couleurs hex, pourcentages.
+     */
+    private const CSS_VALUE_ALLOWED_CHARS_REGEX = '/[^\\p{L}\\p{N}\\s\\(\\)\'"«»_\\-:\\/\\.,#%]/u';
+
     private const WEIGHT_MAP = [
         'thin' => '100',
         'extra_light' => '200',
@@ -172,19 +177,7 @@ class ThemeCssGenerator
         return $lines;
     }
 
-    private function normalizeCssDeclarations(string $raw): string
-    {
-        $value = trim($raw);
-        if ($value === '') {
-            return '';
-        }
-
-        $value = preg_replace('/^\s*[^{}]+\{\s*/', '', $value) ?? $value;
-        $value = preg_replace('/\s*\}\s*$/', '', $value) ?? $value;
-        $value = str_replace(["\r\n", "\r"], "\n", $value);
-
-        return trim($value);
-    }
+    
 
     private function buildBaseBuilderCss(): string
     {
@@ -390,18 +383,24 @@ class ThemeCssGenerator
 
     private function formatCssValue(string $value, string|int $prop): string
     {
-        $v = trim($value);
+        $v = trim($this->sanitizeCssValue($value));
+ 
         if ($v === '') {
             return '""';
         }
-        if ($prop === 'padding' || $prop === 'margin') {
-            return $v;
+
+        return $v;
+    }
+
+    private function sanitizeCssValue(string $value): string
+    {
+        $sanitized = preg_replace(self::CSS_VALUE_ALLOWED_CHARS_REGEX, '', $value);
+        
+        if ($sanitized === null) {
+            return '';
         }
 
-        if($prop === 'font-family') {
-            return $this->fonts[$value] ?? $value;
-        }
-        
-        return $v;
+        // Réduit les espaces successifs sans casser la lisibilité.
+        return preg_replace('/\s+/u', ' ', $sanitized) ?? '';
     }
 }

@@ -13,10 +13,10 @@
 9. OK Custom PureMusic
 10. OK Custom Video
 11. OK Anniversaire
-12. css pour card image ratio (override)
+12. OK css pour card image ratio (override)
 13. OK icone TOP
 14. gestion des icones
-15. extraire le theme globale css et creer le générateur
+15. OK extraire le theme globale css et creer le générateur
 16. Suppression compte utilisateur
 17. generateur css  (verifier si il y une erreur de typo)
 18. Gestionnaire de média (création de dossier)

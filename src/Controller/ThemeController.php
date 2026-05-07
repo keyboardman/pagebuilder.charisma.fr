@@ -8,6 +8,7 @@ use App\DTO\Theme\ThemeConfigDTO;
 use App\Entity\Font;
 use App\Entity\FontType as FontTypeEnum;
 use App\Entity\Theme;
+use App\Helper\ThemeDTOSanitizer;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
@@ -83,7 +84,9 @@ class ThemeController extends AbstractController
         if ($request->isMethod('POST')) {
             $post = json_decode($request->request->getString('config'), true);
             
-            $dto = ThemeConfigDTO::fromArray($post);
+
+            $dto = ThemeDTOSanitizer::sanitize(ThemeConfigDTO::fromArray($post));
+
          
             $theme->setName($dto->getName());
             $theme->setSlug($this->slugger->slug($dto->getName())->toString());

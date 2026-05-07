@@ -23,8 +23,6 @@ class ThemeConfigDTO
     /** @var array<string, string> Overrides CSS par node builder (déclarations CSS sans sélecteur). */
     private array $node_overrides = [];
 
-    /** @var array<string, string> Styles du bloc body (font-family, font-size, line-height, color, margin, padding) */
-    private array $body = [];
 
     /** CSS personnalisé ajouté à la fin du fichier généré (classes non prévues par le générateur). */
     private string $customCss = '';
@@ -77,18 +75,6 @@ class ThemeConfigDTO
         $this->node_overrides = $nodeOverrides;
     }
 
-    /** @return array<string, string> */
-    public function getBody(): array
-    {
-        return $this->body;
-    }
-
-    /** @param array<string, string> $body */
-    public function setBody(array $body): void
-    {
-        $this->body = $body;
-    }
-
     public function getCustomCss(): string
     {
         return $this->customCss;
@@ -112,7 +98,6 @@ class ThemeConfigDTO
             'fonts' => $this->fonts,
             'vars' => $this->vars,
             'node_overrides' => $this->node_overrides,
-            'body' => $this->body,
             'custom_css' => $this->customCss,
         ];
 
@@ -126,7 +111,6 @@ class ThemeConfigDTO
         $dto->setFonts($theme->getConfig()['fonts'] ?? []);
         $dto->setVars($theme->getConfig()['vars'] ?? []);
         $dto->setNodeOverrides($theme->getConfig()['node_overrides'] ?? []);
-        $dto->setBody($theme->getConfig()['body'] ?? []);
         $dto->setCustomCss($theme->getConfig()['custom_css'] ?? '');
         return $dto;
     }
@@ -138,9 +122,10 @@ class ThemeConfigDTO
         $dto->setFonts($array['fonts'] ?? []);
         $dto->setVars($array['vars'] ?? []);
         $dto->setNodeOverrides($array['node_overrides'] ?? []);
-        $dto->setBody($array['body'] ?? []);
         $dto->setCustomCss($array['custom_css'] ?? '');
-
+        
         return $dto;
     }
+
+    
 }

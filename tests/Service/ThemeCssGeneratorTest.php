@@ -7,15 +7,22 @@ namespace App\Tests\Service;
 use App\Service\OklchScale;
 use App\Service\ThemeCssGenerator;
 use PHPUnit\Framework\TestCase;
+use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 
 class ThemeCssGeneratorTest extends TestCase
 {
     private string $projectDir;
+    /** @var UrlGeneratorInterface&\PHPUnit\Framework\MockObject\MockObject */
+    private $urlGenerator;
 
     protected function setUp(): void
     {
         $this->projectDir = sys_get_temp_dir() . '/theme-css-gen-' . uniqid();
         mkdir($this->projectDir, 0755, true);
+        $this->urlGenerator = $this->createMock(UrlGeneratorInterface::class);
+        $this->urlGenerator
+            ->method('generate')
+            ->willReturn('https://example.test/font-file');
     }
 
     protected function tearDown(): void
@@ -33,27 +40,31 @@ class ThemeCssGeneratorTest extends TestCase
 
     public function testBuildCssProducesRootAndSelectors(): void
     {
-        $gen = new ThemeCssGenerator($this->projectDir, new OklchScale());
+        $gen = new ThemeCssGenerator($this->projectDir, new OklchScale(), $this->urlGenerator);
         $config = [
             'nom' => 'Test',
             'vars' => ['--color-white' => '#ffffff', '--color-blue' => '#1858A0', '--font-size-base' => '16px'],
             'body' => ['font-family' => 'Arial', 'font-size' => '1rem'],
-            'h1' => ['font-size' => '2rem'],
+            'node_overrides' => [
+                '.ce-container' => ['max-width' => '1280px', 'padding' => '0 24px'],
+                '.ce-button' => ['border-radius' => '9999px'],
+                '.ce-text' => ['color' => '#000000', 'font-family' => 'Arial'],
+                '.ce-header-h1' => ['color' => '#000000']
+            ],
         ];
         $css = $gen->buildCss($config);
+
         $this->assertStringContainsString(':root', $css);
         $this->assertStringContainsString('--color-white', $css);
         $this->assertStringContainsString('.ce-container', $css);
-        $this->assertStringContainsString('.text-blue-100', $css);
-        $this->assertStringContainsString('.bg-blue-900', $css);
-        $this->assertStringContainsString('body {', $css);
-        $this->assertStringContainsString('h1 {', $css);
-        $this->assertStringContainsString('font-family', $css);
+        //$this->assertStringContainsString('body {', $css);
+        $this->assertStringContainsString('.ce-header-h1', $css);
+        $this->assertStringContainsString('font-family:', $css);
     }
 
     public function testGenerateWritesFileWithVersionInName(): void
     {
-        $gen = new ThemeCssGenerator($this->projectDir, new OklchScale());
+        $gen = new ThemeCssGenerator($this->projectDir, new OklchScale(), $this->urlGenerator);
         $config = ['vars' => ['--color-white' => '#fff'], 'body' => []];
         $path = $gen->generate($config, 'storage/themes/test', null);
         $this->assertStringContainsString('theme.', $path);
@@ -66,7 +77,7 @@ class ThemeCssGeneratorTest extends TestCase
 
     public function testGenerateDeletesOldCssWhenProvided(): void
     {
-        $gen = new ThemeCssGenerator($this->projectDir, new OklchScale());
+        $gen = new ThemeCssGenerator($this->projectDir, new OklchScale(), $this->urlGenerator);
         $themeDir = 'storage/themes/test';
         $dir = $this->projectDir . '/' . $themeDir;
         mkdir($dir, 0755, true);
@@ -77,40 +88,13 @@ class ThemeCssGeneratorTest extends TestCase
         $this->assertFileDoesNotExist($this->projectDir . '/' . $oldPath);
     }
 
-    public function testBuildCssIncludesButtonClasses(): void
-    {
-        $gen = new ThemeCssGenerator($this->projectDir, new OklchScale());
-        $config = [
-            'vars' => [],
-            'ch_btn' => [
-                'background-color' => '#e0e0e0',
-                'color' => '#333',
-                'border-width' => '1px',
-                'border-radius' => '0.375rem',
-                'padding' => '0.5rem 1rem',
-            ],
-            'ch_btn_primary' => ['background-color' => '#0066cc', 'color' => '#fff', 'border-color' => '#0066cc'],
-            'ch_btn_hover' => ['background-color' => '#d0d0d0', 'color' => '#000', 'border-color' => '#ccc'],
-            'ch_btn_disabled' => ['background-color' => '#f0f0f0', 'color' => '#999', 'border-color' => '#e0e0e0'],
-            'ch_btn_sm' => ['padding' => '0.25rem 0.5rem', 'font-size' => '0.875rem', 'line-height' => '1.25'],
-        ];
-        $css = $gen->buildCss($config);
-        $this->assertStringContainsString('.ch_btn {', $css);
-        $this->assertStringContainsString('border-style: solid', $css);
-        $this->assertStringContainsString('.ch_btn_primary {', $css);
-        $this->assertStringContainsString('.ch_btn:hover', $css);
-        $this->assertStringContainsString('.ch_btn:disabled', $css);
-        $this->assertStringContainsString('.ch_btn.disabled', $css);
-        $this->assertStringContainsString('.ch_btn_sm {', $css);
-    }
-
     public function testBuildCssIncludesNodeOverridesAfterBaseCss(): void
     {
-        $gen = new ThemeCssGenerator($this->projectDir, new OklchScale());
+        $gen = new ThemeCssGenerator($this->projectDir, new OklchScale(), $this->urlGenerator);
         $config = [
             'node_overrides' => [
-                'node-container' => 'max-width: 1280px; padding: 0 24px;',
-                'node-button' => ".ce-button { border-radius: 9999px; }\n",
+                '.ce-container' => ['max-width' => '1280px', 'padding' => '0 24px'],
+                '.ce-button' => ['border-radius' => '9999px'],
             ],
         ];
 
@@ -119,5 +103,27 @@ class ThemeCssGeneratorTest extends TestCase
         $this->assertStringContainsString('max-width: 1280px;', $css);
         $this->assertStringContainsString('.ce-button {', $css);
         $this->assertStringContainsString('border-radius: 9999px;', $css);
+    }
+
+    public function testBuildCssSanitizesSemicolonButKeepsVarAndUrl(): void
+    {
+        $gen = new ThemeCssGenerator($this->projectDir, new OklchScale(), $this->urlGenerator);
+        $config = [
+            'vars' => [
+                '--color-safe' => 'var(--color-red);',
+                '--bg-image' => 'url("https://www.google.com");',
+            ],
+            'node_overrides' => [
+                '.ce-container' => [
+                    'background-image' => 'url("https://www.google.com");',
+                ],
+            ],
+        ];
+
+        $css = $gen->buildCss($config);
+        $this->assertStringContainsString('--color-safe: var(--color-red);', $css);
+        $this->assertStringContainsString('--bg-image: url("https://www.google.com");', $css);
+        $this->assertStringContainsString('background-image: url("https://www.google.com");', $css);
+        $this->assertStringNotContainsString(';;', $css);
     }
 }

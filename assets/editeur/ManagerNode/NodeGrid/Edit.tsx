@@ -8,8 +8,7 @@ import { styleForView } from "../../utils/styleHelper";
 import { cn } from "@/editeur/lib/utils";
 import { GRID_COLS, SM_GRID_COLS, LG_GRID_COLS, GAP_CLASS, type BreakpointKey, cols, rows } from "./index";
 
-
-const View: FC<NodeViewProps | NodeEditProps> = () => {
+const Edit: FC<NodeViewProps | NodeEditProps> = () => {
   const { node, getChildren } = useNodeContext();
   const { breakpoint, mode } = useAppContext();
   const gridNode = node as NodeGridType;
@@ -71,7 +70,10 @@ const View: FC<NodeViewProps | NodeEditProps> = () => {
     ].join(" ");
 
     cells = cellList.map(({ zone }) => (
-      <div key={zone} >
+      <div
+        key={zone}
+        className="min-h-[100px] border border-black-900 border-border rounded"
+      >
         <NodeCollection nodes={getChildren(zone)} parentId={node.id} zone={zone} />
       </div>
     ));
@@ -113,4 +115,4 @@ const View: FC<NodeViewProps | NodeEditProps> = () => {
   );
 };
 
-export default View;
+export default Edit;
