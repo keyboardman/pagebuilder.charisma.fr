@@ -1670,12 +1670,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/keyboardman/FilemanagerBundle.git",
-                "reference": "9ae5437e58b1310e47bf0417ddc02f04a7e21f92"
+                "reference": "7cce53bd523693cc4e14501d212388a5ee4cb3ab"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/keyboardman/FilemanagerBundle/zipball/9ae5437e58b1310e47bf0417ddc02f04a7e21f92",
-                "reference": "9ae5437e58b1310e47bf0417ddc02f04a7e21f92",
+                "url": "https://api.github.com/repos/keyboardman/FilemanagerBundle/zipball/7cce53bd523693cc4e14501d212388a5ee4cb3ab",
+                "reference": "7cce53bd523693cc4e14501d212388a5ee4cb3ab",
                 "shasum": ""
             },
             "require": {
@@ -1716,7 +1716,7 @@
                 "source": "https://github.com/keyboardman/FilemanagerBundle",
                 "issues": "https://github.com/keyboardman/FilemanagerBundle/issues"
             },
-            "time": "2026-02-27T10:19:12+00:00"
+            "time": "2026-05-07T13:11:31+00:00"
         },
         {
             "name": "league/flysystem",

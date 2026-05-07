@@ -10,9 +10,18 @@
     </div>
 
     <div class="container mt-3">
-      {% if app.flashes('warning') is not empty %}
+      {% set successMessages = app.flashes('success') %}
+      {% if successMessages is not empty %}
+        <p class="text-sm text-green-600">
+          {%- for message in successMessages -%}
+            {{ message }}{% if not loop.last %}. {% endif %}
+          {%- endfor -%}
+        </p>
+      {% endif %}
+      {% set warningMessages = app.flashes('warning') %}
+      {% if warningMessages is not empty %}
         <p class="text-sm text-destructive">
-          {%- for message in app.flashes('warning') -%}
+          {%- for message in warningMessages -%}
             {{ message }}{% if not loop.last %}. {% endif %}
           {%- endfor -%}
         </p>
@@ -35,7 +44,13 @@
                 <td>{{ loop.index }}</td>
                 <td>{{ user.email }}</td>
                 <td>
-                  <a href="{{ path('app_admin_compte_edit', { id: user.id }) }}" class="btn btn-ghost btn-sm">Modifier</a>
+                  <div class="flex items-center gap-2">
+                    <a href="{{ path('app_admin_compte_edit', { id: user.id }) }}" class="btn btn-ghost btn-sm">Modifier</a>
+                    <form method="post" action="{{ path('app_admin_compte_delete', { id: user.id }) }}" onsubmit="return confirm('Confirmer la suppression de ce compte ?');">
+                      <input type="hidden" name="_token" value="{{ csrf_token('delete_user_' ~ user.id) }}">
+                      <button class="btn btn-ghost btn-sm text-red-600" type="submit">Supprimer</button>
+                    </form>
+                  </div>
                 </td>
               </tr>
             {% else %}

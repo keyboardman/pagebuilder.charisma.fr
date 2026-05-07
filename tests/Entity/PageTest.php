@@ -28,7 +28,7 @@ class PageTest extends KernelTestCase
         $page->setSlug('ma-page');
         $page->setTheme($theme);
         $page->setDescription('Description SEO');
-        $page->setContent('Contenu de la page');
+        $page->setContent(['body' => 'Contenu de la page']);
         $em->persist($page);
         $em->flush();
 
@@ -37,6 +37,6 @@ class PageTest extends KernelTestCase
         $this->assertSame('ma-page', $page->getSlug());
         $this->assertSame($theme, $page->getTheme());
         $this->assertSame('Description SEO', $page->getDescription());
-        $this->assertSame('Contenu de la page', $page->getContent());
+        $this->assertSame(['body' => 'Contenu de la page'], $page->getContent());
     }
 }

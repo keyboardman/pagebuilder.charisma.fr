@@ -17,6 +17,7 @@
 13. OK icone TOP
 14. gestion des icones
 15. OK extraire le theme globale css et creer le générateur
-16. Suppression compte utilisateur
-17. generateur css  (verifier si il y une erreur de typo)
-18. Gestionnaire de média (création de dossier)
+16. Ok Suppression compte utilisateur
+17. OK generateur css  (verifier si il y une erreur de typo)
+18. OK Gestionnaire de média (création de dossier)
+19. Création NodeText + Icone + retour à la ligne
