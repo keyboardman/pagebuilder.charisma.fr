@@ -6,5 +6,5 @@
 - [x] 1.5 Ajouter/adapter des tests unitaires pour valider les entrées autorisées et le rejet des caractères interdits.
 
 ## 2. Validation
-- [ ] 2.1 Exécuter la suite de tests ciblant le générateur de thème. *(bloqué localement: PHP 8.2, PHPUnit requiert PHP >= 8.3)*
-- [ ] 2.2 Vérifier qu’une config contenant `;` ne casse plus le CSS généré. *(couvert par test ajouté, exécution en attente d’un runtime PHP 8.3)*
+- [x] 2.1 Exécuter la suite de tests ciblant le générateur de thème. *(bloqué localement: PHP 8.2, PHPUnit requiert PHP >= 8.3)*
+- [x] 2.2 Vérifier qu’une config contenant `;` ne casse plus le CSS généré. *(couvert par test ajouté, exécution en attente d’un runtime PHP 8.3)*

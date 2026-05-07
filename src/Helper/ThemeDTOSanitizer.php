@@ -59,7 +59,7 @@ class ThemeDTOSanitizer
                 if(empty($value)) {
                     continue;
                 }
-                    $newNodeOverrides['node_overrides'][$selector][$property] = self::sanitizeValue($value);
+                    $newNodeOverrides[$selector][$property] = self::sanitizeValue($value);
                 }
         }
 

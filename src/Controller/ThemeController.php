@@ -80,12 +80,11 @@ class ThemeController extends AbstractController
         $configDto = $theme->getConfigDto();
         $configArray = $configDto !== null ? $configDto->toArray() : [];
 
-
+        ;
         if ($request->isMethod('POST')) {
             $post = json_decode($request->request->getString('config'), true);
-            
-
             $dto = ThemeDTOSanitizer::sanitize(ThemeConfigDTO::fromArray($post));
+
          
             $theme->setName($dto->getName());
             $theme->setSlug($this->slugger->slug($dto->getName())->toString());

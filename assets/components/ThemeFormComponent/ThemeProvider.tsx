@@ -14,10 +14,6 @@ export function ThemeProvider({ children, config, allFontsOptions }: ThemeProvid
 
   const [themeState, setThemeState] = useState<ThemeCssType>(config);
   
-  useEffect(() => {
-    console.log('themeState', themeState.node_overrides[".ce-header-h1"] ?? {});
-  }, [themeState]);
-  
   const updateOverrideField = (key: string, attribute: string, value: string) => {
     setThemeState((prev: ThemeCssType) => {
       const currentOverrides = prev.node_overrides;
@@ -87,9 +83,18 @@ export function ThemeProvider({ children, config, allFontsOptions }: ThemeProvid
     });
   };
 
+  const setCustomCss = (customCss: string): void => {
+    setThemeState((prev: ThemeCssType) => {
+      return { ...prev, custom_css: customCss };
+    });
+  };
+
+  const getCustomCss = (): string => {
+    return themeState.custom_css;
+  };
 
   return (
-    <ThemeContext.Provider value={{ themeState, updateOverrideField, getOverrideField, getStyleFromOverride, getThemeName, setThemeName, getFonts, setFonts, getVars, setVars, allFontsOptions }}>
+    <ThemeContext.Provider value={{ themeState, updateOverrideField, getOverrideField, getStyleFromOverride, getThemeName, setThemeName, getFonts, setFonts, getVars, setVars, allFontsOptions, setCustomCss, getCustomCss }}>
       {children}
     </ThemeContext.Provider>
   );

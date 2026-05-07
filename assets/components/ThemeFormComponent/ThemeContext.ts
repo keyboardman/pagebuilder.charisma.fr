@@ -6,6 +6,7 @@ export type ThemeCssType = {
     fonts: number[];
     vars: ThemeVar[];
     node_overrides: Record<string, Record<string, string>>;
+    custom_css: string;
 }
 
 export interface ThemeContextType {
@@ -20,6 +21,8 @@ export interface ThemeContextType {
     setFonts: (fonts: number[]) => void
     getVars: () => ThemeVar[]
     setVars: (vars: ThemeVar[]) => void
+    setCustomCss: (customCss: string) => void
+    getCustomCss: () => string
 }
 
 export const ThemeContext = createContext<ThemeContextType | null>(null)
