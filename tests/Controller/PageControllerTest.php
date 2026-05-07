@@ -1,0 +1,128 @@
+<?php
+
+declare(strict_types=1);
+
+namespace App\Tests\Controller;
+
+use App\Entity\Page;
+use App\Entity\Theme;
+use App\Entity\User;
+use Doctrine\ORM\EntityManagerInterface;
+use Doctrine\ORM\Tools\SchemaTool;
+use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
+use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
+
+class PageControllerTest extends WebTestCase
+{
+    private EntityManagerInterface $entityManager;
+
+    protected function setUp(): void
+    {
+        self::ensureKernelShutdown();
+        self::bootKernel();
+        $this->entityManager = static::getContainer()->get(EntityManagerInterface::class);
+
+        $metadata = $this->entityManager->getMetadataFactory()->getAllMetadata();
+        $schemaTool = new SchemaTool($this->entityManager);
+        $schemaTool->dropDatabase();
+        if ($metadata !== []) {
+            $schemaTool->createSchema($metadata);
+        }
+
+        self::ensureKernelShutdown();
+    }
+
+    public function testDuplicatePageCreatesEditableCopy(): void
+    {
+        $client = static::createClient();
+        $admin = $this->createUser('admin-page@example.test');
+        $source = $this->createPage('Landing Page', 'landing-page');
+        $client->loginUser($admin);
+
+        $token = $this->fetchDuplicateTokenFromPagesList($client, (int) $source->getId());
+
+        $client->request('POST', '/page/duplicate/' . $source->getId(), [
+            '_token' => $token,
+        ]);
+
+        self::assertResponseRedirects();
+        $location = (string) $client->getResponse()->headers->get('Location');
+        self::assertMatchesRegularExpression('#/page/edit/\d+$#', $location);
+
+        /** @var Page[] $pages */
+        $pages = $this->entityManager->getRepository(Page::class)->findBy([], ['id' => 'ASC']);
+        self::assertCount(2, $pages);
+
+        $copy = $pages[1];
+        self::assertNotSame($source->getId(), $copy->getId());
+        self::assertSame('Landing Page (copie)', $copy->getTitle());
+        self::assertNotSame($source->getSlug(), $copy->getSlug());
+        self::assertStringStartsWith('landing-page-copie', $copy->getSlug());
+        self::assertSame($source->getTheme()?->getId(), $copy->getTheme()?->getId());
+        self::assertSame($source->getDescription(), $copy->getDescription());
+        self::assertSame($source->getContent(), $copy->getContent());
+        self::assertSame($source->getRender(), $copy->getRender());
+    }
+
+    public function testDuplicatePageWithInvalidCsrfIsRefused(): void
+    {
+        $client = static::createClient();
+        $admin = $this->createUser('admin-page-csrf@example.test');
+        $source = $this->createPage('Pricing', 'pricing');
+        $client->loginUser($admin);
+
+        $client->request('POST', '/page/duplicate/' . $source->getId(), [
+            '_token' => 'invalid-token',
+        ]);
+
+        self::assertResponseRedirects('/page/');
+        /** @var Page[] $pages */
+        $pages = $this->entityManager->getRepository(Page::class)->findBy([]);
+        self::assertCount(1, $pages);
+    }
+
+    private function fetchDuplicateTokenFromPagesList($client, int $pageId): string
+    {
+        $crawler = $client->request('GET', '/page/');
+        $tokenInput = $crawler->filter(sprintf('form[action="/page/duplicate/%d"] input[name="_token"]', $pageId));
+        self::assertGreaterThan(0, $tokenInput->count());
+
+        return (string) $tokenInput->attr('value');
+    }
+
+    private function createUser(string $email): User
+    {
+        $user = new User();
+        $user->setEmail($email);
+        $user->setRoles(['ROLE_ADMIN']);
+        $user->setActif(true);
+
+        $hasher = static::getContainer()->get(UserPasswordHasherInterface::class);
+        $user->setPassword($hasher->hashPassword($user, 'test-password'));
+
+        $this->entityManager->persist($user);
+        $this->entityManager->flush();
+
+        return $user;
+    }
+
+    private function createPage(string $title, string $slug): Page
+    {
+        $theme = new Theme();
+        $theme->setName('Theme test');
+        $this->entityManager->persist($theme);
+
+        $page = new Page();
+        $page->setTitle($title);
+        $page->setSlug($slug);
+        $page->setTheme($theme);
+        $page->setDescription('Description test');
+        $page->setContent(['root' => ['id' => 'root']]);
+        $page->setRender('<html><body>Test</body></html>');
+
+        $this->entityManager->persist($page);
+        $this->entityManager->flush();
+
+        return $page;
+    }
+}

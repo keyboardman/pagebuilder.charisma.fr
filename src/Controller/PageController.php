@@ -92,6 +92,45 @@ class PageController extends AbstractController
         return $this->redirectToRoute('app_page_index');
     }
 
+    #[Route('/duplicate/{id}', name: 'duplicate', methods: ['POST'], requirements: ['id' => '\d+'])]
+    public function duplicate(Request $request, Page $page): Response
+    {
+        $token = $request->request->getString('_token');
+        if (!$this->isCsrfTokenValid('duplicate' . $page->getId(), $token)) {
+            $this->addFlash('error', 'Le jeton de securite est invalide.');
+            return $this->redirectToRoute('app_page_index');
+        }
+
+        $copy = new Page();
+        $copy->setTitle($page->getTitle() . ' (copie)');
+        $copy->setSlug($this->generateUniqueCopySlug($page));
+        $copy->setTheme($page->getTheme());
+        $copy->setDescription($page->getDescription());
+        $copy->setContent($page->getContent());
+        $copy->setRender($page->getRender());
+
+        $this->em->persist($copy);
+        $this->em->flush();
+
+        $this->addFlash('success', sprintf('Page « %s » dupliquee.', $copy->getTitle()));
+
+        return $this->redirectToRoute('app_page_edit', ['id' => $copy->getId()]);
+    }
+
+    private function generateUniqueCopySlug(Page $sourcePage): string
+    {
+        $baseSlug = $this->slugger->slug($sourcePage->getSlug() . '-copie')->lower()->toString();
+        $slug = $baseSlug;
+        $suffix = 2;
+
+        while ($this->em->getRepository(Page::class)->findOneBy(['slug' => $slug]) !== null) {
+            $slug = sprintf('%s-%d', $baseSlug, $suffix);
+            ++$suffix;
+        }
+
+        return $slug;
+    }
+
     
     #[Route('/{id}/builder', name: 'builder', methods: ['GET'], requirements: ['id' => '\d+'])]
     public function builder(Page $page, ThemeFontBuilderService $themeFontBuilderService): Response
