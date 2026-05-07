@@ -1,5 +1,5 @@
 ## MODIFIED Requirements
-### Requirement: Formulaire dynamique a partir du schema theme.yaml
+### Requirement: Formulaire dynamique à partir du schéma theme.yaml
 
 Le systeme SHALL generer un formulaire d'edition de theme a partir de la structure du theme.yaml : sections pour `vars`, `body`, `h1`-`h6`, `div`, `p` ; types de champs adaptes (texte pour couleurs/font-family, nombre pour font-size/line-height, etc.). Le champ `font-family` SHALL pouvoir etre lie a l'entite `Font` (selection) ou accepter une chaine libre. La soumission du formulaire SHALL produire une structure de donnees ecrite dans le fichier YAML du theme (ou en base) et SHALL permettre de declencher la generation CSS.
 
