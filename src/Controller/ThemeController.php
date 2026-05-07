@@ -86,7 +86,6 @@ class ThemeController extends AbstractController
             
 
             $dto = ThemeDTOSanitizer::sanitize(ThemeConfigDTO::fromArray($post));
-
          
             $theme->setName($dto->getName());
             $theme->setSlug($this->slugger->slug($dto->getName())->toString());
