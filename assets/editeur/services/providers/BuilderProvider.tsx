@@ -4,8 +4,8 @@ import { type ReactNode, type FC, useState, useEffect, useCallback, useRef } fro
 import type { NodeID, NodeType, NodesType } from "../../types/NodeType";
 import nodeHelper from "../../utils/nodeHelper";
 import { useAppContext } from "./AppContext";
-import { startAutoSave, type AutoSaveController } from "../autosave";
 import { syncRegisteredFontsToDocument } from "../typography";
+import { NodeRichTextEditorProvider } from "../../ManagerNode/NodeRichText/NodeRichTextEditorContext";
 
 export interface BuilderContextProviderProps {
   children: ReactNode;
@@ -230,7 +230,9 @@ export const BuilderProvider: FC<BuilderContextProviderProps> = ({
           }
         }
       }}
-    >{children}</BuilderContext.Provider>
+    >
+      <NodeRichTextEditorProvider>{children}</NodeRichTextEditorProvider>
+    </BuilderContext.Provider>
   );
 };
 

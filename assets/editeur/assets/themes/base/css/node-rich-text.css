@@ -361,3 +361,35 @@
   margin: 0 4px;
   flex-shrink: 0;
 }
+
+/* --- Modale d'édition (builder) --- */
+
+.ce-rich-text-modal-content .ce-rich-text-modal.editor-shell {
+  margin: 0;
+  flex: 1;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  border-radius: 0;
+}
+
+.ce-rich-text-modal-content .ce-rich-text-modal .editor-container {
+  flex: 1;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  border-radius: 0;
+  box-shadow: none;
+}
+
+.ce-rich-text-modal-content .ce-rich-text-modal .editor-scroller {
+  flex: 1;
+  min-height: 200px;
+  max-height: calc(85vh - 140px);
+  overflow-y: auto;
+}
+
+.ce-rich-text-modal-content .ce-rich-text-modal .editor {
+  min-height: 200px;
+}
+

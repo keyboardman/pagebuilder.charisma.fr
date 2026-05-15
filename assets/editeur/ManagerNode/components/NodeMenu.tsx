@@ -1,7 +1,9 @@
-import { GripVertical, Trash2, Copy } from "lucide-react";
+import { GripVertical, Trash2, Copy, Pencil } from "lucide-react";
 import { useNodeBuilderContext } from "../../services/providers/NodeBuilderContext";
 import { Button } from "@/editeur/components/ui/button";
 import { cn } from "@/editeur/lib/utils";
+import { NODE_RICH_TEXT_TYPE } from "../NodeRichText";
+import { useNodeRichTextEditorSafe } from "../NodeRichText/NodeRichTextEditorContext";
 
 export default function NodeMenu() {
     const { node, isSelected } = useNodeBuilderContext();
@@ -71,8 +73,9 @@ const NodeMenuInactive = ({ title }: { title: string }) => {
 
 const NodeMenuActive = ({ title }: { title: string }) => {
 
-    const { drag, onDuplicate, onSelect, onDelete } = useNodeBuilderContext();
-
+    const { node, drag, onDuplicate, onSelect, onDelete } = useNodeBuilderContext();
+    const richTextEditor = useNodeRichTextEditorSafe();
+    const isRichText = node.type === NODE_RICH_TEXT_TYPE;
 
     const handleClick = (e: React.MouseEvent<HTMLDivElement>) => {
         e.stopPropagation();
@@ -90,6 +93,21 @@ const NodeMenuActive = ({ title }: { title: string }) => {
                 <GripVertical className="h-4 w-4" />
             </Button>
             <NodeMenuTitle title={title}  />
+            {isRichText && richTextEditor ? (
+                <Button
+                    onClick={(e) => {
+                        e.stopPropagation();
+                        richTextEditor.openEditor(node.id);
+                    }}
+                    variant="ghost"
+                    size="icon"
+                    className="h-4 w-4 shrink-0"
+                    title="Modifier le texte"
+                    aria-label="Modifier le texte"
+                >
+                    <Pencil className="h-4 w-4" />
+                </Button>
+            ) : null}
             <Button
                 onClick={(e) => {
                     e.stopPropagation();
