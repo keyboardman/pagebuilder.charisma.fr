@@ -1,0 +1,7 @@
+{# Assets statiques sous public/ (ex. public/assets/icons/play2.svg → /assets/icons/play2.svg) + basePath. #}
+{% set _mask_video = (app.request.basePath ~ '/assets/icons/video.svg')|replace({'//':'/'}) %}
+{% set _player_icon = (app.request.basePath ~ '/assets/icons/play2.svg')|replace({'//':'/'}) %}
+<style>:root {
+  --ce-builder-icon-video-mask-url: url("{{ _mask_video|e('css') }}");
+  --ce-video-player-icon-url: url("{{ _player_icon|e('css') }}");
+}</style>

@@ -18,6 +18,7 @@ function mountThemeForm(): void {
   const fontsJson = el.dataset.fonts ?? '[]';
   const postUrl = el.dataset.postUrl ?? window.location.pathname;
   const fieldName = el.dataset.fieldName ?? 'config[fonts]';
+  const filemanagerUrl = el.dataset.filemanagerUrl ?? '';
 
   let fonts: { id: number; name: string }[] = [];
   try {
@@ -32,6 +33,7 @@ function mountThemeForm(): void {
       fonts={fonts}
       postUrl={postUrl}
       fieldName={fieldName}
+      filemanagerUrl={filemanagerUrl}
       initialConfig={initialConfig}
     />
   );

@@ -1,6 +1,7 @@
 import { cn } from "@/lib/utils";
-import { toReactStyle } from "../utils";
+import { toReactStyle, toThemePreviewAssetUrl } from "../utils";
 import { useTheme } from "../ThemeContext";
+import { VideoPlayOverlayIcon } from "@/editeur/ManagerNode/components/VideoPlayOverlayIcon";
 
 type OverridesState = Record<string, Record<string, string>>;
 
@@ -32,23 +33,26 @@ export const Card = ({ overrides, position, isApi }: { overrides: OverridesState
 };
 
 export const Media = ({ type }: { type: string }) => {
-    const { getStyleFromOverride } = useTheme();
+    const { getStyleFromOverride, getVideoPlayerIconUrl } = useTheme();
     switch (type) {
         case 'node-image':
             return (
                 <img src={PREVIEW_IMAGE} alt="Media" className="ce-image" style={getStyleFromOverride('.ce-image')} />
             );
-        case 'node-video':
+        case 'node-video': {
+            const playerIconPreviewUrl = toThemePreviewAssetUrl(getVideoPlayerIconUrl());
             return (
-                <div className="ce-video">
+                <div
+                    className="ce-video"
+                    style={{
+                        ['--ce-video-player-icon-url' as string]: `url("${playerIconPreviewUrl}")`,
+                    }}
+                >
                     <img src={PREVIEW_IMAGE} alt="Media" className="ce-video-poster" style={getStyleFromOverride('.ce-video')} />
-                    <div className="ce-video-icon-player">
-                        <div className="ce-video-icon-player-inner" style={getStyleFromOverride('.ce-video .ce-video-icon-player-inner')}>
-                            <div className="ce-icon" style={getStyleFromOverride('.ce-video .ce-icon')} />
-                        </div>
-                    </div>
+                    <VideoPlayOverlayIcon />
                 </div>
             );
+        }
         default:
             return null;
     }

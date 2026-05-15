@@ -29,7 +29,8 @@
 }
 
 .ce-card-video-placeholder .ce-icon {
-    --player-icon-mask: /* webpackIgnore: true */ url("/assets/icons/video.svg");
+    /* webpackIgnore: true */
+    --player-icon-mask: var(--ce-builder-icon-video-mask-url, url("/assets/icons/video.svg"));
     --player-icon-size: 3rem;
 
     display: block;
@@ -43,6 +44,8 @@
     mask-size: contain;
     -webkit-mask-size: contain;
 }
+
+
 
 .ce-card-video-poster {
     width: 100%;

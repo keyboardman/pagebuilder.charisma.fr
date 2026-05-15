@@ -1,6 +1,7 @@
 import { createContext, useContext } from "react";
 import { type NodeID, type NodeType, type NodesType } from "../../types/NodeType";
 import type { FileManagerConfig } from "../../ManagerAsset/types";
+import type { BuilderThemeIcon } from "../../types/BuilderThemeIcon";
 
 export type AppModeType = "edit" | "preview" | "view";
 export type BreakpointType = "mobile" | "tablet" | "desktop";
@@ -15,6 +16,8 @@ export interface AppType {
     breakpoint: BreakpointType;
     setBreakpoint: React.Dispatch<React.SetStateAction<BreakpointType>>;
     fileManagerConfig: FileManagerConfig | null;
+    /** Icônes définies dans le thème de la page (pour NodeTextIcon, etc.). */
+    themeIcons: BuilderThemeIcon[];
 }
 
 export const APP_MODE = {

@@ -1,4 +1,6 @@
 export type FontOption = { id: number; name: string };
+/** `id` : identifiant stable unique (UUID cote client / legacy numerique en chaine). */
+export type ThemeIcon = { id: string; name: string; className: string; url: string };
 
 export type BodyConfig = {
   fontFamily: string;
@@ -48,12 +50,17 @@ export type ThemeConfigJson = {
   body?: Record<string, string>;
   /** CSS personnalisé ajouté à la fin du fichier généré */
   custom_css?: string;
+  /** Icônes disponibles gérées dans le thème */
+  icons?: ThemeIcon[];
+  /** SVG pastille lecture vidéo (chemin relatif, ex. /assets/icons/play2.svg) */
+  video_player_icon_url?: string;
 };
 
 export type ThemeFormProps = {
   fonts: FontOption[];
   postUrl: string;
   fieldName: string;
+  filemanagerUrl?: string;
   /** Config complète du thème (JSON du DTO), fournie par la route /theme/font/{id} */
   initialConfig?: ThemeConfigJson | null;
 };

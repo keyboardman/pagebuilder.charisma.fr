@@ -1,5 +1,5 @@
 import type { ThemeFormProps } from './types';
-import { buildInitialVars, stringCssToMap } from './utils';
+import { buildInitialIcons, buildInitialVars, buildInitialVideoPlayerIconUrl, stringCssToMap } from './utils';
 import { ThemeName } from './components/ThemeName';
 import { NodeThemeNameForm } from './components/NodeThemeNameForm';
 import { NodeVarsForm } from './components/NodeVarsForm';
@@ -13,13 +13,14 @@ import { NodeButtonForm } from './components/NodeButtonForm';
 import { NodeFormForm } from './components/NodeFormForm';
 import { NodeMenuForm } from './components/NodeMenuForm';
 import { CustomCssForm } from './components/CustomCssForm';
+import { NodeIconsForm } from './components/NodeIconsForm';
 import { ThemeProvider } from './ThemeProvider';
 import type { ThemeCssType } from './ThemeContext';
 import TextareaNodeOverridesForm from './components/TextareaNodeOverridesForm';
 import _ from 'lodash';
 import './base-theme-preview.css';
 
-export function ThemeFormComponent({ fonts, postUrl, initialConfig }: ThemeFormProps) {
+export function ThemeFormComponent({ fonts, postUrl, initialConfig, filemanagerUrl }: ThemeFormProps) {
 
   let _config = {
     name: initialConfig?.name ?? '',
@@ -27,16 +28,19 @@ export function ThemeFormComponent({ fonts, postUrl, initialConfig }: ThemeFormP
     vars: buildInitialVars(initialConfig?.vars ?? null),
     node_overrides: _.mapValues(initialConfig?.node_overrides ?? {}, (value) => stringCssToMap(value)),
     custom_css: typeof initialConfig?.custom_css === 'string' ? initialConfig.custom_css : '',
+    icons: buildInitialIcons(initialConfig?.icons),
+    video_player_icon_url: buildInitialVideoPlayerIconUrl(initialConfig?.video_player_icon_url),
   } as unknown as ThemeCssType;
 
   return (
-    <ThemeProvider config={_config} allFontsOptions={fonts} >
+    <ThemeProvider config={_config} allFontsOptions={fonts} filemanagerUrl={filemanagerUrl} >
       <form method="post" action={postUrl} className="relative">
         <ThemeName />
-        <div className="space-y-4">
+        <div className="space-y-4">          
           <NodeThemeNameForm />
           <NodeFontsForm />
           <NodeVarsForm />
+          <NodeIconsForm />
           <NodeBodyForm />
           <NodeHeaderForm />
           <NodeTextForm />
@@ -44,6 +48,7 @@ export function ThemeFormComponent({ fonts, postUrl, initialConfig }: ThemeFormP
           <NodeMediaForm />
           <NodeFormForm />
           <NodeMenuForm />
+          
           <details className="group border border-border rounded-lg">
             <summary className="cursor-pointer list-none px-4 py-3 font-semibold text-base select-none hover:bg-muted/50 rounded-t-lg [&::-webkit-details-marker]:hidden flex items-center gap-2">
               <span className="transition group-open:rotate-90">▶</span>

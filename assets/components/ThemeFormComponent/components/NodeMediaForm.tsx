@@ -1,20 +1,63 @@
+import { useState } from 'react';
 import _ from 'lodash';
+import { FolderOpen } from 'lucide-react';
 import { Media } from './Preview';
 import FormCss from './FormCss';
 import { useTheme } from '../ThemeContext';
+import { FileManagerIframePicker } from '@/editeur/ManagerAsset/FileManagerIframePicker';
+import type { FileItem } from '@/editeur/ManagerAsset/types';
+import {
+  DEFAULT_VIDEO_PLAYER_ICON_URL,
+  isSvgPath,
+  toRelativeWebPath,
+  toThemePreviewAssetUrl,
+} from '../utils';
 
 const MEDIAS = {
   'node-image': '.ce-image',
-  'node-video': '.ce-video'
+  'node-video': '.ce-video',
 } as Record<string, string>;
 
-function targetKey(target: string): string {
-  return MEDIAS[target].trim();
+function VideoPlayerIconPreview({ url }: { url: string }) {
+  const previewUrl = toThemePreviewAssetUrl(url);
+  return (
+    <div
+      className="flex h-14 w-14 shrink-0 items-center justify-center"
+      title={url}
+    >
+      <span
+        className="ce-icon-video-play block h-10 w-10 bg-contain bg-center bg-no-repeat"
+        style={{ backgroundImage: `url("${previewUrl}")` }}
+      />
+    </div>
+  );
 }
 
 export function NodeMediaForm() {
+  const {
+    getOverrideField,
+    updateOverrideField,
+    getVideoPlayerIconUrl,
+    setVideoPlayerIconUrl,
+    filemanagerUrl,
+  } = useTheme();
+  const [isFileManagerOpen, setIsFileManagerOpen] = useState(false);
 
-  const { getOverrideField, updateOverrideField } = useTheme();
+  const playerIconUrl = getVideoPlayerIconUrl();
+
+  const applyPlayerIconUrl = (raw: string) => {
+    const relative = toRelativeWebPath(raw);
+    if (!isSvgPath(relative)) {
+      window.alert('Seuls les fichiers SVG sont acceptés pour l’icône du lecteur vidéo.');
+      return;
+    }
+    setVideoPlayerIconUrl(relative);
+  };
+
+  const handleSelectFile = (file: FileItem) => {
+    applyPlayerIconUrl(file.url);
+    setIsFileManagerOpen(false);
+  };
 
   return (
     <>
@@ -54,7 +97,6 @@ export function NodeMediaForm() {
                       type="text"
                       label="aspect-ratio"
                     />
-
                     <FormCss
                       id={`${key}-object-fit`}
                       value={getOverrideField(media, 'object-fit')}
@@ -71,41 +113,53 @@ export function NodeMediaForm() {
                       <option value="scale-down">scale-down</option>
                     </FormCss>
                   </div>
-                  {key === 'node-video' ? (<>
-                    <div className="font-semibold my-0">Icône</div>
-                    <div className="grid gap-2 grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 p-1">
-                      <FormCss
-                        id={`${key}-player-inner-border-radius`}
-                        value={getOverrideField(`${targetKey(key)} .ce-video-icon-player-inner`, 'border-radius')}
-                        onChange={(e) => updateOverrideField(`${targetKey(key)} .ce-video-icon-player-inner`, 'border-radius', e.target.value)}
-                        placeholder="0.5rem"
-                        type="text"
-                        label="border-radius"
-                      />
-                      <FormCss
-                        id={`${key}-player-inner-background-color`}
-                        value={getOverrideField(`${targetKey(key)} .ce-video-icon-player-inner`, 'background-color')}
-                        onChange={(e) => updateOverrideField(`${targetKey(key)} .ce-video-icon-player-inner`, 'background-color', e.target.value)}
-                        placeholder="var(--color-primary)"
-                        type="background-color"
-                        label="background-color"
-                      />
-                      <FormCss
-                        id={`${key}-icon-color`}
-                        value={getOverrideField(`${targetKey(key)} .ce-icon`, 'background-color')}
-                        onChange={(e) => updateOverrideField(`${targetKey(key)} .ce-icon`, 'background-color', e.target.value)}
-                        placeholder="var(--color-primary)"
-                        type="background-color"
-                        label="background-color"
-                      />
+                  {key === 'node-video' ? (
+                    <div className="mt-4 space-y-2">
+                      <div className="font-semibold my-0">Icône lecteur (SVG)</div>
+                      <p className="text-xs text-muted-foreground">
+                        Fichier dans <span className="font-mono">public/</span> (ex.{' '}
+                        <span className="font-mono">public{DEFAULT_VIDEO_PLAYER_ICON_URL}</span> → URL{' '}
+                        <span className="font-mono">{DEFAULT_VIDEO_PLAYER_ICON_URL}</span>) ou SVG de la
+                        médiathèque (<span className="font-mono">/media/…</span>). Le basePath est ajouté à la
+                        génération du CSS.
+                      </p>
+                      <div className="flex flex-wrap items-center gap-2">
+                        <VideoPlayerIconPreview url={playerIconUrl} />
+                        <input
+                          type="text"
+                          className="input input-bordered min-w-0 flex-1 font-mono text-sm"
+                          value={playerIconUrl}
+                          onChange={(e) => setVideoPlayerIconUrl(e.target.value)}
+                          onBlur={(e) => applyPlayerIconUrl(e.target.value)}
+                          placeholder={DEFAULT_VIDEO_PLAYER_ICON_URL}
+                        />
+                        <button
+                          type="button"
+                          className="btn btn-sm btn-outline shrink-0"
+                          onClick={() => setIsFileManagerOpen(true)}
+                          disabled={!filemanagerUrl}
+                          title="Choisir un SVG dans la médiathèque"
+                        >
+                          <FolderOpen className="h-4 w-4" />
+                        </button>
+                      </div>
                     </div>
-                  </>) : false}
+                  ) : null}
                 </div>
               </div>
             ))}
           </div>
         </div>
       </details>
+      {!!filemanagerUrl && (
+        <FileManagerIframePicker
+          open={isFileManagerOpen}
+          onOpenChange={setIsFileManagerOpen}
+          onSelectFile={handleSelectFile}
+          filemanagerUrl={filemanagerUrl}
+          type="image"
+        />
+      )}
     </>
   );
 }

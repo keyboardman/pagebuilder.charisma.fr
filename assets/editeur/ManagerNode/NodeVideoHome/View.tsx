@@ -5,6 +5,7 @@ import { useAppContext, APP_MODE } from "../../services/providers/AppContext";
 import { cn } from "@/editeur/lib/utils";
 import type { NodeVideoHomeItem, NodeVideoHomeType } from "./index";
 import { styleForView } from "../../utils/styleHelper";
+import { VideoPlayOverlayIcon } from "../components/VideoPlayOverlayIcon";
 import { Dialog, DialogContent, DialogTitle } from "@/editeur/components/ui/dialog";
 import { VisuallyHidden } from "@/editeur/components/ui/visually-hidden";
 import { X } from "lucide-react";
@@ -129,12 +130,12 @@ const View: FC<NodeViewProps> = () => {
                     }
                   }}
                 >
-                  <div className="ce-card-video-wrapper">
+                  <div className="ce-card-video-wrapper ce-video">
                     {video.poster ? (
                       <img
                         src={video.poster}
                         alt={video.title}
-                        className="ce-card-video-poster"
+                        className="ce-video-poster"
                         style={styleForView(imageStyle)}
                       />
                     ) : (
@@ -143,11 +144,7 @@ const View: FC<NodeViewProps> = () => {
                         <p>Aucune video</p>
                       </div>
                     )}
-                    <div className="ce-video-icon-player">
-                      <div className="ce-video-icon-player-inner">
-                        <div className="ce-icon" />
-                      </div>
-                    </div>
+                    <VideoPlayOverlayIcon />
                   </div>
                   <div
                     className="ce-card-video-title"

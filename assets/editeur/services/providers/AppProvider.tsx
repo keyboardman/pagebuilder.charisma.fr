@@ -5,6 +5,7 @@ import type { FileManagerConfig } from "../../ManagerAsset/types";
 import BuilderProvider from "./BuilderProvider";
 import nodeHelper from "../../utils/nodeHelper";
 import { ThemeProvider } from "./ThemeProvider";
+import type { BuilderThemeIcon } from "../../types/BuilderThemeIcon";
 
 
 export interface AppProviderProps {
@@ -13,6 +14,8 @@ export interface AppProviderProps {
     target?: string;
     view?: boolean;
     fileManagerConfig?: FileManagerConfig | null;
+    /** Icônes du thème courant (injectées par le backend sur le builder de page). */
+    themeIcons?: BuilderThemeIcon[] | null;
     /** Callback appelé quand les nodes changent (intégration embarquée) */
     onSaveCallback?: (nodes: NodesType) => void;
 }
@@ -27,7 +30,15 @@ const defaultJson = JSON.stringify({
         }
     }
 });
-export const AppProvider: FC<AppProviderProps> = ({ children, json = defaultJson, target, view = false, fileManagerConfig = null, onSaveCallback }: AppProviderProps) => {
+export const AppProvider: FC<AppProviderProps> = ({
+    children,
+    json = defaultJson,
+    target,
+    view = false,
+    fileManagerConfig = null,
+    themeIcons = null,
+    onSaveCallback,
+}: AppProviderProps) => {
 
     const defaultNodes: NodesType = {
         cylsqgudkwtz: {
@@ -103,7 +114,9 @@ export const AppProvider: FC<AppProviderProps> = ({ children, json = defaultJson
                 setBreakpoint,
 
                 // filemanager
-                fileManagerConfig
+                fileManagerConfig,
+
+                themeIcons: themeIcons ?? [],
             }} >
                 {mode !== APP_MODE.VIEW ? <BuilderProvider target={target} onSaveCallback={onSaveCallback}>{children}</BuilderProvider> : children}
             </AppContext.Provider>

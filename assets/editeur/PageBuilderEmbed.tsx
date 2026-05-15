@@ -4,6 +4,7 @@ import BuilderInline from "./app/builder/BuilderInline";
 import App from "./app/App";
 import type { FileManagerConfig } from "./ManagerAsset/types";
 import type { NodesType } from "./types/NodeType";
+import type { BuilderThemeIcon } from "./types/BuilderThemeIcon";
 import { registerBackendApis } from "./ManagerApi/backendApiAdapter";
 import { apiRegistry } from "./ManagerApi/ApiRegistry";
 
@@ -11,6 +12,8 @@ export interface PageBuilderEmbedProps {
   value: string;
   onChange: (json: string) => void;
   fileManagerConfig?: FileManagerConfig | null;
+  /** Icônes du thème (liste + classes CSS générées dans le CSS du thème). */
+  themeIcons?: BuilderThemeIcon[] | null;
   /** Base URL de l’API Symfony (ex. /page-builder/api) pour charger les APIs card enregistrées en PHP */
   apiCardsBaseUrl?: string | null;
 }
@@ -22,6 +25,7 @@ export default function PageBuilderEmbed({
   value,
   onChange,
   fileManagerConfig = null,
+  themeIcons = null,
   apiCardsBaseUrl = null,
 }: PageBuilderEmbedProps) {
   useEffect(() => {
@@ -42,6 +46,7 @@ export default function PageBuilderEmbed({
       json={value}
       view={false}
       fileManagerConfig={fileManagerConfig}
+      themeIcons={themeIcons}
       onSaveCallback={handleSave}
     >
       <BuilderInline>

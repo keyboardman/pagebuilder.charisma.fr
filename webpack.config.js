@@ -79,4 +79,41 @@ config.resolve.extensions = [
     '.ts',
     '.tsx'
 ]
+
+// Laisser les url() absolues vers public/ (ex. /assets/icons/*.svg) pour le navigateur, sans les résoudre au build.
+config.module.rules.forEach((rule) => {
+    if (!rule.oneOf) {
+        return
+    }
+    rule.oneOf.forEach((oneOfRule) => {
+        if (!oneOfRule.use) {
+            return
+        }
+        oneOfRule.use.forEach((useEntry) => {
+            const loader = typeof useEntry === 'object' ? useEntry.loader : ''
+            if (
+                typeof loader !== 'string'
+                || !loader.includes('css-loader')
+                || loader.includes('postcss-loader')
+            ) {
+                return
+            }
+            const options = useEntry.options || {}
+            const previousUrl = options.url
+            options.url = {
+                filter: (url) => {
+                    if (url.startsWith('/assets/')) {
+                        return false
+                    }
+                    if (typeof previousUrl === 'object' && previousUrl !== null && typeof previousUrl.filter === 'function') {
+                        return previousUrl.filter(url)
+                    }
+                    return true
+                },
+            }
+            useEntry.options = options
+        })
+    })
+})
+
 module.exports = config

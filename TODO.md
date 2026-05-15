@@ -15,9 +15,10 @@
 11. OK Anniversaire
 12. OK css pour card image ratio (override)
 13. OK icone TOP
-14. gestion des icones
-15. OK extraire le theme globale css et creer le générateur
-16. Ok Suppression compte utilisateur
-17. OK generateur css  (verifier si il y une erreur de typo)
-18. OK Gestionnaire de média (création de dossier)
-19. Création NodeText + Icone + retour à la ligne
+14. OK extraire le theme globale css et creer le générateur
+15. Ok Suppression compte utilisateur
+16. OK generateur css  (verifier si il y une erreur de typo)
+17. OK Gestionnaire de média (création de dossier)
+18. Création NodeText + Icone + retour à la ligne
+19. Gestion des icones
+20. Editeur en fenetre modale

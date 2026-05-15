@@ -37,3 +37,28 @@
 
 /* Shared theme overrides/helpers from base theme */
 /* @import "../../editeur/assets/themes/base/css/override.css"; */
+
+i.ce-icon-small {
+    width: 16px;
+    height: 16px;
+}
+
+i.ce-icon-large {
+    width: 32px;
+    height: 32px;
+}
+
+i.ce-icon {
+    background-size: contain;
+    background-repeat: no-repeat;
+    background-position: center;
+    display: inline-block;
+    width: 24px;
+    height: 24px;
+    vertical-align: middle;
+    
+}
+
+i.ce-icon-article {
+    background-image: url("https://127.0.0.1:8000/media/icons/icone_bible.png");
+}

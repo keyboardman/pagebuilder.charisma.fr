@@ -42,15 +42,13 @@
 }
 
 .ce-video-placeholder .ce-icon {
-    --player-icon-mask:
-        /* webpackIgnore: true */
-        url("/assets/icons/video.svg");
+    /* webpackIgnore: true */
+    --player-icon-mask: var(--ce-builder-icon-video-mask-url, url("/assets/icons/video.svg"));
     --player-icon-size: 3rem;
 
     display: block;
     height: var(--player-icon-size);
     width: var(--player-icon-size);
-    background-color: hsl(var(--muted-foreground));
     background-color: #8F9CAC;
     opacity: 0.9;
     mask: var(--player-icon-mask) no-repeat center;
@@ -59,76 +57,33 @@
     -webkit-mask-size: contain;
 }
 
-.ce-video-icon-player {
-    align-items: center;
-    /* background-color: rgba(0, 0, 0, 0.2); */
-    /* on commente impacte le broder-radius j'ai un fond carré */
-    display: flex;
-    inset: 0;
-    justify-content: center;
-    pointer-events: none;
-    position: absolute;
-    transition-property: color, background-color, border-color;
-    transition-duration: 150ms;
-    transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
-    z-index: 10;
-}
 
-.ce-video-icon-player:hover {
-    background-color: rgba(0, 0, 0, 0.3);
-}
 
-.ce-video-icon-player-inner {
-    align-items: center;
-    background-color: var(--ce-video-player-bg, rgba(255, 255, 255, 0.9));
 
-    color: var(--ce-video-player-icon-color, black);
-    display: flex;
-    justify-content: center;
-    padding: 1rem;
-
-    border-radius: 50%;
-
-    width: 56px;
-    height: 56px;
-}
-
-.ce-video-icon-player-inner .ce-icon {
-    --player-icon-size: 1.75rem;
-    --player-icon-mask:
-        /* webpackIgnore: true */
-        url("/assets/icons/play.svg");
-    display: flex;
-    background-color: var(--ce-video-player-icon-color, black);
-    align-items: center;
-    justify-content: center;
-    height: var(--player-icon-size, 1rem);
-    width: var(--player-icon-size, 1rem);
-    mask-size: contain;
-    -webkit-mask-size: contain;
-    mask: var(--player-icon-mask) no-repeat center;
-    -webkit-mask: var(--player-icon-mask) no-repeat center;
-
-}
-
-.ce-video-icon-player:hover .ce-video-icon-player-inner {
-    background-color: var(--ce-video-player-bg-hover, rgba(255, 255, 255, 1));
-}
 
 
 @media (max-width: 768px) {
-
     .ce-video-icon-player-inner {
-        --player-icon-size: 3rem;
-        width: calc(var(--player-icon-size) * 0.75);
-        height: calc(var(--player-icon-size) * 0.75);
-        padding: 0rem;
+        --ce-video-player-circle-size: 2.75rem;
     }
+}
 
-    .ce-video-icon-player-inner .ce-icon {
-        --player-icon-size: 1.75rem;
-        width: calc(var(--player-icon-size) * 0.75);
-        height: calc(var(--player-icon-size) * 0.75);
-        padding: 0rem;
-    }
+.ce-video-icon-player-inner{
+    display: flex;
+    justify-content: center;
+    align-items: center;
+
+    position: absolute;
+    inset: 0;
+    z-index: 10;
+}
+
+.ce-icon-video-play {
+    display: inline-block;
+    width: min(56px, 25%);
+    aspect-ratio: 1;
+    background-image: var(--ce-video-player-icon-url);
+    background-size: contain;
+    background-repeat: no-repeat;
+    background-position: center;
 }

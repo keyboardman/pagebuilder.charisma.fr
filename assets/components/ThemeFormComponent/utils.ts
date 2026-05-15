@@ -6,6 +6,7 @@ import type {
     ButtonColorOnly,
     ButtonSizeConfig,
     ThemeConfigJson,
+    ThemeIcon,
     ThemeVar
 } from './types'
 
@@ -336,6 +337,98 @@ export function buildInitialVars (
             ? initial
             : _initial;
     return source as unknown as ThemeVar[]
+}
+
+/** Nouvel identifiant d'icone (UUID v4 si disponible). */
+export function newThemeIconId (): string {
+    if (typeof crypto !== 'undefined' && typeof crypto.randomUUID === 'function') {
+        return crypto.randomUUID()
+    }
+    return `i-${Date.now().toString(36)}-${Math.random().toString(36).slice(2, 11)}`
+}
+
+function normalizeIconIdFromServer (raw: unknown, index: number): string {
+    if (typeof raw === 'string' && raw.trim() !== '') {
+        return raw.trim()
+    }
+    if (typeof raw === 'number' && Number.isFinite(raw)) {
+        return String(raw)
+    }
+    if (raw != null && String(raw).trim() !== '') {
+        return String(raw).trim()
+    }
+    return `${newThemeIconId()}-i${index}`
+}
+
+/** Icône play par défaut pour les nœuds vidéo (chemin relatif à la racine web). */
+export const DEFAULT_VIDEO_PLAYER_ICON_URL = '/assets/icons/play2.svg'
+
+/** Normalise une URL en chemin relatif depuis la racine du site (ex. /media/foo.svg). */
+export function toRelativeWebPath (url: string): string {
+    const trimmed = url.trim()
+    if (!trimmed) {
+        return DEFAULT_VIDEO_PLAYER_ICON_URL
+    }
+    try {
+        if (trimmed.startsWith('http://') || trimmed.startsWith('https://')) {
+            const parsed = new URL(trimmed)
+            if (typeof window !== 'undefined' && parsed.origin === window.location.origin) {
+                return parsed.pathname || DEFAULT_VIDEO_PLAYER_ICON_URL
+            }
+            return parsed.pathname || trimmed
+        }
+    } catch {
+        // ignore
+    }
+    return trimmed.startsWith('/') ? trimmed : `/${trimmed}`
+}
+
+export function isSvgPath (url: string): boolean {
+    const path = url.split('?')[0].split('#')[0]
+    return /\.svg$/i.test(path)
+}
+
+/** URL absolue pour l’aperçu dans le formulaire thème (même origine). */
+export function toThemePreviewAssetUrl (relativePath: string): string {
+    const path = toRelativeWebPath(relativePath)
+    if (typeof window === 'undefined') {
+        return path
+    }
+    return `${window.location.origin}${path}`
+}
+
+export function buildInitialVideoPlayerIconUrl (
+    initial: string | null | undefined
+): string {
+    const raw = typeof initial === 'string' ? initial.trim() : ''
+    if (!raw) {
+        return DEFAULT_VIDEO_PLAYER_ICON_URL
+    }
+    const relative = toRelativeWebPath(raw)
+    return isSvgPath(relative) ? relative : DEFAULT_VIDEO_PLAYER_ICON_URL
+}
+
+export function buildInitialIcons (
+    initial: ThemeIcon[] | null | undefined
+): ThemeIcon[] {
+    if (!Array.isArray(initial)) {
+        return []
+    }
+
+    const seen = new Set<string>()
+    return initial.map((icon, index) => {
+        let id = normalizeIconIdFromServer(icon?.id, index)
+        while (seen.has(id)) {
+            id = newThemeIconId()
+        }
+        seen.add(id)
+        return {
+            id,
+            name: String(icon?.name ?? ''),
+            className: String(icon?.className ?? ''),
+            url: String(icon?.url ?? '')
+        }
+    })
 }
 
 export function normalizeVarNameForSubmit (raw: string): string {

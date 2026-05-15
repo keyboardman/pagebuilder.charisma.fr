@@ -2,15 +2,16 @@ import { useEffect, useMemo, useState, CSSProperties } from 'react';
 import { ThemeContext } from './ThemeContext';
 import type { ThemeCssType } from './ThemeContext';
 import { toReactStyle } from './utils';
-import { FontOption, ThemeVar } from './types';
+import { FontOption, ThemeIcon, ThemeVar } from './types';
 
 export interface ThemeProviderProps {
   children: React.ReactNode;
   config: ThemeCssType;
   allFontsOptions: FontOption[];
+  filemanagerUrl?: string;
 }
 
-export function ThemeProvider({ children, config, allFontsOptions }: ThemeProviderProps) {
+export function ThemeProvider({ children, config, allFontsOptions, filemanagerUrl }: ThemeProviderProps) {
 
   const [themeState, setThemeState] = useState<ThemeCssType>(config);
   
@@ -93,8 +94,27 @@ export function ThemeProvider({ children, config, allFontsOptions }: ThemeProvid
     return themeState.custom_css;
   };
 
+  const getIcons = (): ThemeIcon[] => {
+    return themeState.icons;
+  };
+
+  const setIcons = (icons: ThemeIcon[]): void => {
+    setThemeState((prev: ThemeCssType) => {
+      return { ...prev, icons: icons as ThemeIcon[] };
+    });
+  };
+
+  const getVideoPlayerIconUrl = (): string => themeState.video_player_icon_url;
+
+  const setVideoPlayerIconUrl = (url: string): void => {
+    setThemeState((prev: ThemeCssType) => ({
+      ...prev,
+      video_player_icon_url: url,
+    }));
+  };
+
   return (
-    <ThemeContext.Provider value={{ themeState, updateOverrideField, getOverrideField, getStyleFromOverride, getThemeName, setThemeName, getFonts, setFonts, getVars, setVars, allFontsOptions, setCustomCss, getCustomCss }}>
+    <ThemeContext.Provider value={{ themeState, updateOverrideField, getOverrideField, getStyleFromOverride, getThemeName, setThemeName, getFonts, setFonts, getVars, setVars, allFontsOptions, setCustomCss, getCustomCss, getIcons, setIcons, getVideoPlayerIconUrl, setVideoPlayerIconUrl, filemanagerUrl }}>
       {children}
     </ThemeContext.Provider>
   );

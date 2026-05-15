@@ -40,8 +40,9 @@ class ThemeController extends AbstractController
 
 
         if ($request->isMethod('POST')) {
-            $config = is_array($request->request->all('config')) ? $request->request->all('config') : [];
-            $dto = ThemeConfigDTO::fromArray($config);
+            $decoded = json_decode($request->request->getString('config'), true);
+            $config = \is_array($decoded) ? $decoded : [];
+            $dto = ThemeDTOSanitizer::sanitize(ThemeConfigDTO::fromArray($config));
             $theme = new Theme();
             $theme->setName($dto->getName() ?: 'Sans nom');
             $theme->setSlug($this->slugger->slug($theme->getName())->toString());
@@ -79,12 +80,10 @@ class ThemeController extends AbstractController
         $fonts = $this->em->getRepository(Font::class)->findBy([], ['name' => 'ASC']);
         $configDto = $theme->getConfigDto();
         $configArray = $configDto !== null ? $configDto->toArray() : [];
-
-        ;
         if ($request->isMethod('POST')) {
             $post = json_decode($request->request->getString('config'), true);
             $dto = ThemeDTOSanitizer::sanitize(ThemeConfigDTO::fromArray($post));
-
+  
          
             $theme->setName($dto->getName());
             $theme->setSlug($this->slugger->slug($dto->getName())->toString());

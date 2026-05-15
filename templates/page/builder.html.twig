@@ -34,7 +34,8 @@
             themeFonts: theme_fonts|default([]), 
             apiCardsBaseUrl: path('app_page_builder_api_cards_list')|replace({'/cards': ''}), 
             filemanagerUrl: url('keyboardman_filemanager', {'filesystem': 'default', 'mode': 'iframe'}), 
-            resolveUrl: path('keyboardman_filemanager') 
+            resolveUrl: path('keyboardman_filemanager'),
+            themeIcons: theme_icons|default([])
         }|json_encode|raw }}
         </script>
         

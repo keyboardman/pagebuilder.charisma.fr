@@ -7,6 +7,7 @@ namespace App\Service;
 use App\Entity\Font;
 use App\Entity\FontType as FontTypeEnum;
 use App\Entity\FontVariant;
+use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 
 /**
@@ -43,11 +44,15 @@ class ThemeCssGenerator
         'assets/editeur/assets/themes/base/css/index.css'
     ];
 
+    /** Chemin web par défaut → fichier {@see public/assets/icons/play2.svg}. */
+    private const DEFAULT_VIDEO_PLAYER_ICON_WEB_PATH = '/assets/icons/play2.svg';
+
     private array $fonts = [];
     public function __construct(
         private readonly string $projectDir,
         private readonly OklchScale $oklchScale,
-        private readonly UrlGeneratorInterface $urlGenerator
+        private readonly UrlGeneratorInterface $urlGenerator,
+        private readonly RequestStack $requestStack,
     ) {}
 
     /**
@@ -111,6 +116,9 @@ class ThemeCssGenerator
             $lines[] = '';
         }
 
+        $lines[] = $this->buildRootCss($config);
+        
+
         $baseCss = $this->buildBaseBuilderCss();
 
         if ($baseCss !== '') {
@@ -118,25 +126,8 @@ class ThemeCssGenerator
             $lines[] = '';
         }
 
-    
-
-        $vars = $config['vars'] ?? [];
-        if (!empty($vars)) {
-            $root = [];
-            foreach ($vars as $key => $value) {
-                if ($value !== '' && $value !== null) {
-                    $root[] = '  ' . $key . ': ' . $this->formatCssValue($this->resolveColorValue($this->valueToString($value), $vars), $key) . ';';
-                }
-            }
-            if ($root !== []) {
-                $lines[] = ':root {';
-                $lines[] = implode("\n", $root);
-                $lines[] = '}';
-                $lines[] = '';
-            }
-        }
-
         $lines = array_merge($lines, $this->buildNodeOverrideCss($config));
+        $lines = array_merge($lines, $this->buildThemeIconsCss($config));
 
         
         $customCss = trim((string) ($config['custom_css'] ?? ''));
@@ -146,6 +137,161 @@ class ThemeCssGenerator
         }
 
         return trim(implode("\n", $lines)) . "\n";
+    }
+
+    private function buildRootCss(array $config): string
+    {
+
+        $lines[] = ':root {';
+
+        // Build vars
+        $vars = $config['vars'] ?? [];
+        if (!is_array($vars)) {
+            $vars = [];
+        }
+        foreach ($vars as $var) {
+            if($var['value'] === '' || $var['value'] === null) {
+                continue;
+            }
+            $lines[] = '  ' . $var['name'] . ': ' . $this->formatCssValue($this->resolveColorValue($this->valueToString($var['value']), $vars), $var['name']) . ';';
+        }
+
+        // Build icons
+        $playerIcon = $this->normalizeThemePublicAssetWebPath(
+            trim((string) ($config['video_player_icon_url'] ?? ''))
+        );
+        if (!$this->themePublicAssetExists($playerIcon)) {
+            $playerIcon = self::DEFAULT_VIDEO_PLAYER_ICON_WEB_PATH;
+        }
+        $playerPath = str_replace("'", "\\'", $this->resolvePublicWebPath($playerIcon));
+        $lines[] = '  --ce-video-player-icon-url: url(' . $playerPath . ');';
+        $lines[] = '}';
+        $lines[] = '';
+        return implode("\n", $lines);
+    }
+
+    /**
+     * @param array<string, mixed> $config
+     * @return list<string>
+     */
+    private function buildThemeIconsCss(array $config): array
+    {
+        $icons = $config['icons'] ?? [];
+        if (!is_array($icons) || $icons === []) {
+            return [];
+        }
+
+        $lines = ['', '/* Icones du theme (SVG: masque + currentColor; PNG/JPG et autres rasters: background-image uniquement) */'];
+
+        foreach ($icons as $icon) {
+            if (!is_array($icon)) {
+                continue;
+            }
+
+            $className = trim((string) ($icon['className'] ?? ''));
+            $url = trim((string) ($icon['url'] ?? ''));
+
+            $selector = $this->normalizeIconSelector($className);
+            if ($selector === '' || $url === '') {
+                continue;
+            }
+
+            $safeUrl = $this->sanitizeIconUrl($url);
+            if ($safeUrl === '') {
+                continue;
+            }
+
+            $escapedUrl = str_replace("'", "\\'", $safeUrl);
+
+            if ($this->isThemeIconUrlSvg($safeUrl)) {
+                foreach ($this->buildThemeIconSvgCssBlock($selector, $escapedUrl) as $line) {
+                    $lines[] = $line;
+                }
+            } else {
+                foreach ($this->buildThemeIconRasterCssBlock($selector, $escapedUrl) as $line) {
+                    $lines[] = $line;
+                }
+            }
+
+            $lines[] = '';
+        }
+
+        return $lines;
+    }
+
+    /**
+     * PNG / JPEG : une seule propriété {@see background-image} (pas de masque).
+     *
+     * @return list<string>
+     */
+    private function buildThemeIconRasterCssBlock(string $selector, string $escapedUrl): array
+    {
+        return [
+            $selector . ' {',
+            "  background-image: url('" . $escapedUrl . "');",
+            '}',
+        ];
+    }
+
+    /**
+     * SVG : masque + {@see currentColor} pour suivre la couleur du texte héritée.
+     *
+     * @return list<string>
+     */
+    private function buildThemeIconSvgCssBlock(string $selector, string $escapedUrl): array
+    {
+        return [
+            $selector . ' {',
+            '  display: inline-block;',
+            '  vertical-align: middle;',
+            '  flex-shrink: 0;',
+            '  box-sizing: border-box;',
+            '  height: 1.5em;',
+            '  width: auto;',
+            '  min-width: 0.25em;',
+            '  max-width: min(100%, 16rem);',
+            '  padding: 0;',
+            '  background-color: currentColor;',
+            "  mask-image: url('" . $escapedUrl . "');",
+            '  mask-repeat: no-repeat;',
+            '  mask-position: center;',
+            '  mask-size: auto 100%;',
+            "  -webkit-mask-image: url('" . $escapedUrl . "');",
+            '  -webkit-mask-repeat: no-repeat;',
+            '  -webkit-mask-position: center;',
+            '  -webkit-mask-size: auto 100%;',
+            '}',
+        ];
+    }
+
+    private function isThemeIconUrlSvg(string $safeUrl): bool
+    {
+        $path = parse_url($safeUrl, PHP_URL_PATH);
+        if (!is_string($path) || $path === '') {
+            return false;
+        }
+
+        return strcasecmp((string) pathinfo($path, PATHINFO_EXTENSION), 'svg') === 0;
+    }
+
+    private function normalizeIconSelector(string $className): string
+    {
+        $normalized = preg_replace('/[^a-zA-Z0-9_-]/', '', ltrim($className, '.'));
+        if (!is_string($normalized) || $normalized === '') {
+            return '';
+        }
+
+        return '.' . $normalized;
+    }
+
+    private function sanitizeIconUrl(string $url): string
+    {
+        $sanitized = preg_replace('/[^a-zA-Z0-9_\\.\\-:\\/\\?&=%#]/', '', $url);
+        if ($sanitized === null) {
+            return '';
+        }
+
+        return trim($sanitized);
     }
 
     /**
@@ -177,7 +323,60 @@ class ThemeCssGenerator
         return $lines;
     }
 
-    
+    /**
+     * Chemin web relatif (ex. /assets/icons/play2.svg) → fichier sous {@see public/}.
+     */
+    private function themePublicAssetExists(string $webPath): bool
+    {
+        $relative = ltrim($webPath, '/');
+        if ($relative === '') {
+            return false;
+        }
+
+        return is_file($this->projectDir . '/public/' . $relative);
+    }
+
+    /**
+     * Normalise un chemin d’asset statique (public/ ou médiathèque /media/…).
+     *
+     * @return non-empty-string
+     */
+    private function normalizeThemePublicAssetWebPath(string $url): string
+    {
+        $playerIcon = $url !== '' ? $url : self::DEFAULT_VIDEO_PLAYER_ICON_WEB_PATH;
+        if (preg_match('#^https?://#i', $playerIcon) === 1) {
+            $path = parse_url($playerIcon, PHP_URL_PATH);
+            $playerIcon = \is_string($path) && $path !== '' ? $path : self::DEFAULT_VIDEO_PLAYER_ICON_WEB_PATH;
+        } elseif (!str_starts_with($playerIcon, '/')) {
+            $playerIcon = '/' . $playerIcon;
+        }
+        if (!str_ends_with(strtolower($playerIcon), '.svg')) {
+            return self::DEFAULT_VIDEO_PLAYER_ICON_WEB_PATH;
+        }
+
+        return $playerIcon;
+    }
+
+    /**
+     * Préfixe le chemin web avec le basePath Symfony (sous-dossier de déploiement).
+     *
+     * @param non-empty-string $pathFromWebRoot chemin commençant par / (ex. /assets/icons/video.svg)
+     *
+     * @return non-empty-string
+     */
+    private function resolvePublicWebPath(string $pathFromWebRoot): string
+    {
+        $path = '/' . ltrim($pathFromWebRoot, '/');
+        $request = $this->requestStack->getCurrentRequest();
+
+        if ($request === null) {
+            return $path;
+        }
+
+        $base = rtrim($request->getSchemeAndHttpHost(), '/');
+
+        return ($base === '' ? '' : $base) . $path;
+    }
 
     private function buildBaseBuilderCss(): string
     {

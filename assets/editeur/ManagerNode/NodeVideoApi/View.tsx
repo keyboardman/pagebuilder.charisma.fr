@@ -7,6 +7,7 @@ import {  Video as VideoIcon, X } from "lucide-react";
 import { cn } from "@/editeur/lib/utils";
 //import { Card, CardImage, CardContent } from "@editeur/components/card";
 import { styleForView } from "../../utils/styleHelper";
+import { VideoPlayOverlayIcon } from "../components/VideoPlayOverlayIcon";
 
 import {
   Dialog,
@@ -44,23 +45,14 @@ const VideoWrapper = ({ children, className, style, onClick, onKeyDown }: { chil
   );
 }
 
-const IconPlayer = () => {
-  return (
-    <div className="ce-video-icon-player">
-      <div className="ce-video-icon-player-inner">
-        <div className="ce-icon" />
-      </div>
-    </div>
-  );
-}
-
 const VideoPoster = ({ poster, alt = "", style }: { poster: string, alt?: string, style?: React.CSSProperties }) => {
   return (
     <img
       src={poster}
       alt={alt}
       className="ce-card-image ce-video-poster"
-      style={style}
+      style={style} 
+      loading="lazy"
     />
   );
 }
@@ -155,7 +147,7 @@ const View: FC<NodeViewProps | NodeEditProps> = () => {
           {hasPoster && (
             <VideoPoster poster={content.poster} alt="Video thumbnail" style={imageStyle} />
           )}
-          <IconPlayer />
+          <VideoPlayOverlayIcon />
         </VideoWrapper>
         
         {shouldShowTitle && (

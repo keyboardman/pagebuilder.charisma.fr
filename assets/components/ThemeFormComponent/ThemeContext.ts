@@ -1,5 +1,5 @@
 import { createContext, useContext, CSSProperties } from 'react'
-import { FontOption, ThemeVar } from './types';
+import { FontOption, ThemeIcon, ThemeVar } from './types';
 
 export type ThemeCssType = {
     name: string;
@@ -7,11 +7,14 @@ export type ThemeCssType = {
     vars: ThemeVar[];
     node_overrides: Record<string, Record<string, string>>;
     custom_css: string;
+    icons: ThemeIcon[];
+    video_player_icon_url: string;
 }
 
 export interface ThemeContextType {
     themeState: ThemeCssType
     allFontsOptions: FontOption[]
+    filemanagerUrl?: string
     updateOverrideField: (key: string, attribute: string, value: string) => void
     getOverrideField: (key: string, attribute: string) => string
     getStyleFromOverride: (key: string) => CSSProperties
@@ -23,6 +26,10 @@ export interface ThemeContextType {
     setVars: (vars: ThemeVar[]) => void
     setCustomCss: (customCss: string) => void
     getCustomCss: () => string
+    getIcons: () => ThemeIcon[]
+    setIcons: (icons: ThemeIcon[]) => void
+    getVideoPlayerIconUrl: () => string
+    setVideoPlayerIconUrl: (url: string) => void
 }
 
 export const ThemeContext = createContext<ThemeContextType | null>(null)

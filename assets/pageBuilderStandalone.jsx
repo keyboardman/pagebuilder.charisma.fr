@@ -85,6 +85,7 @@ function PageBuilderStandalone({
   themeCssUrl = '',
   renderCssUrls = [],
   fileManagerConfig = null,
+  themeIcons = [],
 }) {
   const [content, setContent] = useState(initialContent || '');
   const [saveStatus, setSaveStatus] = useState('idle');
@@ -152,6 +153,7 @@ function PageBuilderStandalone({
           onChange={handleChange}
           fileManagerConfig={fileManagerConfig ?? getFileManagerConfig({})}
           apiCardsBaseUrl={apiCardsBaseUrl}
+          themeIcons={themeIcons}
         />
       </div>
     </div>
@@ -173,6 +175,7 @@ if (dataEl && rootEl) {
   let themeCssUrl = '';
   let renderCssUrls = [];
   let fileManagerConfig = null;
+  let themeIcons = [];
   try {
     const data = JSON.parse(dataEl.textContent);
 
@@ -196,6 +199,7 @@ if (dataEl && rootEl) {
     themeCssUrl = typeof data.themeCssUrl === 'string' ? data.themeCssUrl : '';
     renderCssUrls = Array.isArray(data.renderCssUrls) ? data.renderCssUrls : [];
     fileManagerConfig = getFileManagerConfig(data);
+    themeIcons = Array.isArray(data.themeIcons) ? data.themeIcons : [];
 
     const themeFonts = data.themeFonts ?? [];
     themeFonts.forEach((font) => {
@@ -223,6 +227,7 @@ if (dataEl && rootEl) {
       themeCssUrl={themeCssUrl}
       renderCssUrls={renderCssUrls}
       fileManagerConfig={fileManagerConfig}
+      themeIcons={themeIcons}
     />
   );
 }

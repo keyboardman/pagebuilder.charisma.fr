@@ -136,8 +136,28 @@ class PageController extends AbstractController
     public function builder(Page $page, ThemeFontBuilderService $themeFontBuilderService): Response
     {
         $themeFonts = $themeFontBuilderService->build($page->getTheme());
+        $themeConfig = $page->getTheme()->getConfig() ?? [];
+        $rawIcons = $themeConfig['icons'] ?? [];
+        $themeIcons = [];
+        if (\is_array($rawIcons)) {
+            foreach ($rawIcons as $icon) {
+                if (!\is_array($icon)) {
+                    continue;
+                }
+                $themeIcons[] = [
+                    'id' => (string) ($icon['id'] ?? ''),
+                    'name' => (string) ($icon['name'] ?? ''),
+                    'className' => (string) ($icon['className'] ?? ''),
+                    'url' => (string) ($icon['url'] ?? ''),
+                ];
+            }
+        }
 
-        return $this->render('page/builder.html.twig', ['page' => $page, 'theme_fonts' => $themeFonts]);
+        return $this->render('page/builder.html.twig', [
+            'page' => $page,
+            'theme_fonts' => $themeFonts,
+            'theme_icons' => $themeIcons,
+        ]);
     }
 
     #[Route('/preview/{id}', name: 'preview', methods: ['GET'], requirements: ['id' => '\d+'])]

@@ -12,6 +12,7 @@ import {
 } from "@/editeur/components/ui/dialog";
 import { VisuallyHidden } from "@/editeur/components/ui/visually-hidden";
 import { styleForView } from "../../utils/styleHelper";
+import { VideoPlayOverlayIcon } from "../components/VideoPlayOverlayIcon";
 
 const VideoPlaceholder: FC<{ text?: string }> = ({ text = "Aucune vidéo" }) => {
   return (
@@ -22,22 +23,13 @@ const VideoPlaceholder: FC<{ text?: string }> = ({ text = "Aucune vidéo" }) => 
   );
 };
 
-const IconPlayer = () => {
-  return (
-    <div className="ce-video-icon-player">
-      <div className="ce-video-icon-player-inner">
-        <div className="ce-icon" />
-      </div>
-    </div>
-  );
-}
-
 const VideoPoster = ({ poster, alt = "" }: { poster: string, alt?: string }) => {
   return (
     <img
       src={poster}
       alt={alt}
-      className="ce-video-poster"
+      className="ce-video-poster" 
+      loading="lazy"
     />
   );
 }
@@ -119,7 +111,7 @@ const View: FC<NodeViewProps | NodeEditProps> = () => {
         }}
       >
         {hasPoster && <VideoPoster poster={content.poster} alt="" />}
-        <IconPlayer />
+       <VideoPlayOverlayIcon />
       </VideoWrapper>
       <ModalPlayer modalOpen={modalOpen} setModalOpen={setModalOpen} src={content.src} poster={content.poster} />
     </>
