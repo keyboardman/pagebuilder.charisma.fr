@@ -556,7 +556,8 @@ const Settings: FC<NodeSettingsProps> = () => {
                         <img
                           src={slide.src}
                           alt={slide.alt ?? ""}
-                          className="w-20 h-14 object-cover rounded"
+                          className="w-20 h-14 object-cover rounded" 
+                          loading="lazy"
                         />
                         <div className="mt-1 text-[10px] text-muted-foreground text-center">
                           {idx + 1}

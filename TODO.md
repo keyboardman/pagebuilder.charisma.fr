@@ -19,6 +19,6 @@
 15. Ok Suppression compte utilisateur
 16. OK generateur css  (verifier si il y une erreur de typo)
 17. OK Gestionnaire de média (création de dossier)
-18. Création NodeText + Icone + retour à la ligne
-19. Gestion des icones
+18. OK Création NodeText + Icone + retour à la ligne
+19. OK Gestion des icones
 20. Editeur en fenetre modale

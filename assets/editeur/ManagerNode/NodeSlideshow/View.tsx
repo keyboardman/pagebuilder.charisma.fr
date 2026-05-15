@@ -147,7 +147,8 @@ const View: FC = () => {
                     className="ce-slideshow-image"
                     src={slide.src}
                     alt={slide.alt ?? ""}
-                    style={{ borderRadius: imageBorderRadius }}
+                    style={{ borderRadius: imageBorderRadius }} 
+                    loading="lazy"
                   />
                 </a>
               ) : (
@@ -155,7 +156,8 @@ const View: FC = () => {
                   className="ce-slideshow-image"
                   src={slide.src}
                   alt={slide.alt ?? ""}
-                  style={{ borderRadius: imageBorderRadius }}
+                  style={{ borderRadius: imageBorderRadius }} 
+                  loading="lazy"
                 />
               )}
             </div>

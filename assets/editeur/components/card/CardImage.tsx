@@ -20,7 +20,7 @@ export function CardImage({
 
   return (
     <div className={_className}>
-        <img src={src} alt={alt} className={cn("h-full w-full object-cover", className ?? "")} style={style ?? {}} />
+        <img src={src} alt={alt} className={cn("h-full w-full object-cover", className ?? "")} style={style ?? {}} loading="lazy" />
     </div>
     
   )

@@ -136,7 +136,8 @@ const View: FC<NodeViewProps> = () => {
                         src={video.poster}
                         alt={video.title}
                         className="ce-video-poster"
-                        style={styleForView(imageStyle)}
+                        style={styleForView(imageStyle)} 
+                        loading="lazy"
                       />
                     ) : (
                       <div className="ce-card-video-placeholder">

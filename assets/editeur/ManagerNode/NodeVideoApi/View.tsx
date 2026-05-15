@@ -52,7 +52,7 @@ const VideoPoster = ({ poster, alt = "", style }: { poster: string, alt?: string
       alt={alt}
       className="ce-card-image ce-video-poster"
       style={style} 
-      loading="lazy"
+      loading="lazy" 
     />
   );
 }

@@ -17,7 +17,7 @@ export const Card = ({ overrides, position, isApi }: { overrides: OverridesState
     return (
         <div className="space-y-2">
             <article className={className} style={toReactStyle(overrides[`${_prefix}`] ?? {})}>
-                <img src={PREVIEW_IMAGE} alt="Card" className={isApi ? "ce-card-api-image" : "ce-card-image"} style={toReactStyle(overrides[`${_prefix} .ce-card-image`] ?? {})} />
+                <img src={PREVIEW_IMAGE} alt="Card" className={isApi ? "ce-card-api-image" : "ce-card-image"} style={toReactStyle(overrides[`${_prefix} .ce-card-image`] ?? {})} loading="lazy" />
                 <div className={isApi ? "ce-card-api-container-content" : "ce-card-container-content"} style={toReactStyle(overrides[`${_prefix} .ce-card-container-content`] ?? {})}>
                     <div className={isApi ? "ce-card-api-title" : "ce-card-title"} style={toReactStyle(overrides[`${_prefix} .ce-card-title`] ?? {})}>Titre de carte</div>
                     {position !== 'overlay' ? (
@@ -37,7 +37,7 @@ export const Media = ({ type }: { type: string }) => {
     switch (type) {
         case 'node-image':
             return (
-                <img src={PREVIEW_IMAGE} alt="Media" className="ce-image" style={getStyleFromOverride('.ce-image')} />
+                <img src={PREVIEW_IMAGE} alt="Media" className="ce-image" style={getStyleFromOverride('.ce-image')} loading="lazy" />
             );
         case 'node-video': {
             const playerIconPreviewUrl = toThemePreviewAssetUrl(getVideoPlayerIconUrl());
@@ -48,7 +48,7 @@ export const Media = ({ type }: { type: string }) => {
                         ['--ce-video-player-icon-url' as string]: `url("${playerIconPreviewUrl}")`,
                     }}
                 >
-                    <img src={PREVIEW_IMAGE} alt="Media" className="ce-video-poster" style={getStyleFromOverride('.ce-video')} />
+                    <img src={PREVIEW_IMAGE} alt="Media" className="ce-video-poster" style={getStyleFromOverride('.ce-video')} loading="lazy" />
                     <VideoPlayOverlayIcon />
                 </div>
             );

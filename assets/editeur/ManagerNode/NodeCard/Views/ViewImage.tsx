@@ -25,7 +25,8 @@ export const ViewImage: FC<ViewImageProps> = ({ alt, className, image, style, on
             alt={alt} 
             className={cn("ce-card-image", className, onClick ? "cursor-pointer" : "")} 
             style={style} 
-            onClick={onClick}
+            onClick={onClick} 
+            loading="lazy"
         />
     );
 }

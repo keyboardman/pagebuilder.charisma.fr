@@ -289,6 +289,7 @@ export function FileManager() {
                     src={previewUrl}
                     alt={previewItem.name}
                     className="max-h-[75dvh] max-w-full object-contain"
+                    loading="lazy"
                   />
                 )}
                 {previewMediaType === 'video' && (

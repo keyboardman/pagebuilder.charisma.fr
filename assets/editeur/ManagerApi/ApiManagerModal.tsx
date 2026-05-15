@@ -397,7 +397,8 @@ export function ApiManagerModal({
                                     src={mapped.image}
                                     alt={mapped.title}
                                     className="w-16 h-16 object-cover rounded shrink-0"
-                                    style={{ width: '64px', height: '64px', flexShrink: 0 }}
+                                    style={{ width: '64px', height: '64px', flexShrink: 0 }} 
+                                    loading="lazy"
                                   />
                                 ) : (
                                   <div className="shrink-0 bg-muted rounded flex items-center justify-center" style={{ width: '64px', height: '64px' }}>

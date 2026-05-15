@@ -190,7 +190,8 @@ export function ApiManager({ apiId: initialApiId, itemId: initialItemId, onSelec
                           <img
                             src={mapped.image}
                             alt={mapped.title}
-                            className="w-16 h-16 object-cover rounded"
+                            className="w-16 h-16 object-cover rounded" 
+                            loading="lazy"
                           />
                         )}
                         <div className="flex-1 min-w-0">

@@ -162,6 +162,7 @@ const CardAdvanced = React.forwardRef<HTMLDivElement, CardAdvancedProps>(
             alt={imageAlt || title || "Card image"}
             className={cn(defaultImageClasses, imageClassName)}
             style={imageStyle}
+            loading="lazy"
           />
         </div>
       )

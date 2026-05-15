@@ -29,7 +29,8 @@ const View: FC<NodeViewProps|NodeEditProps> = () => {
             {...restAttributes}
             style={styleForView(style)}
             src={node.content?.src ?? "https://placehold.net/3-800x600.png"}
-            alt={node.content.alt ?? "..."}
+            alt={node.content.alt ?? "..."} 
+            loading="lazy"
         />
     );
 }
