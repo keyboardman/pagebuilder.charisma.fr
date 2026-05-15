@@ -69,7 +69,7 @@ export const NodeTextIcon: NodeConfigurationType = {
     label: "Text Icon",
     icon: IoText,
     category: "content",
-    order: 3,
+    order: 4,
   },
   default: {
     ...defaultNodeConfiguration.default,

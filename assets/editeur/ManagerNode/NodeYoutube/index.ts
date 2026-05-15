@@ -24,7 +24,7 @@ export const NodeYoutube: NodeConfigurationType = {
     label: "Youtube",
     icon: IoLogoYoutube,
     category: 'content',
-    order: 5
+    order: 8
   },
   default: {
     ...defaultNodeConfiguration.default,

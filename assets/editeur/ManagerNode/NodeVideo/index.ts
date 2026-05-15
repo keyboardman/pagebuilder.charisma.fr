@@ -27,7 +27,7 @@ export const NodeVideo: NodeConfigurationType = {
     label: "Video",
     icon: IoFilmOutline,
     category: 'content',
-    order: 4
+    order: 6
   },
   default: {
     ...defaultNodeConfiguration.default,

@@ -47,7 +47,7 @@ export const NodeButton: NodeConfigurationType = {
     label: "Bouton",
     icon: IoEllipseOutline,
     category: "content",
-    order: 2,
+    order: 12,
   },
   default: {
     ...defaultNodeConfiguration.default,

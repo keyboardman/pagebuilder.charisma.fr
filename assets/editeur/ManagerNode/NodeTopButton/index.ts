@@ -29,7 +29,7 @@ export const NodeTopButton: NodeConfigurationType = {
     label: "Top page",
     icon: IoArrowUpOutline,
     category: "content",
-    order: 12,
+    order: 14,
   },
   default: {
     ...defaultNodeConfiguration.default,

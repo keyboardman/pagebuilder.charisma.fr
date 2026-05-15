@@ -98,7 +98,7 @@ export const NodeCard: NodeConfigurationType = {
       label: "Card",
       icon: IoCard,
       category: 'content',
-      order: 2
+      order: 13
     },
     default: {
       ...defaultNodeConfiguration.default,

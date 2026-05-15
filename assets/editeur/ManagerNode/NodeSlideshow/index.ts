@@ -67,7 +67,7 @@ export const NodeSlideshow: NodeConfigurationType = {
     label: "Slideshow",
     icon: IoImageOutline,
     category: "content",
-    order: 6,
+    order: 10,
   },
   default: {
     ...defaultNodeConfiguration.default,

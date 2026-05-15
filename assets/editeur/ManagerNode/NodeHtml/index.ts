@@ -25,7 +25,7 @@ export const NodeHtml: NodeConfigurationType = {
     label: "HTML",
     icon: IoText,
     category: "content",
-    order: 3,
+    order: 9,
   },
   default: {
     ...defaultNodeConfiguration.default,

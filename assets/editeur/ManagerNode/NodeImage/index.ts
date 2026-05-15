@@ -28,7 +28,7 @@ export const NodeImage: NodeConfigurationType = {
       label: "Image",
       icon: IoImageOutline,
       category: 'content',
-      order: 3
+      order: 6
     },
     default: {
       ...defaultNodeConfiguration.default,

@@ -26,7 +26,7 @@ export const NodeRichText: NodeConfigurationType = {
     label: "Texte riche",
     icon: IoText,
     category: "content",
-    order: 2,
+    order: 3,
   },
   default: {
     ...defaultNodeConfiguration.default,
