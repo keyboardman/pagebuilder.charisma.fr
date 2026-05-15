@@ -8,10 +8,11 @@
     {% if page.description %}
         <meta name="description" content="{{ page.description }}">
     {% endif %}
+    
+    {{ encore_entry_link_tags('pagePreview') }}
     {% if page.theme.generatedCssPath %}
         <link rel="stylesheet" href="{{ path('app_theme_css', { id: page.theme.id }) }}">
     {% endif %}
-    {{ encore_entry_link_tags('pagePreview') }}
 </head>
 <body class="min-h-screen p-6">
    
