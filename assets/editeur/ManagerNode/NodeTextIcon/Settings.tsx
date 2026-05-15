@@ -13,7 +13,8 @@ import type {
   NodeTextIconVerticalAlign,
 } from "./index";
 import { NodeSettingsWrapper } from "../components/NodeSettingsWrapper";
-import { Base2Settings, Background2Settings, Border2Settings, Spacing2Settings, Text2Settings } from "../Settings";
+import { Base2Settings } from "../Settings";
+import { ContainerStyleSettings, IconStyleSettings, TextStyleSettings } from "./Settings/index";
 import { useAppContext } from "../../services/providers/AppContext";
 import { Button } from "@/editeur/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/editeur/components/ui/tabs";
@@ -216,7 +217,7 @@ const Settings: FC<NodeSettingsProps> = () => {
   };
 
   return (
-    <Tabs className="flex min-h-0 flex-1 flex-col overflow-hidden" defaultValue="icon">
+    <Tabs className="flex min-h-0 flex-1 flex-col overflow-hidden" defaultValue="container">
       <div className="flex min-h-0 flex-1 flex-col overflow-hidden">
         <NodeSettingsWrapper
           header={
@@ -281,6 +282,7 @@ const Settings: FC<NodeSettingsProps> = () => {
                 />
               </Form.Group>
               <TabsList className="mb-3 w-full justify-center">
+                <TabsTrigger value="container">Conteneur</TabsTrigger>
                 <TabsTrigger value="icon">Icône</TabsTrigger>
                 <TabsTrigger value="text">Texte</TabsTrigger>
               </TabsList>
@@ -288,6 +290,9 @@ const Settings: FC<NodeSettingsProps> = () => {
           }
           content={
             <>
+              <TabsContent value="container" className="mt-0">
+                <ContainerStyleSettings />
+              </TabsContent>
               <TabsContent value="icon" className="mt-0">
                 <Form.Group>
                   <Form.Label text="Type d'icone" />
@@ -457,48 +462,10 @@ const Settings: FC<NodeSettingsProps> = () => {
                     options={ICON_SIZE_VARIANT_OPTIONS}
                   />
                 </Form.Group>
+                <IconStyleSettings />
               </TabsContent>
               <TabsContent value="text" className="mt-0">
-
-
-
-
-                <Text2Settings
-                  style={node.attributes?.style || {}}
-                  onChange={(style) =>
-                    onChange({
-                      ...node,
-                      attributes: { ...node.attributes, style },
-                    })
-                  }
-                />
-                <Background2Settings
-                  style={node.attributes?.style || {}}
-                  onChange={(style) =>
-                    onChange({
-                      ...node,
-                      attributes: { ...node.attributes, style },
-                    })
-                  }
-                />
-                <Border2Settings
-                  style={node.attributes?.style || {}}
-                  onChange={(style) =>
-                    onChange({
-                      ...node,
-                      attributes: { ...node.attributes, style },
-                    })
-                  }
-                />
-                <Spacing2Settings
-                  style={node.attributes?.style || {}}
-                  onChange={(style) =>
-                    onChange({
-                      ...node,
-                      attributes: { ...node.attributes, style },
-                    })
-                  }
-                />
+                <TextStyleSettings />
               </TabsContent>
             </>
           }

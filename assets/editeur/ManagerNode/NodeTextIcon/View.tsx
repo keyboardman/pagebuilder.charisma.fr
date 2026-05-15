@@ -9,6 +9,9 @@ import {
   resolveNodeTextIconSource,
   resolveIconSizeVariant,
   resolveNodeTextIconTag,
+  resolveNodeTextIconContainerStyle,
+  resolveNodeTextIconTextStyle,
+  resolveNodeTextIconIconMediaStyle,
   nodeTextIconBodyClassName,
   toAlignItems,
   toJustifyContent,
@@ -27,18 +30,19 @@ const View: FC<NodeViewProps> = () => {
   const linkUrl = textNode.content?.linkUrl ?? "";
   const horizontalAlign = textNode.content?.horizontalAlign ?? "left";
   const verticalAlign = textNode.content?.verticalAlign ?? "middle";
-  const contentStyle = styleForView(node?.attributes?.style ?? {});
-
   const containerStyle: CSSProperties = {
     display: "flex",
     justifyContent: toJustifyContent(horizontalAlign),
     alignItems: toAlignItems(verticalAlign),
     gap: "0.5rem",
-    ...contentStyle,
+    ...styleForView(resolveNodeTextIconContainerStyle(textNode)),
   };
+  const textStyle = styleForView(resolveNodeTextIconTextStyle(textNode));
+  const iconMediaStyle = styleForView(resolveNodeTextIconIconMediaStyle(textNode));
 
   const textElement = React.createElement(tag, {
     className: textBodyClassName,
+    style: textStyle,
     dangerouslySetInnerHTML: { __html: html },
   });
 
@@ -50,7 +54,7 @@ const View: FC<NodeViewProps> = () => {
       themeIconUrl={textNode.content?.themeIconUrl}
       iconImageUrl={textNode.content?.iconImageUrl}
       iconSizeVariant={iconSizeVariant}
-      style={{ flexShrink: 0 }}
+      style={iconMediaStyle}
     />
   );
 

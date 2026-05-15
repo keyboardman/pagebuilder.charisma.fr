@@ -10,6 +10,9 @@ import {
   resolveNodeTextIconSource,
   resolveIconSizeVariant,
   resolveNodeTextIconTag,
+  resolveNodeTextIconContainerStyle,
+  resolveNodeTextIconTextStyle,
+  resolveNodeTextIconIconMediaStyle,
   nodeTextIconBodyClassName,
   toAlignItems,
   toJustifyContent,
@@ -28,15 +31,15 @@ const Edit: FC<NodeEditProps> = () => {
   const linkUrl = textNode.content?.linkUrl ?? "";
   const horizontalAlign = textNode.content?.horizontalAlign ?? "left";
   const verticalAlign = textNode.content?.verticalAlign ?? "middle";
-  const contentStyle = styleForView(node?.attributes?.style ?? {});
-
   const containerStyle: CSSProperties = {
     display: "flex",
     justifyContent: toJustifyContent(horizontalAlign),
     alignItems: toAlignItems(verticalAlign),
     gap: "0.5rem",
-    ...contentStyle,
+    ...styleForView(resolveNodeTextIconContainerStyle(textNode)),
   };
+  const textStyle = styleForView(resolveNodeTextIconTextStyle(textNode));
+  const iconMediaStyle = styleForView(resolveNodeTextIconIconMediaStyle(textNode));
 
   const iconElement = (
     <NodeTextIconMedia
@@ -46,7 +49,7 @@ const Edit: FC<NodeEditProps> = () => {
       themeIconUrl={textNode.content?.themeIconUrl}
       iconImageUrl={textNode.content?.iconImageUrl}
       iconSizeVariant={iconSizeVariant}
-      style={{ flexShrink: 0 }}
+      style={iconMediaStyle}
     />
   );
 
@@ -61,10 +64,12 @@ const Edit: FC<NodeEditProps> = () => {
         })
       }
       className={textBodyClassName}
+      style={textStyle}
     />
   ) : (
     React.createElement(tag, {
       className: textBodyClassName,
+      style: textStyle,
       dangerouslySetInnerHTML: { __html: html },
     })
   );

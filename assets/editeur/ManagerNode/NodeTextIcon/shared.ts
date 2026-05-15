@@ -5,8 +5,27 @@ import type {
   NodeTextIconSizeVariant,
   NodeTextIconSource,
   NodeTextIconTag,
+  NodeTextIconType,
   NodeTextIconVerticalAlign,
 } from "./index";
+
+/** Styles du conteneur flex ; repli sur `attributes.style` pour les pages existantes. */
+export function resolveNodeTextIconContainerStyle(
+  node: Pick<NodeTextIconType, "content" | "attributes">,
+): CSSProperties {
+  if (node.content?.container?.style !== undefined) {
+    return node.content.container.style;
+  }
+  return node.attributes?.style ?? {};
+}
+
+export function resolveNodeTextIconTextStyle(node: Pick<NodeTextIconType, "content">): CSSProperties {
+  return node.content?.text?.style ?? {};
+}
+
+export function resolveNodeTextIconIconMediaStyle(node: Pick<NodeTextIconType, "content">): CSSProperties {
+  return node.content?.iconMedia?.style ?? {};
+}
 
 export function resolveNodeTextIconTag(tag: unknown): NodeTextIconTag {
   if (tag === "div" || tag === "p") {

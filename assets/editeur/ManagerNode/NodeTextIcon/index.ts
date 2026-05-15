@@ -1,3 +1,4 @@
+import type React from "react";
 import { type NodeType } from "../../types/NodeType";
 import View from "./View";
 import Edit from "./Edit";
@@ -42,6 +43,18 @@ export interface NodeTextIconType extends NodeType {
     linkUrl?: string;
     horizontalAlign?: NodeTextIconHorizontalAlign;
     verticalAlign?: NodeTextIconVerticalAlign;
+    /** Conteneur flex (marge, padding, fond, bordure). */
+    container?: {
+      style?: React.CSSProperties;
+    };
+    /** Bloc texte (typographie, fond, bordure, espacement). */
+    text?: {
+      style?: React.CSSProperties;
+    };
+    /** Élément `<i>` icône (couleur via fond, bordure, espacement). */
+    iconMedia?: {
+      style?: React.CSSProperties;
+    };
   };
 }
 
@@ -74,6 +87,9 @@ export const NodeTextIcon: NodeConfigurationType = {
       linkUrl: "",
       horizontalAlign: "left" as NodeTextIconHorizontalAlign,
       verticalAlign: "middle" as NodeTextIconVerticalAlign,
+      container: { style: {} },
+      text: { style: {} },
+      iconMedia: { style: {} },
     },
   },
 };

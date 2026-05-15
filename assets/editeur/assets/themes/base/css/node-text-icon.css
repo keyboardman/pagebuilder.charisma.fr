@@ -62,3 +62,12 @@ i.ce-icon.ce-icon-preset-arrow {
   -webkit-mask-position: center;
   mask-position: center;
 }
+
+
+.ce-text-icon {
+  margin-bottom: 1rem;
+}
+
+.ce-text-icon__text {
+  margin-bottom: 0;
+}
