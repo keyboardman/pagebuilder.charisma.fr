@@ -17,7 +17,7 @@ export function createBackendApiAdapter(meta: BackendApiMeta, baseUrl: string): 
   return {
     id: meta.id,
     label: meta.label,
-    type: meta.type as "article" | "video" | "image",
+    type: meta.type as "article" | "video" | "image" | "list",
     category: meta.category ?? undefined,
     collectionMode: meta.collectionMode ?? "normal",
     categoryQueryParam: "category",

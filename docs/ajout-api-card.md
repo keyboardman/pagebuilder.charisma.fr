@@ -6,7 +6,7 @@ Ce guide décrit comment exposer une nouvelle source de contenu (articles, vidé
 
 Une **ApiCard** est un service PHP qui :
 
-- implémente `ApiCardInterface` (ou `ApiCardArticleInterface` / `ApiCardVideoInterface`) ;
+- implémente `ApiCardInterface` (ou `ApiCardArticleInterface`, `ApiCardVideoInterface`, `ApiCardImageInterface`, `ApiCardListInterface`) ;
 - est **tagué** `app.builder_api_card` dans `config/services.yaml` ;
 - est automatiquement enregistré dans `ApiCardRegistry` et exposé à l’éditeur via `/page-builder/api/cards`.
 
@@ -22,8 +22,10 @@ L’éditeur récupère la liste des cartes via cette API et propose chaque cart
 
 - **Articles** (actualités, blog, témoignages…) → `ApiCardArticleInterface` → `getType()` retourne `"article"`.
 - **Vidéos** → `ApiCardVideoInterface` → `getType()` retourne `"video"`.
+- **Images** → `ApiCardImageInterface` → `getType()` retourne `"image"`.
+- **Listes / menus** → `ApiCardListInterface` → `getType()` retourne `"list"` (consommées par le nœud **NodeNavApi**).
 
-Types supportés côté builder : `article`, `video`, `image`.
+Types supportés côté builder : `article`, `video`, `image`, `list`.
 
 ### 2. Créer la classe
 
@@ -158,6 +160,8 @@ Transforme un objet brut (réponse API) en format standard utilisé par le build
 | `text`        | string | non         | Extrait / résumé texte            |
 | `raw`         | object | oui         | Objet brut (pour usage avancé)    |
 
+Pour une API de type **`list`**, le mapping SHALL fournir au minimum `id`, `title` et `link`. La cible des liens (`target`, ex. `_self` / `_blank`) est configurée dans le nœud **NodeNavApi** (`node-nav-api`), pas dans l’ApiCard. Le nœud charge toute la collection et affiche un lien par item (sans sélection item par item).
+
 
 Exemple :
 
@@ -239,7 +243,8 @@ Recharger la page de l’éditeur (ou vider le cache Symfony si besoin) pour voi
 
 - **Contrat** : `src/PageBuilder/ApiCard/ApiCardInterface.php`
 - **Comportement optionnel** : `src/PageBuilder/ApiCard/ApiCardBehaviorInterface.php`
-- **Types** : `ApiCardArticleInterface`, `ApiCardVideoInterface`, `ApiCardImageInterface`
+- **Types** : `ApiCardArticleInterface`, `ApiCardVideoInterface`, `ApiCardImageInterface`, `ApiCardListInterface`
+- **Exemple list** : `StubNavListApiCard.php` (menu de démonstration), `FlashnewsThemeApiList.php` (thèmes Flashnews pour NodeNavApi)
 - **Exemples** : `CharismaArticleAuteurApiCard.php`, `CharismaTemoignageApiCard.php`, `FlashnewsApiCard.php`, `CharismaVideosApiCard.php`
 - **Registre** : `src/PageBuilder/ApiCard/ApiCardRegistry.php`
 - **API HTTP** : `src/Controller/PageBuilderApiController.php`

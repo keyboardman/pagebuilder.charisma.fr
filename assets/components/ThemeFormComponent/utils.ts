@@ -164,6 +164,7 @@ export const NODE_OVERRIDE_TARGETS = [
     },
     { key: 'node-form', label: 'NodeForm', selector: '.ce-form' },
     { key: 'node-nav', label: 'NodeNav', selector: '.ce-menu' },
+    { key: 'node-nav-api', label: 'NodeNavApi', selector: '.ce-menu-api' },
     { key: 'node-nav-item', label: 'NodeNavItem', selector: '.ce-nav-item' },
     { key: 'node-text', label: 'NodeText', selector: '.ce-text' },
     { key: 'node-rich-text', label: 'NodeRichText', selector: '.ce-rich-text' },

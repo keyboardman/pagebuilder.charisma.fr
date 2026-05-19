@@ -1,0 +1,51 @@
+/* NodeNavApi — réutilise les styles NodeNav (.ce-menu, .ce-nav-item, .ce-menu-burger) */
+
+.ce-menu-api .ce-menu-api-status {
+    display: block;
+    padding: 0.25rem 0.5rem;
+    font-size: 0.75rem;
+}
+
+/* Défilement sans barre visible (souris molette + touch) */
+.ce-menu-api.ce-menu-api--scroll {
+    overflow: hidden;
+    max-width: 100%;
+}
+
+.ce-menu-api-scroll {
+    overflow-x: auto;
+    overflow-y: hidden;
+    max-width: 100%;
+    -webkit-overflow-scrolling: touch;
+    overscroll-behavior-x: contain;
+    touch-action: pan-x;
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+}
+
+.ce-menu-api-scroll::-webkit-scrollbar {
+    display: none;
+    width: 0;
+    height: 0;
+}
+
+.ce-menu-api.ce-menu-api--scroll[data-ce-direction="vertical"] .ce-menu-api-scroll {
+    overflow-x: hidden;
+    overflow-y: auto;
+    touch-action: pan-y;
+    overscroll-behavior-y: contain;
+}
+
+.ce-menu-api--scroll .ce-menu-content {
+    width: max-content;
+    max-width: none;
+}
+
+.ce-menu-api.ce-menu-api--scroll[data-ce-direction="vertical"] .ce-menu-content {
+    width: 100%;
+    max-width: 100%;
+}
+
+.ce-menu-api--scroll .ce-nav-item {
+    flex-shrink: 0;
+}

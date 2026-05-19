@@ -76,6 +76,9 @@ services:
     App\PageBuilder\ApiCard\FlashnewsApiCard:
         tags: [app.builder_api_card]
 
+    App\PageBuilder\ApiCard\FlashnewsThemeApiList:
+        tags: [app.builder_api_card]
+
     App\PageBuilder\ApiCard\CharismaArticleAuteurApiCard:
         tags: [app.builder_api_card]
 
@@ -89,6 +92,9 @@ services:
         tags: [app.builder_api_card]
 
     App\PageBuilder\ApiCard\CharismaEvenementHomeApiCard:
+        tags: [app.builder_api_card]
+
+    App\PageBuilder\ApiCard\StubNavListApiCard:
         tags: [app.builder_api_card]
 
 

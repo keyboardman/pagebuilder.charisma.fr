@@ -3,8 +3,9 @@
  * - "article" : pour les APIs fournissant des articles de blog, actualités, etc.
  * - "video" : pour les APIs fournissant des vidéos
  * - "image" : pour les APIs fournissant des images
+ * - "list" : pour les APIs fournissant des listes de liens (menus de navigation)
  */
-export type ApiAdapterType = "article" | "video" | "image";
+export type ApiAdapterType = "article" | "video" | "image" | "list";
 export type ApiCollectionMode = "normal" | "fixed";
 
 /**

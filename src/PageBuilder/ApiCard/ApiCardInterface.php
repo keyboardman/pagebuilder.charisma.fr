@@ -14,7 +14,7 @@ interface ApiCardInterface
     public function getLabel(): string;
 
     /**
-     * Type de contenu : "article", "video" ou "image".
+     * Type de contenu : "article", "video", "image" ou "list".
      */
     public function getType(): string;
 

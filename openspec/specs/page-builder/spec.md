@@ -345,26 +345,34 @@ Le nœud SHALL appliquer cet aspect ratio au conteneur de l’image afin que la 
 
 ### Requirement: Nœud texte riche (NodeRichText)
 
-Le builder SHALL fournir un type de nœud **NodeRichText** (identifiant `node-rich-text`) permettant l’édition de texte riche sans saisie de HTML brut. Le nœud SHALL proposer un éditeur visuel (WYSIWYG) directement dans l’interface de configuration du nœud.
+Le builder SHALL fournir un type de nœud **NodeRichText** (identifiant `node-rich-text`) permettant l’édition de texte riche sans saisie de HTML brut. Lorsque l’utilisateur **sélectionne** un `NodeRichText` dans le builder, le système SHALL ouvrir une **fenêtre modale** contenant l’éditeur visuel (WYSIWYG) complet. Dans le canevas, le nœud SHALL afficher un **aperçu** du contenu (sans éditeur inline contraint par la largeur du bloc). La modale SHALL offrir une largeur d’édition suffisante pour travailler confortablement (ex. largeur maximale adaptée à l’écran, zone de saisie scrollable si le contenu est long). La fermeture de la modale SHALL conserver le contenu déjà appliqué au nœud.
 
 #### Scenario: Ajout d’un NodeRichText depuis le panneau
 - **WHEN** l’utilisateur ajoute un bloc depuis le panneau des composants et choisit le nœud texte riche (NodeRichText)
 - **THEN** un nœud NodeRichText est inséré dans la page avec un contenu texte initial éditable
 
+#### Scenario: Ouverture de la modale à la sélection
+- **WHEN** l’utilisateur sélectionne un `NodeRichText` déjà présent dans le canevas
+- **THEN** une modale s’ouvre avec l’éditeur WYSIWYG (barre d’outils et zone de saisie) ; le canevas affiche l’aperçu du contenu sans éditeur inline
+
+#### Scenario: Fermeture de la modale
+- **WHEN** l’utilisateur ferme la modale (bouton de fermeture, clic sur l’overlay ou touche Échap) après avoir modifié le texte
+- **THEN** la modale se ferme, le contenu riche reste enregistré sur le nœud et l’aperçu dans le canevas reflète les modifications
+
 ### Requirement: Mise en forme riche de base
 
-Le nœud NodeRichText SHALL exposer au minimum les actions de mise en forme suivantes: **gras**, **italique**, **souligné**, **barré**, **liste à puces**, **liste numérotée** et **lien**. Les actions SHALL s’appliquer à la sélection courante dans l’éditeur.
+Le nœud NodeRichText SHALL exposer au minimum les actions de mise en forme suivantes dans l’éditeur de la modale : **gras**, **italique**, **souligné**, **barré**, **liste à puces**, **liste numérotée** et **lien**. Les actions SHALL s’appliquer à la sélection courante dans l’éditeur.
 
 #### Scenario: Application d’un style inline
-- **WHEN** l’utilisateur sélectionne un texte dans NodeRichText puis active une action inline (ex. gras ou italique)
-- **THEN** la mise en forme est appliquée immédiatement au texte sélectionné dans l’éditeur et visible en preview
+- **WHEN** l’utilisateur sélectionne un texte dans l’éditeur de la modale `NodeRichText` puis active une action inline (ex. gras ou italique)
+- **THEN** la mise en forme est appliquée immédiatement au texte sélectionné dans l’éditeur et visible dans l’aperçu du canevas après fermeture ou mise à jour du nœud
 
 #### Scenario: Création d’une liste
-- **WHEN** l’utilisateur sélectionne un ou plusieurs paragraphes et active une liste à puces ou numérotée
+- **WHEN** l’utilisateur sélectionne un ou plusieurs paragraphes dans la modale et active une liste à puces ou numérotée
 - **THEN** le contenu est transformé en liste correspondante dans le rendu du NodeRichText
 
 #### Scenario: Insertion d’un lien
-- **WHEN** l’utilisateur sélectionne du texte puis renseigne une URL via l’action lien
+- **WHEN** l’utilisateur sélectionne du texte dans la modale puis renseigne une URL via l’action lien
 - **THEN** le texte est rendu comme lien cliquable avec l’URL configurée
 
 ### Requirement: Persistance du contenu riche
@@ -689,4 +697,55 @@ Le nœud SHALL permettre de configurer:
 #### Scenario: Persistance du NodeTextIcon
 - **WHEN** l'utilisateur sauvegarde une page contenant un ou plusieurs `NodeTextIcon`
 - **THEN** les propriétés du nœud (texte, icône, position avant/après, lien, alignements, taille d'icône) sont sérialisées et restaurées à l'identique lors du rechargement
+
+### Requirement: Menu de navigation piloté par API (NodeNavApi)
+
+Le builder SHALL fournir un type de nœud **NodeNavApi** (identifiant `node-nav-api`) qui affiche un menu de navigation alimenté par une **ApiCard** de type `list` (voir capacité `builder-api-registry`). Le nœud SHALL exposer un champ **apiId** pour sélectionner la source. Le nœud SHALL charger la collection via les endpoints Symfony (`fetchCollection`) et SHALL rendre chaque item mappé comme un lien (`title` → libellé, `link` → `href`). Le nœud SHALL exposer une option **target** (`_self` ou `_blank`) appliquée à tous les liens du menu ; cette option SHALL être configurée côté **NodeNavApi** et ne SHALL pas dépendre du mapping ApiCard `list`. Le nœud SHALL **ne pas** être droppable et SHALL **ne pas** accepter d’enfants **NodeNavItem** : les entrées proviennent uniquement de l’API.
+
+Le NodeNavApi SHALL réutiliser les options de présentation du **NodeNav** : **direction** (horizontal, vertical), **variante** (`navbar`, `liste`) avec hooks DOM (`data-ce-variant`, classe `ce-menu--{variant}` sur le conteneur `<nav>`), **icône burger** (booléen) pour regrouper les liens sur petit viewport, ainsi que les réglages d’alignement et d’espacement équivalents (ex. `justify`, `gap`) lorsqu’ils sont supportés par **NodeNav**. Le NodeNavApi SHALL exposer une option **scrollWithoutScrollbar** (défilement sans barre visible) : lorsqu’elle est activée, les liens dépassant la largeur (ou la hauteur en mode vertical) SHALL être scrollables à la souris (molette, trackpad) et au tactile, sans afficher de barre de défilement.
+
+#### Scenario: Ajout d’un NodeNavApi depuis le panneau
+
+- **WHEN** l’utilisateur ajoute un bloc menu API (NodeNavApi) depuis le panneau des composants
+- **THEN** un nœud `node-nav-api` est inséré ; l’utilisateur peut choisir une API de type `list` dans les réglages ; aucun enfant manuel n’est attendu
+
+#### Scenario: Sélection d’une API list
+
+- **WHEN** l’utilisateur ouvre les réglages du NodeNavApi et choisit une API
+- **THEN** seules les APIs enregistrées avec le type `list` sont proposées ; après validation, `apiId` est persisté dans le contenu du nœud
+
+#### Scenario: Rendu des liens depuis la collection
+
+- **WHEN** le NodeNavApi a un `apiId` valide et que l’endpoint collection retourne des items mappés
+- **THEN** le builder affiche un `<nav>` contenant un lien par item (`<a href="…">` avec le libellé `title`) dans l’éditeur, la prévisualisation et le rendu exporté
+
+#### Scenario: Option target appliquée à tous les liens
+
+- **WHEN** l’utilisateur configure l’option **target** du NodeNavApi sur `_blank`
+- **THEN** tous les liens rendus depuis la collection API utilisent `target="_blank"` (et `rel="noopener noreferrer"`) quel que soit le contenu mappé par l’ApiCard `list`
+
+#### Scenario: Options direction et variante
+
+- **WHEN** l’utilisateur modifie la direction ou la variante (`navbar` / `liste`) du NodeNavApi
+- **THEN** le rendu applique les mêmes conventions DOM que **NodeNav** (`data-ce-variant`, `ce-menu--{variant}`) pour permettre le styling CSS thème
+
+#### Scenario: Défilement sans barre de scroll
+
+- **WHEN** l’utilisateur active l’option de défilement sans barre sur un NodeNavApi horizontal contenant plus de liens que la largeur disponible
+- **THEN** le menu permet de faire défiler les liens à la molette ou au glissement tactile sans afficher de scrollbar ; en mode vertical, le défilement suit l’axe vertical
+
+#### Scenario: Menu burger sur petit viewport
+
+- **WHEN** l’utilisateur active l’option burger sur un NodeNavApi
+- **THEN** sur viewport tablette/mobile (selon les mêmes règles que **NodeNav**), une icône burger permet d’afficher ou masquer la liste des liens issus de l’API
+
+#### Scenario: API indisponible ou vide
+
+- **WHEN** l’API sélectionnée ne répond pas, retourne une erreur ou une collection vide
+- **THEN** le NodeNavApi affiche un état dégradé (menu vide ou message discret) sans empêcher la sauvegarde de la page
+
+#### Scenario: Persistance du NodeNavApi
+
+- **WHEN** l’utilisateur sauvegarde une page contenant un NodeNavApi configuré
+- **THEN** le contenu sérialisé conserve `apiId`, les options de présentation (direction, variante, burger, etc.) et permet de recharger le menu à l’affichage
 

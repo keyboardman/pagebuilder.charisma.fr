@@ -27,4 +27,5 @@
 23. Ajout des liens de partage dans card api
 24. card vidéo possibilité de ne pas afficher le titre
 25. trier les composants titre description dans card api grille droite gauche
+26. OK lien article auteur corrigé
 

@@ -1,4 +1,4 @@
-import type { ApiAdapter } from "./ApiAdapter";
+import type { ApiAdapter, ApiAdapterType } from "./ApiAdapter";
 class ApiRegistry {
     private adapters = new Map<string, ApiAdapter>();
   
@@ -8,6 +8,10 @@ class ApiRegistry {
   
     list() {
       return Array.from(this.adapters.values());
+    }
+
+    listByType(type: ApiAdapterType) {
+      return this.list().filter((adapter) => adapter.type === type);
     }
   
     get(id: string) {
