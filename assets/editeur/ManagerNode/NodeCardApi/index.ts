@@ -3,7 +3,6 @@ import { defaultNodeConfiguration, type NodeConfigurationType } from "../NodeCon
 import View from "./View";
 import Settings from "./Settings";
 import { IoCardOutline } from "react-icons/io5";
-import type { CardElementType } from "../NodeCard";
 
 export type ContainerPosition = "left" | "right" | "top" | "overlay";
 export type ContainerTextPositionApi = "bottom" | "top" | "center";

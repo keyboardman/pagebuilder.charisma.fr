@@ -58,7 +58,6 @@ const Settings: FC<NodeSettingsProps> = () => {
       try {
         const item = await adapter.fetchItem(content.itemId);
         const mappedData = adapter.mapItem(item);
-
         const nextText = extractText(mappedData);
         const nextLabels = extractLabels(mappedData);
 

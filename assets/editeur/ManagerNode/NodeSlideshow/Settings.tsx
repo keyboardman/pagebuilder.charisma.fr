@@ -5,7 +5,6 @@ import { Base2Settings } from "../Settings";
 import Form from "../../components/form";
 import { useNodeBuilderContext } from "../../services/providers/NodeBuilderContext";
 import { apiRegistry } from "../../ManagerApi/ApiRegistry";
-import type { ApiAdapterType } from "../../ManagerApi/ApiAdapter";
 import { Button } from "@/editeur/components/ui/button";
 import { Switch } from "@/editeur/components/ui/switch";
 import { cn } from "@/editeur/lib/utils";

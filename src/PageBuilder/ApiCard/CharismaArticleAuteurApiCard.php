@@ -56,6 +56,7 @@ final class CharismaArticleAuteurApiCard implements ApiCardArticleInterface
                 'timeout' => 30,
             ]);
             $data = $response->toArray();
+
             $member = $data['member'] ?? [];
             $totalItems = (int) ($data['totalItems'] ?? 0);
             $items = array_map(static fn (mixed $item): object => (object) (is_array($item) ? $item : []), $member);
@@ -87,7 +88,7 @@ final class CharismaArticleAuteurApiCard implements ApiCardArticleInterface
         $resume = $item->resume ?? null;
         $classements = $item->classements ?? null;
         $auteur = $item->auteur ?? null;
-        $link = $item->link ?? null;
+        $link = $item->url ?? null;
 
         
         $labels = [];

@@ -58,6 +58,7 @@ export function createBackendApiAdapter(meta: BackendApiMeta, baseUrl: string): 
 
     mapItem(item: unknown) {
       const o = item as Record<string, unknown>;
+
       return {
         id: String(o?.id ?? ""),
         title: String(o?.title ?? ""),
