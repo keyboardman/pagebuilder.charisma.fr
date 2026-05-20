@@ -53,12 +53,12 @@ class ThemeCssGeneratorListener
         }
 
         $config = $configDto->toArray();
-        $slug = $theme->getSlug();
-        if ($slug === null || $slug === '') {
+        $id = $theme->getId();
+        if ($id === null) {
             return;
         }
 
-        $themeDir = 'storage/themes/' . $slug;
+        $themeDir = 'storage/themes/theme-' . $id;
         $fontsToImport = $this->resolveFontsToImport($config['fonts'] ?? []);
         $oldCssPath = $theme->getGeneratedCssPath();
 

@@ -18,8 +18,8 @@ class PageTest extends KernelTestCase
         $theme = new Theme();
         $theme->setName('Test Theme');
         $theme->setSlug('test-theme');
-        $theme->setGeneratedYamlPath('storage/themes/test-theme/theme.yaml');
-        $theme->setGeneratedCssPath('storage/themes/test-theme/theme.css');
+        $theme->setGeneratedYamlPath('storage/themes/theme-1/theme.yaml');
+        $theme->setGeneratedCssPath('storage/themes/theme-1/theme.css');
         $em->persist($theme);
         $em->flush();
 

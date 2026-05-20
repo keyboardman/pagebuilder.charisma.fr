@@ -5,7 +5,7 @@ TBD - created by archiving change add-theme-generator. Update Purpose after arch
 ## Requirements
 ### Requirement: Entité Theme et chemins des fichiers générés
 
-Le système SHALL fournir une entité `Theme` avec : `name` (string), `generatedYamlPath` (string, chemin du fichier YAML du thème généré), `generatedCssPath` (string, chemin du fichier CSS généré). Optionnellement `slug` pour identification et construction des chemins (ex. `storage/themes/{slug}/`). Les chemins SHALL pointer vers les fichiers produits par le générateur (YAML de config, CSS compilé).
+Le système SHALL fournir une entité `Theme` avec : `name` (string), `generatedYamlPath` (string, chemin du fichier YAML du thème généré), `generatedCssPath` (string, chemin du fichier CSS généré). Optionnellement `slug` pour identification (hors chemins de stockage sur disque). Les fichiers générés SHALL être rangés sous `storage/themes/theme-{id}/` (`{id}` = identifiant numérique du Theme). Les chemins SHALL pointer vers les fichiers produits par le générateur (YAML de config, CSS compilé).
 
 #### Scenario: Création d’un Theme et enregistrement des chemins
 

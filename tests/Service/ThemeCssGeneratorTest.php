@@ -137,7 +137,7 @@ class ThemeCssGeneratorTest extends TestCase
     {
         $gen = new ThemeCssGenerator($this->projectDir, new OklchScale(), $this->urlGenerator, $this->requestStack);
         $config = ['vars' => ['--color-white' => '#fff'], 'body' => []];
-        $path = $gen->generate($config, 'storage/themes/test', null);
+        $path = $gen->generate($config, 'storage/themes/theme-1', null);
         $this->assertStringContainsString('theme.', $path);
         $this->assertStringContainsString('.css', $path);
         $full = $this->projectDir . '/' . $path;
@@ -149,7 +149,7 @@ class ThemeCssGeneratorTest extends TestCase
     public function testGenerateDeletesOldCssWhenProvided(): void
     {
         $gen = new ThemeCssGenerator($this->projectDir, new OklchScale(), $this->urlGenerator, $this->requestStack);
-        $themeDir = 'storage/themes/test';
+        $themeDir = 'storage/themes/theme-1';
         $dir = $this->projectDir . '/' . $themeDir;
         mkdir($dir, 0755, true);
         $oldPath = $themeDir . '/theme.oldver.css';

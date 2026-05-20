@@ -21,11 +21,10 @@
 17. OK Création NodeText + Icone + retour à la ligne
 18. OK Gestion des icones
 19. OK Editeur en fenetre modale
-20. Api List
+20. OK Api List
 21. POST Form
-22. Theme dans storage ne doit pas etre le nom mais l'id
+22. OK Theme dans storage ne doit pas etre le nom mais l'id
 23. Ajout des liens de partage dans card api
 24. card vidéo possibilité de ne pas afficher le titre
 25. trier les composants titre description dans card api grille droite gauche
 26. OK lien article auteur corrigé
-
