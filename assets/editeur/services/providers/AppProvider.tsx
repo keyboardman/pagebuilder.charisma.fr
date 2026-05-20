@@ -16,6 +16,8 @@ export interface AppProviderProps {
     fileManagerConfig?: FileManagerConfig | null;
     /** Icônes du thème courant (injectées par le backend sur le builder de page). */
     themeIcons?: BuilderThemeIcon[] | null;
+    /** Base URL API page-builder (GET /forms/catalog, etc.) — identique à apiCardsBaseUrl en pratique. */
+    pageBuilderApiBaseUrl?: string | null;
     /** Callback appelé quand les nodes changent (intégration embarquée) */
     onSaveCallback?: (nodes: NodesType) => void;
 }
@@ -37,6 +39,7 @@ export const AppProvider: FC<AppProviderProps> = ({
     view = false,
     fileManagerConfig = null,
     themeIcons = null,
+    pageBuilderApiBaseUrl = null,
     onSaveCallback,
 }: AppProviderProps) => {
 
@@ -117,6 +120,7 @@ export const AppProvider: FC<AppProviderProps> = ({
                 fileManagerConfig,
 
                 themeIcons: themeIcons ?? [],
+                pageBuilderApiBaseUrl: pageBuilderApiBaseUrl ?? null,
             }} >
                 {mode !== APP_MODE.VIEW ? <BuilderProvider target={target} onSaveCallback={onSaveCallback}>{children}</BuilderProvider> : children}
             </AppContext.Provider>

@@ -8,7 +8,7 @@ Le projet utilise Doctrine (DBAL, ORM, Migrations) et PostgreSQL via Docker, mai
 
 - Nouvelle capacité **database-init** : procédure et commandes pour créer la base (si nécessaire), exécuter les migrations et vérifier la connectivité.
 - Documentation dans `openspec/specs/database-init/spec.md` des exigences (connexion, migrations, env test, schéma vide initial).
-- Tâches pour : vérifier `DATABASE_URL`, ajouter une migration vide initiale (ou squelettes), documenter `bin/console doctrine:database:create` et `doctrine:migrations:migrate`, et l’env test (`dbname_suffix`).
+- Tâches pour : vérifier `DATABASE_URL`, ajouter une migration vide initiale (ou squelettes), documenter `symfony console doctrine:database:create` et `doctrine:migrations:migrate`, et l’env test (`dbname_suffix`).
 
 ## Impact
 

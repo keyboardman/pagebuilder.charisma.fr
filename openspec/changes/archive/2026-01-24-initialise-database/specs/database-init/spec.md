@@ -4,20 +4,20 @@
 
 ### Requirement: Connexion et création de la base
 
-Le projet SHALL utiliser `DATABASE_URL` pour la connexion Doctrine. La commande `php bin/console doctrine:database:create` SHALL créer la base de données PostgreSQL si elle n’existe pas. La variable SHALL être définie dans `.env` (ou `.env.local`) et cohérente avec le service `database` du `compose.yaml`.
+Le projet SHALL utiliser `DATABASE_URL` pour la connexion Doctrine. La commande `symfony console doctrine:database:create` SHALL créer la base de données PostgreSQL si elle n’existe pas. La variable SHALL être définie dans `.env` (ou `.env.local`) et cohérente avec le service `database` du `compose.yaml`.
 
 #### Scenario: Création de la base en dev
 
-- **WHEN** PostgreSQL est démarré (ex. `docker compose up -d`), `DATABASE_URL` est configuré et `php bin/console doctrine:database:create` est exécuté en `APP_ENV=dev`
+- **WHEN** PostgreSQL est démarré (ex. `docker compose up -d`), `DATABASE_URL` est configuré et `symfony console doctrine:database:create` est exécuté en `APP_ENV=dev`
 - **THEN** la base cible existe et la commande se termine sans erreur (ou avec un message indiquant qu’elle existait déjà)
 
 ### Requirement: Exécution des migrations
 
-Le projet SHALL disposer d’au moins une migration dans `migrations/` (namespace `DoctrineMigrations`). La commande `php bin/console doctrine:migrations:migrate --no-interaction` SHALL appliquer les migrations en attente et SHALL initialiser la table `doctrine_migration_versions` si nécessaire.
+Le projet SHALL disposer d’au moins une migration dans `migrations/` (namespace `DoctrineMigrations`). La commande `symfony console doctrine:migrations:migrate --no-interaction` SHALL appliquer les migrations en attente et SHALL initialiser la table `doctrine_migration_versions` si nécessaire.
 
 #### Scenario: Application des migrations en dev
 
-- **WHEN** la base existe, des migrations sont présentes dans `migrations/` et `php bin/console doctrine:migrations:migrate --no-interaction` est exécuté
+- **WHEN** la base existe, des migrations sont présentes dans `migrations/` et `symfony console doctrine:migrations:migrate --no-interaction` est exécuté
 - **THEN** les migrations sont exécutées sans erreur et leur statut est enregistré dans `doctrine_migration_versions`
 
 ### Requirement: Environnement de test

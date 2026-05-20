@@ -1,0 +1,50 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Modifier {{ builderForm.label }}{% endblock %}
+
+{% block body %}
+<div class="max-w-4xl space-y-6">
+    <div>
+        <a href="{{ path('app_builder_form_config_index') }}" class="btn btn-ghost btn-sm mb-2">← Retour</a>
+        <h1 class="text-2xl font-bold tracking-tight">Modifier « {{ builderForm.label }} »</h1>
+    </div>
+
+    <p class="text-sm text-muted-foreground">
+        URL de soumission&nbsp;: <code class="text-xs">{{ absolute_url(path('app_builder_form_submit', { slug: builderForm.slug })) }}</code>
+    </p>
+
+    {{ form_start(form, { attr: { class: 'space-y-6' } }) }}
+    <div class="card p-4 space-y-4">
+        {{ form_errors(form) }}
+        <div class="mb-6">
+            {{ form_row(form.slug) }}
+        </div>
+        
+        <div class="mb-6">
+        {{ form_row(form.label) }}
+        </div>
+        
+        <div class="mb-6">
+        {{ form_row(form.recipientEmailsText) }}
+        </div>
+
+        <div class="mb-6">
+        {{ form_row(form.emailSubjectTemplate) }}
+        </div>
+        
+        <div class="mb-6">
+        {{ form_row(form.emailBodyTemplate) }}
+        </div>
+        
+        <div class="mb-6">
+        {{ form_row(form.webhookUrl) }}
+        </div>
+        
+        <div class="mb-6">
+        {{ form_row(form.enabled) }}
+        </div>
+    </div>
+    <button type="submit" class="btn btn-primary">Enregistrer</button>
+    {{ form_end(form) }}
+</div>
+{% endblock %}

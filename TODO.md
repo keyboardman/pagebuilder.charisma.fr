@@ -22,7 +22,7 @@
 18. OK Gestion des icones
 19. OK Editeur en fenetre modale
 20. OK Api List
-21. POST Form
+21. OK POST Form (empecher la modification quand un est sélectionné)
 22. OK Theme dans storage ne doit pas etre le nom mais l'id
 23. Ajout des liens de partage dans card api
 24. card vidéo possibilité de ne pas afficher le titre

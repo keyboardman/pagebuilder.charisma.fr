@@ -6,7 +6,7 @@
 
 ## 2. Documentation et procédure
 
-- [x] 2.1 Documenter dans `openspec/project.md` (ou README) la procédure d’initialisation : démarrage PostgreSQL (ex. `docker compose up -d` ou équivalent), `php bin/console doctrine:database:create`, `php bin/console doctrine:migrations:migrate --no-interaction`.
+- [x] 2.1 Documenter dans `openspec/project.md` (ou README) la procédure d’initialisation : démarrage PostgreSQL (ex. `docker compose up -d` ou équivalent), `symfony console doctrine:database:create`, `symfony console doctrine:migrations:migrate --no-interaction`.
 - [x] 2.2 Préciser la nécessité de `DATABASE_URL` (et `.env`/`.env.local`) et, pour les tests, le comportement de `dbname_suffix` (`_test`).
 
 ## 3. Validation

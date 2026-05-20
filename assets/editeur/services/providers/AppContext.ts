@@ -18,6 +18,10 @@ export interface AppType {
     fileManagerConfig: FileManagerConfig | null;
     /** Icônes définies dans le thème de la page (pour NodeTextIcon, etc.). */
     themeIcons: BuilderThemeIcon[];
+    /**
+     * Base URL de l’API Symfony page-builder (ex. /page-builder/api), pour catalogue formulaires, etc.
+     */
+    pageBuilderApiBaseUrl: string | null;
 }
 
 export const APP_MODE = {

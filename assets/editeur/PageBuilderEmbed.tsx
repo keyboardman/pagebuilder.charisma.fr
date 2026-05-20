@@ -28,6 +28,7 @@ export default function PageBuilderEmbed({
   themeIcons = null,
   apiCardsBaseUrl = null,
 }: PageBuilderEmbedProps) {
+  const pageBuilderApiBase = apiCardsBaseUrl?.trim() ? apiCardsBaseUrl.replace(/\/$/, "") : null;
   useEffect(() => {
     if (apiCardsBaseUrl) {
       registerBackendApis(apiCardsBaseUrl, (adapter) => apiRegistry.register(adapter));
@@ -47,6 +48,7 @@ export default function PageBuilderEmbed({
       view={false}
       fileManagerConfig={fileManagerConfig}
       themeIcons={themeIcons}
+      pageBuilderApiBaseUrl={pageBuilderApiBase}
       onSaveCallback={handleSave}
     >
       <BuilderInline>

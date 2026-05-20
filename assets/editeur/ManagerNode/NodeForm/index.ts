@@ -13,6 +13,8 @@ export interface NodeFormType extends NodeType {
   content?: {
     method: NodeFormMethod;
     action: string;
+    /** Slug backend (`builder_form_config.slug`) si formulaire géré par l’app. */
+    formConfigId?: string;
   };
   isDroppable: true;
 }

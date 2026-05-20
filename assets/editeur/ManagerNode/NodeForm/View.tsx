@@ -6,6 +6,7 @@ import { styleForView } from "../../utils/styleHelper";
 import type { NodeFormType } from "./index";
 import { cn } from "@/editeur/lib/utils";
 import { IoClose } from "react-icons/io5";
+import { BUILDER_FORM_HONEYPOT_FIELD } from "./builderFormConstants";
 
 const View: FC<NodeViewProps | NodeEditProps> = () => {
   const { node, getChildren } = useNodeContext();
@@ -13,6 +14,8 @@ const View: FC<NodeViewProps | NodeEditProps> = () => {
   const children = getChildren("main");
   const method = formNode.content?.method ?? "POST";
   const action = (formNode.content?.action ?? "").trim();
+
+  const formConfigId = (formNode.content?.formConfigId ?? "").trim();
 
   const [submitState, setSubmitState] = useState<{
     status: "idle" | "success" | "error";
@@ -104,6 +107,17 @@ const View: FC<NodeViewProps | NodeEditProps> = () => {
       action={action || undefined}
       onSubmit={onSubmitAjax}
     >
+      {formConfigId ? (
+        <input
+          type="text"
+          name={BUILDER_FORM_HONEYPOT_FIELD}
+          defaultValue=""
+          tabIndex={-1}
+          autoComplete="off"
+          className="pointer-events-none absolute left-[-10000px] h-px w-px opacity-0"
+          aria-hidden="true"
+        />
+      ) : null}
       {submitState.status !== "idle" ? (
         <div
           role="status"

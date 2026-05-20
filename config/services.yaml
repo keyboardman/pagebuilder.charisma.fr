@@ -10,6 +10,11 @@ parameters:
     storage.fonts.path: '%kernel.project_dir%/var/storage/fonts'
     # /media/api/* (list, upload, mkdir, delete, etc.) lit/écrit dans public/media ; les fichiers sont servis en direct à /media/{path}
     storage.media.path: '%kernel.project_dir%/public/media'
+    app.builder_form.honeypot_field: '_builder_form_hp'
+    app.builder_form.rate_limit.max_attempts: 25
+    app.builder_form.rate_limit.window_seconds: 3600
+    app.builder_form.mail_from: 'noreply@localhost'
+    app.builder_form.generic_error_message: 'Impossible d’envoyer le message pour le moment. Réessayez plus tard.'
 
 services:
     font_storage.adapter:
@@ -96,5 +101,9 @@ services:
 
     App\PageBuilder\ApiCard\StubNavListApiCard:
         tags: [app.builder_api_card]
+
+when@test:
+    parameters:
+        app.builder_form.rate_limit.max_attempts: 2
 
 
