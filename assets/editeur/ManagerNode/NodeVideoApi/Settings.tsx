@@ -20,6 +20,8 @@ const Settings: FC<NodeSettingsProps> = () => {
   const [error, setError] = useState<string | null>(null);
   const [modalOpen, setModalOpen] = useState<boolean>(false);
 
+  console.log("node", node);
+
   // Charger automatiquement l'item si apiId et itemId sont définis
   useEffect(() => {
     const loadItem = async () => {

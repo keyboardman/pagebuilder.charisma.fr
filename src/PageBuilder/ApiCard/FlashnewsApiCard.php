@@ -84,7 +84,7 @@ final class FlashnewsApiCard implements ApiCardArticleInterface
         $id = $item->id ?? null;
         $titre = $item->titre ?? '';
         $viewResume = $item->viewResume ?? null;
-        $tags = $item->tags ?? null;
+        $tags = $item->tags['member'] ?? null;
         $image = $item->image ?? null;
         $viewUrl = $item->viewUrl ?? null;
 
@@ -97,7 +97,9 @@ final class FlashnewsApiCard implements ApiCardArticleInterface
             $linkUrl = self::BASE_URL . (str_starts_with((string) $viewUrl, '/') ? '' : '/') . $viewUrl;
         }
         $labels = null;
+
         if (is_array($tags)) {
+
             $labels = array_map('strval', $tags);
         }
 
