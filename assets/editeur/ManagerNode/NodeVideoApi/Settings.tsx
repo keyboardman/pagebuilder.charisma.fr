@@ -11,6 +11,7 @@ import { NodeSettingsWrapper } from "../components/NodeSettingsWrapper";
 import { Base2Settings, Background2Settings, Spacing2Settings, Border2Settings, Object2Settings, Text2Settings } from "../Settings";
 import { Tabs, TabsList, TabsTrigger } from "@/editeur/components/ui/tabs";
 import { TabsContent } from "@/editeur/components/ui/tabs";
+import { Switch } from "@/editeur/components/ui/switch";
 
 const Settings: FC<NodeSettingsProps> = () => {
   const { node, onChange } = useNodeBuilderContext();
@@ -165,109 +166,126 @@ const Settings: FC<NodeSettingsProps> = () => {
   const imageStyle = content.image?.style || {};
 
   return (
-    <>
-      <Tabs defaultValue="card">
-        <NodeSettingsWrapper header={<>
+    <Tabs className="flex min-h-0 flex-1 flex-col overflow-hidden" defaultValue="card">
+      <div className="flex min-h-0 flex-1 flex-col overflow-hidden">
+        <NodeSettingsWrapper 
+          header={<>
+            {renderApiSection()}
+            <Base2Settings
+              attributes={node.attributes}
+              onChange={(attributes: { className?: string; id?: string }) => onChange({
+                ...node,
+                attributes: {
+                  ...node.attributes,
+                  ...attributes
+                }
+              })}
 
-          {renderApiSection()}
-          <Base2Settings
-            attributes={node.attributes}
-            onChange={(attributes: { className?: string; id?: string }) => onChange({
-              ...node,
-              attributes: {
-                ...node.attributes,
-                ...attributes
-              }
-            })}
+            />
+            <TabsList className="justify-center w-full">
+              <TabsTrigger value="card">Card</TabsTrigger>
+              <TabsTrigger value="title">Title</TabsTrigger>
+              <TabsTrigger value="image">Image</TabsTrigger>
+            </TabsList>
+          </>} 
+          content={<>
+            <TabsContent value="card">
+              
+              <Background2Settings
+                style={cardStyle}
+                onChange={(style) => onChange({
+                  ...node,
+                  content: { ...node.content, card: { ...node.content?.card, style } }
+                })}
+              />
+              <Border2Settings
+                style={cardStyle}
+                onChange={(style) => onChange({
+                  ...node,
+                  content: { ...node.content, card: { ...node.content?.card, style } }
+                })}
+              />
+              <Spacing2Settings
+                style={cardStyle}
+                onChange={(style) => onChange({
+                  ...node,
+                  content: { ...node.content, card: { ...node.content?.card, style } }
+                })}
+              />
 
-          />
-          <TabsList className="justify-center w-full">
-            <TabsTrigger value="card">Card</TabsTrigger>
-            <TabsTrigger value="title">Title</TabsTrigger>
-            <TabsTrigger value="image">Image</TabsTrigger>
-          </TabsList>
-
-        </>} content={<>
-          <TabsContent value="card">
-            <Background2Settings
-              style={cardStyle}
-              onChange={(style) => onChange({
-                ...node,
-                content: { ...node.content, card: { ...node.content?.card, style } }
-              })}
-            />
-            <Border2Settings
-              style={cardStyle}
-              onChange={(style) => onChange({
-                ...node,
-                content: { ...node.content, card: { ...node.content?.card, style } }
-              })}
-            />
-            <Spacing2Settings
-              style={cardStyle}
-              onChange={(style) => onChange({
-                ...node,
-                content: { ...node.content, card: { ...node.content?.card, style } }
-              })}
-            />
-
-          </TabsContent>
-          <TabsContent value="title">
-            <Text2Settings
-              style={titleStyle}
-              onChange={(style) => onChange({
-                ...node,
-                content: { ...node.content, title: { ...node.content?.title, style } }
-              })}
-            />
-            <Background2Settings
-              style={titleStyle}
-              onChange={(style) => onChange({
-                ...node,
-                content: { ...node.content, title: { ...node.content?.title, style } }
-              })}
-            />
-            <Border2Settings
-              style={titleStyle}
-              onChange={(style) => onChange({
-                ...node,
-                content: { ...node.content, title: { ...node.content?.title, style } }
-              })}
-            />
-            <Spacing2Settings
-              style={titleStyle}
-              onChange={(style) => onChange({
-                ...node,
-                content: { ...node.content, title: { ...node.content?.title, style } }
-              })}
-            />
-          </TabsContent>
-          <TabsContent value="image">
-            <Object2Settings
-              style={imageStyle}
-              onChange={(style) => onChange({
-                ...node,
-                content: { ...node.content, image: { ...node.content?.image, style } }
-              })}
-            />
-            <Border2Settings
-              style={imageStyle}
-              onChange={(style) => onChange({
-                ...node,
-                content: { ...node.content, image: { ...node.content?.image, style } }
-              })}
-            />
-            <Spacing2Settings
-              style={imageStyle}
-              onChange={(style) => onChange({
-                ...node,
-                content: { ...node.content, image: { ...node.content?.image, style } }
-              })}
-            />
-          </TabsContent>
-        </>} />
-      </Tabs>
-    </>
+            </TabsContent>
+            <TabsContent value="title">
+              <div>
+                Visible&nbsp;
+                <Switch
+                  checked={content?.showTitle !== false}
+                  onCheckedChange={(checked) => {
+                    onChange({
+                      ...node,
+                      content: {
+                        ...node.content,
+                        showTitle: checked,
+                      },
+                    });
+                  }}
+                />
+              </div>
+              <Text2Settings
+                style={titleStyle}
+                onChange={(style) => onChange({
+                  ...node,
+                  content: { ...node.content, title: { ...node.content?.title, style } }
+                })}
+              />
+              <Background2Settings
+                style={titleStyle}
+                onChange={(style) => onChange({
+                  ...node,
+                  content: { ...node.content, title: { ...node.content?.title, style } }
+                })}
+              />
+              <Border2Settings
+                style={titleStyle}
+                onChange={(style) => onChange({
+                  ...node,
+                  content: { ...node.content, title: { ...node.content?.title, style } }
+                })}
+              />
+              <Spacing2Settings
+                style={titleStyle}
+                onChange={(style) => onChange({
+                  ...node,
+                  content: { ...node.content, title: { ...node.content?.title, style } }
+                })}
+              />
+            </TabsContent>
+            <TabsContent value="image">
+              <Object2Settings
+                style={imageStyle}
+                onChange={(style) => onChange({
+                  ...node,
+                  content: { ...node.content, image: { ...node.content?.image, style } }
+                })}
+              />
+              <Border2Settings
+                style={imageStyle}
+                onChange={(style) => onChange({
+                  ...node,
+                  content: { ...node.content, image: { ...node.content?.image, style } }
+                })}
+              />
+              <Spacing2Settings
+                style={imageStyle}
+                onChange={(style) => onChange({
+                  ...node,
+                  content: { ...node.content, image: { ...node.content?.image, style } }
+                })}
+              />
+            </TabsContent>
+          </>} 
+        />
+      </div>
+    </Tabs>
   );
 };
 
