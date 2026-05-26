@@ -12,7 +12,7 @@
         "ext-iconv": "*",
         "doctrine/doctrine-bundle": "^3.2.2",
         "doctrine/doctrine-migrations-bundle": "^4.0",
-        "doctrine/orm": "^3.6.5",
+        "doctrine/orm": "^3.6.7",
         "keyboardman/filemanager-bundle": "dev-main",
         "league/flysystem": "^3.34",
         "league/flysystem-aws-s3-v3": "^3.34",
@@ -50,7 +50,7 @@
         "symfony/webpack-encore-bundle": "^2.4",
         "symfony/yaml": "8.0.*",
         "twig/extra-bundle": "^2.12|^3.24",
-        "twig/twig": "^2.12|^3.25"
+        "twig/twig": "^2.12|^3.26"
     },
     "config": {
         "allow-plugins": {
@@ -111,7 +111,7 @@
     },
     "require-dev": {
         "doctrine/doctrine-fixtures-bundle": "^4.3.1",
-        "phpunit/phpunit": "^12.5.25",
+        "phpunit/phpunit": "^12.5.27",
         "symfony/browser-kit": "8.0.*",
         "symfony/css-selector": "8.0.*",
         "symfony/debug-bundle": "8.0.*",

@@ -112,7 +112,7 @@ export const NodeCard: NodeConfigurationType = {
         container: {
           position: "top",
           align: "start",
-          ratio: "1_3",
+          ratio: "",
           link: "#",
           style: {},
         },

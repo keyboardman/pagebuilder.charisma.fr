@@ -14,6 +14,8 @@ export function CardSettings() {
   const cardStyle = content?.card?.style || {};
   const gap = content?.container?.style?.gap || "";
 
+  console.log([{'label': '...', 'value': ''}, ...ContainerRatioOptions]);
+
   return (
     <div className="flex flex-1 flex-col gap-1">
       <div className="flex flex-1 items-center justify-between p-2 gap-2">
@@ -80,13 +82,24 @@ export function CardSettings() {
           value={content.container?.position || "top"}
           onChange={(value) => {
             const newPosition = value as ContainerPosition;
+
+            let newRatio = "1_3" as ContainerRatio;
+            let newAlign = "center" as ContainerAlign;
+
+            if(newPosition === "top" || newPosition === "overlay") { 
+              newRatio = "full" as ContainerRatio;
+              newAlign = "start" as ContainerAlign;
+            }
+
             onChange({
               ...node,
               content: {
                 ...cardNode.content,
                 container: {
                   ...content.container,
-                  position: newPosition                
+                  position: newPosition,
+                  ratio: newRatio,
+                  align: newAlign
                 },
               },
             });
@@ -118,9 +131,11 @@ export function CardSettings() {
       <Form.Group>
         <Form.Label text="Taille de l'image" />
         <Form.Select
-          options={ContainerRatioOptions}
-          value={content.container?.ratio || "1/3"}
+          options={[{'label': '...', 'value': ''}, ...ContainerRatioOptions]}
+          value={content.container?.ratio || ""}
           onChange={(value) => {
+            
+
             onChange({
               ...node,
               content: {
