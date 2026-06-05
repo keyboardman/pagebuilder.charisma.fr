@@ -38,7 +38,6 @@ class ThemeController extends AbstractController
     {
         $fonts = $this->em->getRepository(Font::class)->findBy([], ['name' => 'ASC']);
 
-
         if ($request->isMethod('POST')) {
             $decoded = json_decode($request->request->getString('config'), true);
             $config = \is_array($decoded) ? $decoded : [];
@@ -47,8 +46,11 @@ class ThemeController extends AbstractController
             $theme->setName($dto->getName() ?: 'Sans nom');
             $theme->setSlug($this->slugger->slug($theme->getName())->toString());
             $theme->setConfigDto($dto);
+
+            
             $this->em->persist($theme);
             $this->em->flush();
+
             $this->addFlash('success', sprintf(
                 'Thème « %s » créé.',
                 $theme->getName()
@@ -67,7 +69,7 @@ class ThemeController extends AbstractController
 
         return $this->render('theme/fonts.html.twig', [
             'theme' => null,
-            'post_url' => $this->generateUrl('app_theme_index'),
+            'post_url' => $this->generateUrl('app_theme_new'),
             'google_font_urls' => $fonts,
             'fonts_for_js' => $fontsForJs,
         ]);
