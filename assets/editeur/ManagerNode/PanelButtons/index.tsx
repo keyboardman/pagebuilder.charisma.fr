@@ -10,7 +10,7 @@ const CATEGORY_CONFIG = [
     { key: 'container', label: 'Container' },
     { key: 'content', label: 'Content' },
     { key: 'nav', label: 'Nav' },
-    { key: 'form', label: 'Formulaire' },   
+    { key: 'form', label: 'Formulaire' },
     { key: 'api', label: 'Api' },
     { key: 'custom', label: 'Custom' }
 ] as const;
@@ -54,22 +54,13 @@ export default function PanelButtons() {
                                     id={registry.type}
                                     data={{ action: "add", type: registry.type }}
                                 >
-                                    <NodeComponentButton label={registry.button.label} icon={<registry.button.icon />} />
+                                    <NodeComponentButton label={registry.button.label} icon={<registry.button.icon />} tooltip={registry.button.tooltip} />
                                 </DraggableItem>
                             );
                         })}
                     </React.Fragment>
                 );
             })}
-            {/* Boutons personnalisés supplémentaires */}
-            {/* Exemple: 
-            <DraggableItem
-                id="custom-button"
-                data={{ action: "add", type: "custom-type" }}
-            >
-                <NodeComponentButton label="Custom" icon={<CustomIcon />} />
-            </DraggableItem>
-            */}
         </>
     );
 }

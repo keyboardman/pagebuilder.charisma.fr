@@ -23,7 +23,7 @@ export const NodeRichText: NodeConfigurationType = {
   type: NODE_RICH_TEXT_TYPE,
   button: {
     ...defaultNodeConfiguration.button,
-    label: "Texte riche",
+    label: "Rich Text",
     icon: IoText,
     category: "content",
     order: 3,

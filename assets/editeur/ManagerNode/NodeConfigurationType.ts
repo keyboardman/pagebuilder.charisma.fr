@@ -26,7 +26,8 @@ export interface NodeConfigurationType {
         label: string,
         icon: IconType,
         category?: string,
-        order?:number
+        order?:number,
+        tooltip?: string
     }|null;
     default: {
         content?: Record<string, unknown>;

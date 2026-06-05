@@ -29,3 +29,6 @@
 25. trier les composants titre description dans card api grille droite gauche
 26. OK lien article auteur corrigé
 27. construire l'explorateur
+28. le menu enregistré devient genant mais je ne sais pas quand cela se produit (en previsualisation ) quand on depasse le scroll de lediteur
+29. texte strong dans bouton
+30. tooltip

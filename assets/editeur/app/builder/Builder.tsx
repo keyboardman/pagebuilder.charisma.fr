@@ -14,9 +14,9 @@ import PanelButtons from "../../ManagerNode/PanelButtons";
 import NodeSettings from "../../ManagerNode/components/NodeSettings";
 import NodeWrapper from "../../ManagerNode/NodeWrapper";
 import CustomDragOverlay from "../../components/DragOverlay";
-import type {DragDropEvents} from '@dnd-kit/abstract';
-import {DragDropManager} from '@dnd-kit/dom';
-import type { Draggable, Droppable} from '@dnd-kit/dom';
+import type { DragDropEvents } from '@dnd-kit/abstract';
+import { DragDropManager } from '@dnd-kit/dom';
+import type { Draggable, Droppable } from '@dnd-kit/dom';
 
 type Events = DragDropEvents<Draggable, Droppable, DragDropManager>;
 type DragStartHandler = Events['dragstart'];
@@ -128,25 +128,26 @@ function Builder() {
   }, [enterFullScreen, exitFullScreen, isFullScreen]);
 
   return (
-    <DragDropProvider
-      sensors={[
-        PointerSensor.configure({ activationConstraints: () => undefined }),
-        KeyboardSensor,
-      ]}
-      onDragStart={handleDragStart}
-      onDragEnd={handleDragEnd}
-    >
-      <CustomDragOverlay activeId={activeDragId} activeData={activeDragData} />
-      <div 
-        ref={divRef} 
-        className={cn(
-          "admin-layout relative h-screen flex flex-col overflow-hidden",
-          mode === APP_MODE.EDIT && sidebarLeftCollapsed && "admin-layout--sidebar-collapsed"
-        )} 
-        data-mode={mode}
+    <TooltipProvider delayDuration={100}>
+      <DragDropProvider
+        sensors={[
+          PointerSensor.configure({ activationConstraints: () => undefined }),
+          KeyboardSensor,
+        ]}
+        onDragStart={handleDragStart}
+        onDragEnd={handleDragEnd}
       >
-        <Layout.Header dark={theme === "dark"}>
-          <TooltipProvider delayDuration={100}>
+        <CustomDragOverlay activeId={activeDragId} activeData={activeDragData} />
+        <div
+          ref={divRef}
+          className={cn(
+            "admin-layout relative h-screen flex flex-col overflow-hidden",
+            mode === APP_MODE.EDIT && sidebarLeftCollapsed && "admin-layout--sidebar-collapsed"
+          )}
+          data-mode={mode}
+        >
+          <Layout.Header dark={theme === "dark"}>
+
             <div className="flex w-full flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
               <div className="flex flex-wrap items-center gap-2">
                 <ToggleGroup
@@ -267,41 +268,39 @@ function Builder() {
                 </ToggleGroupItem>
               </ToggleGroup>
             </div>
-          </TooltipProvider>
-        </Layout.Header>
-  
-        <Layout.Canvas>
-          <NodeWrapper />
-        </Layout.Canvas>
-        {mode === APP_MODE.EDIT && (
-          <Layout.SidebarLeft 
-            collapsed={sidebarLeftCollapsed}
-            onToggle={() => setSidebarLeftCollapsed(!sidebarLeftCollapsed)}
-            dark={theme === "dark"}
-          >
+          </Layout.Header>
 
-            <Card className="bg-card shadow-sm backdrop-blur">
-              <CardHeader className="pb-4">
-                <CardTitle>Bibliothèque de blocs</CardTitle>
-                <CardDescription>
-                  Glissez et déposez un bloc pour l&apos;ajouter au canvas.
-                </CardDescription>
-              </CardHeader>
-              <CardContent className="grid grid-cols-2 gap-3">
-                <PanelButtons />
-              </CardContent>
-            </Card>
-          </Layout.SidebarLeft>
-        )}
-        {mode === APP_MODE.EDIT && (
-          <Layout.SidebarRight dark={theme === "dark"}>
-            <NodeSettings />
-          </Layout.SidebarRight>
-        )}
-        
-        
+          <Layout.Canvas>
+            <NodeWrapper />
+          </Layout.Canvas>
+          {mode === APP_MODE.EDIT && (
+            <Layout.SidebarLeft
+              collapsed={sidebarLeftCollapsed}
+              onToggle={() => setSidebarLeftCollapsed(!sidebarLeftCollapsed)}
+              dark={theme === "dark"}
+            >
+
+              <Card className="bg-card shadow-sm backdrop-blur">
+                <CardHeader className="pb-4">
+                  <CardTitle>Bibliothèque de blocs</CardTitle>
+                  <CardDescription>
+                    Glissez et déposez un bloc pour l&apos;ajouter au canvas.
+                  </CardDescription>
+                </CardHeader>
+                <CardContent className="grid grid-cols-2 gap-3">
+                  <PanelButtons />
+                </CardContent>
+              </Card>
+            </Layout.SidebarLeft>
+          )}
+          {mode === APP_MODE.EDIT && (
+            <Layout.SidebarRight dark={theme === "dark"}>
+              <NodeSettings />
+            </Layout.SidebarRight>
+          )}
         </div>
-    </DragDropProvider>
+      </DragDropProvider>
+    </TooltipProvider>
   );
 }
 

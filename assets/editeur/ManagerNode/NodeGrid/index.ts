@@ -115,7 +115,8 @@ export const NodeGrid: NodeConfigurationType = {
         label: 'Grid',
         icon: IoGridOutline,
         category: 'container',
-        order: 2
+        order: 2,
+        tooltip: "Conteneur pour organiser les éléments en grille"
     },
     default: {
         ...defaultNodeConfiguration.default,

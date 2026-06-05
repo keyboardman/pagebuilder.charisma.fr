@@ -27,6 +27,7 @@ export const NodeHero: NodeConfigurationType = {
     icon: IoImageOutline,
     category: "container",
     order: 4,
+    tooltip: "Conteneur  avec image de fond et alignement des blocs"
   },
   default: {
     ...defaultNodeConfiguration.default,

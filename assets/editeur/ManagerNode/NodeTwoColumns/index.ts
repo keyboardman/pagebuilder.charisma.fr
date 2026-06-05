@@ -39,7 +39,8 @@ export const NodeTwoColumns: NodeConfigurationType = {
     label: "2 Columns",
     icon: IoSquareOutline,
     category: 'container',
-    order: 1
+    order: 1,
+    tooltip: "Conteneur pour organiser les éléments en 2 colonnes"
   },
   default: {
     ...defaultNodeConfiguration.default,

@@ -23,7 +23,8 @@ export const NodeContainer: NodeConfigurationType = {
         label: "Container",
         icon: IoSquareOutline,
         category: 'container',
-        order: 1
+        order: 1,
+        tooltip: "<p>Conteneur pour organiser les éléments</p><p>Gestion de la fluidité et des marges</p>"
     },
     default: {
         ...defaultNodeConfiguration.default,

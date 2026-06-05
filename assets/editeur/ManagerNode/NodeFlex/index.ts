@@ -40,6 +40,7 @@ export const NodeFlex: NodeConfigurationType = {
     icon: IoExpandOutline,
     category: "container",
     order: 3,
+    tooltip: "<p>Conteneur pour organiser les éléments sur un axe horizontal ou vertical</p><p>Gestion de l'alignement et des espacements</p>"
   },
   default: {
     ...defaultNodeConfiguration.default,
