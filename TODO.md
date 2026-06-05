@@ -32,3 +32,5 @@
 28. le menu enregistré devient genant mais je ne sais pas quand cela se produit (en previsualisation ) quand on depasse le scroll de lediteur
 29. texte strong dans bouton
 30. OK tooltip
+31. Texte icone couleur ?
+32. Node Icone

@@ -55,15 +55,24 @@ const View: FC<NodeViewProps> = () => {
       iconImageUrl={textNode.content?.iconImageUrl}
       iconSizeVariant={iconSizeVariant}
       style={iconMediaStyle}
+
     />
   );
 
   const linkedText = linkUrl ? (
-    <a href={linkUrl} className="ce-text-icon__link">
+    <a href={linkUrl} className="ce-text-icon__link" target="_blank">
       {textElement}
     </a>
   ) : (
     textElement
+  );
+
+  const linkedIcon = linkUrl ? (
+    <a href={linkUrl} className="ce-text-icon__link" target="_blank">
+      {iconElement}
+    </a>
+  ) : (
+    iconElement
   );
 
   return (
@@ -73,10 +82,11 @@ const View: FC<NodeViewProps> = () => {
       style={containerStyle}
       data-ce-id={node.id}
       data-ce-type={node.type}
+      
     >
-      {iconPosition === "before" && iconElement}
+      {iconPosition === "before" && linkedIcon}
       {linkedText}
-      {iconPosition === "after" && iconElement}
+      {iconPosition === "after" && linkedIcon}
     </div>
   );
 };

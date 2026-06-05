@@ -3,6 +3,7 @@ import { cn } from "@/editeur/lib/utils";
 import type { NodeTextIconName, NodeTextIconSizeVariant, NodeTextIconSource } from "./index";
 import { ceIconBackgroundImageStyle, ceIconClassNames, sanitizeThemeIconClass } from "./shared";
 
+
 interface MediaProps {
   iconSource: NodeTextIconSource;
   presetIcon: NodeTextIconName;
