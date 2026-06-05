@@ -142,7 +142,7 @@ const View: FC = () => {
               style={aspectRatio ? { aspectRatio } : undefined}
             >
               {slide.link && slide.link.trim().length > 0 ? (
-                <a href={slide.link} className="block h-full w-full">
+                <a href={slide.link} className="block h-full w-full" target="_blank">
                   <img
                     className="ce-slideshow-image"
                     src={slide.src}
