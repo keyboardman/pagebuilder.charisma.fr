@@ -1,5 +1,5 @@
-import { registerReactControllerComponents } from '@symfony/ux-react';
-import './styles/app.css';
-import './bootstrap';
+    import { registerReactControllerComponents } from '@symfony/ux-react';
+    import './styles/app.css';
+    import './bootstrap';
 
-registerReactControllerComponents(require.context('./react/controllers', true, /\.(j|t)sx?$/));
+    registerReactControllerComponents(require.context('./react/controllers', true, /\.(j|t)sx?$/));

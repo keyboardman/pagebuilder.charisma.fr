@@ -25,6 +25,7 @@
 21. OK POST Form (empecher la modification quand un est sélectionné)
 22. OK Theme dans storage ne doit pas etre le nom mais l'id
 23. Ajout des liens de partage dans card api
-24. card vidéo possibilité de ne pas afficher le titre
+24. OK card vidéo possibilité de ne pas afficher le titre
 25. trier les composants titre description dans card api grille droite gauche
 26. OK lien article auteur corrigé
+27. construire l'explorateur

@@ -53,6 +53,7 @@ import {
   Sun,
   Tablet,
 } from "lucide-react";
+import Explorer from "../layout/Explorer";
 
 function Builder() {
   const { nodes, mode, setMode, breakpoint, setBreakpoint } = useAppContext();
@@ -278,6 +279,7 @@ function Builder() {
             onToggle={() => setSidebarLeftCollapsed(!sidebarLeftCollapsed)}
             dark={theme === "dark"}
           >
+
             <Card className="bg-card shadow-sm backdrop-blur">
               <CardHeader className="pb-4">
                 <CardTitle>Bibliothèque de blocs</CardTitle>
