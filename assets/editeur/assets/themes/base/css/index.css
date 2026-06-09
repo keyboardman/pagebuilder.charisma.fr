@@ -47,3 +47,4 @@ iframe {
 
 /* Node text + icône (<i class="ce-icon">) */
 @import "./node-text-icon.css";
+@import "./node-icone.css";

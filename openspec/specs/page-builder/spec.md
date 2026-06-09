@@ -385,12 +385,12 @@ Le builder SHALL sérialiser le contenu de NodeRichText dans le format de persis
 
 ### Requirement: Conteneur formulaire (NodeForm)
 
-Le builder SHALL fournir un type de nœud conteneur **NodeForm** (identifiant `node-form`) représentant un élément HTML `<form>`. Le nœud SHALL être droppable (une zone unique, ex. `main`). Le NodeForm SHALL exposer au minimum les propriétés configurables **method** (méthode HTTP, ex. `GET` ou `POST`) et **action** (URL absolue ou relative de soumission). Le NodeForm SHALL soumettre le formulaire en **AJAX** via `fetch` lors du `submit` (interception de l’événement), et afficher un message d’alerte de retour (succès en fond vert, erreur en fond rouge) dans l’interface de l’éditeur. Le NodeForm SHALL autoriser comme descendants directs ou indirects : les nœuds **NodeFormInput**, **NodeFormSelect**, **NodeFormRadio**, les nœuds **NodeButton** (pour des actions comme “submit”), et les nœuds du builder dont la catégorie d’enregistrement est **container** (ex. NodeFlex, NodeGrid, NodeContainer), afin de permettre la mise en page à l’intérieur du formulaire. Le NodeForm SHALL refuser l’imbrication d’un second NodeForm en tant qu’enfant (formulaires non imbriqués).
+Le builder SHALL fournir un type de nœud conteneur **NodeForm** (identifiant `node-form`) représentant un élément HTML `<form>`. Le nœud SHALL être droppable (une zone unique, ex. `main`). Le NodeForm SHALL exposer au minimum les propriétés configurables **method** (méthode HTTP, ex. `GET` ou `POST`) et **action** (URL absolue ou relative de soumission). Le NodeForm SHALL permettre de sélectionner une **configuration de formulaire** issue du **catalogue backend** de la capacité **builder-form-submission** (**formConfigId** ou équivalent) ; lorsque ce champ est renseigné, l’**action** SHALL être dérivée de l’**URL de soumission** fournie par ce catalogue et SHALL être **enregistrée** dans le contenu du nœud avec cette valeur résolue, afin que l’affichage public et l’export HTML ne dépendent pas d’un nouvel appel au catalogue au chargement de la page. Lorsqu’un **formConfigId** est défini, le rendu du `<form>` (preview, page publique, export) SHALL inclure les **champs et jetons** requis par la politique **antispam** du backend (au minimum un **honeypot** convenu avec le serveur, et tout jeton supplémentaire si activé), de sorte que la soumission **AJAX** existante via `FormData` satisfasse les contrôles décrits dans **builder-form-submission**. Lorsque aucune configuration n’est choisie, l’utilisateur SHALL pouvoir définir **action** manuellement et aucune exigence antispam backend ne s’applique via ce mécanisme. Le chargement du catalogue dans l’éditeur SHALL utiliser la **fonctionnalité backend dédiée** (pas le registre ApiCard). Le NodeForm SHALL soumettre le formulaire en **AJAX** via `fetch` lors du `submit` (interception de l’événement), et afficher un message d’alerte de retour (succès en fond vert, erreur en fond rouge) dans l’interface de l’éditeur. Le NodeForm SHALL autoriser comme descendants directs ou indirects : les nœuds **NodeFormInput**, **NodeFormSelect**, **NodeFormRadio**, les nœuds **NodeButton** (pour des actions comme "submit"), et les nœuds du builder dont la catégorie d’enregistrement est **container** (ex. NodeFlex, NodeGrid, NodeContainer), afin de permettre la mise en page à l’intérieur du formulaire. Le NodeForm SHALL refuser l’imbrication d’un second NodeForm en tant qu’enfant (formulaires non imbriqués).
 
 #### Scenario: Ajout d’un NodeForm depuis le panneau
 
 - **WHEN** l’utilisateur ajoute un bloc depuis le panneau des composants et choisit le conteneur formulaire (NodeForm)
-- **THEN** un nœud NodeForm est inséré dans la page ; l’utilisateur peut définir method et action, et déposer des champs formulaire et des conteneurs de mise en page dans la zone du formulaire
+- **THEN** un nœud NodeForm est inséré dans la page ; l’utilisateur peut définir method et action (manuelle ou via catalogue backend), et déposer des champs formulaire et des conteneurs de mise en page dans la zone du formulaire
 
 #### Scenario: Composition avec conteneur interne
 
@@ -421,6 +421,16 @@ Le builder SHALL fournir un type de nœud conteneur **NodeForm** (identifiant `n
 
 - **WHEN** l’utilisateur soumet un NodeForm (via un bouton `submit`) et que la réponse HTTP échoue (non-2xx) ou qu’un JSON retourne `{ success: false, message: "..." }`
 - **THEN** un bandeau d’alerte est affiché avec un style d’erreur (fond rouge) et le message de retour
+
+#### Scenario: Sélection d’une configuration via le catalogue backend
+
+- **WHEN** l’utilisateur choisit une entrée du catalogue des formulaires configurés (appel backend dédié, hors ApiCard)
+- **THEN** le NodeForm enregistre `formConfigId` et une propriété **action** égale à l’URL de soumission fournie pour cette configuration ; la soumission utilise cette URL sans rappel au catalogue côté affichage public
+
+#### Scenario: Rendu des garde-fous antispam pour formulaire backend
+
+- **WHEN** un NodeForm est associé à une configuration backend et affiché hors mode édition structuré uniquement (ex. prévisualisation ou page publique)
+- **THEN** le DOM du formulaire inclut les éléments nécessaires au passage des contrôles antispam (honeypot et dépendances), sans casser l’accessibilité ni le flux `FormData` actuel
 
 ### Requirement: Champ saisie (NodeFormInput)
 
@@ -748,4 +758,195 @@ Le NodeNavApi SHALL réutiliser les options de présentation du **NodeNav** : **
 
 - **WHEN** l’utilisateur sauvegarde une page contenant un NodeNavApi configuré
 - **THEN** le contenu sérialisé conserve `apiId`, les options de présentation (direction, variante, burger, etc.) et permet de recharger le menu à l’affichage
+
+### Requirement: Navigateur de composants en arbre
+
+En mode édition, le builder SHALL exposer un **navigateur de composants** affichant la hiérarchie des nœuds de la page sous forme d’**arbre** (structure parent/enfant analogue à un arbre DOM). Le navigateur SHALL être accessible depuis la **sidebar gauche** (onglet ou section dédiée, distincte de la bibliothèque de blocs). Il SHALL partir du nœud racine de la page (`node-root`) et SHALL lister récursivement les descendants selon les relations `parent` des `NodesType`, y compris lorsque les enfants sont répartis dans **plusieurs zones** de dépôt d’un même conteneur (ex. cellules de grille).
+
+Chaque entrée de l’arbre SHALL afficher un libellé lisible dérivé du type de nœud (libellé du registre `NodeRegistry` lorsqu’il est défini). Les nœuds conteneurs SHALL pouvoir être **repliés ou dépliés** pour parcourir la structure.
+
+#### Scenario: Affichage de l’arbre en mode édition
+
+- **WHEN** l’utilisateur ouvre le builder en mode édition et consulte le navigateur de composants
+- **THEN** la hiérarchie des nœuds de la page courante est affichée en arbre à partir de `node-root`
+- **AND** les nœuds imbriqués apparaissent comme enfants de leur conteneur parent
+
+#### Scenario: Enfants dans plusieurs zones
+
+- **WHEN** un conteneur possède des enfants dans plus d’une zone (ex. grille `NodeGrid` avec cellules `cell-*`)
+- **THEN** l’arbre regroupe ou identifie ces enfants sous leur zone respective afin de refléter la structure réelle de la page
+
+#### Scenario: Repli et dépli des conteneurs
+
+- **WHEN** l’utilisateur replie un nœud conteneur dans le navigateur
+- **THEN** les descendants de ce conteneur ne sont plus visibles jusqu’au dépli
+
+### Requirement: Sélection d’un nœud depuis le navigateur
+
+Un clic sur une entrée du navigateur de composants SHALL **sélectionner** le nœud correspondant dans le builder (même mécanisme que la sélection sur le canevas : `setSelected`). Lorsqu’un nœud est sélectionné depuis le navigateur, le panneau de réglages (**NodeSettings**, sidebar droite) SHALL afficher les paramètres de ce nœud, comme pour une sélection directe sur le canevas.
+
+#### Scenario: Clic sur un nœud dans l’arbre
+
+- **WHEN** l’utilisateur clique sur une entrée du navigateur correspondant à un nœud éditable
+- **THEN** ce nœud devient le nœud sélectionné du builder
+- **AND** le panneau NodeSettings affiche les réglages de ce nœud
+
+#### Scenario: Clic sur un conteneur parent
+
+- **WHEN** l’utilisateur clique sur l’entrée d’un conteneur (ex. `NodeFlex`, `NodeGrid`)
+- **THEN** le conteneur est sélectionné et ses réglages sont affichés dans NodeSettings
+
+### Requirement: Synchronisation navigateur et canevas
+
+La sélection effectuée **depuis le canevas** (clic sur un bloc dans la page) SHALL être **reflétée** dans le navigateur : l’entrée correspondante SHALL être visuellement distinguée (état actif / surbrillance). Le navigateur SHALL déplier automatiquement les ancêtres du nœud sélectionné afin que l’entrée active reste accessible sans navigation manuelle exhaustive.
+
+#### Scenario: Sélection depuis le canevas
+
+- **WHEN** l’utilisateur sélectionne un nœud en cliquant sur le canevas
+- **THEN** l’entrée correspondante est mise en surbrillance dans le navigateur de composants
+- **AND** les conteneurs parents sur le chemin vers ce nœud sont dépliés si nécessaire
+
+### Requirement: Organisation du module ManagerExplorer
+
+Le code source du **navigateur de composants** (Explorer) SHALL être regroupé sous `assets/editeur/ManagerExplorer/`, sur le modèle du module `ManagerNode`. Ce dossier SHALL contenir au minimum le composant principal `Explorer`, les composants UI spécifiques au navigateur (ex. zones de dépôt dans l’arbre) et les utilitaires dédiés à la construction de l’arbre et à la synchronisation avec le canevas (`explorerTree`, `scrollCanvasToNode`). Les utilitaires partagés avec d’autres domaines du builder (ex. libellés de nœuds via `nodeLabel`) MAY rester dans `assets/editeur/utils/`.
+
+Le point d’entrée public du module SHALL être exposé via `ManagerExplorer/index.ts` pour les consommateurs (ex. `Builder.tsx`).
+
+#### Scenario: Localisation du code Explorer
+
+- **WHEN** un développeur cherche l’implémentation du navigateur de composants
+- **THEN** les fichiers UI et utilitaires propres à l’Explorer se trouvent sous `assets/editeur/ManagerExplorer/` et non sous `app/layout/` ni dans `utils/` (hors dépendances partagées)
+
+#### Scenario: Import depuis le builder
+
+- **WHEN** le builder intègre le navigateur dans la sidebar gauche
+- **THEN** il importe le composant `Explorer` depuis `ManagerExplorer` (point d’entrée public du module)
+
+### Requirement: Mise en page preview sans chevauchement d’en-têtes (standalone)
+
+Lorsque le builder est monté dans la page standalone (`pageBuilderStandalone.jsx`, route builder dédiée), le système SHALL afficher deux barres distinctes et non superposées : l’en-tête applicatif (navigation Retour, titre de page, action Enregistrer) et la barre d’outils du builder (`Layout.Header` : bascule Édition/Prévisualisation, plein écran, thème, undo/redo, breakpoints). En mode prévisualisation, le défilement du contenu de la page SHALL être confiné au canevas (`admin-layout__main`) ; la barre d’outils du builder SHALL rester visible et interactive pendant tout le défilement, y compris lorsque l’utilisateur atteint le bas d’une page longue.
+
+#### Scenario: Défilement en bas de page en prévisualisation standalone
+
+- **WHEN** l’utilisateur ouvre le builder standalone, bascule en mode prévisualisation et fait défiler une page longue jusqu’en bas
+- **THEN** l’en-tête applicatif (Retour / Enregistrer) reste visible en haut de la fenêtre
+- **AND** la barre d’outils du builder (`Layout.Header`) reste visible sous l’en-tête applicatif, sans être recouverte par celui-ci
+- **AND** l’utilisateur peut cliquer sur le bouton de retour en mode édition sans recharger la page
+
+#### Scenario: Une seule zone de défilement vertical en preview
+
+- **WHEN** l’utilisateur est en mode prévisualisation sur la page standalone et fait défiler le contenu
+- **THEN** seul le canevas de prévisualisation défile verticalement
+- **AND** ni l’en-tête applicatif ni la barre d’outils du builder ne défilent hors de la zone visible à cause d’un conteneur parent scrollable
+
+#### Scenario: Hauteur du builder adaptée au shell standalone
+
+- **WHEN** le builder est monté dans le shell standalone sous l’en-tête applicatif
+- **THEN** le layout builder occupe la hauteur disponible restante (sans imposer `100vh` au-delà de l’espace alloué)
+- **AND** aucune barre de défilement superflue n’apparaît sur le conteneur englobant du builder en l’absence de contenu dépassant la hauteur utile
+
+### Requirement: Nœud icône seule (NodeIcone)
+Le builder SHALL fournir un type de nœud **NodeIcone** (identifiant `node-icone`) affichant une icône seule, sans bloc texte éditable. Le nœud SHALL réutiliser le même modèle de rendu d'icône que **NodeTextIcon** (balise `<i>` avec classes `ce-icon`, presets intégrés, icône du thème ou image).
+
+Le nœud SHALL permettre de configurer:
+- la source de l'icône (**preset**, **theme** ou **image**),
+- la taille de l'icône (`default`, `small`, `large`),
+- l'alignement horizontal et vertical de l'icône dans son conteneur,
+- un lien cliquable optionnel appliqué à l'icône,
+- les styles du conteneur et de l'élément icône (marge, padding, fond, bordure, couleur).
+
+Le nœud SHALL **ne pas** exposer d'édition de texte HTML ni les options propres au couplage texte+icône (balise de texte, position avant/après le texte, styles texte).
+
+#### Scenario: Ajout d'un NodeIcone depuis le panneau
+- **WHEN** l'utilisateur ajoute un bloc depuis le panneau des composants et choisit `NodeIcone`
+- **THEN** un nœud `node-icone` est inséré avec une icône preset par défaut
+- **AND** aucun champ texte éditable n'est affiché dans le canvas
+
+#### Scenario: Source d'icône preset, thème ou image
+- **WHEN** l'utilisateur configure la source sur `preset` et choisit une icône intégrée
+- **THEN** l'icône preset est rendue via les classes `ce-icon` et `ce-icon-preset-*`
+- **WHEN** l'utilisateur configure la source sur `theme` et sélectionne une icône du thème de la page
+- **THEN** l'icône du thème est rendue via la classe CSS du thème ou l'URL associée
+- **WHEN** l'utilisateur configure la source sur `image` et renseigne une URL (ou sélectionne via la médiathèque)
+- **THEN** l'icône est rendue en `background-image` sur l'élément `<i>`
+
+#### Scenario: Alignements horizontal et vertical
+- **WHEN** l'utilisateur modifie l'alignement horizontal et/ou vertical dans les paramètres du `NodeIcone`
+- **THEN** l'icône s'aligne selon les valeurs choisies dans l'éditeur, la preview et le rendu final
+
+#### Scenario: Taille de l'icône
+- **WHEN** l'utilisateur modifie la taille de l'icône dans les paramètres du `NodeIcone`
+- **THEN** l'icône est rendue à la taille configurée (`ce-icon`, `ce-icon-small` ou `ce-icon-large`)
+
+#### Scenario: Lien cliquable optionnel
+- **WHEN** l'utilisateur renseigne une URL de lien dans les paramètres du `NodeIcone`
+- **THEN** l'icône est rendue comme un élément cliquable pointant vers cette URL
+- **AND** le comportement est visible en preview et dans le rendu final
+
+#### Scenario: Persistance du NodeIcone
+- **WHEN** l'utilisateur sauvegarde une page contenant un ou plusieurs `NodeIcone`
+- **THEN** les propriétés du nœud (source, icône, taille, lien, alignements, styles conteneur et icône) sont sérialisées et restaurées à l'identique lors du rechargement
+
+### Requirement: Confirmation avant suppression d'un nœud
+
+Lorsqu'un utilisateur déclenche la suppression manuelle d'un nœud éditable (ex. icône poubelle du menu de bloc), le builder SHALL afficher une **modale de confirmation** avant de modifier `NodesType`. La modale SHALL indiquer le libellé ou le type du nœud ciblé. Si le nœud possède un ou plusieurs **descendants**, la modale SHALL le signaler et SHALL préciser qu'ils seront supprimés avec lui. La suppression ne SHALL s'exécuter qu'après confirmation explicite ; l'annulation SHALL laisser `nodes` inchangé.
+
+#### Scenario: Confirmation avec descendants
+
+- **WHEN** l'utilisateur clique sur supprimer pour un conteneur ayant des nœuds enfants
+- **THEN** une modale de confirmation s'affiche
+- **AND** le message indique que les sous-blocs seront également supprimés
+- **AND** la suppression n'est appliquée qu'après validation explicite
+
+#### Scenario: Annulation de la suppression
+
+- **WHEN** l'utilisateur ouvre la modale de confirmation puis annule
+- **THEN** le nœud et ses descendants restent présents dans `nodes`
+- **AND** la sélection et l'affichage du builder ne changent pas
+
+#### Scenario: Suppression confirmée d'un nœud feuille
+
+- **WHEN** l'utilisateur confirme la suppression d'un nœud sans enfant
+- **THEN** le nœud est retiré de `NodesType`
+- **AND** les ordres des frères restants dans la même zone parente sont réindexés
+
+### Requirement: Suppression récursive des descendants
+
+Lorsqu'un nœud est supprimé (manuellement après confirmation ou lors de l'épuration automatique), le builder SHALL retirer **récursivement** ce nœud et **tous ses descendants** de `NodesType`. Aucun nœud dont `parent.id` référençait le nœud supprimé (directement ou via une chaîne d'ancêtres supprimés) ne SHALL subsister dans le JSON.
+
+#### Scenario: Suppression d'un conteneur parent
+
+- **WHEN** l'utilisateur confirme la suppression d'un conteneur possédant des enfants imbriqués
+- **THEN** le conteneur et l'ensemble de ses descendants sont retirés de `NodesType`
+- **AND** aucun nœud orphelin ne reste référencé dans le JSON
+
+#### Scenario: Réindexation après suppression
+
+- **WHEN** un nœud est supprimé parmi plusieurs frères dans la même zone parente
+- **THEN** les `parent.order` des frères restants sont réassignés de façon séquentielle sans trou
+
+### Requirement: Nettoyage des nœuds invalides au chargement
+
+Lors du chargement du contenu éditable (parse du JSON vers `NodesType`), le builder SHALL **épurer automatiquement** les entrées invalides avant d'afficher la page :
+
+- les nœuds dont le `type` n'existe pas dans le registre courant `NodeRegistry`, **avec tous leurs descendants** ;
+- les nœuds **orphelins** dont `parent.id` ne correspond à aucun nœud existant dans le dictionnaire (sauf le nœud racine `node-root`).
+
+L'épuration SHALL appliquer la même suppression récursive et la même réindexation des ordres que la suppression manuelle. Le nœud racine `node-root` ne SHALL jamais être retiré par cette épuration.
+
+#### Scenario: Type de nœud retiré du registre
+
+- **WHEN** le JSON chargé contient un nœud de type absent de `NodeRegistry` (ex. ancien composant supprimé du code)
+- **THEN** ce nœud et tous ses descendants sont retirés de `NodesType` au chargement
+- **AND** le builder s'affiche sans erreur avec la structure restante valide
+
+#### Scenario: Nœud orphelin sans parent existant
+
+- **WHEN** le JSON chargé contient un nœud dont `parent.id` ne référence aucun nœud du dictionnaire
+- **THEN** ce nœud et ses descendants sont retirés de `NodesType` au chargement
+
+#### Scenario: Sauvegarde après épuration
+
+- **WHEN** l'utilisateur enregistre la page après ouverture d'un contenu nettoyé automatiquement
+- **THEN** le JSON persisté ne contient plus les nœuds invalides ni leurs descendants
 

@@ -72,8 +72,10 @@ export const AppProvider: FC<AppProviderProps> = ({
         if (typeof parsed !== "object" || parsed === null) return defaultNodes;
         const obj = parsed as Record<string, unknown>;
         if (Object.keys(obj).length === 0) return defaultNodes;
-        if (obj.cylsqgudkwtz) return obj as NodesType;
-        return { ...defaultNodes, ...obj, cylsqgudkwtz: defaultNodes.cylsqgudkwtz };
+        const parsedNodes = obj.cylsqgudkwtz
+            ? (obj as NodesType)
+            : { ...defaultNodes, ...obj, cylsqgudkwtz: defaultNodes.cylsqgudkwtz };
+        return nodeHelper.sanitizeNodes(parsedNodes);
     };
 
     const [nodes, setNodes] = useState<NodesType>(() => parseJsonToNodes(json));

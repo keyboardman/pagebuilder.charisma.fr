@@ -1,6 +1,43 @@
 import NodeRegistry from "../ManagerNode/components/NodeRegistry";
+import { NODE_ROOT_TYPE } from "../ManagerNode/NodeRoot";
 import type { NodeID, NodesType, NodeType, ParentProps } from "../types/NodeType";
 import { generateNodeId, makeParentProps } from "./helpers";
+
+function cloneNodes(nodes: NodesType): NodesType {
+    return JSON.parse(JSON.stringify(nodes));
+}
+
+function deleteNodeRecursively(nodes: NodesType, id: string): void {
+    const current = nodes[id];
+    if (!current) return;
+
+    Object.values(nodes)
+        .filter((n) => n.parent && n.parent.id === current.id)
+        .forEach((child) => deleteNodeRecursively(nodes, child.id));
+
+    delete nodes[id];
+}
+
+function reindexSiblingOrders(nodes: NodesType, parentId: NodeID | null, zone: string): void {
+    const siblings = Object.values(nodes)
+        .filter((n) => n.parent && n.parent.id === parentId && n.parent.zone === zone)
+        .sort((a, b) => a.parent.order - b.parent.order);
+
+    siblings.forEach((sibling, index) => {
+        sibling.parent.order = index;
+    });
+}
+
+function isInvalidNode(nodes: NodesType, node: NodeType): boolean {
+    if (node.type === NODE_ROOT_TYPE) {
+        return false;
+    }
+    if (!(node.type in NodeRegistry)) {
+        return true;
+    }
+    const parentId = node.parent?.id;
+    return parentId != null && !nodes[parentId];
+}
 
 const nodeHelper = {
     createNode: ( type: string, parentId: NodeID | null, zone = "main", order: number = 0): NodeType => {
@@ -91,37 +128,59 @@ const nodeHelper = {
     updateNode: (nodes: NodesType, updatedNode: NodeType): NodesType => {
         return {...nodes, [updatedNode.id]: updatedNode};
     },
-    removeNode: (nodes: NodesType, node: NodeType) => { 
-        // Clonage profond des nodes
-        const _nodes: NodesType = JSON.parse(JSON.stringify(nodes));
+    countDescendants: (nodes: NodesType, nodeId: NodeID): number => {
+        return Object.values(nodes)
+            .filter((n) => n.parent?.id === nodeId)
+            .reduce(
+                (count, child) => count + 1 + nodeHelper.countDescendants(nodes, child.id),
+                0
+            );
+    },
+    removeNode: (nodes: NodesType, node: NodeType) => {
+        const _nodes = cloneNodes(nodes);
 
-        // Fonction récursive interne
-        const deleteRecursively = (id: string) => {
-            const current = _nodes[id];
-            if (!current) return;
+        deleteNodeRecursively(_nodes, node.id);
+        reindexSiblingOrders(_nodes, node.parent?.id ?? null, node.parent?.zone ?? "main");
 
-            // Supprimer récursivement les enfants
-            Object.values(_nodes)
-                .filter(n => n.parent && n.parent.id === current.id)
-                .forEach(child => {
-                    deleteRecursively(child.id)
+        return _nodes;
+    },
+    sanitizeNodes: (nodes: NodesType): NodesType => {
+        const _nodes = cloneNodes(nodes);
+        let changed = true;
+
+        while (changed) {
+            changed = false;
+            const toRemove = Object.values(_nodes).filter((node) => isInvalidNode(_nodes, node));
+
+            if (toRemove.length === 0) {
+                break;
+            }
+
+            changed = true;
+            const affectedGroups: Array<{ parentId: NodeID | null; zone: string }> = [];
+
+            for (const node of toRemove) {
+                affectedGroups.push({
+                    parentId: node.parent?.id ?? null,
+                    zone: node.parent?.zone ?? "main",
                 });
-            // Supprimer le nœud lui-même
-            delete _nodes[id];
-        };
+                deleteNodeRecursively(_nodes, node.id);
+            }
 
-        // Supprimer le nœud et tous ses descendants
-        deleteRecursively(node.id);
+            const seenGroups = new Set<string>();
+            for (const { parentId, zone } of affectedGroups) {
+                const key = `${parentId ?? "null"}\0${zone}`;
+                if (seenGroups.has(key)) {
+                    continue;
+                }
+                seenGroups.add(key);
+                reindexSiblingOrders(_nodes, parentId, zone);
+            }
 
-        // Récupérer les frères restants dans la même zone
-        const siblings = Object.values(_nodes)
-            .filter(n => n.parent && n.parent.id === node.parent.id && n.parent.zone === node.parent.zone)
-            .sort((a, b) => a.parent.order - b.parent.order);
-
-        // Réassigner des ordres séquentiels
-        siblings.forEach((sibling, index) => {
-            sibling.parent.order = index;
-        });
+            console.warn(
+                `[nodeHelper] sanitizeNodes: removed ${toRemove.length} invalid node(s)`
+            );
+        }
 
         return _nodes;
     },

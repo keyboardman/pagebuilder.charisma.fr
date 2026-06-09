@@ -1,3 +1,29 @@
+/* Page standalone : templates/page/builder.html.twig (classes hors bundle Tailwind admin) */
+.page-builder-standalone-body {
+    display: flex;
+    flex-direction: column;
+    height: 100vh;
+    height: 100dvh;
+    margin: 0;
+    overflow: hidden;
+}
+
+.page-builder-standalone-body__main {
+    display: flex;
+    flex: 1 1 0%;
+    flex-direction: column;
+    min-height: 0;
+    overflow: hidden;
+}
+
+.page-builder-standalone-body__root {
+    display: flex;
+    flex: 1 1 0%;
+    flex-direction: column;
+    min-height: 0;
+    overflow: hidden;
+}
+
 .admin-layout {
     height: 100vh;
     background-color: var(--background);
@@ -32,7 +58,27 @@
 }
 
 .admin-layout[data-mode=preview] {
-    overflow-y: scroll;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+}
+
+.admin-layout[data-mode=preview] .admin-layout__header {
+    flex-shrink: 0;
+}
+
+.admin-layout[data-mode=preview] .admin-layout__main {
+    flex: 1 1 0%;
+    min-height: 0;
+    overflow-y: auto;
+}
+
+.page-builder-standalone-shell .page-builder-standalone-shell__builder,
+.page-builder-standalone-shell .builder-inline,
+.page-builder-standalone-shell .admin-layout,
+.page-builder-standalone-shell .admin-layout[data-mode=edit] {
+    height: 100%;
+    min-height: 0;
 }
 
 .admin-layout__header {
@@ -50,7 +96,16 @@
     color: var(--admin-color);
     min-height: 100%;
     height: 100%;
+    min-width: 0;
+}
 
+.explorer-tree {
+    overscroll-behavior: contain;
+}
+
+.explorer-tree__inner {
+    width: max-content;
+    min-width: 100%;
 }
 
 .admin-layout__left--collapsed {
@@ -77,6 +132,7 @@
 
 .admin-layout__main {
     grid-area: main;
+    min-height: 0;
     background-color: oklch(0.95 0 0);
     /* Gris très clair, indépendant du thème */
 }

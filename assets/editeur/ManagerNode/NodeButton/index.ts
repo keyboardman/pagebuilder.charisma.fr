@@ -28,6 +28,7 @@ export interface NodeButtonType extends NodeType {
   type: "node-button";
   content: {
     buttonType: NodeButtonButtonType;
+    /** Texte brut ou HTML inline limité (`<strong>`, `<b>`) pour le gras partiel. */
     label: string;
     href?: string;
     target?: string;

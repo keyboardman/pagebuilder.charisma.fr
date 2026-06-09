@@ -25,6 +25,7 @@ function NodeBuilderComponent({ children }: { children: ReactNode }) {
             {!isRootNode && <DropZone parent={{ ...node.parent, order: index }} />}
             <div
                 ref={drag.ref}
+                data-ce-id={node.id}
                 className="m-1 p-1 border border-border/50 rounded-b-sm"
             >
                 <NodeMenu />

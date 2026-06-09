@@ -25,6 +25,8 @@ export interface NodeType {
   id: NodeID;
   type: string;
   parent: ParentProps;
+  /** Nom affiché dans l'explorateur et le bandeau du builder (n'affecte pas le rendu public). */
+  editorLabel?: string;
   attributes?: NodeAttributes;
   isDroppable?: boolean;
   content?: Record<string, any>;

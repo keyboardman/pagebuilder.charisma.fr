@@ -20,7 +20,7 @@ const SidebarLeft = ({ children, collapsed = false, onToggle, dark = false }: Si
     <div className="relative">
       <aside 
         className={cn(
-          "admin-layout__left flex flex-col gap-6 overflow-y-auto bg-sidebar px-5 py-6 backdrop-blur transition-all duration-700 ease-in-out min-h-full h-full",
+          "admin-layout__left flex min-h-0 flex-col gap-6 overflow-hidden bg-sidebar px-5 py-6 backdrop-blur transition-all duration-700 ease-in-out h-full",
           collapsed && "admin-layout__left--collapsed",
           dark && "dark"
         )}

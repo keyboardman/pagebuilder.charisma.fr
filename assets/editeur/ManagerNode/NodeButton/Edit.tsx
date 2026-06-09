@@ -33,12 +33,32 @@ const Edit: FC<NodeEditProps> = () => {
 
   const preventLinkNavigation = (e: React.MouseEvent) => e.preventDefault();
 
+  const editableProps = {
+    label,
+    onChange: updateLabel,
+    allowPartialBold: true,
+    ...commonProps,
+  };
+
   if (buttonType === "link") {
-    return <TagNameEditable tagName="a" label={label} onChange={updateLabel} {...commonProps} href={href || "#"} target={target} rel={target === "_blank" ? "noopener noreferrer" : undefined} onClick={preventLinkNavigation} />;
+    return (
+      <TagNameEditable
+        tagName="a"
+        {...editableProps}
+        href={href || "#"}
+        target={target}
+        rel={target === "_blank" ? "noopener noreferrer" : undefined}
+        onClick={preventLinkNavigation}
+      />
+    );
   }
 
   return (
-    <TagNameEditable tagName="button" label={label} onChange={updateLabel} {...commonProps} type={buttonType === "submit" ? "submit" : "button"} />
+    <TagNameEditable
+      tagName="button"
+      {...editableProps}
+      type={buttonType === "submit" ? "submit" : "button"}
+    />
   );
 };
 

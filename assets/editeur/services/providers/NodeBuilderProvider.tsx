@@ -10,7 +10,7 @@ export const NodeBuilderProvider: FC<NodeBuilderProps> = ({ children }: NodeBuil
 
     const { node, getChildren } = useNodeContext();
 
-    const { selected, setSelected, updateNode, removeNode, duplicateNode } = useBuilderContext();
+    const { selected, setSelected, updateNode, requestRemoveNode, duplicateNode } = useBuilderContext();
 
     const dragId = useRef(shortid.generate());
 
@@ -34,7 +34,7 @@ export const NodeBuilderProvider: FC<NodeBuilderProps> = ({ children }: NodeBuil
     };
 
     const onDelete = () => {
-        removeNode(node);
+        requestRemoveNode(node);
     };
 
     const onDuplicate = () => {

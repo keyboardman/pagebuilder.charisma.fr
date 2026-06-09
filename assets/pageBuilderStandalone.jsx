@@ -128,8 +128,8 @@ function PageBuilderStandalone({
   }, [saveContent, content, baseUrl, pageTitle, pageDescription, themeCssUrl, renderCssUrls]);
 
   return (
-    <div className="admin-layout relative h-full flex flex-col overflow-hidden">
-      <header className="shrink-0 flex items-center gap-4 px-4 py-2 border-b bg-background">
+    <div className="page-builder-standalone-shell relative grid min-h-0 flex-1 grid-rows-[auto_1fr] overflow-hidden">
+      <header className="page-builder-standalone-shell__header relative z-20 flex items-center gap-4 border-b bg-background px-4 py-2">
         <a href={backUrl} className="text-sm font-medium text-primary hover:underline">
           ← Retour à la page
         </a>
@@ -147,7 +147,7 @@ function PageBuilderStandalone({
         {saveStatus === 'saved' && <span className="text-green-600 text-sm">Enregistré</span>}
         {saveStatus === 'error' && <span className="text-red-600 text-sm">Erreur</span>}
       </header>
-      <div className="flex-1 min-h-0 min-w-0 overflow-auto">
+      <div className="page-builder-standalone-shell__builder min-h-0 min-w-0 overflow-hidden">
         <PageBuilderEmbed
           value={content || '{"cylsqgudkwtz":{"id":"cylsqgudkwtz","type":"node-root","parent":null,"content":{"title":""}}}'}
           onChange={handleChange}

@@ -1,4 +1,5 @@
 import { BuilderContext } from "./BuilderContext";
+import type { SidebarLeftTab } from "../../types/BuilderType";
 import { type ReactNode, type FC, useState, useEffect, useCallback, useRef } from "react";
 
 import type { NodeID, NodeType, NodesType } from "../../types/NodeType";
@@ -6,6 +7,7 @@ import nodeHelper from "../../utils/nodeHelper";
 import { useAppContext } from "./AppContext";
 import { syncRegisteredFontsToDocument } from "../typography";
 import { NodeRichTextEditorProvider } from "../../ManagerNode/NodeRichText/NodeRichTextEditorContext";
+import NodeDeleteConfirmDialog from "../../ManagerNode/components/NodeDeleteConfirmDialog";
 
 export interface BuilderContextProviderProps {
   children: ReactNode;
@@ -38,8 +40,10 @@ export const BuilderProvider: FC<BuilderContextProviderProps> = ({
   const [iframeRef, setInternalIframeRef] = useState<React.RefObject<HTMLIFrameElement | null> | null>(null);
 
   const [selected, setSelected] = useState<NodeID | null>(null);
+  const [deleteTarget, setDeleteTarget] = useState<NodeType | null>(null);
 
   const [sidebarLeftCollapsed, setSidebarLeftCollapsed] = useState<boolean>(false);
+  const [sidebarLeftTab, setSidebarLeftTab] = useState<SidebarLeftTab>("blocks");
 
   const [historiques, setHistoriques] = useState<HistoriqueState>({
     past: [],
@@ -103,6 +107,19 @@ export const BuilderProvider: FC<BuilderContextProviderProps> = ({
     updateNodes(_nodes);
   }, [nodes]);
 
+  const requestRemoveNode = useCallback((node: NodeType): void => {
+    setDeleteTarget(node);
+  }, []);
+
+  const confirmRemoveNode = useCallback((): void => {
+    if (!deleteTarget) return;
+    removeNode(deleteTarget);
+    if (selected === deleteTarget.id) {
+      setSelected(null);
+    }
+    setDeleteTarget(null);
+  }, [deleteTarget, removeNode, selected]);
+
   const duplicateNode = useCallback((node: NodeType): void => {
     // Créer une copie du nœud avec un nouvel ID et order + 1
     const duplicatedNode = nodeHelper.duplicateNode(node);
@@ -164,6 +181,7 @@ export const BuilderProvider: FC<BuilderContextProviderProps> = ({
 
         updateNode,
         removeNode,
+        requestRemoveNode,
         duplicateNode,
         updateNodes,
 
@@ -177,6 +195,8 @@ export const BuilderProvider: FC<BuilderContextProviderProps> = ({
         // sidebar
         sidebarLeftCollapsed,
         setSidebarLeftCollapsed,
+        sidebarLeftTab,
+        setSidebarLeftTab,
 
         //
         selected,
@@ -231,7 +251,20 @@ export const BuilderProvider: FC<BuilderContextProviderProps> = ({
         }
       }}
     >
-      <NodeRichTextEditorProvider>{children}</NodeRichTextEditorProvider>
+      <NodeRichTextEditorProvider>
+        {children}
+        <NodeDeleteConfirmDialog
+          node={deleteTarget}
+          nodes={nodes}
+          open={deleteTarget !== null}
+          onOpenChange={(open) => {
+            if (!open) {
+              setDeleteTarget(null);
+            }
+          }}
+          onConfirm={confirmRemoveNode}
+        />
+      </NodeRichTextEditorProvider>
     </BuilderContext.Provider>
   );
 };

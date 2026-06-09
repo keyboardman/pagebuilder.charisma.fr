@@ -1,5 +1,6 @@
 import NodeText from "../NodeText"
 import NodeTextIcon from "../NodeTextIcon";
+import NodeIcone from "../NodeIcone";
 import NodeHeader from "../NodeHeader";
 import NodeContainer from "../NodeContainer";
 import NodeFlex from "../NodeFlex";
@@ -34,6 +35,7 @@ export const NodeRegistry = {
     [NodeHeader.type]: NodeHeader,
     [NodeText.type]: NodeText,
     [NodeTextIcon.type]: NodeTextIcon,
+    [NodeIcone.type]: NodeIcone,
     [NodeButton.type]: NodeButton,
     [NodeTopButton.type]: NodeTopButton,
     [NodeRoot.type]: NodeRoot,

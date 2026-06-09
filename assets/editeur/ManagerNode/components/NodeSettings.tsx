@@ -2,6 +2,7 @@ import { useBuilderContext } from "../../services/providers/BuilderContext";
 import NodeRegistry, { isKnownNode } from "./NodeRegistry";
 import NodeBuilderProvider from "../../services/providers/NodeBuilderProvider";
 import NodeProvider from "../../services/providers/NodeProvider";
+import NodeEditorLabelField from "./NodeEditorLabelField";
 
 function EmptySettings() {
   return false;
@@ -26,11 +27,18 @@ function NodeSettings() {
 
   if (!Component) return <EmptySettings />;
 
-  return <NodeProvider node={nodeSelected} index={nodeSelected.parent?.order}>
-    <NodeBuilderProvider>
-      <Component />
-    </NodeBuilderProvider>
-  </NodeProvider>;
+  return (
+    <NodeProvider node={nodeSelected} index={nodeSelected.parent?.order}>
+      <NodeBuilderProvider>
+        <div className="flex h-full min-h-0 flex-1 flex-col gap-3 overflow-hidden">
+          <NodeEditorLabelField />
+          <div className="min-h-0 flex-1 overflow-y-auto">
+            <Component />
+          </div>
+        </div>
+      </NodeBuilderProvider>
+    </NodeProvider>
+  );
 }
 
 export default NodeSettings;

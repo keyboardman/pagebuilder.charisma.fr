@@ -3,6 +3,7 @@ import { useBuilderContext } from "../services/providers/BuilderContext";
 import { type ParentProps } from "../types/NodeType";
 import nodeHelper from "../utils/nodeHelper";
 import { canPlaceUnderParent } from "../utils/formDnd";
+import { tryMoveNode } from "../utils/nodeMove";
 
 import type {DragDropEvents} from '@dnd-kit/abstract';
 import {DragDropManager} from '@dnd-kit/dom';
@@ -71,22 +72,16 @@ export default function useDnd() {
         order: targetData?.order ?? 0,
       } as ParentProps;
 
-      const movingNode = nodes[data.id];
-      if (movingNode?.type === "node-nav-item") {
-        if (!parentNode || parentNode.type !== "node-nav") {
-          return;
-        }
-      } else if (parentNode?.type === "node-nav") {
-        return;
-      }
-      if (!canPlaceUnderParent(nodes, movingNode.type, parentId)) {
-        return;
-      }
-
-      updateNodes(
-        nodeHelper.moveNode(nodes, data.id, data?.parent as ParentProps, _target)
+      const nextNodes = tryMoveNode(
+        nodes,
+        data.id as string,
+        data?.parent as ParentProps,
+        _target
       );
 
+      if (nextNodes) {
+        updateNodes(nextNodes);
+      }
     }
   }
 

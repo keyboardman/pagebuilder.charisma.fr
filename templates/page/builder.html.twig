@@ -13,9 +13,9 @@
     {% endif %}
     
 </head>
-<body class="h-screen flex flex-col overflow-hidden m-0">
+<body class="page-builder-standalone-body">
 
-    <main class="flex-1 min-h-0 flex flex-col">
+    <main class="page-builder-standalone-body__main">
         {% set default_content = '{"cylsqgudkwtz":{"id":"cylsqgudkwtz","type":"node-root","parent":null,"content":{"title":""}}}' %}
         {% set content_json = (page.content is defined and page.content is not empty) ? (page.content|json_encode(constant('JSON_UNESCAPED_UNICODE'))) : default_content %}
         {% set base_url = app.request.schemeAndHttpHost ~ app.request.basePath %}
@@ -40,7 +40,7 @@
         }|json_encode|raw }}
         </script>
         
-        <div id="page-builder-standalone-root" class="h-full"></div>
+        <div id="page-builder-standalone-root" class="page-builder-standalone-body__root"></div>
     </main>
     {{ encore_entry_script_tags('pageBuilderStandalone') }}
 </body>

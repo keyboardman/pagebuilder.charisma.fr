@@ -22,6 +22,7 @@ type Events = DragDropEvents<Draggable, Droppable, DragDropManager>;
 type DragStartHandler = Events['dragstart'];
 
 import tailwindHelper from "../../utils/tailwindHelper";
+import Explorer, { scrollCanvasToNode } from "../../ManagerExplorer";
 import Layout from "../layout";
 import { cn } from "@/editeur/lib/utils";
 import { Button } from "@/editeur/components/ui/button";
@@ -40,6 +41,7 @@ import {
   CardHeader,
   CardTitle,
 } from "@/editeur/components/ui/card";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/editeur/components/ui/tabs";
 import {
   Eye,
   Maximize2,
@@ -53,8 +55,6 @@ import {
   Sun,
   Tablet,
 } from "lucide-react";
-import Explorer from "../layout/Explorer";
-
 function Builder() {
   const { nodes, mode, setMode, breakpoint, setBreakpoint } = useAppContext();
   const { theme, toggleTheme } = useTheme();
@@ -66,7 +66,10 @@ function Builder() {
     canUndo,
     sidebarLeftCollapsed,
     setSidebarLeftCollapsed,
-    save
+    sidebarLeftTab,
+    setSidebarLeftTab,
+    save,
+    selected,
   } = useBuilderContext();
 
   const { onDragEnd } = useDnd();
@@ -98,6 +101,18 @@ function Builder() {
     tailwindHelper.updateNodes(nodes);
     save();
   }, [nodes, save]);
+
+  useEffect(() => {
+    if (mode !== APP_MODE.EDIT || !selected) {
+      return;
+    }
+
+    const frameId = requestAnimationFrame(() => {
+      scrollCanvasToNode(selected);
+    });
+
+    return () => cancelAnimationFrame(frameId);
+  }, [mode, selected]);
 
   const handleModeChange = useCallback(
     (nextMode: string) => {
@@ -141,7 +156,7 @@ function Builder() {
         <div
           ref={divRef}
           className={cn(
-            "admin-layout relative h-screen flex flex-col overflow-hidden",
+            "admin-layout relative flex h-full min-h-0 flex-col overflow-hidden",
             mode === APP_MODE.EDIT && sidebarLeftCollapsed && "admin-layout--sidebar-collapsed"
           )}
           data-mode={mode}
@@ -280,17 +295,46 @@ function Builder() {
               dark={theme === "dark"}
             >
 
-              <Card className="bg-card shadow-sm backdrop-blur">
-                <CardHeader className="pb-4">
-                  <CardTitle>Bibliothèque de blocs</CardTitle>
-                  <CardDescription>
-                    Glissez et déposez un bloc pour l&apos;ajouter au canvas.
-                  </CardDescription>
-                </CardHeader>
-                <CardContent className="grid grid-cols-2 gap-3">
-                  <PanelButtons />
-                </CardContent>
-              </Card>
+              <Tabs
+                value={sidebarLeftTab}
+                onValueChange={(value) => {
+                  if (value === "blocks" || value === "structure") {
+                    setSidebarLeftTab(value);
+                  }
+                }}
+                className="flex min-h-0 flex-1 flex-col overflow-hidden"
+              >
+                <TabsList className="grid w-full grid-cols-2">
+                  <TabsTrigger value="blocks">Blocs</TabsTrigger>
+                  <TabsTrigger value="structure">Structure</TabsTrigger>
+                </TabsList>
+                <TabsContent value="blocks" className="mt-4 min-h-0 flex-1 overflow-y-auto">
+                  <Card className="bg-card shadow-sm backdrop-blur">
+                    <CardHeader className="pb-4">
+                      <CardTitle>Bibliothèque de blocs</CardTitle>
+                      <CardDescription>
+                        Glissez et déposez un bloc pour l&apos;ajouter au canvas.
+                      </CardDescription>
+                    </CardHeader>
+                    <CardContent className="grid grid-cols-2 gap-3">
+                      <PanelButtons />
+                    </CardContent>
+                  </Card>
+                </TabsContent>
+                <TabsContent value="structure" className="mt-4 flex min-h-0 flex-1 flex-col overflow-hidden">
+                  <Card className="flex min-h-0 flex-1 flex-col overflow-hidden bg-card shadow-sm backdrop-blur">
+                    <CardHeader className="shrink-0 pb-3">
+                      <CardTitle>Structure</CardTitle>
+                      <CardDescription>
+                        Parcourez les composants de la page et sélectionnez-en un pour éditer ses réglages.
+                      </CardDescription>
+                    </CardHeader>
+                    <CardContent className="flex min-h-0 flex-1 flex-col overflow-hidden pb-4">
+                      <Explorer />
+                    </CardContent>
+                  </Card>
+                </TabsContent>
+              </Tabs>
             </Layout.SidebarLeft>
           )}
           {mode === APP_MODE.EDIT && (

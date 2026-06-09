@@ -9,5 +9,9 @@ interface BuilderInlineProps {
 }
 
 export default function BuilderInline({ children }: BuilderInlineProps) {
-  return <div className="builder-inline w-full min-h-[400px]">{children}</div>;
+  return (
+    <div className="builder-inline h-full min-h-[400px] w-full">
+      {children}
+    </div>
+  );
 }

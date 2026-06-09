@@ -2,6 +2,7 @@ import React, { type FC } from "react";
 import { type NodeViewProps } from "../NodeConfigurationType";
 import { useNodeContext } from "../../services/providers/NodeContext";
 import type { NodeButtonType } from "./index";
+import { sanitizeButtonLabelHtml } from "./shared";
 import { styleForView } from "../../utils/styleHelper";
 import { cn } from "@/editeur/lib/utils";
 
@@ -9,7 +10,7 @@ const View: FC<NodeViewProps> = () => {
   const { node } = useNodeContext();
   const buttonNode = node as NodeButtonType;
   const buttonType = buttonNode.content?.buttonType ?? "button";
-  const label = buttonNode.content?.label ?? "";
+  const labelHtml = sanitizeButtonLabelHtml(buttonNode.content?.label ?? "");
   const href = buttonNode.content?.href ?? "";
   const target = buttonNode.content?.target ?? "_self";
   const style = styleForView(node?.attributes?.style ?? {});
@@ -20,20 +21,17 @@ const View: FC<NodeViewProps> = () => {
     id: node?.attributes?.id ?? undefined,
     className: cn(`ce-button ce-button-${buttonNode.content?.size ?? "medium"} ce-button-${buttonNode.content?.variant ?? "default"}`, node?.attributes?.className ?? ""),
     style,
+    dangerouslySetInnerHTML: { __html: labelHtml },
   };
 
   if (buttonType === "link") {
     return (
-      <a href={href || "#"} target={target} rel={target === "_blank" ? "noopener noreferrer" : undefined} {...commonProps}>
-        {label}
-      </a>
+      <a href={href || "#"} target={target} rel={target === "_blank" ? "noopener noreferrer" : undefined} {...commonProps} />
     );
   }
 
   return (
-    <button type={buttonType === "submit" ? "submit" : "button"} {...commonProps}>
-      {label}
-    </button>
+    <button type={buttonType === "submit" ? "submit" : "button"} {...commonProps} />
   );
 };
 

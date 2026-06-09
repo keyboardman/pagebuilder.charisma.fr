@@ -28,9 +28,10 @@
 24. OK card vidéo possibilité de ne pas afficher le titre
 25. trier les composants titre description dans card api grille droite gauche
 26. OK lien article auteur corrigé
-27. construire l'explorateur
-28. le menu enregistré devient genant mais je ne sais pas quand cela se produit (en previsualisation ) quand on depasse le scroll de lediteur
-29. texte strong dans bouton
+27. OK construire l'explorateur
+28. OK le menu enregistré devient genant mais je ne sais pas quand cela se produit (en previsualisation ) quand on depasse le scroll de lediteur
+29. OK texte strong dans bouton
 30. OK tooltip
-31. Texte icone couleur ?
-32. Node Icone
+31. OK Texte icone couleur ?
+32. OK Node Icone
+33. OK node orphelin suppression

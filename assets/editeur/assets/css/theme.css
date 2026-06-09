@@ -48,7 +48,7 @@
     --admin-background-color: var(--sidebar);
     --admin-color: var(--sidebar-foreground);
     --admin-border-color: var(--sidebar-border);
-    --sizes-sidebarWidth: 280px;
+    --sizes-sidebarWidth: 360px;
     --sizes-sidebarRightWidth: 360px;
     --radius: 0.375rem;
     --background: oklch(1.0000 0 0);

@@ -50,3 +50,8 @@
 .ce-button:hover {
     opacity: 0.9;
 }
+
+.ce-button strong,
+.ce-button b {
+    font-weight: 900;
+}

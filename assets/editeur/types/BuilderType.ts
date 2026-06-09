@@ -4,16 +4,21 @@ import type { HistoriqueState } from "../services/providers/BuilderProvider";
 
 export type BuilderModeType = "edit" | "preview" | "view";
 
+export type SidebarLeftTab = "blocks" | "structure";
+
 export interface BuilderType {
  
   updateNode: (node: NodeType) => void;
   removeNode: <T extends NodeType>(node: T) => void;
+  requestRemoveNode: (node: NodeType) => void;
   duplicateNode: (node: NodeType) => void;
   updateNodes: (newNodes: NodesType) => void;
 
   // sidebar
   sidebarLeftCollapsed: boolean;
   setSidebarLeftCollapsed: React.Dispatch<React.SetStateAction<boolean>>;
+  sidebarLeftTab: SidebarLeftTab;
+  setSidebarLeftTab: React.Dispatch<React.SetStateAction<SidebarLeftTab>>;
 
   // historiques
   historiques: HistoriqueState;
