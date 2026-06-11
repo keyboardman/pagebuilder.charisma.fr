@@ -316,7 +316,7 @@ function Builder() {
                         Glissez et déposez un bloc pour l&apos;ajouter au canvas.
                       </CardDescription>
                     </CardHeader>
-                    <CardContent className="grid grid-cols-2 gap-3">
+                    <CardContent className="grid grid-cols-3 gap-3">
                       <PanelButtons />
                     </CardContent>
                   </Card>
