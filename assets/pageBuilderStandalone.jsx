@@ -3,6 +3,8 @@ import { createRoot } from 'react-dom/client';
 import PageBuilderEmbed from './editeur/PageBuilderEmbed';
 import AppProvider from './editeur/services/providers/AppProvider';
 import App from './editeur/app/App';
+import { registerBackendApis } from './editeur/ManagerApi/backendApiAdapter';
+import { apiRegistry } from './editeur/ManagerApi/ApiRegistry';
 import { registerFont } from './editeur/services/typography';
 import './editeur/assets/css/index.css';
 
@@ -49,27 +51,40 @@ function buildFullDocument(bodyInnerHTML, { baseUrl = '', pageTitle = '', pageDe
 
 function generateFullRenderHtml(content, opts) {
   return new Promise((resolve) => {
-    const container = document.createElement('div');
-    container.setAttribute('aria-hidden', 'true');
-    container.style.cssText = 'position:absolute;left:-9999px;top:0;width:1px;height:1px;overflow:hidden;pointer-events:none;';
-    document.body.appendChild(container);
-    const root = createRoot(container);
-    root.render(
-      React.createElement(AppProvider, { json: content, view: true }, React.createElement(App))
-    );
-    setTimeout(() => {
-      try {
-        const bodyHtml = makeLinksAbsolute(container.innerHTML, opts.baseUrl);
-        const fullDoc = buildFullDocument(bodyHtml, opts);
-        root.unmount();
-        document.body.removeChild(container);
-        resolve(fullDoc);
-      } catch (e) {
-        root.unmount();
-        if (container.parentNode) document.body.removeChild(container);
-        resolve('');
+    const boot = async () => {
+      if (opts.apiCardsBaseUrl) {
+        try {
+          await registerBackendApis(opts.apiCardsBaseUrl, (adapter) => apiRegistry.register(adapter));
+        } catch {
+          // ignore — le rendu statique reste dégradé si les APIs ne sont pas disponibles
+        }
       }
-    }, 400);
+
+      const container = document.createElement('div');
+      container.setAttribute('aria-hidden', 'true');
+      container.style.cssText = 'position:absolute;left:-9999px;top:0;width:1px;height:1px;overflow:hidden;pointer-events:none;';
+      document.body.appendChild(container);
+      const root = createRoot(container);
+      root.render(
+        React.createElement(AppProvider, { json: content, view: true }, React.createElement(App))
+      );
+
+      setTimeout(() => {
+        try {
+          const bodyHtml = makeLinksAbsolute(container.innerHTML, opts.baseUrl);
+          const fullDoc = buildFullDocument(bodyHtml, opts);
+          root.unmount();
+          document.body.removeChild(container);
+          resolve(fullDoc);
+        } catch (e) {
+          root.unmount();
+          if (container.parentNode) document.body.removeChild(container);
+          resolve('');
+        }
+      }, opts.apiCardsBaseUrl ? 1200 : 400);
+    };
+
+    void boot();
   });
 }
 
@@ -121,11 +136,18 @@ function PageBuilderStandalone({
   }, []);
 
   const handleSave = useCallback(() => {
-    const opts = { baseUrl, pageTitle, pageDescription, themeCssUrl, renderCssUrls };
+    const opts = {
+      baseUrl,
+      pageTitle,
+      pageDescription,
+      themeCssUrl,
+      renderCssUrls,
+      apiCardsBaseUrl,
+    };
     generateFullRenderHtml(content, opts).then((fullHtml) => {
       saveContent(content, fullHtml);
     });
-  }, [saveContent, content, baseUrl, pageTitle, pageDescription, themeCssUrl, renderCssUrls]);
+  }, [saveContent, content, baseUrl, pageTitle, pageDescription, themeCssUrl, renderCssUrls, apiCardsBaseUrl]);
 
   return (
     <div className="page-builder-standalone-shell relative grid min-h-0 flex-1 grid-rows-[auto_1fr] overflow-hidden">

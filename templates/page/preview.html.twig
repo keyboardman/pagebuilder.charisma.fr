@@ -24,7 +24,7 @@
             <h1 class="text-3xl font-bold tracking-tight mb-6">{{ page.title }}</h1>
             <div class="prose prose-neutral dark:prose-invert max-w-none">
                 {% if page.content is not empty %}
-                    <div id="page-preview-root" data-json="{{ page.content|json_encode|e('html_attr') }}"></div>
+                    <div id="page-preview-root" data-json="{{ page.content|json_encode|e('html_attr') }}" data-api-cards-base-url="{{ path('app_page_builder_api_cards_list')|replace({'/cards': ''})|e('html_attr') }}"></div>
                     {{ encore_entry_script_tags('pagePreview') }}
                 {% else %}
                     <p class="text-muted-foreground">Aucun contenu.</p>

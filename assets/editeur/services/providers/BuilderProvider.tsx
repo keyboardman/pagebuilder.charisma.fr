@@ -67,14 +67,15 @@ export const BuilderProvider: FC<BuilderContextProviderProps> = ({
   }, [nodes]);
 
   const onSave = useCallback(() => {
+    const nodesToSave = nodeHelper.sanitizeNodes(nodes);
     if (onSaveCallback) {
-      onSaveCallback(nodes);
+      onSaveCallback(nodesToSave);
     }
     if (target !== undefined) {
       const doc = typeof document !== "undefined" ? document : null;
       const textarea = doc?.getElementById(target) as HTMLTextAreaElement | null;
       if (textarea) {
-        textarea.value = JSON.stringify(nodes);
+        textarea.value = JSON.stringify(nodesToSave);
       }
     }
   }, [nodes, onSaveCallback, target]);

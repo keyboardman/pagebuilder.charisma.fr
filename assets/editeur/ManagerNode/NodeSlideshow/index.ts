@@ -30,6 +30,11 @@ export interface NodeSlideshowType extends NodeType {
     slidesMode: "manual" | "api-endpoint";
     /** API endpoint sélectionnée (quand `slidesMode="api-endpoint"`) */
     apiId?: string;
+    /**
+     * Slides persistées uniquement en mode `manual`.
+     * En mode `api-endpoint`, le tableau reste vide à la sauvegarde ;
+     * les slides sont chargées à l'affichage via `apiId`.
+     */
     slides: NodeSlideshowSlide[];
     navigationEnabled: boolean;
     paginationEnabled: boolean;

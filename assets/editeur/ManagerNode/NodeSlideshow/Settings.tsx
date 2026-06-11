@@ -9,9 +9,16 @@ import { Button } from "@/editeur/components/ui/button";
 import { Switch } from "@/editeur/components/ui/switch";
 import { cn } from "@/editeur/lib/utils";
 import type { NodeSlideshowSlide, NodeSlideshowType } from ".";
+import {
+  DEFAULT_SLIDE_SRC,
+  fetchSlidesFromApi,
+  normalizeSlideshowContent,
+  placeholderApiSlide,
+  resolveApiId,
+  resolveSlidesMode,
+} from "./slideshowApi";
 import { Table, TableHeader, TableBody, TableRow, TableCell, TableHead } from "@/editeur/components/ui/table";
 import { Monitor, Tablet, Phone } from "lucide-react";
-const DEFAULT_SLIDE_SRC = "https://placehold.net/3-800x600.png";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/editeur/components/ui/tabs";
 
 function moveIndex<T>(arr: T[], from: number, to: number): T[] {
@@ -32,7 +39,31 @@ const Settings: FC<NodeSettingsProps> = () => {
   const { node, onChange } = useNodeBuilderContext();
   const slideshowNode = node as NodeSlideshowType;
 
-  const slidesSafe = useMemo<NodeSlideshowSlide[]>(() => {
+  const contentForMode = slideshowNode.content ?? {};
+  const slidesMode = resolveSlidesMode(contentForMode);
+
+  useEffect(() => {
+    const normalized = normalizeSlideshowContent(
+      (slideshowNode.content ?? {}) as Record<string, unknown>
+    );
+    const current = slideshowNode.content ?? {};
+    const needsMigration =
+      normalized.slidesMode !== current.slidesMode ||
+      JSON.stringify(normalized.slides ?? []) !== JSON.stringify(current.slides ?? []) ||
+      normalized.apiId !== current.apiId;
+
+    if (needsMigration) {
+      onChange({
+        ...node,
+        content: {
+          ...(node.content ?? {}),
+          ...normalized,
+        },
+      });
+    }
+  }, [node.id]);
+
+  const manualSlides = useMemo<NodeSlideshowSlide[]>(() => {
     const slides = slideshowNode.content?.slides;
     if (!Array.isArray(slides) || slides.length === 0) {
       return [{ src: DEFAULT_SLIDE_SRC, alt: "", source: "media", link: "" }];
@@ -40,16 +71,18 @@ const Settings: FC<NodeSettingsProps> = () => {
     return slides;
   }, [slideshowNode.content?.slides]);
 
+  const [apiPreviewSlides, setApiPreviewSlides] = useState<NodeSlideshowSlide[]>([]);
   const [selectedIndex, setSelectedIndex] = useState(0);
   const [draggingIndex, setDraggingIndex] = useState<number | null>(null);
   const [dragOverIndex, setDragOverIndex] = useState<number | null>(null);
-  const slidesMode = slideshowNode.content?.slidesMode ?? "manual";
   const [apiLoading, setApiLoading] = useState(false);
   const [apiError, setApiError] = useState<string | null>(null);
 
+  const displaySlides = slidesMode === "manual" ? manualSlides : apiPreviewSlides;
+
   useEffect(() => {
-    setSelectedIndex((idx) => Math.min(Math.max(0, idx), slidesSafe.length - 1));
-  }, [slidesSafe.length]);
+    setSelectedIndex((idx) => Math.min(Math.max(0, idx), Math.max(displaySlides.length - 1, 0)));
+  }, [displaySlides.length]);
 
   const updateContent = (patch: Partial<NodeSlideshowType["content"]>) => {
     onChange({
@@ -96,7 +129,7 @@ const Settings: FC<NodeSettingsProps> = () => {
       ? slideshowNode.content.gap
       : 10;
 
-  const selectedSlide = slidesSafe[selectedIndex];
+  const selectedSlide = displaySlides[selectedIndex];
   const updateSlidesPerView = (
     key: keyof NodeSlideshowType["content"]["slidesPerViewByBreakpoint"],
     rawValue: string
@@ -129,49 +162,33 @@ const Settings: FC<NodeSettingsProps> = () => {
     label: adapter.label,
   }));
 
-  const apiId = slideshowNode.content?.apiId ?? "";
+  const apiId = resolveApiId(contentForMode);
 
   const loadSlidesFromApi = async (nextApiId: string) => {
-    const adapter = apiRegistry.get(nextApiId);
-    if (!adapter) return;
+    if (!nextApiId) return;
 
     setApiLoading(true);
     setApiError(null);
     try {
-      const result = await adapter.fetchCollection({
-        page: 1,
-        limit: 200,
-      });
-
-      const mappedSlides: NodeSlideshowSlide[] = (result.items ?? [])
-        .map((item) => adapter.mapItem(item))
-        .filter((mapped) => (mapped.image ?? "").trim().length > 0)
-        .map((mapped) => ({
-          src: String(mapped.image ?? ""),
-          alt: mapped.title ?? "",
-          source: "api-fixed",
-          link: mapped.link ?? "",
-          apiId: nextApiId,
-          itemId: mapped.id,
-        }));
-
-      const nextSlides =
-        mappedSlides.length > 0
-          ? mappedSlides
-          : [{ src: DEFAULT_SLIDE_SRC, alt: "", source: "api-fixed" as const, link: "", apiId: nextApiId }];
-
-      updateContent({
-        slidesMode: "api-endpoint",
-        apiId: nextApiId,
-        slides: nextSlides,
-      });
+      const mappedSlides = await fetchSlidesFromApi(nextApiId);
+      setApiPreviewSlides(mappedSlides);
       setSelectedIndex(0);
     } catch (err) {
+      setApiPreviewSlides([placeholderApiSlide(nextApiId)]);
       setApiError(err instanceof Error ? err.message : "Erreur lors du chargement depuis l'API");
     } finally {
       setApiLoading(false);
     }
   };
+
+  useEffect(() => {
+    if (slidesMode !== "api-endpoint" || !apiId) {
+      setApiPreviewSlides([]);
+      return;
+    }
+    void loadSlidesFromApi(apiId);
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- recharger uniquement quand la source API change
+  }, [slidesMode, apiId]);
 
   return (
     <Tabs className="flex min-h-0 flex-1 flex-col overflow-hidden" defaultValue="main">
@@ -396,40 +413,28 @@ const Settings: FC<NodeSettingsProps> = () => {
                         onChange={(value) => {
                           const nextMode = (value as "manual" | "api-endpoint") || "manual";
                           if (nextMode === "manual") {
-                            const nextSlides = [
-                              {
-                                src: DEFAULT_SLIDE_SRC,
-                                alt: "",
-                                source: "media" as const,
-                                link: "",
-                              },
-                            ];
+                            setApiPreviewSlides([]);
                             updateContent({
                               slidesMode: "manual",
                               apiId: undefined,
-                              slides: nextSlides,
+                              slides: [
+                                {
+                                  src: DEFAULT_SLIDE_SRC,
+                                  alt: "",
+                                  source: "media" as const,
+                                  link: "",
+                                },
+                              ],
                             });
                             setSelectedIndex(0);
                           } else {
-                            const nextApiId = apiId;
-                            const placeholderSlides = [
-                              {
-                                src: DEFAULT_SLIDE_SRC,
-                                alt: "",
-                                source: "api-fixed" as const,
-                                link: "",
-                                apiId: nextApiId || undefined,
-                              },
-                            ];
+                            setApiPreviewSlides([]);
                             updateContent({
                               slidesMode: "api-endpoint",
-                              apiId: nextApiId || undefined,
-                              slides: placeholderSlides,
+                              apiId: apiId || undefined,
+                              slides: [],
                             });
                             setSelectedIndex(0);
-                            if (nextApiId) {
-                              void loadSlidesFromApi(nextApiId);
-                            }
                           }
                         }}
                         options={[
@@ -448,7 +453,7 @@ const Settings: FC<NodeSettingsProps> = () => {
                         size="sm"
                         onClick={() => {
                           const nextSlides = [
-                            ...slidesSafe,
+                            ...manualSlides,
                             {
                               src: DEFAULT_SLIDE_SRC,
                               alt: "",
@@ -472,11 +477,11 @@ const Settings: FC<NodeSettingsProps> = () => {
                           onChange={(value) => {
                             const nextId = String(value ?? "");
                             if (!nextId) {
-                              updateContent({ apiId: undefined });
+                              setApiPreviewSlides([]);
+                              updateContent({ apiId: undefined, slides: [] });
                               return;
                             }
-                            updateContent({ slidesMode: "api-endpoint", apiId: nextId });
-                            void loadSlidesFromApi(nextId);
+                            updateContent({ slidesMode: "api-endpoint", apiId: nextId, slides: [] });
                           }}
                           options={apiOptions}
                           placeholder={apiOptions.length ? "Choisir une API..." : "Aucune API fixe"}
@@ -507,26 +512,28 @@ const Settings: FC<NodeSettingsProps> = () => {
                   )}
 
                   <div className="flex flex-wrap gap-2">
-                    {slidesSafe.map((slide, idx) => (
+                    {displaySlides.map((slide, idx) => (
                       <div
-                        key={`${slide.src}-${idx}`}
-                        draggable
+                        key={`${slide.itemId ?? slide.src}-${idx}`}
+                        draggable={slidesMode === "manual"}
                         onDragStart={(e) => {
-                          // Certaines implémentations HTML5 DnD nécessitent un dataTransfer pour autoriser le drop.
+                          if (slidesMode !== "manual") return;
                           e.dataTransfer.effectAllowed = "move";
                           e.dataTransfer.setData("text/plain", String(idx));
                           setDraggingIndex(idx);
                           setDragOverIndex(idx);
                         }}
                         onDragOver={(e) => {
+                          if (slidesMode !== "manual") return;
                           e.preventDefault();
                           setDragOverIndex(idx);
                         }}
                         onDrop={(e) => {
+                          if (slidesMode !== "manual") return;
                           e.preventDefault();
                           if (draggingIndex == null) return;
                           if (draggingIndex === idx) return;
-                          const nextSlides = moveIndex(slidesSafe, draggingIndex, idx);
+                          const nextSlides = moveIndex(manualSlides, draggingIndex, idx);
                           const nextSelected = computeNewSelectedIndex(
                             draggingIndex,
                             idx,
@@ -543,7 +550,8 @@ const Settings: FC<NodeSettingsProps> = () => {
                         }}
                         onClick={() => setSelectedIndex(idx)}
                         className={cn(
-                          "ce-slideshow-thumb relative cursor-pointer rounded border p-1",
+                          "ce-slideshow-thumb relative rounded border p-1",
+                          slidesMode === "manual" ? "cursor-pointer" : "cursor-default",
                           idx === selectedIndex
                             ? "border-primary"
                             : "border-border/50 hover:border-border/80",
@@ -580,7 +588,7 @@ const Settings: FC<NodeSettingsProps> = () => {
                           type="text"
                           value={selectedSlide?.src ?? ""}
                           onChange={(value) => {
-                            const nextSlides = [...slidesSafe];
+                            const nextSlides = [...manualSlides];
                             if (!nextSlides[selectedIndex]) return;
                             nextSlides[selectedIndex] = {
                               ...nextSlides[selectedIndex],
@@ -598,7 +606,7 @@ const Settings: FC<NodeSettingsProps> = () => {
                           type="text"
                           value={selectedSlide?.alt ?? ""}
                           onChange={(value) => {
-                            const nextSlides = [...slidesSafe];
+                            const nextSlides = [...manualSlides];
                             if (!nextSlides[selectedIndex]) return;
                             nextSlides[selectedIndex] = {
                               ...nextSlides[selectedIndex],
@@ -616,7 +624,7 @@ const Settings: FC<NodeSettingsProps> = () => {
                           value={selectedSlide?.link ?? ""}
                           placeholder="https://..."
                           onChange={(value) => {
-                            const nextSlides = [...slidesSafe];
+                            const nextSlides = [...manualSlides];
                             if (!nextSlides[selectedIndex]) return;
                             nextSlides[selectedIndex] = {
                               ...nextSlides[selectedIndex],
@@ -633,14 +641,13 @@ const Settings: FC<NodeSettingsProps> = () => {
                           variant="destructive"
                           size="sm"
                           onClick={() => {
-                            if (slidesSafe.length <= 1) {
-                              // On garde toujours au moins 1 slide pour éviter un Swiper vide.
+                            if (manualSlides.length <= 1) {
                               updateContent({
                                 slides: [
                                   {
                                     src: DEFAULT_SLIDE_SRC,
                                     alt: "",
-                                    source: slidesMode === "manual" ? ("media" as const) : ("api-fixed" as const),
+                                    source: "media" as const,
                                     link: "",
                                   },
                                 ],
@@ -648,7 +655,7 @@ const Settings: FC<NodeSettingsProps> = () => {
                               setSelectedIndex(0);
                               return;
                             }
-                            const nextSlides = slidesSafe.filter((_, idx) => idx !== selectedIndex);
+                            const nextSlides = manualSlides.filter((_, idx) => idx !== selectedIndex);
                             const nextSelected = Math.min(selectedIndex, nextSlides.length - 1);
                             updateContent({ slides: nextSlides });
                             setSelectedIndex(nextSelected);

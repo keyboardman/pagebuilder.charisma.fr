@@ -1,9 +1,16 @@
-import { type FC } from "react";
+import { type FC, useEffect, useMemo, useState } from "react";
 import { useNodeContext } from "../../services/providers/NodeContext";
 import { useAppContext } from "../../services/providers/AppContext";
-import type { NodeSlideshowType } from ".";
+import type { NodeSlideshowSlide, NodeSlideshowType } from ".";
 import { styleForView } from "../../utils/styleHelper";
 import { cn } from "@/editeur/lib/utils";
+import {
+  DEFAULT_SLIDE_SRC,
+  fetchSlidesFromApi,
+  placeholderApiSlide,
+  resolveApiId,
+  resolveSlidesMode,
+} from "./slideshowApi";
 
 import { Swiper, SwiperSlide } from "swiper/react";
 import {
@@ -27,18 +34,72 @@ import "swiper/css/effect-flip";
 import "swiper/css/effect-cards";
 import "swiper/css/effect-creative";
 
-const DEFAULT_SLIDE_SRC = "https://placehold.net/3-800x600.png";
-
 const View: FC = () => {
   const { node } = useNodeContext() as { node: NodeSlideshowType };
   const { breakpoint } = useAppContext();
 
   const content = node.content ?? ({} as NodeSlideshowType["content"]);
-  const slidesFromNode = Array.isArray(content.slides) ? content.slides : [];
-  const slides =
-    slidesFromNode.length > 0
+  const slidesMode = resolveSlidesMode(content);
+  const apiId = resolveApiId(content);
+
+  const [apiSlides, setApiSlides] = useState<NodeSlideshowSlide[] | null>(null);
+  const [apiLoading, setApiLoading] = useState(false);
+  const [apiError, setApiError] = useState(false);
+
+  useEffect(() => {
+    if (slidesMode !== "api-endpoint" || !apiId) {
+      setApiSlides(null);
+      setApiLoading(false);
+      setApiError(false);
+      return;
+    }
+
+    let cancelled = false;
+
+    const load = async () => {
+      setApiLoading(true);
+      setApiError(false);
+
+      try {
+        const slides = await fetchSlidesFromApi(apiId);
+        if (!cancelled) {
+          setApiSlides(slides);
+        }
+      } catch {
+        if (!cancelled) {
+          setApiSlides(null);
+          setApiError(true);
+        }
+      } finally {
+        if (!cancelled) {
+          setApiLoading(false);
+        }
+      }
+    };
+
+    void load();
+
+    return () => {
+      cancelled = true;
+    };
+  }, [slidesMode, apiId]);
+
+  const slides = useMemo<NodeSlideshowSlide[]>(() => {
+    if (slidesMode === "api-endpoint") {
+      if (apiLoading || apiSlides === null) {
+        return [placeholderApiSlide(apiId)];
+      }
+      if (apiError) {
+        return [placeholderApiSlide(apiId)];
+      }
+      return apiSlides.length > 0 ? apiSlides : [placeholderApiSlide(apiId)];
+    }
+
+    const slidesFromNode = Array.isArray(content.slides) ? content.slides : [];
+    return slidesFromNode.length > 0
       ? slidesFromNode
-      : [{ src: DEFAULT_SLIDE_SRC, alt: "" }];
+      : [{ src: DEFAULT_SLIDE_SRC, alt: "", source: "media" as const, link: "" }];
+  }, [slidesMode, apiId, apiLoading, apiSlides, apiError, content.slides]);
 
   const navigationEnabled = content.navigationEnabled !== false;
   const paginationEnabled = content.paginationEnabled !== false;
@@ -88,7 +149,7 @@ const View: FC = () => {
     ...(effect === "creative" ? [EffectCreative] : []),
   ];
 
-  const swiperKey = `${navigationEnabled ? 1 : 0}-${paginationEnabled ? 1 : 0}-${speedMs}-${slides.length}-${slidesPerViewCurrent}-${autoplayEnabled ? 1 : 0}-${autoplayDelayMs}-${aspectRatioRaw}-${effect}-${imageBorderRadius}-${gap}`;
+  const swiperKey = `${navigationEnabled ? 1 : 0}-${paginationEnabled ? 1 : 0}-${speedMs}-${slides.length}-${slidesPerViewCurrent}-${autoplayEnabled ? 1 : 0}-${autoplayDelayMs}-${aspectRatioRaw}-${effect}-${imageBorderRadius}-${gap}-${slidesMode}-${apiId}`;
 
   return (
     <div
@@ -136,18 +197,18 @@ const View: FC = () => {
         spaceBetween={slidesPerViewCurrent > 1 ? gap : 0}
       >
         {slides.map((slide, idx) => (
-          <SwiperSlide key={`${slide.src}-${idx}`} className="ce-slideshow-slide">
+          <SwiperSlide key={`${slide.itemId ?? slide.src}-${idx}`} className="ce-slideshow-slide">
             <div
               className="ce-slideshow-image-wrapper"
               style={aspectRatio ? { aspectRatio } : undefined}
             >
               {slide.link && slide.link.trim().length > 0 ? (
-                <a href={slide.link} className="block h-full w-full" target="_blank">
+                <a href={slide.link} className="block h-full w-full" target="_blank" rel="noopener noreferrer">
                   <img
                     className="ce-slideshow-image"
                     src={slide.src}
                     alt={slide.alt ?? ""}
-                    style={{ borderRadius: imageBorderRadius }} 
+                    style={{ borderRadius: imageBorderRadius }}
                     loading="lazy"
                   />
                 </a>
@@ -156,7 +217,7 @@ const View: FC = () => {
                   className="ce-slideshow-image"
                   src={slide.src}
                   alt={slide.alt ?? ""}
-                  style={{ borderRadius: imageBorderRadius }} 
+                  style={{ borderRadius: imageBorderRadius }}
                   loading="lazy"
                 />
               )}
@@ -169,4 +230,3 @@ const View: FC = () => {
 };
 
 export default View;
-

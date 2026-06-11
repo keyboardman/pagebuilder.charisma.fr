@@ -1,4 +1,6 @@
 import NodeRegistry from "../ManagerNode/components/NodeRegistry";
+import { NODE_SLIDESHOW_TYPE } from "../ManagerNode/NodeSlideshow";
+import { normalizeSlideshowContent } from "../ManagerNode/NodeSlideshow/slideshowApi";
 import { NODE_ROOT_TYPE } from "../ManagerNode/NodeRoot";
 import type { NodeID, NodesType, NodeType, ParentProps } from "../types/NodeType";
 import { generateNodeId, makeParentProps } from "./helpers";
@@ -179,6 +181,15 @@ const nodeHelper = {
 
             console.warn(
                 `[nodeHelper] sanitizeNodes: removed ${toRemove.length} invalid node(s)`
+            );
+        }
+
+        for (const node of Object.values(_nodes)) {
+            if (node.type !== NODE_SLIDESHOW_TYPE || !node.content) {
+                continue;
+            }
+            node.content = normalizeSlideshowContent(
+                node.content as Record<string, unknown>
             );
         }
 
