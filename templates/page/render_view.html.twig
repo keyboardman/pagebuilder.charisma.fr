@@ -13,6 +13,7 @@
     {% if page.theme.generatedCssPath %}
         <link rel="stylesheet" href="{{ path('app_theme_css', { id: page.theme.id }) }}">
     {% endif %}
+    {% include '_page_fonts.html.twig' %}
 </head>
 <body class="theme-view-scope min-h-screen m-0">
     <div id="page-preview-root" data-json="{{ (page.content ?? {})|json_encode(constant('JSON_UNESCAPED_UNICODE'))|e('html_attr') }}" data-api-cards-base-url="{{ path('app_page_builder_api_cards_list')|replace({'/cards': ''})|e('html_attr') }}"></div>

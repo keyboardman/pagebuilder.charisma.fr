@@ -1,0 +1,10 @@
+{# Polices utilisées dans le contenu de la page (hors thème) #}
+{% for font in page_fonts|default([]) %}
+    {% if font.href is defined and font.href starts with 'builtin:' %}
+        {# native catalogue — rien à charger #}
+    {% elseif font.href is defined and ('fonts.googleapis.com' in font.href or font.href ends with '.css') %}
+        <link rel="stylesheet" href="{{ font.href }}">
+    {% elseif font.href is defined and font.name is defined %}
+        <style>@font-face { font-family: "{{ font.name|e('css') }}"; src: url("{{ font.href|e('css') }}") format("woff2"); font-display: swap; }</style>
+    {% endif %}
+{% endfor %}

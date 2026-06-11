@@ -235,23 +235,30 @@ Le nœud SHALL être éditable dans le panneau de propriétés du builder et SHA
 - **WHEN** l’utilisateur configure une liste de slides avec des images
 - **THEN** la preview affiche un carrousel Swiper avec une slide par image
 
-#### Scenario: Persistance de la configuration du node
-- **WHEN** l’utilisateur sauvegarde la page contenant un NodeSlideshow
+#### Scenario: Persistance de la configuration du node en mode manuel
+- **WHEN** l’utilisateur sauvegarde la page contenant un NodeSlideshow en mode `manual`
 - **THEN** les images (dans leur ordre), leurs métadonnées de slide (dont `alt`, source d'image et lien éventuel), ainsi que les options d’affichage Swiper définies, sont sérialisées et restituées lors d’un rechargement
+
+#### Scenario: Persistance de la configuration du node en mode API
+- **WHEN** l’utilisateur sauvegarde la page contenant un NodeSlideshow en mode `api-endpoint`
+- **THEN** le contenu sérialisé conserve `slidesMode`, `apiId` et les options d’affichage Swiper
+- **AND** le contenu sérialisé ne conserve pas le tableau `slides` issu de l’API (snapshot)
+- **AND** les slides sont rechargées depuis l’API à l’affichage ultérieur
 
 ### Requirement: Gestion des slides images (ajout, tri, suppression, modification)
 Le nœud NodeSlideshow SHALL permettre à l’utilisateur de gérer la liste des slides images en choisissant un mode de source :
 - mode `manual` : la liste des slides est éditée directement dans le panneau (ajout, suppression, tri drag-and-drop, édition `src`/`alt`)
-- mode `api-endpoint` : la liste des slides est déterminée par la sélection d’un endpoint API image (collection fixe) dans le panneau ; le système charge automatiquement la collection et la mappe en slides.
+- mode `api-endpoint` : la liste des slides est déterminée par la sélection d’un endpoint API image (collection fixe) dans le panneau ; le système charge la collection à l’affichage via `fetchCollection` et la mappe en slides, sans persister les données de la collection dans le contenu du nœud.
 
-Dans les deux modes, le nœud SHALL exposer un champ `link` optionnel par slide ; lorsque `link` est renseigné, la slide SHALL être cliquable dans la preview et le rendu final.
+En mode `manual`, le nœud SHALL exposer un champ `link` optionnel par slide ; lorsque `link` est renseigné, la slide SHALL être cliquable dans la preview et le rendu final. En mode `api-endpoint`, les liens SHALL provenir du mapping ApiCard (`mapItem`) de chaque item.
 
-Après chaque action, l’ordre et le contenu SHALL être immédiatement reflétés dans la preview.
+Après chaque action en mode `manual`, l’ordre et le contenu SHALL être immédiatement reflétés dans la preview. En mode `api-endpoint`, la preview SHALL refléter la collection API courante (rechargée à l’affichage ou via le bouton « Recharger » du panneau).
 
-Le changement de mode (`manual` <-> `api-endpoint`) SHALL réinitialiser la liste des slides affichée (et recharger depuis l’API lorsque `api-endpoint` est sélectionné).
+Le changement de mode (`manual` <-> `api-endpoint`) SHALL réinitialiser la source des slides affichées (liste manuelle vide ou placeholder en mode API) et SHALL purger toute donnée de slide persistée lorsque le mode API est actif.
 
-#### Scenario: Tri par drag-and-drop
-- **WHEN** l’utilisateur réordonne les slides par drag-and-drop
+#### Scenario: Tri par drag-and-drop en mode manuel
+- **WHEN** l’utilisateur est en mode `manual`
+- **AND** l’utilisateur réordonne les slides par drag-and-drop
 - **THEN** l’ordre Swiper correspond à l’ordre visuel dans la liste
 
 #### Scenario: Ajout de slide en mode manuel (saisie d’URL)
@@ -261,19 +268,35 @@ Le changement de mode (`manual` <-> `api-endpoint`) SHALL réinitialiser la list
 - **THEN** une nouvelle slide apparaît dans la liste et la preview est mise à jour
 
 #### Scenario: Suppression de la slide sélectionnée
-- **WHEN** l’utilisateur sélectionne une slide puis clique “Supprimer”
+- **WHEN** l’utilisateur est en mode `manual`
+- **AND** l’utilisateur sélectionne une slide puis clique “Supprimer”
 - **THEN** la slide est retirée de la liste et la preview est mise à jour
 
-#### Scenario: Sélection d’un endpoint API pour charger les slides
+#### Scenario: Sélection d’un endpoint API pour afficher les slides
 - **WHEN** l’utilisateur passe en mode `api-endpoint`
 - **AND** l’utilisateur sélectionne une API image fixe dans le sélecteur “Endpoint API (image fixed)”
-- **THEN** les slides sont chargées automatiquement depuis la collection de l’API sélectionnée
+- **THEN** les slides sont chargées depuis la collection de l’API sélectionnée pour la preview
+- **AND** seuls `slidesMode` et `apiId` sont persistés dans le contenu du nœud
 
-#### Scenario: Lien optionnel par slide
-- **WHEN** l’utilisateur renseigne une URL de lien sur une slide
+#### Scenario: Données API fraîches à l’affichage
+- **WHEN** un NodeSlideshow en mode `api-endpoint` avec un `apiId` valide est affiché (éditeur, preview ou rendu final)
+- **THEN** le système appelle `fetchCollection` sur l’API référencée et mappe les items en slides
+- **AND** le rendu reflète la collection courante de l’API, indépendamment d’un éventuel snapshot `slides` présent dans d’anciennes sauvegardes
+
+#### Scenario: Rechargement manuel dans le panneau
+- **WHEN** l’utilisateur clique sur “Recharger” en mode `api-endpoint`
+- **THEN** la preview des vignettes est rafraîchie depuis l’API sans écrire les slides dans le contenu persisté du nœud
+
+#### Scenario: Lien optionnel par slide en mode manuel
+- **WHEN** l’utilisateur est en mode `manual`
+- **AND** l’utilisateur renseigne une URL de lien sur une slide
 - **THEN** la slide devient cliquable dans le rendu
 - **WHEN** l’utilisateur vide le champ de lien
 - **THEN** la slide redevient non cliquable
+
+#### Scenario: API indisponible ou collection vide en mode API
+- **WHEN** l’API sélectionnée ne répond pas, retourne une erreur ou une collection vide en mode `api-endpoint`
+- **THEN** le NodeSlideshow affiche un état dégradé (placeholder ou message discret) sans empêcher la sauvegarde de la page
 
 ### Requirement: Réglages d’affichage Swiper (navigation, pagination, vitesse)
 Le nœud NodeSlideshow SHALL exposer des paramètres permettant de configurer :

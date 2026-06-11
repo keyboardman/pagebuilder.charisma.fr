@@ -3,6 +3,8 @@ import { useSyncExternalStore } from "react";
 /** Format CSS pour @font-face : opentype (.otf), truetype (.ttf), woff, woff2 */
 export type FontFormat = "opentype" | "truetype" | "woff" | "woff2";
 
+export type FontTier = "builtin" | "theme" | "page";
+
 export type RegisterFontInput = {
   name: string;
   href: string;
@@ -10,6 +12,7 @@ export type RegisterFontInput = {
   /** Format du fichier (opentype pour .otf, truetype pour .ttf, woff, woff2). Inféré depuis l'URL si absent. */
   format?: FontFormat;
   fontSizes?: string[];
+  tier?: FontTier;
 };
 
 type RegisteredFont = {
@@ -18,6 +21,7 @@ type RegisteredFont = {
   fontFamily: string;
   format?: FontFormat;
   fontSizes?: string[];
+  tier: FontTier;
 };
 
 type TypographyState = {
@@ -26,13 +30,13 @@ type TypographyState = {
 };
 
 const DEFAULT_FONTS: RegisteredFont[] = [
-  { name: "Sans (par défaut)", fontFamily: "var(--font-sans)", href: "builtin:font-sans" },
-  { name: "Serif (par défaut)", fontFamily: "var(--font-serif)", href: "builtin:font-serif" },
-  { name: "Mono (par défaut)", fontFamily: "var(--font-mono)", href: "builtin:font-mono" },
-  { name: "Arial, Helvetica", fontFamily: "Arial, Helvetica, sans-serif", href: "builtin:arial" },
-  { name: "Times New Roman", fontFamily: "Times, Times New Roman, serif", href: "builtin:times" },
-  { name: "Georgia", fontFamily: "Georgia, serif", href: "builtin:georgia" },
-  { name: "Verdana", fontFamily: "Verdana, sans-serif", href: "builtin:verdana" },
+  { name: "Sans (par défaut)", fontFamily: "var(--font-sans)", href: "builtin:font-sans", tier: "builtin" },
+  { name: "Serif (par défaut)", fontFamily: "var(--font-serif)", href: "builtin:font-serif", tier: "builtin" },
+  { name: "Mono (par défaut)", fontFamily: "var(--font-mono)", href: "builtin:font-mono", tier: "builtin" },
+  { name: "Arial, Helvetica", fontFamily: "Arial, Helvetica, sans-serif", href: "builtin:arial", tier: "builtin" },
+  { name: "Times New Roman", fontFamily: "Times, Times New Roman, serif", href: "builtin:times", tier: "builtin" },
+  { name: "Georgia", fontFamily: "Georgia, serif", href: "builtin:georgia", tier: "builtin" },
+  { name: "Verdana", fontFamily: "Verdana, sans-serif", href: "builtin:verdana", tier: "builtin" },
 ];
 
 const DEFAULT_FONT_SIZES: string[] = [
@@ -47,18 +51,19 @@ const DEFAULT_FONT_SIZES: string[] = [
   "3rem",
 ];
 
+const protectedFontFamilies = new Set(
+  DEFAULT_FONTS.map((font) => font.fontFamily)
+);
+
 let state: TypographyState = {
   fonts: [...DEFAULT_FONTS],
   fontSizes: [...DEFAULT_FONT_SIZES],
 };
 
 const listeners = new Set<() => void>();
-// Track loaded stylesheets per document to avoid duplicates
 const loadedStylesheetsByDoc = new WeakMap<Document, Set<string>>();
 const loadedFontFacesByDoc = new WeakMap<Document, Set<string>>();
 const preconnectAddedByDoc = new WeakMap<Document, boolean>();
-// registerFont peut être appelé avant que l'iframe soit montée.
-// Dans ce cas, l'injection est rejouée via syncRegisteredFontsToDocument(doc) dès que BuilderProvider fournit l'iframe.
 
 const notify = () => listeners.forEach((listener) => listener());
 
@@ -75,21 +80,18 @@ const ensureGoogleFontsPreconnect = (doc: Document) => {
     return;
   }
 
-  // Vérifier si les preconnect ont déjà été ajoutés pour ce document
   if (preconnectAddedByDoc.get(doc)) {
     return;
   }
 
-  // Vérifier si les balises existent déjà dans le DOM
   const existingPreconnect1 = doc.querySelector('link[rel="preconnect"][href="https://fonts.googleapis.com"]');
   const existingPreconnect2 = doc.querySelector('link[rel="preconnect"][href="https://fonts.gstatic.com"]');
-  
+
   if (existingPreconnect1 && existingPreconnect2) {
     preconnectAddedByDoc.set(doc, true);
     return;
   }
-  
-  // Ajouter preconnect pour fonts.googleapis.com
+
   if (!existingPreconnect1) {
     const preconnect1 = doc.createElement("link");
     preconnect1.rel = "preconnect";
@@ -97,7 +99,6 @@ const ensureGoogleFontsPreconnect = (doc: Document) => {
     doc.head.insertBefore(preconnect1, doc.head.firstChild);
   }
 
-  // Ajouter preconnect pour fonts.gstatic.com avec crossorigin
   if (!existingPreconnect2) {
     const preconnect2 = doc.createElement("link");
     preconnect2.rel = "preconnect";
@@ -109,8 +110,7 @@ const ensureGoogleFontsPreconnect = (doc: Document) => {
   preconnectAddedByDoc.set(doc, true);
 };
 
-/** Normalise les espaces : &nbsp; et U+00A0 → espace normal (CSS exige un espace pour font-family). */
-const normalizeFontFamilySpaces = (s: string) =>
+export const normalizeFontFamilySpaces = (s: string) =>
   s.replace(/\u00A0/g, " ").replace(/&nbsp;/g, " ");
 
 const sanitizeFontFamilyName = (fontFamily: string) => {
@@ -119,7 +119,6 @@ const sanitizeFontFamilyName = (fontFamily: string) => {
   return primary.replace(/^['"]|['"]$/g, "");
 };
 
-/** Infère le format CSS à partir de l'extension du fichier. */
 const inferFormatFromHref = (href: string): FontFormat => {
   const ext = href.split(".").pop()?.toLowerCase()?.split("?")[0] ?? "";
   switch (ext) {
@@ -142,57 +141,54 @@ const getIframeDocumentFromGlobalContext = (): Document | null => {
   return iframeRef?.current?.contentDocument ?? null;
 };
 
+const getTargetDocument = (): Document | null => {
+  const iframeDoc = getIframeDocumentFromGlobalContext();
+  return iframeDoc ?? (typeof document !== "undefined" ? document : null);
+};
+
 const ensureStylesheetInjected = (doc: Document, href: string) => {
   if (href.startsWith("builtin:")) {
     return;
   }
-  
+
   if (!doc.head) {
     return;
   }
-  
-  // Ajouter les preconnect pour Google Fonts si nécessaire
+
   if (isGoogleFontsUrl(href)) {
     ensureGoogleFontsPreconnect(doc);
   }
-  
-  // Get or create the set for this document
+
   let loadedForDoc = loadedStylesheetsByDoc.get(doc);
   if (!loadedForDoc) {
     loadedForDoc = new Set<string>();
     loadedStylesheetsByDoc.set(doc, loadedForDoc);
   }
-  
-  // Check if already loaded for this document
+
   if (loadedForDoc.has(href)) {
     return;
   }
-  
-  // Check if link already exists in DOM
+
   const existing = doc.querySelector(`link[rel="stylesheet"][href="${href}"]`);
   if (existing) {
     loadedForDoc.add(href);
     return;
   }
-  
+
   const link = doc.createElement("link");
   link.rel = "stylesheet";
   link.href = href;
-  
-  link.onload = () => {
-    // Link loaded successfully
-  };
-  
+  link.setAttribute("data-charisma-font", href);
+
   link.onerror = (error) => {
-    console.error("[Typography] ❌ Failed to load stylesheet:", href, error);
+    console.error("[Typography] Failed to load stylesheet:", href, error);
   };
-  
+
   try {
     doc.head.appendChild(link);
     loadedForDoc.add(href);
-    
   } catch (error) {
-    console.error("[Typography] ❌ Error appending link to head:", error);
+    console.error("[Typography] Error appending link to head:", error);
   }
 };
 
@@ -207,11 +203,9 @@ const ensureFontFaceInjected = (
   }
 
   if (!doc.head) {
-    console.error("[Typography] ❌ Document head is not available!");
     return;
   }
 
-  // Get or create the set for this document
   let loadedForDoc = loadedFontFacesByDoc.get(doc);
   if (!loadedForDoc) {
     loadedForDoc = new Set<string>();
@@ -228,6 +222,7 @@ const ensureFontFaceInjected = (
 
   const style = doc.createElement("style");
   style.type = "text/css";
+  style.setAttribute("data-charisma-font", href);
   const fontFaceRule = `@font-face { font-family: "${primaryFamily}"; src: url("${href}") format("${fontFormat}"); font-display: swap; }`;
   style.appendChild(doc.createTextNode(fontFaceRule));
 
@@ -235,24 +230,71 @@ const ensureFontFaceInjected = (
     doc.head.appendChild(style);
     loadedForDoc.add(key);
   } catch (error) {
-    console.error("[Typography] ❌ Error appending style to head:", error);
+    console.error("[Typography] Error appending style to head:", error);
+  }
+};
+
+const removeFontFromDocument = (doc: Document, href: string, fontFamily: string) => {
+  if (!doc.head || href.startsWith("builtin:")) return;
+
+  doc.querySelectorAll(`link[data-charisma-font="${href}"]`).forEach((el) => el.remove());
+  doc.querySelectorAll(`style[data-charisma-font="${href}"]`).forEach((el) => el.remove());
+
+  const loadedStyles = loadedStylesheetsByDoc.get(doc);
+  loadedStyles?.delete(href);
+
+  const key = `${fontFamily}|${href}`;
+  const loadedFaces = loadedFontFacesByDoc.get(doc);
+  loadedFaces?.delete(key);
+};
+
+const injectFontIntoDocument = (
+  href: string,
+  fontFamily: string,
+  format?: FontFormat
+) => {
+  const doc = getTargetDocument();
+  if (!doc?.head) return;
+
+  if (isStylesheetUrl(href)) {
+    ensureStylesheetInjected(doc, href);
+  } else {
+    ensureFontFaceInjected(doc, href, fontFamily, format);
+  }
+};
+
+/** Charge une police dans le document courant (UI builder) pour aperçu dans ManagerFont. */
+export const loadFontForPreview = (font: {
+  href: string;
+  fontFamily: string;
+  format?: FontFormat;
+}): void => {
+  if (typeof document === "undefined" || !document.head || font.href.startsWith("builtin:")) {
+    return;
+  }
+
+  const href = font.href;
+  const fontFamily = normalizeFontFamilySpaces(font.fontFamily);
+
+  if (isStylesheetUrl(href)) {
+    ensureStylesheetInjected(document, href);
+  } else {
+    ensureFontFaceInjected(document, href, fontFamily, font.format);
   }
 };
 
 export const syncRegisteredFontsToDocument = (doc: Document) => {
   if (!doc.head) {
-    console.error("[Typography] ❌ Cannot sync: document head is not available!");
     return;
   }
-  
-  // Vérifier s'il y a des Google Fonts à synchroniser pour ajouter les preconnect
-  const hasGoogleFonts = state.fonts.some(font => 
-    !font.href.startsWith("builtin:") && isGoogleFontsUrl(font.href)
+
+  const hasGoogleFonts = state.fonts.some(
+    (font) => !font.href.startsWith("builtin:") && isGoogleFontsUrl(font.href)
   );
   if (hasGoogleFonts) {
     ensureGoogleFontsPreconnect(doc);
   }
-  
+
   state.fonts.forEach((font) => {
     if (font.href.startsWith("builtin:")) return;
     if (isStylesheetUrl(font.href)) {
@@ -270,45 +312,91 @@ const addFontSizes = (fontSizes?: string[]) => {
   rebuildSnapshot();
 };
 
-export const registerFont = (font: RegisterFontInput): RegisteredFont => {
+const upsertFont = (font: RegisterFontInput, tier: FontTier): RegisteredFont => {
   const { name, href, format, fontSizes } = font;
   const fontFamily = normalizeFontFamilySpaces(font.fontFamily);
 
   if (!name || !href || !fontFamily) {
-    console.error("[Typography] ❌ registerFont validation failed: missing name, href, or fontFamily");
     throw new Error("registerFont requires name, href, and fontFamily");
   }
 
   const existing = state.fonts.find(
-    (item) => item.name === name || item.href === href || item.fontFamily === fontFamily
+    (item) => item.href === href || item.fontFamily === fontFamily
   );
 
   if (!existing) {
     state = {
       ...state,
-      fonts: [...state.fonts, { name, href, fontFamily, format, fontSizes }],
+      fonts: [...state.fonts, { name, href, fontFamily, format, fontSizes, tier }],
     };
+  } else if (existing.tier === "page" && tier !== "page") {
+    const fonts = state.fonts.map((item) =>
+      item.href === href || item.fontFamily === fontFamily
+        ? { ...item, tier, name, href, fontFamily, format, fontSizes }
+        : item
+    );
+    state = { ...state, fonts };
   }
 
-  // En mode builder : injecter dans l'iframe. En mode view (pas d'iframe) : injecter dans le document courant.
-  const iframeDoc = getIframeDocumentFromGlobalContext();
-  const doc = iframeDoc ?? (typeof document !== "undefined" ? document : null);
-  if (doc?.head) {
-    if (isStylesheetUrl(href)) {
-      ensureStylesheetInjected(doc, href);
-    } else {
-      ensureFontFaceInjected(doc, href, fontFamily, format);
-    }
-  }
+  injectFontIntoDocument(href, fontFamily, format);
 
   if (fontSizes?.length) {
     addFontSizes(fontSizes);
   }
   rebuildSnapshot();
   notify();
-  
-  const result = existing ?? { name, href, fontFamily, fontSizes };
-  return result;
+
+  return existing ?? { name, href, fontFamily, format, fontSizes, tier };
+};
+
+export const registerFont = (font: RegisterFontInput): RegisteredFont => {
+  return upsertFont(font, font.tier ?? "page");
+};
+
+export const registerThemeFont = (font: RegisterFontInput): RegisteredFont => {
+  protectedFontFamilies.add(normalizeFontFamilySpaces(font.fontFamily));
+  return upsertFont(font, "theme");
+};
+
+export const registerPageFont = (font: RegisterFontInput): RegisteredFont => {
+  return upsertFont(font, "page");
+};
+
+export const markThemeFontFamilies = (families: string[]): void => {
+  families.forEach((family) => {
+    if (family.trim()) {
+      protectedFontFamilies.add(normalizeFontFamilySpaces(family));
+    }
+  });
+};
+
+export const isProtectedFontFamily = (fontFamily: string): boolean => {
+  const normalized = normalizeFontFamilySpaces(fontFamily);
+  return protectedFontFamilies.has(normalized);
+};
+
+export const unregisterPageFont = (fontFamily: string, href?: string): void => {
+  const normalized = normalizeFontFamilySpaces(fontFamily);
+  const target = state.fonts.find(
+    (font) =>
+      font.tier === "page" &&
+      (font.fontFamily === normalized || (href && font.href === href))
+  );
+
+  if (!target) return;
+
+  state = {
+    ...state,
+    fonts: state.fonts.filter((font) => font !== target),
+  };
+
+  const doc = getTargetDocument();
+  if (doc) {
+    removeFontFromDocument(doc, target.href, target.fontFamily);
+  }
+
+  rebuildSnapshot();
+  notify();
 };
 
 export const getFontOptions = () =>
@@ -340,7 +428,6 @@ const snapshot = () => cachedSnapshot;
 
 export const useTypographyOptions = () => useSyncExternalStore(subscribeTypography, snapshot, snapshot);
 
-// Fonction utilitaire pour forcer la synchronisation des polices : iframe en mode builder, document courant en mode view.
 export const forceSyncToIframe = () => {
   const iframeDoc = getIframeDocumentFromGlobalContext();
   const doc = iframeDoc ?? (typeof document !== "undefined" ? document : null);
@@ -353,6 +440,10 @@ export const forceSyncToIframe = () => {
 
 export default {
   registerFont,
+  registerThemeFont,
+  registerPageFont,
+  unregisterPageFont,
+  loadFontForPreview,
   getFontOptions,
   getFontSizeOptions,
   useTypographyOptions,

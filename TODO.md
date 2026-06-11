@@ -35,3 +35,4 @@
 31. OK Texte icone couleur ?
 32. OK Node Icone
 33. OK node orphelin suppression
+34. Restructurer Api on ne voit pas bien separer fonts, cards

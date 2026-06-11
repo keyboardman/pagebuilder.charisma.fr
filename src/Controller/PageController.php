@@ -9,6 +9,7 @@ use App\Entity\FontType as FontTypeEnum;
 use App\Entity\Page;
 use App\Entity\Theme;
 use App\Form\AdminPageFormType;
+use App\Service\PageFontResolverService;
 use App\Service\ThemeFontBuilderService;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -24,6 +25,7 @@ class PageController extends AbstractController
     public function __construct(
         private readonly EntityManagerInterface $em,
         private readonly SluggerInterface $slugger,
+        private readonly PageFontResolverService $pageFontResolverService,
     ) {
     }
 
@@ -156,6 +158,7 @@ class PageController extends AbstractController
         return $this->render('page/builder.html.twig', [
             'page' => $page,
             'theme_fonts' => $themeFonts,
+            'theme_font_ids' => $themeFontBuilderService->getThemeFontIds($page->getTheme()),
             'theme_icons' => $themeIcons,
         ]);
     }
@@ -163,7 +166,10 @@ class PageController extends AbstractController
     #[Route('/preview/{id}', name: 'preview', methods: ['GET'], requirements: ['id' => '\d+'])]
     public function preview(Page $page): Response
     {
-        return $this->render('page/preview.html.twig', ['page' => $page]);
+        return $this->render('page/preview.html.twig', [
+            'page' => $page,
+            'page_fonts' => $this->pageFontResolverService->resolveFromContent($page->getContent(), $page->getTheme()),
+        ]);
     }
 
 
@@ -225,7 +231,10 @@ class PageController extends AbstractController
             throw new NotFoundHttpException('Page not found.');
         }
 
-        $html = $this->renderView('page/render_view.html.twig', ['page' => $page]);
+        $html = $this->renderView('page/render_view.html.twig', [
+            'page' => $page,
+            'page_fonts' => $this->pageFontResolverService->resolveFromContent($page->getContent(), $page->getTheme()),
+        ]);
         $baseUrl = rtrim($request->getSchemeAndHttpHost() . $request->getBasePath(), '/');
         $html = preg_replace('#(href|src)="/(?!\/)#', '$1="' . $baseUrl . '/', $html) ?? $html;
 

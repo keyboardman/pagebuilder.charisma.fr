@@ -5,7 +5,8 @@ import AppProvider from './editeur/services/providers/AppProvider';
 import App from './editeur/app/App';
 import { registerBackendApis } from './editeur/ManagerApi/backendApiAdapter';
 import { apiRegistry } from './editeur/ManagerApi/ApiRegistry';
-import { registerFont } from './editeur/services/typography';
+import { registerThemeFont } from './editeur/services/typography';
+import { initThemeFontFamilies, initThemeFontIds } from './editeur/ManagerFont/FontUsageRegistry';
 import './editeur/assets/css/index.css';
 
 // Config filemanager : si filemanagerUrl est fourni (backend), mode iframe keyboardman ; sinon custom (legacy)
@@ -224,10 +225,15 @@ if (dataEl && rootEl) {
     themeIcons = Array.isArray(data.themeIcons) ? data.themeIcons : [];
 
     const themeFonts = data.themeFonts ?? [];
+    const themeFontIds = Array.isArray(data.themeFontIds)
+      ? data.themeFontIds.map((id) => Number(id)).filter((id) => id > 0)
+      : [];
+    initThemeFontFamilies(themeFonts.map((font) => font?.fontFamily).filter(Boolean));
+    initThemeFontIds(themeFontIds);
     themeFonts.forEach((font) => {
       try {
         if (font?.name && font?.href && font?.fontFamily) {
-          registerFont({ name: font.name, href: font.href, fontFamily: font.fontFamily });
+          registerThemeFont({ name: font.name, href: font.href, fontFamily: font.fontFamily });
         }
       } catch (e) {
         console.warn('Erreur enregistrement police:', font?.name, e);

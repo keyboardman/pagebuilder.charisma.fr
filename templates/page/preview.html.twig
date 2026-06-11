@@ -13,6 +13,7 @@
     {% if page.theme.generatedCssPath %}
         <link rel="stylesheet" href="{{ path('app_theme_css', { id: page.theme.id }) }}">
     {% endif %}
+    {% include '_page_fonts.html.twig' %}
 </head>
 <body class="min-h-screen p-6">
    

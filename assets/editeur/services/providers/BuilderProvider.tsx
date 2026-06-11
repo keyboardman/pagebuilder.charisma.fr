@@ -6,6 +6,7 @@ import type { NodeID, NodeType, NodesType } from "../../types/NodeType";
 import nodeHelper from "../../utils/nodeHelper";
 import { useAppContext } from "./AppContext";
 import { syncRegisteredFontsToDocument } from "../typography";
+import { syncFontUsageFromNodes } from "../../ManagerFont/FontUsageRegistry";
 import { NodeRichTextEditorProvider } from "../../ManagerNode/NodeRichText/NodeRichTextEditorContext";
 import NodeDeleteConfirmDialog from "../../ManagerNode/components/NodeDeleteConfirmDialog";
 
@@ -34,7 +35,7 @@ export const BuilderProvider: FC<BuilderContextProviderProps> = ({
   onSaveCallback,
 }) => {
 
-  const { nodes, setNodes } = useAppContext();
+  const { nodes, setNodes, pageBuilderApiBaseUrl } = useAppContext();
 
   const [pendingNodes, setPendingNodes] = useState<NodesType | null>(null);
   const [iframeRef, setInternalIframeRef] = useState<React.RefObject<HTMLIFrameElement | null> | null>(null);
@@ -52,6 +53,10 @@ export const BuilderProvider: FC<BuilderContextProviderProps> = ({
   });
 
   const nodesRef = useRef<NodesType>(nodes);
+
+  useEffect(() => {
+    void syncFontUsageFromNodes(nodes, pageBuilderApiBaseUrl);
+  }, [nodes, pageBuilderApiBaseUrl]);
 
   // ✅ applique la mise à jour après le render
   useEffect(() => {
