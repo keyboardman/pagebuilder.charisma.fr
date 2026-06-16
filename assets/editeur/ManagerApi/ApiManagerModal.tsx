@@ -41,6 +41,11 @@ interface ApiManagerModalProps {
   categoryFilter?: string;
   /** Filtre optionnel pour le mode de collection (normal/fixed). */
   collectionModeFilter?: ApiCollectionMode;
+  /**
+   * `item` (défaut) : sélection d’un item dans la collection.
+   * `api` : sélection de l’API seule (ex. NodeSlideshow en collection fixe).
+   */
+  selectionMode?: "item" | "api";
   onSelect: (apiId: string, itemId: string, mappedData: MappedItemData) => void;
 }
 
@@ -52,7 +57,8 @@ export function ApiManagerModal({
   typeFilter,
   categoryFilter,
   collectionModeFilter,
-  onSelect 
+  selectionMode = "item",
+  onSelect,
 }: ApiManagerModalProps) {
   const [selectedApiId, setSelectedApiId] = useState<string>(initialApiId || "");
   const [searchTerm, setSearchTerm] = useState<string>("");
@@ -267,6 +273,12 @@ export function ApiManagerModal({
     }
   }, [selectedApiId, onSelect, onOpenChange]);
 
+  const handleApiConfirm = useCallback(() => {
+    if (!selectedApiId || selectionMode !== "api") return;
+    onSelect(selectedApiId, "", { id: "", title: "", raw: null });
+    onOpenChange(false);
+  }, [selectedApiId, selectionMode, onSelect, onOpenChange]);
+
   const totalPages = Math.ceil(total / limit);
   const hasPrevious = page > 1;
   const hasNext = page < totalPages;
@@ -283,9 +295,13 @@ export function ApiManagerModal({
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="api-manager-ui max-w-2xl max-h-[80vh] flex flex-col">
         <DialogHeader>
-          <DialogTitle className="node-block-title">Sélectionner un item depuis une API</DialogTitle>
+          <DialogTitle className="node-block-title">
+            {selectionMode === "api" ? "Sélectionner une API" : "Sélectionner un item depuis une API"}
+          </DialogTitle>
           <DialogDescription>
-            Choisissez une API et sélectionnez un item à afficher dans la card.
+            {selectionMode === "api"
+              ? "Choisissez une API image en collection fixe pour alimenter le diaporama."
+              : "Choisissez une API et sélectionnez un item à afficher dans la card."}
           </DialogDescription>
         </DialogHeader>
 
@@ -376,16 +392,20 @@ export function ApiManagerModal({
                           const mapped = selectedAdapter.mapItem(item);
                           const isSelected = selectedItemId === mapped.id;
                           const itemNumber = (page - 1) * limit + index + 1;
+                          const isApiOnly = selectionMode === "api";
                           
                           return (
                             <div
                               key={mapped.id || index}
-                              onClick={() => handleItemSelect(item)}
+                              onClick={isApiOnly ? undefined : () => handleItemSelect(item)}
                               className={cn(
-                                "p-3 border rounded-lg cursor-pointer transition-colors",
-                                isSelected
+                                "p-3 border rounded-lg transition-colors",
+                                isApiOnly
+                                  ? "border-border"
+                                  : "cursor-pointer",
+                                !isApiOnly && (isSelected
                                   ? "border-primary bg-primary/5"
-                                  : "border-border hover:border-primary/50 hover:bg-accent/50"
+                                  : "border-border hover:border-primary/50 hover:bg-accent/50")
                               )}
                             >
                               <div className="flex gap-3 items-center w-full">
@@ -444,6 +464,21 @@ export function ApiManagerModal({
                 </>
               )}
             </>
+          )}
+
+          {selectionMode === "api" && adapters.length > 0 && (
+            <div className="flex justify-end gap-2 pt-2 border-t">
+              <Button type="button" variant="outline" onClick={() => onOpenChange(false)}>
+                Annuler
+              </Button>
+              <Button
+                type="button"
+                disabled={!selectedApiId || loading}
+                onClick={handleApiConfirm}
+              >
+                Utiliser cette API
+              </Button>
+            </div>
           )}
         </div>
       </DialogContent>

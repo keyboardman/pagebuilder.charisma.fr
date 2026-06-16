@@ -44,15 +44,6 @@ export async function fetchFonts(
   return (await res.json()) as FontListResponse;
 }
 
-export async function fetchFontById(baseUrl: string, id: number): Promise<FontPayload> {
-  const res = await fetch(`${normalizeBase(baseUrl)}/fonts/${id}`);
-  if (!res.ok) {
-    const text = await res.text().catch(() => res.statusText);
-    throw new Error(text || "fetchFontById failed");
-  }
-  return (await res.json()) as FontPayload;
-}
-
 const resolveCache = new Map<string, FontPayload | null>();
 
 export async function resolveFontFamily(
@@ -72,18 +63,18 @@ export async function resolveFontFamily(
     q.set("excludeIds", options.excludeIds.join(","));
   }
   const res = await fetch(`${normalizeBase(baseUrl)}/fonts/resolve?${q.toString()}`);
-  if (res.status === 404) {
+  if (res.status === 404 || res.status === 204) {
     resolveCache.set(cacheKey, null);
     return null;
   }
   if (!res.ok) {
     return null;
   }
-  const payload = (await res.json()) as FontPayload;
+  const payload = (await res.json()) as FontPayload | null;
+  if (!payload || typeof payload.id !== "number") {
+    resolveCache.set(cacheKey, null);
+    return null;
+  }
   resolveCache.set(cacheKey, payload);
   return payload;
-}
-
-export function clearFontResolveCache(): void {
-  resolveCache.clear();
 }

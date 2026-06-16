@@ -51,9 +51,42 @@ const DEFAULT_FONT_SIZES: string[] = [
   "3rem",
 ];
 
-const protectedFontFamilies = new Set(
-  DEFAULT_FONTS.map((font) => font.fontFamily)
-);
+const normalizeFontFamilyKey = (fontFamily: string) => {
+  const normalized = fontFamily
+    .replace(/\u00A0/g, " ")
+    .replace(/&nbsp;/g, " ")
+    .replace(/\s*,\s*/g, ",")
+    .trim();
+  const primary = extractPrimaryFontFamily(normalized);
+  return {
+    normalized,
+    primary: primary.replace(/^['"]|['"]$/g, ""),
+  };
+};
+
+const extractPrimaryFontFamily = (fontFamily: string): string => {
+  let quote: "'" | '"' | null = null;
+  for (let i = 0; i < fontFamily.length; i += 1) {
+    const char = fontFamily[i];
+    if ((char === "'" || char === '"') && (i === 0 || fontFamily[i - 1] !== "\\")) {
+      quote = quote === char ? null : quote ?? char;
+      continue;
+    }
+    if (char === "," && quote === null) {
+      return fontFamily.slice(0, i).trim();
+    }
+  }
+  return fontFamily.trim();
+};
+
+const protectedFontFamilies = new Set<string>();
+const protectedPrimaryFontFamilies = new Set<string>();
+
+DEFAULT_FONTS.forEach((font) => {
+  const key = normalizeFontFamilyKey(font.fontFamily);
+  protectedFontFamilies.add(key.normalized);
+  protectedPrimaryFontFamilies.add(key.primary);
+});
 
 let state: TypographyState = {
   fonts: [...DEFAULT_FONTS],
@@ -115,7 +148,7 @@ export const normalizeFontFamilySpaces = (s: string) =>
 
 const sanitizeFontFamilyName = (fontFamily: string) => {
   const normalized = normalizeFontFamilySpaces(fontFamily);
-  const primary = normalized.split(",")[0]?.trim() ?? normalized;
+  const primary = extractPrimaryFontFamily(normalized);
   return primary.replace(/^['"]|['"]$/g, "");
 };
 
@@ -354,7 +387,9 @@ export const registerFont = (font: RegisterFontInput): RegisteredFont => {
 };
 
 export const registerThemeFont = (font: RegisterFontInput): RegisteredFont => {
-  protectedFontFamilies.add(normalizeFontFamilySpaces(font.fontFamily));
+  const key = normalizeFontFamilyKey(font.fontFamily);
+  protectedFontFamilies.add(key.normalized);
+  protectedPrimaryFontFamilies.add(key.primary);
   return upsertFont(font, "theme");
 };
 
@@ -365,14 +400,16 @@ export const registerPageFont = (font: RegisterFontInput): RegisteredFont => {
 export const markThemeFontFamilies = (families: string[]): void => {
   families.forEach((family) => {
     if (family.trim()) {
-      protectedFontFamilies.add(normalizeFontFamilySpaces(family));
+      const key = normalizeFontFamilyKey(family);
+      protectedFontFamilies.add(key.normalized);
+      protectedPrimaryFontFamilies.add(key.primary);
     }
   });
 };
 
 export const isProtectedFontFamily = (fontFamily: string): boolean => {
-  const normalized = normalizeFontFamilySpaces(fontFamily);
-  return protectedFontFamilies.has(normalized);
+  const key = normalizeFontFamilyKey(fontFamily);
+  return protectedFontFamilies.has(key.normalized) || protectedPrimaryFontFamilies.has(key.primary);
 };
 
 export const unregisterPageFont = (fontFamily: string, href?: string): void => {

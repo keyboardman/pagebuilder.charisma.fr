@@ -103,10 +103,3 @@ export function normalizeSlideshowContent(
     slidesMode: "manual",
   };
 }
-
-/** @deprecated Utiliser normalizeSlideshowContent */
-export function sanitizeSlideshowContentForPersistence(
-  content: Record<string, unknown>
-): Record<string, unknown> {
-  return normalizeSlideshowContent(content);
-}

@@ -107,7 +107,7 @@ class PageBuilderApiController extends AbstractController
 
         $excludeIds = $this->parseExcludeIds($request);
         if ($font->getId() !== null && isset($excludeIds[$font->getId()])) {
-            return new JsonResponse(null, Response::HTTP_NOT_FOUND);
+            return new JsonResponse(null, Response::HTTP_OK);
         }
 
         $payload = $this->themeFontBuilderService->buildFontPayload($font);

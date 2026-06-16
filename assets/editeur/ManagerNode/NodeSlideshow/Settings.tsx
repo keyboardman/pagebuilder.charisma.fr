@@ -5,7 +5,9 @@ import { Base2Settings } from "../Settings";
 import Form from "../../components/form";
 import { useNodeBuilderContext } from "../../services/providers/NodeBuilderContext";
 import { apiRegistry } from "../../ManagerApi/ApiRegistry";
+import { ApiManagerModal } from "../../ManagerApi/ApiManagerModal";
 import { Button } from "@/editeur/components/ui/button";
+import { Database } from "lucide-react";
 import { Switch } from "@/editeur/components/ui/switch";
 import { cn } from "@/editeur/lib/utils";
 import type { NodeSlideshowSlide, NodeSlideshowType } from ".";
@@ -77,6 +79,7 @@ const Settings: FC<NodeSettingsProps> = () => {
   const [dragOverIndex, setDragOverIndex] = useState<number | null>(null);
   const [apiLoading, setApiLoading] = useState(false);
   const [apiError, setApiError] = useState<string | null>(null);
+  const [apiModalOpen, setApiModalOpen] = useState(false);
 
   const displaySlides = slidesMode === "manual" ? manualSlides : apiPreviewSlides;
 
@@ -149,20 +152,8 @@ const Settings: FC<NodeSettingsProps> = () => {
     });
   };
 
-  const imageFixedApiAdapters = useMemo(() => {
-    // On limite aux APIs image en collection fixe (les items deviennent un “endpoint” de slides).
-    // Si aucune API fixed n'existe, on laissera l'interface vide plutôt que de mixer les modes.
-    return apiRegistry
-      .list()
-      .filter((a) => a.type === "image" && (a.collectionMode ?? "normal") === "fixed");
-  }, []);
-
-  const apiOptions = imageFixedApiAdapters.map((adapter) => ({
-    value: adapter.id,
-    label: adapter.label,
-  }));
-
   const apiId = resolveApiId(contentForMode);
+  const selectedApiAdapter = apiId ? apiRegistry.get(apiId) : null;
 
   const loadSlidesFromApi = async (nextApiId: string) => {
     if (!nextApiId) return;
@@ -470,24 +461,36 @@ const Settings: FC<NodeSettingsProps> = () => {
                     </div>
                   ) : (
                     <div className="space-y-2">
-                      <Form.Group>
-                        <Form.Label text="Endpoint API (image fixed)" />
-                        <Form.Select
-                          value={apiId}
-                          onChange={(value) => {
-                            const nextId = String(value ?? "");
-                            if (!nextId) {
-                              setApiPreviewSlides([]);
-                              updateContent({ apiId: undefined, slides: [] });
-                              return;
-                            }
-                            updateContent({ slidesMode: "api-endpoint", apiId: nextId, slides: [] });
-                          }}
-                          options={apiOptions}
-                          placeholder={apiOptions.length ? "Choisir une API..." : "Aucune API fixe"}
-                          disabled={apiOptions.length === 0}
-                        />
-                      </Form.Group>
+                      {selectedApiAdapter && (
+                        <p className="text-xs text-muted-foreground">
+                          API : <span className="font-medium text-foreground">{selectedApiAdapter.label}</span>
+                        </p>
+                      )}
+                      <Button
+                        type="button"
+                        variant="outline"
+                        size="sm"
+                        onClick={() => setApiModalOpen(true)}
+                      >
+                        <Database className="h-4 w-4 mr-2" />
+                        {apiId ? "Changer l'API" : "Sélectionner une API"}
+                      </Button>
+                      <ApiManagerModal
+                        open={apiModalOpen}
+                        onOpenChange={setApiModalOpen}
+                        apiId={apiId}
+                        typeFilter="image"
+                        collectionModeFilter="fixed"
+                        selectionMode="api"
+                        onSelect={(nextApiId) => {
+                          setApiPreviewSlides([]);
+                          updateContent({
+                            slidesMode: "api-endpoint",
+                            apiId: nextApiId,
+                            slides: [],
+                          });
+                        }}
+                      />
                       {apiLoading && <p className="text-xs text-muted-foreground">Chargement...</p>}
                       {apiError && (
                         <p className="text-xs text-destructive bg-destructive/10 border border-destructive/20 rounded p-2">

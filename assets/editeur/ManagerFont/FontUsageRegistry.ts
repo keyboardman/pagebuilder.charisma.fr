@@ -64,9 +64,7 @@ export function syncFontUsageFromNodes(nodes: NodesType, apiBaseUrl: string | nu
     for (const [family] of familyCounts) {
       if (isProtectedFontFamily(family)) continue;
 
-      const payload = await resolveFontFamily(apiBaseUrl, family, {
-        excludeIds: getThemeFontIds(),
-      });
+      const payload = await resolveFontFamily(apiBaseUrl, family);
       if (!payload || isExcludedPageFont(payload)) continue;
 
       resolvedById.set(payload.id, payload);

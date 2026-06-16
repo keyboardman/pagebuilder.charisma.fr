@@ -10,7 +10,6 @@ console.log('webpack.config.js', process.env.NODE_ENV || 'dev') //
 Encore.setOutputPath('public/build/')
     .setPublicPath('/build')
     .addEntry('app', './assets/app.js')
-    .addEntry('themeForm', './assets/themeForm.jsx')
     .addEntry('ThemeForm2', './assets/ThemeForm2.tsx')
 
 
@@ -71,7 +70,7 @@ config.resolve = config.resolve || {}
 config.resolve.alias = {
     ...(config.resolve.alias || {}),
     '@': path.resolve(__dirname, 'assets'),
-    '@editeur': path.resolve(__dirname, 'assets/editeur2')
+    '@editeur': path.resolve(__dirname, 'assets/editeur')
 }
 
 config.resolve.extensions = [

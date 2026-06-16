@@ -1,7 +1,5 @@
 import { NODE_ROOT_TYPE } from "../../ManagerNode/NodeRoot";
 import type { NodeID, NodesType, NodeType } from "../../types/NodeType";
-import { getNodeTypeLabel } from "../../utils/nodeLabel";
-
 export { getNodeDisplayLabel, getNodeTypeLabel, hasCustomNodeLabel } from "../../utils/nodeLabel";
 
 export type ChildZoneGroup = {
@@ -11,11 +9,6 @@ export type ChildZoneGroup = {
 
 export function findRootNode(nodes: NodesType): NodeType | null {
   return Object.values(nodes).find((n) => n.type === NODE_ROOT_TYPE) ?? null;
-}
-
-/** @deprecated Utiliser getNodeDisplayLabel ou getNodeTypeLabel */
-export function getNodeLabel(node: NodeType): string {
-  return getNodeTypeLabel(node);
 }
 
 export function getChildZoneGroups(nodes: NodesType, parentId: NodeID): ChildZoneGroup[] {
