@@ -6,6 +6,7 @@ import { Base2Settings, Spacing2Settings, Border2Settings, THEME_SELECTORS } fro
 import { useNodeBuilderContext } from "../../services/providers/NodeBuilderContext";
 import type { NodeYoutubeType } from ".";
 import { NodeSettingsWrapper } from "../components/NodeSettingsWrapper";
+import { extractYoutubeVideoId } from "../../utils/youtubeVideoId";
 const Settings: FC<NodeSettingsProps> = () => {
   const { node, onChange } = useNodeBuilderContext();
   const youtubeNode = node as NodeYoutubeType;
@@ -38,12 +39,12 @@ const Settings: FC<NodeSettingsProps> = () => {
                 onChange={(value) => {
                   onChange({
                     ...node,
-                    content: { ...content, videoId: value },
+                    content: { ...content, videoId: extractYoutubeVideoId(value) },
                   });
                 }}
-                placeholder="Ex: dQw4w9WgXcQ"
+                placeholder="Ex: dQw4w9WgXcQ ou https://youtu.be/dQw4w9WgXcQ"
               />
-              <div className="mt-1 text-sm font-medium text-foreground">Entrez l'ID de la vidéo YouTube (visible dans l'URL de la vidéo)</div>
+              <div className="mt-1 text-sm font-medium text-foreground">Collez l&apos;URL complète de la vidéo ou saisissez son ID YouTube</div>
             </Form.Group>
           </>
         }
