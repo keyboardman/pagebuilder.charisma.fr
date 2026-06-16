@@ -37,7 +37,9 @@
             apiCardsBaseUrl: path('app_page_builder_api_cards_list')|replace({'/cards': ''}), 
             filemanagerUrl: url('keyboardman_filemanager', {'filesystem': 'default', 'mode': 'iframe'}), 
             resolveUrl: path('keyboardman_filemanager'),
-            themeIcons: theme_icons|default([])
+            themeIcons: theme_icons|default([]),
+            themeNodeOverrides: theme_node_overrides|default({}),
+            themeVars: theme_vars|default({})
         }|json_encode|raw }}
         </script>
         

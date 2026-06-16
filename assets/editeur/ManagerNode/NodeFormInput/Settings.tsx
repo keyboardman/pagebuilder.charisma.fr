@@ -12,6 +12,7 @@ import {
   Border2Settings,
   Spacing2Settings,
   Text2Settings,
+  THEME_SELECTORS,
 } from "../Settings";
 
 const inputTypeOptions: { value: NodeFormInputHtmlType; label: string }[] = [
@@ -141,27 +142,27 @@ const Settings: FC<NodeSettingsProps> = () => {
 
               <TabsContent value="container">
                 <div className="flex flex-1 flex-col gap-1">
-                  <Background2Settings style={content.container.style} onChange={setContainerStyle} />
-                  <Border2Settings style={content.container.style} onChange={setContainerStyle} />
-                  <Spacing2Settings style={content.container.style} onChange={setContainerStyle} />
+                  <Background2Settings themeOverrideSelector={THEME_SELECTORS.formField} style={content.container.style} onChange={setContainerStyle} />
+                  <Border2Settings themeOverrideSelector={THEME_SELECTORS.formField} style={content.container.style} onChange={setContainerStyle} />
+                  <Spacing2Settings themeOverrideSelector={THEME_SELECTORS.formField} style={content.container.style} onChange={setContainerStyle} />
                 </div>
               </TabsContent>
 
               <TabsContent value="label">
                 <div className="flex flex-1 flex-col gap-1">
-                  <Text2Settings style={content.label.style} onChange={setLabelStyle} />
-                  <Background2Settings style={content.label.style} onChange={setLabelStyle} />
-                  <Border2Settings style={content.label.style} onChange={setLabelStyle} />
-                  <Spacing2Settings style={content.label.style} onChange={setLabelStyle} />
+                  <Text2Settings themeOverrideSelector={THEME_SELECTORS.formLabel} style={content.label.style} onChange={setLabelStyle} />
+                  <Background2Settings themeOverrideSelector={THEME_SELECTORS.formLabel} style={content.label.style} onChange={setLabelStyle} />
+                  <Border2Settings themeOverrideSelector={THEME_SELECTORS.formLabel} style={content.label.style} onChange={setLabelStyle} />
+                  <Spacing2Settings themeOverrideSelector={THEME_SELECTORS.formLabel} style={content.label.style} onChange={setLabelStyle} />
                 </div>
               </TabsContent>
 
               <TabsContent value="input">
                 <div className="flex flex-1 flex-col gap-1">
-                  <Text2Settings style={content.input.style} onChange={setInputStyle} />
-                  <Background2Settings style={content.input.style} onChange={setInputStyle} />
-                  <Border2Settings style={content.input.style} onChange={setInputStyle} />
-                  <Spacing2Settings style={content.input.style} onChange={setInputStyle} />
+                  <Text2Settings themeOverrideSelector={THEME_SELECTORS.formControl} style={content.input.style} onChange={setInputStyle} />
+                  <Background2Settings themeOverrideSelector={THEME_SELECTORS.formControl} style={content.input.style} onChange={setInputStyle} />
+                  <Border2Settings themeOverrideSelector={THEME_SELECTORS.formControl} style={content.input.style} onChange={setInputStyle} />
+                  <Spacing2Settings themeOverrideSelector={THEME_SELECTORS.formControl} style={content.input.style} onChange={setInputStyle} />
                 </div>
               </TabsContent>
             </>

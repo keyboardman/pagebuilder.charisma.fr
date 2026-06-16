@@ -4,7 +4,9 @@ import { Button } from "@/editeur/components/ui/button";
 import { ImageIcon } from "lucide-react";
 import { FileManagerIframePicker } from "../../ManagerAsset/FileManagerIframePicker";
 import type { FileItem } from "../../ManagerAsset/types";
-import { useAppContext, APP_MODE } from "../../services/providers/AppContext";
+import { useAppContext } from "../../services/providers/AppContext";
+import { useThemeStylePlaceholder } from "../../services/themeStyleHints";
+import type { ThemeAwareStyleSettingsProps } from "./types";
 
 function toAbsoluteUrl(url: string): string {
     if (typeof window === "undefined" || !url) return url;
@@ -13,17 +15,18 @@ function toAbsoluteUrl(url: string): string {
     return `${window.location.origin}${path}`;
 }
 
-export interface Background2SettingsProps {
-    style: React.CSSProperties;
-    onChange: (style: React.CSSProperties) => void;
-}
+export type Background2SettingsProps = ThemeAwareStyleSettingsProps;
 
-export function Background2Settings({ style, onChange }: Background2SettingsProps) {
+export function Background2Settings({ style, onChange, themeOverrideSelector }: Background2SettingsProps) {
     const [isFileManagerOpen, setIsFileManagerOpen] = useState(false);
     const { fileManagerConfig } = useAppContext();
+    const backgroundImagePlaceholder = useThemeStylePlaceholder(themeOverrideSelector, "background-image");
+    const backgroundColorPlaceholder = useThemeStylePlaceholder(themeOverrideSelector, "background-color");
+    const backgroundPositionLabel = useThemeStylePlaceholder(themeOverrideSelector, "background-position") ?? "...";
+    const backgroundSizeLabel = useThemeStylePlaceholder(themeOverrideSelector, "background-size") ?? "...";
+    const backgroundRepeatLabel = useThemeStylePlaceholder(themeOverrideSelector, "background-repeat") ?? "...";
 
     const handleSelectImage = (file: FileItem) => {
-        console.log('handleSelectImage', file);
         const absoluteUrl = toAbsoluteUrl(file.url);
         onChange({
             ...style,
@@ -35,7 +38,7 @@ export function Background2Settings({ style, onChange }: Background2SettingsProp
 
     return (
         <div className="flex flex-col gap-1 mb-2 mt-1">
-            <div className="text-center text-sm py-0 leading-tight text-white bg-gray-200/50">Background</div>
+            <div className="text-center text-sm py-0 leading-tight text-muted-foreground bg-gray-200/50">Background</div>
 
             <Form.Group className="mb-0">
                 <Form.Label text="background-image" className="text-foreground" />
@@ -44,6 +47,7 @@ export function Background2Settings({ style, onChange }: Background2SettingsProp
                         type="text"
                         value={style?.backgroundImage?.toString() ?? ""}
                         onChange={(value) => onChange({ ...style, backgroundImage: value as React.CSSProperties["backgroundImage"] })}
+                        placeholder={backgroundImagePlaceholder}
                         className="h-7 text-sm flex-1 min-w-0"
                     />
                     <Button
@@ -72,13 +76,14 @@ export function Background2Settings({ style, onChange }: Background2SettingsProp
                         type="text"
                         value={style?.backgroundColor?.toString() ?? ""}
                         onChange={(value) => onChange({ ...style, backgroundColor: value })}
+                        placeholder={backgroundColorPlaceholder}
                         className="h-7 text-sm"
                     />
                 </Form.Group>
                 <Form.Group className="mb-0">
                     <Form.Label text="position" className="text-foreground" />
                     <Form.Select options={[
-                        { label: '...', value: '' },
+                        { label: backgroundPositionLabel, value: '' },
                         { label: 'top', value: 'top' },
                         { label: 'left', value: 'left' },
                         { label: 'center', value: 'center' },
@@ -95,7 +100,7 @@ export function Background2Settings({ style, onChange }: Background2SettingsProp
                 <Form.Group className="mb-0">
                     <Form.Label text="size" className="text-foreground" />
                     <Form.Select options={[
-                        { label: '...', value: '' },
+                        { label: backgroundSizeLabel, value: '' },
                         { label: 'cover', value: 'cover' },
                         { label: 'contain', value: 'contain' }
                     ]}
@@ -107,7 +112,7 @@ export function Background2Settings({ style, onChange }: Background2SettingsProp
                 <Form.Group className="mb-0">
                     <Form.Label text="repeat" className="text-foreground" />
                     <Form.Select options={[
-                        { label: '...', value: '' },
+                        { label: backgroundRepeatLabel, value: '' },
                         { label: 'repeat', value: 'repeat' },
                         { label: 'no-repeat', value: 'no-repeat' },
                         { label: 'repeat-x', value: 'repeat-x' },

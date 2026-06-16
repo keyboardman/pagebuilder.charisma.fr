@@ -2,7 +2,8 @@ import { type FC } from "react";
 import { type NodeSettingsProps } from "../NodeConfigurationType";
 import { useNodeBuilderContext } from "../../services/providers/NodeBuilderContext";
 import { NodeSettingsWrapper } from "../components/NodeSettingsWrapper";
-import { Base2Settings, Background2Settings, Border2Settings, Spacing2Settings, Text2Settings } from "../Settings";
+import { Base2Settings, Background2Settings, Border2Settings, Spacing2Settings, Text2Settings, THEME_SELECTORS } from "../Settings";
+// theme selectors added below
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/editeur/components/ui/tabs";
 import { Input } from "@/editeur/components/ui/input";
 import Form from "../../components/form";
@@ -55,7 +56,9 @@ const Settings: FC<NodeSettingsProps> = () => {
             <>
               <TabsContent value="title">
                 <Text2Settings
-                  style={titleStyle}
+                  
+            themeOverrideSelector={THEME_SELECTORS.pureMusicTopSemaine}
+            style={titleStyle}
                   onChange={(style) =>
                     onChange({
                       ...node,
@@ -64,7 +67,9 @@ const Settings: FC<NodeSettingsProps> = () => {
                   }
                 />
                 <Spacing2Settings
-                  style={titleStyle}
+                  
+            themeOverrideSelector={THEME_SELECTORS.pureMusicTopSemaine}
+            style={titleStyle}
                   onChange={(style) =>
                     onChange({
                       ...node,
@@ -75,7 +80,9 @@ const Settings: FC<NodeSettingsProps> = () => {
               </TabsContent>
               <TabsContent value="item">
                 <Background2Settings
-                  style={itemStyle}
+                  
+            themeOverrideSelector={THEME_SELECTORS.pureMusicTopSemaine}
+            style={itemStyle}
                   onChange={(style) =>
                     onChange({
                       ...node,
@@ -84,7 +91,9 @@ const Settings: FC<NodeSettingsProps> = () => {
                   }
                 />
                 <Spacing2Settings
-                  style={itemStyle}
+                  
+            themeOverrideSelector={THEME_SELECTORS.pureMusicTopSemaine}
+            style={itemStyle}
                   onChange={(style) =>
                     onChange({
                       ...node,
@@ -95,7 +104,9 @@ const Settings: FC<NodeSettingsProps> = () => {
               </TabsContent>
               <TabsContent value="item-number">
                 <Text2Settings
-                  style={itemNumberStyle}
+                  
+            themeOverrideSelector={THEME_SELECTORS.pureMusicTopSemaine}
+            style={itemNumberStyle}
                   onChange={(style) =>
                     onChange({
                       ...node,
@@ -107,7 +118,9 @@ const Settings: FC<NodeSettingsProps> = () => {
                   }
                 />
                 <Background2Settings
-                  style={itemNumberStyle}
+                  
+            themeOverrideSelector={THEME_SELECTORS.pureMusicTopSemaine}
+            style={itemNumberStyle}
                   onChange={(style) =>
                     onChange({
                       ...node,
@@ -116,7 +129,9 @@ const Settings: FC<NodeSettingsProps> = () => {
                   }
                 />
                 <Border2Settings
-                  style={itemNumberStyle}
+                  
+            themeOverrideSelector={THEME_SELECTORS.pureMusicTopSemaine}
+            style={itemNumberStyle}
                   onChange={(style) =>
                     onChange({
                       ...node,
@@ -125,7 +140,9 @@ const Settings: FC<NodeSettingsProps> = () => {
                   }
                 />
                 <Spacing2Settings
-                  style={itemNumberStyle}
+                  
+            themeOverrideSelector={THEME_SELECTORS.pureMusicTopSemaine}
+            style={itemNumberStyle}
                   onChange={(style) =>
                     onChange({
                       ...node,
@@ -136,7 +153,9 @@ const Settings: FC<NodeSettingsProps> = () => {
               </TabsContent>
               <TabsContent value="item-title">
                 <Text2Settings
-                  style={itemTitleStyle}
+                  
+            themeOverrideSelector={THEME_SELECTORS.pureMusicTopSemaine}
+            style={itemTitleStyle}
                   onChange={(style) =>
                     onChange({
                       ...node,
@@ -145,7 +164,9 @@ const Settings: FC<NodeSettingsProps> = () => {
                   }
                 />
                 <Spacing2Settings
-                  style={itemTitleStyle}
+                  
+            themeOverrideSelector={THEME_SELECTORS.pureMusicTopSemaine}
+            style={itemTitleStyle}
                   onChange={(style) =>
                     onChange({
                       ...node,
@@ -154,7 +175,9 @@ const Settings: FC<NodeSettingsProps> = () => {
                   }
                 />
                 <Background2Settings
-                  style={itemTitleStyle}
+                  
+            themeOverrideSelector={THEME_SELECTORS.pureMusicTopSemaine}
+            style={itemTitleStyle}
                   onChange={(style) =>
                     onChange({
                       ...node,
@@ -163,7 +186,9 @@ const Settings: FC<NodeSettingsProps> = () => {
                   }
                 />
                 <Border2Settings
-                  style={itemTitleStyle}
+                  
+            themeOverrideSelector={THEME_SELECTORS.pureMusicTopSemaine}
+            style={itemTitleStyle}
                   onChange={(style) =>
                     onChange({
                       ...node,
@@ -174,7 +199,9 @@ const Settings: FC<NodeSettingsProps> = () => {
               </TabsContent>
               <TabsContent value="item-description">
                 <Text2Settings
-                  style={itemDescriptionStyle}
+                  
+            themeOverrideSelector={THEME_SELECTORS.pureMusicTopSemaine}
+            style={itemDescriptionStyle}
                   onChange={(style) =>
                     onChange({
                       ...node,
@@ -183,7 +210,9 @@ const Settings: FC<NodeSettingsProps> = () => {
                   }
                 />
                 <Background2Settings
-                  style={itemDescriptionStyle}
+                  
+            themeOverrideSelector={THEME_SELECTORS.pureMusicTopSemaine}
+            style={itemDescriptionStyle}
                   onChange={(style) =>
                     onChange({
                       ...node,
@@ -192,7 +221,9 @@ const Settings: FC<NodeSettingsProps> = () => {
                   }
                 />
                 <Spacing2Settings
-                  style={itemDescriptionStyle}
+                  
+            themeOverrideSelector={THEME_SELECTORS.pureMusicTopSemaine}
+            style={itemDescriptionStyle}
                   onChange={(style) =>
                     onChange({
                       ...node,
@@ -203,7 +234,9 @@ const Settings: FC<NodeSettingsProps> = () => {
               </TabsContent>
               <TabsContent value="item-icon">
                 <Text2Settings
-                  style={itemIconStyle}
+                  
+            themeOverrideSelector={THEME_SELECTORS.pureMusicTopSemaine}
+            style={itemIconStyle}
                   onChange={(style) =>
                     onChange({
                       ...node,
@@ -212,7 +245,9 @@ const Settings: FC<NodeSettingsProps> = () => {
                   }
                 />
                 <Background2Settings
-                  style={itemIconStyle}
+                  
+            themeOverrideSelector={THEME_SELECTORS.pureMusicTopSemaine}
+            style={itemIconStyle}
                   onChange={(style) =>
                     onChange({
                       ...node,

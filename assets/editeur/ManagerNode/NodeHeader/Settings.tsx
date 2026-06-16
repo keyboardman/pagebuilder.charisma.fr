@@ -1,5 +1,5 @@
 import { type FC } from "react";
-import { Base2Settings, Background2Settings, Text2Settings, Border2Settings, Spacing2Settings } from "../Settings";
+import { Base2Settings, Background2Settings, Text2Settings, Border2Settings, Spacing2Settings, headerTagSelector } from "../Settings";
 import { type NodeSettingsProps } from "../NodeConfigurationType";
 import Form from "../../components/form";
 import { useNodeBuilderContext } from "../../services/providers/NodeBuilderContext";
@@ -8,10 +8,9 @@ import { NodeSettingsWrapper } from "../components/NodeSettingsWrapper";
 
 const Settings: FC<NodeSettingsProps> = () => {
   const { node, onChange } = useNodeBuilderContext();
-
   const headerNode = node as NodeHeaderType;
-  
   const currentTag = headerNode.content?.tag ?? "h1";
+  const themeOverrideSelector = headerTagSelector(currentTag);
 
   const tagOptions = [
     { value: "h1", label: "H1" },
@@ -52,6 +51,8 @@ const Settings: FC<NodeSettingsProps> = () => {
       content={
         <>
           <Text2Settings 
+            
+            themeOverrideSelector={themeOverrideSelector}
             style={node.attributes?.style || {}}
             onChange={(style) => onChange({
               ...node,
@@ -59,6 +60,8 @@ const Settings: FC<NodeSettingsProps> = () => {
             })}
           />
           <Background2Settings 
+            
+            themeOverrideSelector={themeOverrideSelector}
             style={node.attributes?.style || {}}
             onChange={(style) => onChange({
               ...node,
@@ -66,6 +69,8 @@ const Settings: FC<NodeSettingsProps> = () => {
             })}
           />
           <Border2Settings 
+            
+            themeOverrideSelector={themeOverrideSelector}
             style={node.attributes?.style || {}}
             onChange={(style) => onChange({
               ...node,
@@ -73,6 +78,8 @@ const Settings: FC<NodeSettingsProps> = () => {
             })}
           />
           <Spacing2Settings 
+            
+            themeOverrideSelector={themeOverrideSelector}
             style={node.attributes?.style || {}}
             onChange={(style) => onChange({
               ...node,

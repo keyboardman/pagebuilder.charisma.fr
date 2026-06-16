@@ -7,6 +7,10 @@ import { registerBackendApis } from './editeur/ManagerApi/backendApiAdapter';
 import { apiRegistry } from './editeur/ManagerApi/ApiRegistry';
 import { registerThemeFont } from './editeur/services/typography';
 import { initThemeFontFamilies, initThemeFontIds } from './editeur/ManagerFont/FontUsageRegistry';
+import {
+  normalizeThemeNodeOverrides,
+  normalizeThemeVars,
+} from './editeur/services/themeStyleHints';
 import './editeur/assets/css/index.css';
 
 // Config filemanager : si filemanagerUrl est fourni (backend), mode iframe keyboardman ; sinon custom (legacy)
@@ -102,6 +106,8 @@ function PageBuilderStandalone({
   renderCssUrls = [],
   fileManagerConfig = null,
   themeIcons = [],
+  themeNodeOverrides = {},
+  themeVars = {},
 }) {
   const [content, setContent] = useState(initialContent || '');
   const [saveStatus, setSaveStatus] = useState('idle');
@@ -177,6 +183,8 @@ function PageBuilderStandalone({
           fileManagerConfig={fileManagerConfig ?? getFileManagerConfig({})}
           apiCardsBaseUrl={apiCardsBaseUrl}
           themeIcons={themeIcons}
+          themeNodeOverrides={themeNodeOverrides}
+          themeVars={themeVars}
         />
       </div>
     </div>
@@ -199,6 +207,8 @@ if (dataEl && rootEl) {
   let renderCssUrls = [];
   let fileManagerConfig = null;
   let themeIcons = [];
+  let themeNodeOverrides = {};
+  let themeVars = {};
   try {
     const data = JSON.parse(dataEl.textContent);
 
@@ -223,6 +233,8 @@ if (dataEl && rootEl) {
     renderCssUrls = Array.isArray(data.renderCssUrls) ? data.renderCssUrls : [];
     fileManagerConfig = getFileManagerConfig(data);
     themeIcons = Array.isArray(data.themeIcons) ? data.themeIcons : [];
+    themeNodeOverrides = normalizeThemeNodeOverrides(data.themeNodeOverrides);
+    themeVars = normalizeThemeVars(data.themeVars);
 
     const themeFonts = data.themeFonts ?? [];
     const themeFontIds = Array.isArray(data.themeFontIds)
@@ -256,6 +268,8 @@ if (dataEl && rootEl) {
       renderCssUrls={renderCssUrls}
       fileManagerConfig={fileManagerConfig}
       themeIcons={themeIcons}
+      themeNodeOverrides={themeNodeOverrides}
+      themeVars={themeVars}
     />
   );
 }

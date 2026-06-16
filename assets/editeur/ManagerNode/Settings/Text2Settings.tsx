@@ -1,18 +1,27 @@
 import Form from "../../components/form";
 import { useTypographyOptions } from "../../services/typography";
+import { useThemeStylePlaceholder } from "../../services/themeStyleHints";
+import type { ThemeAwareStyleSettingsProps } from "./types";
 
-export interface Text2SettingsProps {
-    style: React.CSSProperties;
-    onChange: (style: React.CSSProperties) => void;
-}
+export type Text2SettingsProps = ThemeAwareStyleSettingsProps;
 
-export function Text2Settings({ style, onChange }: Text2SettingsProps) {
+export function Text2Settings({ style, onChange, themeOverrideSelector }: Text2SettingsProps) {
 
     const { fontSizeOptions } = useTypographyOptions();
+    const fontSizePlaceholder = useThemeStylePlaceholder(themeOverrideSelector, "font-size", "ex: 1.5rem");
+    const lineHeightPlaceholder = useThemeStylePlaceholder(themeOverrideSelector, "line-height", "ex: 1.5, 1.5rem, 24px");
+    const fontWeightLabel = useThemeStylePlaceholder(themeOverrideSelector, "font-weight") ?? "...";
+    const fontStyleLabel = useThemeStylePlaceholder(themeOverrideSelector, "font-style") ?? "...";
+    const textAlignLabel = useThemeStylePlaceholder(themeOverrideSelector, "text-align") ?? "...";
+    const colorPlaceholder = useThemeStylePlaceholder(themeOverrideSelector, "color");
+    const decorationLabel = useThemeStylePlaceholder(themeOverrideSelector, "text-decoration") ?? "...";
+    const transformLabel = useThemeStylePlaceholder(themeOverrideSelector, "text-transform") ?? "none";
+    const overflowLabel = useThemeStylePlaceholder(themeOverrideSelector, "text-overflow") ?? "ellipsis";
+    const lineClampLabel = useThemeStylePlaceholder(themeOverrideSelector, "line-clamp") ?? "...";
 
     return (
         <div className="flex flex-col gap-1 mb-2 mt-1">
-            <div className="text-center text-sm py-0 leading-tight text-white bg-gray-200/50">Text</div>
+            <div className="text-center text-sm py-0 leading-tight text-muted-foreground bg-gray-200/50">Text</div>
             <div className="flex flex-1">
                 <Form.Group className="w-1/2">
                     <Form.Label text="font-size" className="text-foreground" />
@@ -23,7 +32,7 @@ export function Text2Settings({ style, onChange }: Text2SettingsProps) {
                         onChange={(value) => onChange({
                             ...style, fontSize: value as React.CSSProperties['fontSize']
                         })}
-                        placeholder="ex: 1.5rem"
+                        placeholder={fontSizePlaceholder}
                         className="h-7 text-sm"
                     />
                     <datalist id="node-card-title-font-sizes">
@@ -34,7 +43,7 @@ export function Text2Settings({ style, onChange }: Text2SettingsProps) {
                     <Form.Label text="font-weight" className="text-foreground" />
                     <Form.Select
                         options={[
-                            { label: '...', value: '' },
+                            { label: fontWeightLabel, value: '' },
                             { label: '100', value: '100' },
                             { label: '200', value: '200' },
                             { label: '300', value: '300' },
@@ -56,7 +65,7 @@ export function Text2Settings({ style, onChange }: Text2SettingsProps) {
                     <Form.Label text="font-style" className="text-foreground" />
                     <Form.Select
                         options={[
-                            { label: '...', value: '' },
+                            { label: fontStyleLabel, value: '' },
                             { label: 'normal', value: 'normal' },
                             { label: 'italic', value: 'italic' },
                             { label: 'oblique', value: 'oblique' },
@@ -81,7 +90,7 @@ export function Text2Settings({ style, onChange }: Text2SettingsProps) {
                 <Form.Group className="mb-0 w-1/2">
                     <Form.Label text="text-align" className="text-foreground" />
                     <Form.Select options={[
-                        { label: '...', value: '' },
+                        { label: textAlignLabel, value: '' },
                         { label: 'left', value: 'left' },
                         { label: 'right', value: 'right' },
                         { label: 'center', value: 'center' },
@@ -101,6 +110,7 @@ export function Text2Settings({ style, onChange }: Text2SettingsProps) {
                         type="text"
                         value={style?.color?.toString() ?? ""}
                         onChange={(value) => onChange({ ...style, color: value })}
+                        placeholder={colorPlaceholder}
                         className="h-7 text-sm"
                     />
                 </Form.Group>
@@ -109,7 +119,7 @@ export function Text2Settings({ style, onChange }: Text2SettingsProps) {
                 <Form.Group className="w-1/2 mb-0">
                     <Form.Label text="decoration" className="text-foreground" />
                     <Form.Select options={[
-                        { label: '...', value: '' },
+                        { label: decorationLabel, value: '' },
                         { label: 'underline', value: 'underline' },
                         { label: 'overline', value: 'overline' },
                         { label: 'line-through', value: 'line-through' }
@@ -128,7 +138,7 @@ export function Text2Settings({ style, onChange }: Text2SettingsProps) {
                         value={style?.lineHeight?.toString() ?? ""}
                         onChange={(value) => onChange({...style, lineHeight: value as React.CSSProperties['lineHeight']})}
                         className="h-7 text-sm"
-                        placeholder="ex: 1.5, 1.5rem, 24px"
+                        placeholder={lineHeightPlaceholder}
                     />
                 </Form.Group>
             </div>
@@ -137,7 +147,7 @@ export function Text2Settings({ style, onChange }: Text2SettingsProps) {
                     <Form.Label text="text-transform" className="text-foreground" />
                     <Form.Select
                         options={[
-                            { label: 'none', value: 'none' },
+                            { label: transformLabel, value: 'none' },
                             { label: 'capitalize', value: 'capitalize' },
                             { label: 'uppercase', value: 'uppercase' },
                             { label: 'lowercase', value: 'lowercase' },
@@ -153,7 +163,7 @@ export function Text2Settings({ style, onChange }: Text2SettingsProps) {
                     <Form.Label text="text-overflow" className="text-foreground" />
                     <Form.Select
                         options={[
-                            { label: 'clip', value: 'clip' },
+                            { label: overflowLabel, value: 'clip' },
                             { label: 'ellipsis', value: 'ellipsis' },
                         ]}
                         value={style?.textOverflow?.toString() ?? "ellipsis"}
@@ -169,7 +179,7 @@ export function Text2Settings({ style, onChange }: Text2SettingsProps) {
                     <Form.Label text="line-clamp" className="text-foreground" />
                     <Form.Select
                         options={[
-                            { label: '...', value: '' },
+                            { label: lineClampLabel, value: '' },
                             { label: '2', value: '2' },
                             { label: '3', value: '3' },
                             { label: '4', value: '4' },

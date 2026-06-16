@@ -2,6 +2,7 @@ import { createContext, useContext } from "react";
 import { type NodeID, type NodeType, type NodesType } from "../../types/NodeType";
 import type { FileManagerConfig } from "../../ManagerAsset/types";
 import type { BuilderThemeIcon } from "../../types/BuilderThemeIcon";
+import type { ThemeNodeOverrides, ThemeVars } from "../themeStyleHints";
 
 export type AppModeType = "edit" | "preview" | "view";
 export type BreakpointType = "mobile" | "tablet" | "desktop";
@@ -18,6 +19,10 @@ export interface AppType {
     fileManagerConfig: FileManagerConfig | null;
     /** Icônes définies dans le thème de la page (pour NodeTextIcon, etc.). */
     themeIcons: BuilderThemeIcon[];
+    /** Overrides CSS du thème (`node_overrides`), indexés par sélecteur. */
+    themeNodeOverrides: ThemeNodeOverrides;
+    /** Variables CSS du thème (`vars`). */
+    themeVars: ThemeVars;
     /**
      * Base URL de l’API Symfony page-builder (ex. /page-builder/api), pour catalogue formulaires, etc.
      */

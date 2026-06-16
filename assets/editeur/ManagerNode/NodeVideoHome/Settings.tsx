@@ -2,7 +2,8 @@ import { type FC } from "react";
 import { type NodeSettingsProps } from "../NodeConfigurationType";
 import { useNodeBuilderContext } from "../../services/providers/NodeBuilderContext";
 import { NodeSettingsWrapper } from "../components/NodeSettingsWrapper";
-import { Base2Settings, Background2Settings, Spacing2Settings, Text2Settings, Object2Settings, Border2Settings } from "../Settings";
+import { Base2Settings, Background2Settings, Spacing2Settings, Text2Settings, Object2Settings, Border2Settings, THEME_SELECTORS } from "../Settings";
+// theme selectors added below
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/editeur/components/ui/tabs";
 import Form from "../../components/form";
 import { Input } from "@/editeur/components/ui/input";
@@ -50,7 +51,9 @@ const Settings: FC<NodeSettingsProps> = () => {
                   <Input value={endpoint} disabled />
                 </Form.Group>
                 <Background2Settings
-                  style={containerStyle}
+                  
+            themeOverrideSelector={THEME_SELECTORS.videoHome}
+            style={containerStyle}
                   onChange={(style) =>
                     onChange({
                       ...node,
@@ -59,7 +62,9 @@ const Settings: FC<NodeSettingsProps> = () => {
                   }
                 />
                 <Spacing2Settings
-                  style={containerStyle}
+                  
+            themeOverrideSelector={THEME_SELECTORS.videoHome}
+            style={containerStyle}
                   onChange={(style) =>
                     onChange({
                       ...node,
@@ -70,7 +75,9 @@ const Settings: FC<NodeSettingsProps> = () => {
               </TabsContent>
               <TabsContent value="card">
                 <Background2Settings
-                  style={cardStyle}
+                  
+            themeOverrideSelector={THEME_SELECTORS.videoHome}
+            style={cardStyle}
                   onChange={(style) =>
                     onChange({
                       ...node,
@@ -79,7 +86,9 @@ const Settings: FC<NodeSettingsProps> = () => {
                   }
                 />
                 <Spacing2Settings
-                  style={cardStyle}
+                  
+            themeOverrideSelector={THEME_SELECTORS.videoHome}
+            style={cardStyle}
                   onChange={(style) =>
                     onChange({
                       ...node,
@@ -90,7 +99,9 @@ const Settings: FC<NodeSettingsProps> = () => {
               </TabsContent>
               <TabsContent value="title">
                 <Text2Settings
-                  style={titleStyle}
+                  
+            themeOverrideSelector={THEME_SELECTORS.videoHome}
+            style={titleStyle}
                   onChange={(style) =>
                     onChange({
                       ...node,
@@ -99,7 +110,9 @@ const Settings: FC<NodeSettingsProps> = () => {
                   }
                 />
                 <Background2Settings
-                  style={titleStyle}
+                  
+            themeOverrideSelector={THEME_SELECTORS.videoHome}
+            style={titleStyle}
                   onChange={(style) =>
                     onChange({
                       ...node,
@@ -108,7 +121,9 @@ const Settings: FC<NodeSettingsProps> = () => {
                   }
                 />
                 <Spacing2Settings
-                  style={titleStyle}
+                  
+            themeOverrideSelector={THEME_SELECTORS.videoHome}
+            style={titleStyle}
                   onChange={(style) =>
                     onChange({
                       ...node,
@@ -119,7 +134,9 @@ const Settings: FC<NodeSettingsProps> = () => {
               </TabsContent>
               <TabsContent value="image">
                 <Object2Settings
-                  style={imageStyle}
+                  
+            themeOverrideSelector={THEME_SELECTORS.videoHome}
+            style={imageStyle}
                   onChange={(style) =>
                     onChange({
                       ...node,
@@ -128,7 +145,9 @@ const Settings: FC<NodeSettingsProps> = () => {
                   }
                 />
                 <Border2Settings
-                  style={imageStyle}
+                  
+            themeOverrideSelector={THEME_SELECTORS.videoHome}
+            style={imageStyle}
                   onChange={(style) =>
                     onChange({
                       ...node,
@@ -137,7 +156,9 @@ const Settings: FC<NodeSettingsProps> = () => {
                   }
                 />
                 <Spacing2Settings
-                  style={imageStyle}
+                  
+            themeOverrideSelector={THEME_SELECTORS.videoHome}
+            style={imageStyle}
                   onChange={(style) =>
                     onChange({
                       ...node,

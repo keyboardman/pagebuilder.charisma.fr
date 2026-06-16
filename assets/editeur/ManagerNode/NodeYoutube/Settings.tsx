@@ -1,7 +1,8 @@
 import type { FC } from "react";
 import { type NodeSettingsProps } from "../NodeConfigurationType";
 import Form from "../../components/form";
-import { Base2Settings, Spacing2Settings, Border2Settings } from "../Settings";
+import { Base2Settings, Spacing2Settings, Border2Settings, THEME_SELECTORS } from "../Settings";
+// theme selectors added below
 import { useNodeBuilderContext } from "../../services/providers/NodeBuilderContext";
 import type { NodeYoutubeType } from ".";
 import { NodeSettingsWrapper } from "../components/NodeSettingsWrapper";
@@ -49,6 +50,8 @@ const Settings: FC<NodeSettingsProps> = () => {
 
         content={<>
           <Spacing2Settings
+            
+            themeOverrideSelector={THEME_SELECTORS.youtube}
             style={node.attributes?.style || {}}
             onChange={(style) => onChange({
               ...node,
@@ -56,6 +59,8 @@ const Settings: FC<NodeSettingsProps> = () => {
             })}
           />
           <Border2Settings
+            
+            themeOverrideSelector={THEME_SELECTORS.youtube}
             style={node.attributes?.style || {}}
             onChange={(style) => onChange({
               ...node,

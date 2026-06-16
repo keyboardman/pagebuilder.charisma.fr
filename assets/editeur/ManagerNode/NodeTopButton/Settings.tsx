@@ -4,7 +4,8 @@ import Form from "../../components/form";
 import { useNodeBuilderContext } from "../../services/providers/NodeBuilderContext";
 import type { NodeTopButtonType } from "./index";
 import { NodeSettingsWrapper } from "../components/NodeSettingsWrapper";
-import { Base2Settings, Background2Settings, Border2Settings } from "../Settings";
+import { Base2Settings, Background2Settings, Border2Settings, THEME_SELECTORS } from "../Settings";
+// theme selectors added below
 
 const HORIZONTAL_ALIGN_OPTIONS = [
   { value: "right", label: "Droite" },
@@ -99,6 +100,8 @@ const Settings: FC<NodeSettingsProps> = () => {
       content={
         <>
           <Background2Settings
+            
+            themeOverrideSelector={THEME_SELECTORS.topButton}
             style={node.attributes?.style || {}}
             onChange={(style) =>
               onChange({
@@ -108,6 +111,8 @@ const Settings: FC<NodeSettingsProps> = () => {
             }
           />
           <Border2Settings
+            
+            themeOverrideSelector={THEME_SELECTORS.topButton}
             style={node.attributes?.style || {}}
             onChange={(style) =>
               onChange({

@@ -6,6 +6,7 @@ import BuilderProvider from "./BuilderProvider";
 import nodeHelper from "../../utils/nodeHelper";
 import { ThemeProvider } from "./ThemeProvider";
 import type { BuilderThemeIcon } from "../../types/BuilderThemeIcon";
+import type { ThemeNodeOverrides, ThemeVars } from "../themeStyleHints";
 
 
 export interface AppProviderProps {
@@ -16,6 +17,8 @@ export interface AppProviderProps {
     fileManagerConfig?: FileManagerConfig | null;
     /** Icônes du thème courant (injectées par le backend sur le builder de page). */
     themeIcons?: BuilderThemeIcon[] | null;
+    themeNodeOverrides?: ThemeNodeOverrides | null;
+    themeVars?: ThemeVars | null;
     /** Base URL API page-builder (GET /forms/catalog, etc.) — identique à apiCardsBaseUrl en pratique. */
     pageBuilderApiBaseUrl?: string | null;
     /** Callback appelé quand les nodes changent (intégration embarquée) */
@@ -39,6 +42,8 @@ export const AppProvider: FC<AppProviderProps> = ({
     view = false,
     fileManagerConfig = null,
     themeIcons = null,
+    themeNodeOverrides = null,
+    themeVars = null,
     pageBuilderApiBaseUrl = null,
     onSaveCallback,
 }: AppProviderProps) => {
@@ -122,6 +127,8 @@ export const AppProvider: FC<AppProviderProps> = ({
                 fileManagerConfig,
 
                 themeIcons: themeIcons ?? [],
+                themeNodeOverrides: themeNodeOverrides ?? {},
+                themeVars: themeVars ?? {},
                 pageBuilderApiBaseUrl: pageBuilderApiBaseUrl ?? null,
             }} >
                 {mode !== APP_MODE.VIEW ? <BuilderProvider target={target} onSaveCallback={onSaveCallback}>{children}</BuilderProvider> : children}

@@ -2,12 +2,13 @@ import Form from "../../../components/form";
 import { InputFile } from "../../../components/form/InputFile";
 import { useNodeBuilderContext } from "../../../services/providers/NodeBuilderContext";
 import type { NodeCardType } from "../index";
-import { ClassName2Settings } from "../../Settings";
+import { ClassName2Settings, getCardThemeSelector } from "../../Settings";
 import { Border2Settings, Object2Settings, Background2Settings } from "../../Settings";
 
 export function ImageSettings() {
   const { node, onChange } = useNodeBuilderContext();
   const cardNode = node as NodeCardType;
+  const themeOverrideSelector = getCardThemeSelector(cardNode.content?.container?.position, "image");
 
   const className = cardNode.content?.image?.className || "";
   const style = cardNode.content?.image?.style || {};
@@ -64,6 +65,7 @@ export function ImageSettings() {
         }
       />
       <Object2Settings
+        themeOverrideSelector={themeOverrideSelector}
         style={style}
         onChange={(style) =>
           onChange({
@@ -76,6 +78,7 @@ export function ImageSettings() {
         }
       />
       <Border2Settings
+        themeOverrideSelector={themeOverrideSelector}
         style={style}
         onChange={(style) =>
           onChange({
@@ -88,6 +91,7 @@ export function ImageSettings() {
         }
       />
       <Background2Settings
+        themeOverrideSelector={themeOverrideSelector}
         style={style}
         onChange={(style) =>
           onChange({

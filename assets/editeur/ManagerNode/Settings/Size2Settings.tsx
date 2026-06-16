@@ -1,14 +1,18 @@
 import Form from "../../components/form";
+import { useThemeStylePlaceholder } from "../../services/themeStyleHints";
+import type { ThemeAwareStyleSettingsProps } from "./types";
 
-export interface Size2SettingsProps {
-    style: React.CSSProperties;
-    onChange: (style: React.CSSProperties) => void;
-}
+export type Size2SettingsProps = ThemeAwareStyleSettingsProps;
 
-export function Size2Settings({ style, onChange }: Size2SettingsProps) {
+export function Size2Settings({ style, onChange, themeOverrideSelector }: Size2SettingsProps) {
+    const minWidthPlaceholder = useThemeStylePlaceholder(themeOverrideSelector, "min-width", "auto");
+    const maxWidthPlaceholder = useThemeStylePlaceholder(themeOverrideSelector, "max-width", "none");
+    const minHeightPlaceholder = useThemeStylePlaceholder(themeOverrideSelector, "min-height", "auto");
+    const maxHeightPlaceholder = useThemeStylePlaceholder(themeOverrideSelector, "max-height", "none");
+
     return (
         <div className="flex flex-col gap-1 mb-2 mt-1">
-            <div className="text-center text-sm py-0 leading-tight text-white bg-gray-200/50">Taille min / max</div>
+            <div className="text-center text-sm py-0 leading-tight text-muted-foreground bg-gray-200/50">Taille min / max</div>
             <div className="grid grid-cols-2 gap-1">
                 <Form.Group className="mb-0">
                     <Form.Label text="min-width" className="text-foreground" />
@@ -17,7 +21,7 @@ export function Size2Settings({ style, onChange }: Size2SettingsProps) {
                         value={style?.minWidth?.toString() ?? ""}
                         onChange={(value) => onChange({ ...style, minWidth: value || undefined })}
                         className="h-7 text-sm"
-                        placeholder="auto"
+                        placeholder={minWidthPlaceholder}
                     />
                 </Form.Group>
                 <Form.Group className="mb-0">
@@ -27,7 +31,7 @@ export function Size2Settings({ style, onChange }: Size2SettingsProps) {
                         value={style?.maxWidth?.toString() ?? ""}
                         onChange={(value) => onChange({ ...style, maxWidth: value || undefined })}
                         className="h-7 text-sm"
-                        placeholder="none"
+                        placeholder={maxWidthPlaceholder}
                     />
                 </Form.Group>
             </div>
@@ -39,7 +43,7 @@ export function Size2Settings({ style, onChange }: Size2SettingsProps) {
                         value={style?.minHeight?.toString() ?? ""}
                         onChange={(value) => onChange({ ...style, minHeight: value || undefined })}
                         className="h-7 text-sm"
-                        placeholder="auto"
+                        placeholder={minHeightPlaceholder}
                     />
                 </Form.Group>
                 <Form.Group className="mb-0">
@@ -49,7 +53,7 @@ export function Size2Settings({ style, onChange }: Size2SettingsProps) {
                         value={style?.maxHeight?.toString() ?? ""}
                         onChange={(value) => onChange({ ...style, maxHeight: value || undefined })}
                         className="h-7 text-sm"
-                        placeholder="none"
+                        placeholder={maxHeightPlaceholder}
                     />
                 </Form.Group>
             </div>

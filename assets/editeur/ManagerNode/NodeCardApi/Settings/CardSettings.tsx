@@ -3,13 +3,14 @@ import { Switch } from "@/editeur/components/ui/switch";
 import { useNodeBuilderContext } from "../../../services/providers/NodeBuilderContext";
 import type { NodeCardApiType, ContainerPosition, ContainerRatio } from "../index";
 import type { ContainerAlign } from "../../NodeCard";
-import { Spacing2Settings, Border2Settings, Background2Settings } from "../../Settings";
+import { Spacing2Settings, Border2Settings, Background2Settings, getCardApiThemeSelector } from "../../Settings";
 import { ContainerAlignOptions, ContainerPositionOptions, ContainerRatioOptions } from "../index";
 
 
 export function CardSettings() {
   const { node, onChange } = useNodeBuilderContext();
   const cardNode = node as NodeCardApiType;
+  const themeOverrideSelector = getCardApiThemeSelector(cardNode.content?.container?.position, "card");
   const content = cardNode.content || {};
   const cardStyle = content?.card?.style || {};
   const gap = content?.container?.style?.gap || "";
@@ -168,7 +169,8 @@ export function CardSettings() {
         />
       </Form.Group>
 
-      <Background2Settings style={cardStyle} onChange={(style) => onChange({
+      <Background2Settings themeOverrideSelector={themeOverrideSelector}
+        style={cardStyle} onChange={(style) => onChange({
         ...node,
         content: {
           ...cardNode.content,
@@ -176,14 +178,16 @@ export function CardSettings() {
         }
       })} />
 
-      <Border2Settings style={cardStyle} onChange={(style) => onChange({
+      <Border2Settings themeOverrideSelector={themeOverrideSelector}
+        style={cardStyle} onChange={(style) => onChange({
         ...node,
         content: {
           ...cardNode.content,
           card: { ...cardNode.content?.card, style }
         }
       })} />
-      <Spacing2Settings style={cardStyle} onChange={(style) => onChange({
+      <Spacing2Settings themeOverrideSelector={themeOverrideSelector}
+        style={cardStyle} onChange={(style) => onChange({
         ...node,
         content: {
           ...cardNode.content,

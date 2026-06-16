@@ -1,11 +1,9 @@
 import { type FC } from "react";
-import {
-  Base2Settings,
+import { Base2Settings,
   Background2Settings,
   Border2Settings,
   Spacing2Settings,
-  Size2Settings,
-} from "../Settings";
+  Size2Settings, THEME_SELECTORS } from "../Settings";
 import Form from "../../components/form";
 import { type NodeSettingsProps } from "../NodeConfigurationType";
 import { useNodeBuilderContext } from "../../services/providers/NodeBuilderContext";
@@ -139,6 +137,8 @@ const Settings: FC<NodeSettingsProps> = () => {
       content={
         <>
           <Background2Settings
+            
+            themeOverrideSelector={THEME_SELECTORS.flex}
             style={node.attributes?.style || {}}
             onChange={(style) =>
               onChange({
@@ -148,6 +148,8 @@ const Settings: FC<NodeSettingsProps> = () => {
             }
           />
           <Border2Settings
+            
+            themeOverrideSelector={THEME_SELECTORS.flex}
             style={node.attributes?.style || {}}
             onChange={(style) =>
               onChange({
@@ -157,6 +159,8 @@ const Settings: FC<NodeSettingsProps> = () => {
             }
           />
           <Spacing2Settings
+            
+            themeOverrideSelector={THEME_SELECTORS.flex}
             style={node.attributes?.style || {}}
             onChange={(style) =>
               onChange({
@@ -166,6 +170,8 @@ const Settings: FC<NodeSettingsProps> = () => {
             }
           />
           <Size2Settings
+            
+            themeOverrideSelector={THEME_SELECTORS.flex}
             style={node.attributes?.style || {}}
             onChange={(style) =>
               onChange({

@@ -3,7 +3,8 @@ import { Pencil } from "lucide-react";
 import { type NodeSettingsProps } from "../NodeConfigurationType";
 import { useNodeBuilderContext } from "../../services/providers/NodeBuilderContext";
 import { NodeSettingsWrapper } from "../components/NodeSettingsWrapper";
-import { Base2Settings, Background2Settings, Text2Settings, Border2Settings, Spacing2Settings } from "../Settings";
+import { Base2Settings, Background2Settings, Text2Settings, Border2Settings, Spacing2Settings, THEME_SELECTORS } from "../Settings";
+// theme selectors added below
 import { Button } from "@/editeur/components/ui/button";
 import { useNodeRichTextEditor } from "./NodeRichTextEditorContext";
 
@@ -39,6 +40,8 @@ const Settings: FC<NodeSettingsProps> = () => {
             </Button>
           </div>
           <Text2Settings
+            
+            themeOverrideSelector={THEME_SELECTORS.richText}
             style={node.attributes?.style || {}}
             onChange={(style) =>
               onChange({
@@ -48,6 +51,8 @@ const Settings: FC<NodeSettingsProps> = () => {
             }
           />
           <Background2Settings
+            
+            themeOverrideSelector={THEME_SELECTORS.richText}
             style={node.attributes?.style || {}}
             onChange={(style) =>
               onChange({
@@ -57,6 +62,8 @@ const Settings: FC<NodeSettingsProps> = () => {
             }
           />
           <Border2Settings
+            
+            themeOverrideSelector={THEME_SELECTORS.richText}
             style={node.attributes?.style || {}}
             onChange={(style) =>
               onChange({
@@ -66,6 +73,8 @@ const Settings: FC<NodeSettingsProps> = () => {
             }
           />
           <Spacing2Settings
+            
+            themeOverrideSelector={THEME_SELECTORS.richText}
             style={node.attributes?.style || {}}
             onChange={(style) =>
               onChange({

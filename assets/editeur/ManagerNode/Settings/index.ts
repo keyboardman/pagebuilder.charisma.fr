@@ -8,3 +8,5 @@ import { Base2Settings } from "./Base2Settings";
 import { Size2Settings } from "./Size2Settings";
 
 export { Text2Settings, Background2Settings, Spacing2Settings, ClassName2Settings, Border2Settings, Object2Settings, Base2Settings, Size2Settings };
+export { THEME_SELECTORS, cardPartSelector, cardApiPartSelector, headerTagSelector, getCardThemeSelector, getCardApiThemeSelector } from "./themeOverrideSelectors";
+export type { ThemeAwareStyleSettingsProps } from "./types";

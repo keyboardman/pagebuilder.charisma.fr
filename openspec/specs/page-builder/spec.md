@@ -246,6 +246,7 @@ Le nœud SHALL être éditable dans le panneau de propriétés du builder et SHA
 - **AND** les slides sont rechargées depuis l’API à l’affichage ultérieur
 
 ### Requirement: Gestion des slides images (ajout, tri, suppression, modification)
+
 Le nœud NodeSlideshow SHALL permettre à l’utilisateur de gérer la liste des slides images en choisissant un mode de source :
 - mode `manual` : la liste des slides est éditée directement dans le panneau (ajout, suppression, tri drag-and-drop, édition `src`/`alt`)
 - mode `api-endpoint` : la liste des slides est déterminée par la sélection d’un endpoint API image (collection fixe) dans le panneau ; le système charge la collection à l’affichage via `fetchCollection` et la mappe en slides, sans persister les données de la collection dans le contenu du nœud.
@@ -256,38 +257,47 @@ Après chaque action en mode `manual`, l’ordre et le contenu SHALL être immé
 
 Le changement de mode (`manual` <-> `api-endpoint`) SHALL réinitialiser la source des slides affichées (liste manuelle vide ou placeholder en mode API) et SHALL purger toute donnée de slide persistée lorsque le mode API est actif.
 
+En mode `api-endpoint`, la sélection de l’API SHALL utiliser le composant standard `ApiManagerModal` avec filtre de type `image` et mode de collection `fixed`, de sorte que seules les APIs cards image adaptées au diaporama sont proposées (sans mélange avec le catalogue de polices servi par `/api/builder/fonts`).
+
 #### Scenario: Tri par drag-and-drop en mode manuel
+
 - **WHEN** l’utilisateur est en mode `manual`
 - **AND** l’utilisateur réordonne les slides par drag-and-drop
 - **THEN** l’ordre Swiper correspond à l’ordre visuel dans la liste
 
 #### Scenario: Ajout de slide en mode manuel (saisie d’URL)
+
 - **WHEN** l’utilisateur est en mode `manual`
 - **AND** l’utilisateur clique sur “Ajouter une slide”
 - **AND** l’utilisateur renseigne une URL dans le champ “Source (URL)”
 - **THEN** une nouvelle slide apparaît dans la liste et la preview est mise à jour
 
 #### Scenario: Suppression de la slide sélectionnée
+
 - **WHEN** l’utilisateur est en mode `manual`
 - **AND** l’utilisateur sélectionne une slide puis clique “Supprimer”
 - **THEN** la slide est retirée de la liste et la preview est mise à jour
 
 #### Scenario: Sélection d’un endpoint API pour afficher les slides
+
 - **WHEN** l’utilisateur passe en mode `api-endpoint`
-- **AND** l’utilisateur sélectionne une API image fixe dans le sélecteur “Endpoint API (image fixed)”
+- **AND** l’utilisateur sélectionne une API image fixe via `ApiManagerModal` (filtre type `image`, collection `fixed`)
 - **THEN** les slides sont chargées depuis la collection de l’API sélectionnée pour la preview
 - **AND** seuls `slidesMode` et `apiId` sont persistés dans le contenu du nœud
 
 #### Scenario: Données API fraîches à l’affichage
+
 - **WHEN** un NodeSlideshow en mode `api-endpoint` avec un `apiId` valide est affiché (éditeur, preview ou rendu final)
 - **THEN** le système appelle `fetchCollection` sur l’API référencée et mappe les items en slides
 - **AND** le rendu reflète la collection courante de l’API, indépendamment d’un éventuel snapshot `slides` présent dans d’anciennes sauvegardes
 
 #### Scenario: Rechargement manuel dans le panneau
+
 - **WHEN** l’utilisateur clique sur “Recharger” en mode `api-endpoint`
 - **THEN** la preview des vignettes est rafraîchie depuis l’API sans écrire les slides dans le contenu persisté du nœud
 
 #### Scenario: Lien optionnel par slide en mode manuel
+
 - **WHEN** l’utilisateur est en mode `manual`
 - **AND** l’utilisateur renseigne une URL de lien sur une slide
 - **THEN** la slide devient cliquable dans le rendu
@@ -295,8 +305,14 @@ Le changement de mode (`manual` <-> `api-endpoint`) SHALL réinitialiser la sour
 - **THEN** la slide redevient non cliquable
 
 #### Scenario: API indisponible ou collection vide en mode API
+
 - **WHEN** l’API sélectionnée ne répond pas, retourne une erreur ou une collection vide en mode `api-endpoint`
 - **THEN** le NodeSlideshow affiche un état dégradé (placeholder ou message discret) sans empêcher la sauvegarde de la page
+
+#### Scenario: Sélection d’API sans mélange avec le catalogue Font
+
+- **WHEN** l’utilisateur configure la source API d’un NodeSlideshow
+- **THEN** `ApiManagerModal` n’affiche que les APIs cards de type `image` en collection `fixed` ; les endpoints du catalogue `Font` (`/api/builder/fonts`) ne figurent pas dans cette liste
 
 ### Requirement: Réglages d’affichage Swiper (navigation, pagination, vitesse)
 Le nœud NodeSlideshow SHALL exposer des paramètres permettant de configurer :
@@ -1032,7 +1048,7 @@ Le builder SHALL maintenir un registre des polices actives sur la page courante 
 
 ### Requirement: Sélecteur font-family enrichi
 
-Le composant `FontFamilySelect` SHALL proposer : (1) les polices navigateur intégrées (builtins) ; (2) les polices du thème (`themeFonts`) ; (3) les polices actives de la page (`FontUsageRegistry`). Il SHALL exposer une action pour ouvrir ManagerFont et ajouter une police du catalogue. Il SHALL NOT charger ni lister l’intégralité du catalogue `Font` en base.
+Le composant `FontFamilySelect` SHALL proposer : (1) les polices navigateur intégrées (builtins) ; (2) les polices du thème (`themeFonts`) ; (3) les polices actives de la page (`FontUsageRegistry`). Il SHALL exposer une action pour ouvrir ManagerFont et ajouter une police du catalogue (Google ou custom via `GET /api/builder/fonts`). Il SHALL NOT charger ni lister l’intégralité du catalogue `Font` en base au démarrage. Les anciens chemins parallèles de sélection de polices (formulaire thème legacy, contrôleurs Stimulus autocomplete non branchés) SHALL NOT être requis pour accéder au catalogue une fois le nettoyage `assets/` effectué.
 
 #### Scenario: Options limitées au boot
 
@@ -1044,6 +1060,11 @@ Le composant `FontFamilySelect` SHALL proposer : (1) les polices navigateur int�
 - **WHEN** une police hors thème est utilisée sur la page
 - **THEN** elle apparaît dans le sélecteur en plus des builtins et des polices thème, sans que toutes les polices du catalogue aient été chargées
 
+#### Scenario: Ajout via ManagerFont après nettoyage assets
+
+- **WHEN** l’utilisateur ouvre « Ajouter une police… » dans un `FontFamilySelect` et que `pageBuilderApiBaseUrl` est configuré
+- **THEN** la modale ManagerFont charge le catalogue paginé depuis `/api/builder/fonts` ; la police sélectionnée est enregistrée dans `FontUsageRegistry` et apparaît dans le sélecteur
+
 ### Requirement: Chargement des polices de page en preview et rendu public
 
 Lors de la preview ou du rendu public d’une page, le système SHALL charger les polices référencées dans le contenu JSON de la page mais absentes du CSS de thème, afin que le rendu corresponde à l’éditeur. Le chargement SHALL être limité aux polices effectivement utilisées dans le contenu.
@@ -1052,4 +1073,55 @@ Lors de la preview ou du rendu public d’une page, le système SHALL charger le
 
 - **WHEN** une page contient un node dont le style utilise une police Google non incluse dans le thème
 - **THEN** la preview injecte la feuille ou le `@font-face` de cette police ; le texte s’affiche avec la bonne famille typographique
+
+### Requirement: Audit et retrait du code mort frontend
+
+Le projet SHALL maintenir le dossier `assets/` exempt de modules, entrées Webpack et exports explicitement morts (fichiers non référencés par le build Encore, les templates Twig ou le code TypeScript/JavaScript actif). Toute évolution du flux polices ou des sélecteurs API du builder SHALL être précédée d’un inventaire documenté des candidats à la suppression et de la validation qu’aucun template ou entrypoint ne les référence encore.
+
+#### Scenario: Inventaire avant modification fonts ou API
+
+- **WHEN** une tâche vise à modifier le sélecteur de polices ou la sélection d’API d’un nœud (ex. NodeSlideshow)
+- **THEN** un inventaire des fichiers et exports non référencés dans `assets/` est produit et les suppressions confirmées sont appliquées avant le changement fonctionnel
+
+#### Scenario: Build après nettoyage
+
+- **WHEN** des fichiers ou entrées Webpack morts sont retirés de `assets/`
+- **THEN** la compilation Encore réussit et les entrypoints actifs (`pageBuilderStandalone`, `pagePreview`, `ThemeForm2`, `app`, `fileManager`) restent fonctionnels
+
+### Requirement: Indication des valeurs thème dans les placeholders des panneaux de style
+
+Les panneaux de style partagés du builder (`Text2Settings`, `Background2Settings`, `Border2Settings`, `Spacing2Settings`, `Size2Settings`, `Object2Settings`) SHALL accepter un contexte de sélecteur d’override thème optionnel. Lorsqu’un champ de style du nœud est vide (aucune valeur inline persistée pour cette propriété) et que le thème de la page définit une valeur pour la propriété CSS correspondante dans `node_overrides`, le champ SHALL afficher cette valeur comme **placeholder** indicatif, après résolution des références `var(--…)` à partir des `vars` du thème. Lorsque le nœud possède déjà une valeur pour la propriété, le placeholder thème SHALL NOT remplacer la valeur affichée. Lorsqu’aucune valeur thème n’est définie pour la propriété, ou lorsque la variable CSS ne peut pas être résolue via les `vars` du thème, le placeholder générique existant (ex. `ex: 1.5rem`, `auto`) SHALL être conservé.
+
+Le builder SHALL recevoir les `node_overrides` et les `vars` du thème associé à la page au chargement de l’éditeur, normalisés en structure exploitable côté frontend (y compris pour les overrides legacy stockés en chaîne CSS).
+
+#### Scenario: Champ vide avec valeur thème littérale
+- **WHEN** l’utilisateur ouvre les réglages de style d’un nœud dont une propriété (ex. `font-size`) n’a pas de valeur inline
+- **AND** le thème définit `font-size: 1.25rem` pour le sélecteur d’override correspondant
+- **THEN** le champ affiche `1.25rem` en placeholder, sans préfixe
+
+#### Scenario: Champ vide avec variable CSS résolue
+- **WHEN** l’utilisateur ouvre les réglages de style d’un nœud dont `color` n’a pas de valeur inline
+- **AND** le thème définit `color: var(--color-primary)` pour le sélecteur correspondant
+- **AND** `vars` contient `--color-primary: #3b82f6`
+- **THEN** le champ affiche `#3b82f6` en placeholder
+- **AND** le champ n’affiche pas la chaîne `var(--color-primary)`
+
+#### Scenario: Champ renseigné sur le nœud
+- **WHEN** l’utilisateur a défini une valeur inline pour une propriété de style sur le nœud
+- **THEN** le champ affiche la valeur du nœud
+- **AND** le placeholder thème n’est pas affiché à la place de cette valeur
+
+#### Scenario: Aucune valeur thème pour la propriété
+- **WHEN** le thème ne définit pas de valeur pour la propriété CSS concernée
+- **THEN** le champ conserve le placeholder générique existant du composant (ex. `ex: 1.5rem`)
+
+#### Scenario: Variable CSS non résolvable
+- **WHEN** le thème définit une valeur `var(--inconnue)` pour une propriété
+- **AND** `--inconnue` est absente des `vars` du thème
+- **THEN** le champ conserve le placeholder générique existant du composant
+
+#### Scenario: Contexte de sous-partie (ex. titre de carte)
+- **WHEN** l’utilisateur édite le style du titre d’un NodeCard en position `top`
+- **AND** le thème définit des overrides pour `.ce-card-position-top .ce-card-title`
+- **THEN** les champs vides de `Text2Settings` / `Spacing2Settings` affichent les valeurs thème résolues de ce sélecteur en placeholder
 

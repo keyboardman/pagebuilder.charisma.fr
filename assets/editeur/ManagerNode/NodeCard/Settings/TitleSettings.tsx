@@ -5,6 +5,7 @@ import {
   Spacing2Settings,
   Background2Settings,
   Border2Settings,
+  getCardThemeSelector,
 } from "../../Settings";
 import type { NodeCardType } from "../index";
 
@@ -13,6 +14,9 @@ export function TitleSettings() {
   const cardNode = node as NodeCardType;
   const titleStyle = cardNode.content?.title?.style || {};
   const titleClassName = cardNode.content?.title?.className || "";
+  const themeOverrideSelector = getCardThemeSelector(cardNode.content?.container?.position, "title");
+
+  const styleProps = { themeOverrideSelector, style: titleStyle };
 
   return (
     <div className="flex flex-1 flex-col gap-1">
@@ -29,7 +33,7 @@ export function TitleSettings() {
         }
       />
       <Text2Settings
-        style={titleStyle}
+        {...styleProps}
         onChange={(style) =>
           onChange({
             ...node,
@@ -41,7 +45,7 @@ export function TitleSettings() {
         }
       />
       <Background2Settings
-        style={titleStyle}
+        {...styleProps}
         onChange={(style) =>
           onChange({
             ...node,
@@ -53,7 +57,7 @@ export function TitleSettings() {
         }
       />
       <Border2Settings
-        style={titleStyle}
+        {...styleProps}
         onChange={(style) =>
           onChange({
             ...node,
@@ -65,7 +69,7 @@ export function TitleSettings() {
         }
       />
       <Spacing2Settings
-        style={titleStyle}
+        {...styleProps}
         onChange={(style) =>
           onChange({
             ...node,

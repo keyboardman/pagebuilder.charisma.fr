@@ -1,11 +1,9 @@
 import { type FC } from "react";
-import {
-  Base2Settings,
+import { Base2Settings,
   Border2Settings,
   Background2Settings,
   Spacing2Settings,
-  Size2Settings,
-} from "../Settings";
+  Size2Settings, THEME_SELECTORS } from "../Settings";
 import Form from "../../components/form";
 import { InputFile } from "../../components/form/InputFile";
 import { type NodeSettingsProps } from "../NodeConfigurationType";
@@ -121,7 +119,9 @@ const Settings: FC<NodeSettingsProps> = () => {
                 </div>
 
                 <Border2Settings
-                  style={node.attributes?.style ?? {}}
+                  
+            themeOverrideSelector={THEME_SELECTORS.hero}
+            style={node.attributes?.style ?? {}}
                   onChange={(style) =>
                     onChange({
                       ...node,
@@ -130,7 +130,9 @@ const Settings: FC<NodeSettingsProps> = () => {
                   }
                 />
                 <Spacing2Settings
-                  style={node.attributes?.style ?? {}}
+                  
+            themeOverrideSelector={THEME_SELECTORS.hero}
+            style={node.attributes?.style ?? {}}
                   onChange={(style) =>
                     onChange({
                       ...node,
@@ -144,9 +146,15 @@ const Settings: FC<NodeSettingsProps> = () => {
             <TabsContent value="dropzone" className="mt-2">
               <div className="space-y-2 text-xs">
                 <p className="node-block-title font-medium text-foreground text-sm">Zone de dépôt</p>
-                <Background2Settings style={dropzoneStyle} onChange={updateDropzoneStyle} />
-                <Spacing2Settings style={dropzoneStyle} onChange={updateDropzoneStyle} />
-                <Size2Settings style={dropzoneStyle} onChange={updateDropzoneStyle} />
+                <Background2Settings 
+            themeOverrideSelector={THEME_SELECTORS.hero}
+            style={dropzoneStyle} onChange={updateDropzoneStyle} />
+                <Spacing2Settings 
+            themeOverrideSelector={THEME_SELECTORS.hero}
+            style={dropzoneStyle} onChange={updateDropzoneStyle} />
+                <Size2Settings 
+            themeOverrideSelector={THEME_SELECTORS.hero}
+            style={dropzoneStyle} onChange={updateDropzoneStyle} />
               </div>
             </TabsContent>
           </>

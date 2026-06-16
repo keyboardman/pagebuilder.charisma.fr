@@ -1,15 +1,18 @@
 import Form from "../../components/form";
+import { useThemeStylePlaceholder } from "../../services/themeStyleHints";
+import type { ThemeAwareStyleSettingsProps } from "./types";
 
-export interface Border2SettingsProps {
-    style: React.CSSProperties;
-    onChange: (style: React.CSSProperties) => void;
-}
+export type Border2SettingsProps = ThemeAwareStyleSettingsProps;
 
-export function Border2Settings({ style, onChange }: Border2SettingsProps) {
+export function Border2Settings({ style, onChange, themeOverrideSelector }: Border2SettingsProps) {
+    const borderColorPlaceholder = useThemeStylePlaceholder(themeOverrideSelector, "border-color");
+    const borderWidthPlaceholder = useThemeStylePlaceholder(themeOverrideSelector, "border-width");
+    const borderStyleLabel = useThemeStylePlaceholder(themeOverrideSelector, "border-style") ?? "...";
+    const borderRadiusPlaceholder = useThemeStylePlaceholder(themeOverrideSelector, "border-radius");
 
     return (
         <div className="flex flex-col gap-1 mb-2 mt-1">
-            <div className="text-center text-sm py-0 leading-tight text-white bg-gray-200/50">Border</div>
+            <div className="text-center text-sm py-0 leading-tight text-muted-foreground bg-gray-200/50">Border</div>
             <div className="flex flex-1">
                 <Form.Group className="mb-0">
                     <Form.Label text="border-color" className="text-foreground" />
@@ -17,6 +20,7 @@ export function Border2Settings({ style, onChange }: Border2SettingsProps) {
                         type="text"
                         value={style?.borderColor?.toString() ?? ""}
                         onChange={(value) => onChange({ ...style, borderColor: value })}
+                        placeholder={borderColorPlaceholder}
                         className="h-7 text-sm"
                     />
                 </Form.Group>
@@ -26,6 +30,7 @@ export function Border2Settings({ style, onChange }: Border2SettingsProps) {
                         type="text"
                         value={style?.borderWidth?.toString() ?? ""}
                         onChange={(value) => onChange({ ...style, borderWidth: value })}
+                        placeholder={borderWidthPlaceholder}
                         className="h-7 text-sm"
                     />
                 </Form.Group>
@@ -34,7 +39,7 @@ export function Border2Settings({ style, onChange }: Border2SettingsProps) {
                 <Form.Group className="mb-0">
                     <Form.Label text="border-style" className="text-foreground" />
                     <Form.Select options={[
-                        { label: '...', value: '' },
+                        { label: borderStyleLabel, value: '' },
                         { label: 'solid', value: 'solid' },
                         { label: 'dashed', value: 'dashed' },
                         { label: 'dotted', value: 'dotted' },
@@ -51,6 +56,7 @@ export function Border2Settings({ style, onChange }: Border2SettingsProps) {
                         type="text"
                         value={style?.borderRadius?.toString() ?? ""}
                         onChange={(value) => onChange({ ...style, borderRadius: value })}
+                        placeholder={borderRadiusPlaceholder}
                         className="h-7 text-sm"
                     />
                 </Form.Group>

@@ -1,17 +1,19 @@
 import { useNodeBuilderContext } from "../../../services/providers/NodeBuilderContext";
 import type { NodeCardApiType } from "../index";
-import { Background2Settings, Border2Settings, Spacing2Settings } from "../../Settings";
+import { Background2Settings, Border2Settings, Spacing2Settings, getCardApiThemeSelector } from "../../Settings";
 
 export function ContainerSettings() {
     const { node, onChange } = useNodeBuilderContext();
     const cardNode = node as NodeCardApiType;
+  const themeOverrideSelector = getCardApiThemeSelector(cardNode.content?.container?.position, "container-content");
     const content = cardNode.content || {};
     const containerStyle = content?.container?.style || {};
 
     return (    
         <div className="flex flex-1 flex-col gap-1">
             <Background2Settings 
-                style={containerStyle} 
+                themeOverrideSelector={themeOverrideSelector}
+        style={containerStyle} 
                 onChange={(style) => onChange({
                     ...node,
                     content: {
@@ -20,7 +22,8 @@ export function ContainerSettings() {
                     }
                 })} 
             />
-            <Border2Settings style={containerStyle} onChange={(style) => onChange({
+            <Border2Settings themeOverrideSelector={themeOverrideSelector}
+        style={containerStyle} onChange={(style) => onChange({
                 ...node,
                 content: {
                     ...cardNode.content,
@@ -28,7 +31,8 @@ export function ContainerSettings() {
                 }
             })} />
             
-            <Spacing2Settings style={containerStyle} onChange={(style) => onChange({
+            <Spacing2Settings themeOverrideSelector={themeOverrideSelector}
+        style={containerStyle} onChange={(style) => onChange({
                 ...node,
                 content: {
                     ...cardNode.content,

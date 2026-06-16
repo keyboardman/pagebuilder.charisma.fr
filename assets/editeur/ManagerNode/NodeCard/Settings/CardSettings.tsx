@@ -3,12 +3,13 @@ import { Switch } from "@/editeur/components/ui/switch";
 import { useNodeBuilderContext } from "../../../services/providers/NodeBuilderContext";
 import type { NodeCardType } from "../index";
 import type { ContainerAlign, ContainerPosition, ContainerRatio } from "../index";
-import { Spacing2Settings, Border2Settings, Background2Settings } from "../../Settings";
+import { Spacing2Settings, Border2Settings, Background2Settings, getCardThemeSelector } from "../../Settings";
 import { ContainerAlignOptions, ContainerPositionOptions, ContainerRatioOptions } from "../index";
 
 export function CardSettings() {
   const { node, onChange } = useNodeBuilderContext();
   const cardNode = node as NodeCardType;
+  const themeOverrideSelector = getCardThemeSelector(cardNode.content?.container?.position, "card");
   const content = cardNode.content || {};
   const link = content?.container?.link || "";
   const gap = content?.container?.style?.gap || "";
@@ -180,6 +181,7 @@ export function CardSettings() {
 
       
       <Background2Settings
+        themeOverrideSelector={themeOverrideSelector}
         style={cardStyle}
         onChange={(style) =>
           onChange({
@@ -192,6 +194,7 @@ export function CardSettings() {
         }
       />
       <Border2Settings
+        themeOverrideSelector={themeOverrideSelector}
         style={cardStyle}
         onChange={(style) =>
           onChange({
@@ -204,6 +207,7 @@ export function CardSettings() {
         }
       />
       <Spacing2Settings
+        themeOverrideSelector={themeOverrideSelector}
         style={cardStyle}
         onChange={(style) =>
           onChange({

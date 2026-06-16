@@ -1,10 +1,8 @@
 import type { FC } from "react";
-import {
-  Base2Settings,
+import { Base2Settings,
   Background2Settings,
   Border2Settings,
-  Spacing2Settings,
-} from "../Settings";
+  Spacing2Settings, THEME_SELECTORS } from "../Settings";
 import Button from "../../components/button";
 import Form from "../../components/form";
 import { Switch } from "@/editeur/components/ui/switch";
@@ -179,6 +177,8 @@ const Settings: FC<NodeSettingsProps> = () => {
       content={
         <>
           <Background2Settings
+            
+            themeOverrideSelector={THEME_SELECTORS.twoColumns}
             style={node.attributes?.style || {}}
             onChange={(style) =>
               onChange({
@@ -188,6 +188,8 @@ const Settings: FC<NodeSettingsProps> = () => {
             }
           />
           <Border2Settings
+            
+            themeOverrideSelector={THEME_SELECTORS.twoColumns}
             style={node.attributes?.style || {}}
             onChange={(style) =>
               onChange({
@@ -197,6 +199,8 @@ const Settings: FC<NodeSettingsProps> = () => {
             }
           />
           <Spacing2Settings
+            
+            themeOverrideSelector={THEME_SELECTORS.twoColumns}
             style={node.attributes?.style || {}}
             onChange={(style) =>
               onChange({

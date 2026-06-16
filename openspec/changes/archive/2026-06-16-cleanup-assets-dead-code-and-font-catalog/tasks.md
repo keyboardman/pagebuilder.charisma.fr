@@ -17,7 +17,7 @@
 ## 3. Catalogue de polices — vérification et consolidation
 
 - [x] 3.1 Vérifier que `pageBuilderApiBaseUrl` est injecté dans `builder.html.twig` et `pageBuilderStandalone.jsx`
-- [ ] 3.2 Tester `FontFamilySelect` → « Ajouter une police… » → sélection Google/custom → police visible dans le sélecteur et l’iframe
+- [x] 3.2 Tester `FontFamilySelect` → « Ajouter une police… » → sélection Google/custom → police visible dans le sélecteur et l’iframe
 - [x] 3.3 Vérifier `syncFontUsageFromNodes` au chargement d’une page avec `fontFamily` catalogue existante
 - [x] 3.4 Supprimer tout résidu UI legacy de sélection de polices non aligné sur ManagerFont
 
@@ -25,7 +25,7 @@
 
 - [x] 4.1 Remplacer le sélecteur API manuel dans `NodeSlideshow/Settings.tsx` par `ApiManagerModal` avec `typeFilter="image"` et `collectionModeFilter="fixed"`
 - [x] 4.2 Conserver la persistance `slidesMode` + `apiId` sans réintroduire la sérialisation des slides API
-- [ ] 4.3 Test manuel : mode `api-endpoint`, changement d’API, preview et rendu avec données fraîches
+- [x] 4.3 Test manuel : mode `api-endpoint`, changement d’API, preview et rendu avec données fraîches
 
 ## 5. Validation OpenSpec
 

@@ -6,8 +6,7 @@ import type { NodeButtonType, NodeButtonButtonType, NodeButtonVariantType, NodeB
 import { NODE_BUTTON_VARIANT_OPTIONS, NODE_BUTTON_SIZE_OPTIONS } from "./index";
 
 import { NodeSettingsWrapper } from "../components/NodeSettingsWrapper";
-import { Base2Settings, Background2Settings, Text2Settings, Border2Settings, Size2Settings, Spacing2Settings } from "../Settings";
-
+import { Base2Settings, Background2Settings, Text2Settings, Border2Settings, Size2Settings, Spacing2Settings, THEME_SELECTORS } from "../Settings";
 
 const BUTTON_TYPE_OPTIONS: { value: NodeButtonButtonType; label: string }[] = [
   { value: "button", label: "Bouton" },
@@ -119,6 +118,8 @@ const Settings: FC<NodeSettingsProps> = () => {
       content={
         <>
           <Text2Settings
+            
+            themeOverrideSelector={THEME_SELECTORS.button}
             style={node.attributes?.style || {}}
             onChange={(style) =>
               onChange({
@@ -128,6 +129,8 @@ const Settings: FC<NodeSettingsProps> = () => {
             }
           />
           <Background2Settings
+            
+            themeOverrideSelector={THEME_SELECTORS.button}
             style={node.attributes?.style || {}}
             onChange={(style) =>
               onChange({
@@ -137,6 +140,8 @@ const Settings: FC<NodeSettingsProps> = () => {
             }
           />
           <Border2Settings
+            
+            themeOverrideSelector={THEME_SELECTORS.button}
             style={node.attributes?.style || {}}
             onChange={(style) =>
               onChange({
@@ -146,6 +151,8 @@ const Settings: FC<NodeSettingsProps> = () => {
             }
           />
           <Size2Settings
+            
+            themeOverrideSelector={THEME_SELECTORS.button}
             style={node.attributes?.style || {}}
             onChange={(style) =>
               onChange({
@@ -155,6 +162,8 @@ const Settings: FC<NodeSettingsProps> = () => {
             }
           />
           <Spacing2Settings
+            
+            themeOverrideSelector={THEME_SELECTORS.button}
             style={node.attributes?.style || {}}
             onChange={(style) =>
               onChange({

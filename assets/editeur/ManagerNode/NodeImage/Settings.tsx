@@ -1,12 +1,10 @@
 import { type FC } from "react";
-import {
-  Base2Settings,
+import { Base2Settings,
   Background2Settings,
   Border2Settings,
   Object2Settings,
   Spacing2Settings,
-  Size2Settings,
-} from "../Settings";
+  Size2Settings, THEME_SELECTORS } from "../Settings";
 import Form from "../../components/form";
 import { InputFile } from "../../components/form/InputFile";
 import { type NodeSettingsProps } from "../NodeConfigurationType";
@@ -100,6 +98,8 @@ const Settings: FC<NodeSettingsProps> = () => {
       content={
         <>
           <Object2Settings
+            
+            themeOverrideSelector={THEME_SELECTORS.image}
             style={node.attributes?.style ?? {}}
             onChange={(style) =>
               onChange({
@@ -109,6 +109,8 @@ const Settings: FC<NodeSettingsProps> = () => {
             }
           />
           <Background2Settings
+            
+            themeOverrideSelector={THEME_SELECTORS.image}
             style={node.attributes?.style ?? {}}
             onChange={(style) =>
               onChange({
@@ -118,6 +120,8 @@ const Settings: FC<NodeSettingsProps> = () => {
             }
           />
           <Border2Settings
+            
+            themeOverrideSelector={THEME_SELECTORS.image}
             style={node.attributes?.style ?? {}}
             onChange={(style) =>
               onChange({
@@ -127,6 +131,8 @@ const Settings: FC<NodeSettingsProps> = () => {
             }
           />
           <Spacing2Settings
+            
+            themeOverrideSelector={THEME_SELECTORS.image}
             style={node.attributes?.style ?? {}}
             onChange={(style) =>
               onChange({
@@ -136,6 +142,8 @@ const Settings: FC<NodeSettingsProps> = () => {
             }
           />
           <Size2Settings
+            
+            themeOverrideSelector={THEME_SELECTORS.image}
             style={node.attributes?.style ?? {}}
             onChange={(style) =>
               onChange({

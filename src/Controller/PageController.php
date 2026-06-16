@@ -139,6 +139,8 @@ class PageController extends AbstractController
     {
         $themeFonts = $themeFontBuilderService->build($page->getTheme());
         $themeConfig = $page->getTheme()->getConfig() ?? [];
+        $themeNodeOverrides = $themeConfig['node_overrides'] ?? [];
+        $themeVars = $themeConfig['vars'] ?? [];
         $rawIcons = $themeConfig['icons'] ?? [];
         $themeIcons = [];
         if (\is_array($rawIcons)) {
@@ -160,6 +162,8 @@ class PageController extends AbstractController
             'theme_fonts' => $themeFonts,
             'theme_font_ids' => $themeFontBuilderService->getThemeFontIds($page->getTheme()),
             'theme_icons' => $themeIcons,
+            'theme_node_overrides' => $themeNodeOverrides,
+            'theme_vars' => $themeVars,
         ]);
     }
 

@@ -1,10 +1,11 @@
 import { useNodeBuilderContext } from "../../../services/providers/NodeBuilderContext";
-import { ClassName2Settings, Text2Settings, Spacing2Settings, Background2Settings, Border2Settings } from "../../Settings";
+import { ClassName2Settings, Text2Settings, Spacing2Settings, Background2Settings, Border2Settings, getCardApiThemeSelector } from "../../Settings";
 import type { NodeCardApiType } from "../index";
 
 export function TitleSettings() {
   const { node, onChange } = useNodeBuilderContext();
   const cardNode = node as NodeCardApiType;
+  const themeOverrideSelector = getCardApiThemeSelector(cardNode.content?.container?.position, "title");
   const titleStyle = cardNode.content?.title?.style || {};
   const titleClassName = cardNode.content?.title?.className || "";
 
@@ -21,28 +22,32 @@ export function TitleSettings() {
           }
         })} 
       />
-      <Text2Settings style={titleStyle} onChange={(style) => onChange({
+      <Text2Settings themeOverrideSelector={themeOverrideSelector}
+        style={titleStyle} onChange={(style) => onChange({
         ...node,
         content: {
           ...cardNode.content,
           title: { ...cardNode.content?.title, style }
         }
       })} />
-      <Background2Settings style={titleStyle} onChange={(style) => onChange({
+      <Background2Settings themeOverrideSelector={themeOverrideSelector}
+        style={titleStyle} onChange={(style) => onChange({
         ...node,
         content: {
           ...cardNode.content,
           title: { ...cardNode.content?.title, style }
         }
       })} />
-      <Border2Settings style={titleStyle} onChange={(style) => onChange({
+      <Border2Settings themeOverrideSelector={themeOverrideSelector}
+        style={titleStyle} onChange={(style) => onChange({
         ...node,
         content: {
           ...cardNode.content,
           title: { ...cardNode.content?.title, style }
         }
       })} />
-      <Spacing2Settings style={titleStyle} onChange={(style) => onChange({
+      <Spacing2Settings themeOverrideSelector={themeOverrideSelector}
+        style={titleStyle} onChange={(style) => onChange({
         ...node,
         content: {
           ...cardNode.content,

@@ -1,10 +1,11 @@
 import { useNodeBuilderContext } from "../../../services/providers/NodeBuilderContext";
-import { ClassName2Settings, Text2Settings, Spacing2Settings, Background2Settings, Border2Settings } from "../../Settings";
+import { ClassName2Settings, Text2Settings, Spacing2Settings, Background2Settings, Border2Settings, getCardApiThemeSelector } from "../../Settings";
 import type { NodeCardApiType } from "../index";
 
 export function TextSettings() {
   const { node, onChange } = useNodeBuilderContext();
   const cardNode = node as NodeCardApiType;
+  const themeOverrideSelector = getCardApiThemeSelector(cardNode.content?.container?.position, "text");
   const textStyle = cardNode.content?.text?.style || {};
   const textClassName = cardNode.content?.text?.className || "";
 
@@ -21,28 +22,32 @@ export function TextSettings() {
           }
         })} 
       />
-      <Text2Settings style={textStyle} onChange={(style) => onChange({
+      <Text2Settings themeOverrideSelector={themeOverrideSelector}
+        style={textStyle} onChange={(style) => onChange({
         ...node,
         content: {
           ...cardNode.content,
           text: { ...cardNode.content?.text, style }
         }
       })} />
-      <Background2Settings style={textStyle} onChange={(style) => onChange({
+      <Background2Settings themeOverrideSelector={themeOverrideSelector}
+        style={textStyle} onChange={(style) => onChange({
         ...node,
         content: {
           ...cardNode.content,
           text: { ...cardNode.content?.text, style }
         }
       })} />
-      <Border2Settings style={textStyle} onChange={(style) => onChange({
+      <Border2Settings themeOverrideSelector={themeOverrideSelector}
+        style={textStyle} onChange={(style) => onChange({
         ...node,
         content: {
           ...cardNode.content,
           text: { ...cardNode.content?.text, style }
         }
       })} />
-      <Spacing2Settings style={textStyle} onChange={(style) => onChange({
+      <Spacing2Settings themeOverrideSelector={themeOverrideSelector}
+        style={textStyle} onChange={(style) => onChange({
         ...node,
         content: {
           ...cardNode.content,

@@ -5,7 +5,8 @@ import { useAppContext } from "../../services/providers/AppContext";
 import { NodeSettingsWrapper } from "../components/NodeSettingsWrapper";
 import Form from "../../components/form";
 import type { NodeFormMethod, NodeFormType } from "./index";
-import { Base2Settings, Background2Settings, Border2Settings, Spacing2Settings, Text2Settings } from "../Settings";
+import { Base2Settings, Background2Settings, Border2Settings, Spacing2Settings, Text2Settings, THEME_SELECTORS } from "../Settings";
+// theme selectors added below
 
 const methodOptions: { value: NodeFormMethod; label: string }[] = [
   { value: "GET", label: "GET" },
@@ -126,18 +127,24 @@ const Settings: FC<NodeSettingsProps> = () => {
       content={
         <>
           <Background2Settings
+            
+            themeOverrideSelector={THEME_SELECTORS.form}
             style={node.attributes?.style || {}}
             onChange={(style) =>
               onChange({ ...node, attributes: { ...node.attributes, style } })
             }
           />
           <Border2Settings
+            
+            themeOverrideSelector={THEME_SELECTORS.form}
             style={node.attributes?.style || {}}
             onChange={(style) =>
               onChange({ ...node, attributes: { ...node.attributes, style } })
             }
           />
           <Spacing2Settings
+            
+            themeOverrideSelector={THEME_SELECTORS.form}
             style={node.attributes?.style || {}}
             onChange={(style) =>
               onChange({ ...node, attributes: { ...node.attributes, style } })

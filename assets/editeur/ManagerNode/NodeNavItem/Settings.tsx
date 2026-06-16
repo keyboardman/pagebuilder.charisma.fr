@@ -3,15 +3,13 @@ import { type NodeSettingsProps } from "../NodeConfigurationType";
 import Form from "../../components/form";
 import { useNodeBuilderContext } from "../../services/providers/NodeBuilderContext";
 import { NodeSettingsWrapper } from "../components/NodeSettingsWrapper";
-import {
-  Base2Settings,
+import { Base2Settings,
   Background2Settings,
   Text2Settings,
   Border2Settings,
   Size2Settings,
   Spacing2Settings,
-  Object2Settings,
-} from "../Settings";
+  Object2Settings, THEME_SELECTORS } from "../Settings";
 import type { NodeNavItemType, NodeNavItemKind } from "./index";
 
 
@@ -72,6 +70,8 @@ const Settings: FC<NodeSettingsProps> = () => {
       content={
         <>
           <Text2Settings
+            
+            themeOverrideSelector={THEME_SELECTORS.navItem}
             style={node.attributes?.style || {}}
             onChange={(style) =>
               onChange({
@@ -81,6 +81,8 @@ const Settings: FC<NodeSettingsProps> = () => {
             }
           />
           <Background2Settings
+            
+            themeOverrideSelector={THEME_SELECTORS.navItem}
             style={node.attributes?.style || {}}
             onChange={(style) =>
               onChange({
@@ -90,6 +92,8 @@ const Settings: FC<NodeSettingsProps> = () => {
             }
           />
           <Border2Settings
+            
+            themeOverrideSelector={THEME_SELECTORS.navItem}
             style={node.attributes?.style || {}}
             onChange={(style) =>
               onChange({
@@ -99,6 +103,8 @@ const Settings: FC<NodeSettingsProps> = () => {
             }
           />
           <Size2Settings
+            
+            themeOverrideSelector={THEME_SELECTORS.navItem}
             style={node.attributes?.style || {}}
             onChange={(style) =>
               onChange({
@@ -108,6 +114,8 @@ const Settings: FC<NodeSettingsProps> = () => {
             }
           />
           <Spacing2Settings
+            
+            themeOverrideSelector={THEME_SELECTORS.navItem}
             style={node.attributes?.style || {}}
             onChange={(style) =>
               onChange({

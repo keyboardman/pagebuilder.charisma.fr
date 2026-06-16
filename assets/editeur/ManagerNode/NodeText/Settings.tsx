@@ -4,7 +4,7 @@ import Form from "../../components/form";
 import { useNodeBuilderContext } from "../../services/providers/NodeBuilderContext";
 import type { NodeTextType } from "./index";
 import { NodeSettingsWrapper } from "../components/NodeSettingsWrapper";
-import { Base2Settings, Background2Settings, Text2Settings, Border2Settings, Spacing2Settings } from "../Settings";
+import { Base2Settings, Background2Settings, Text2Settings, Border2Settings, Spacing2Settings, THEME_SELECTORS } from "../Settings";
 const Settings: FC<NodeSettingsProps> = () => {
   const { node, onChange } = useNodeBuilderContext();
   const textNode = node as NodeTextType;
@@ -46,6 +46,7 @@ const Settings: FC<NodeSettingsProps> = () => {
         </>}
         content={<>
           <Text2Settings
+            themeOverrideSelector={THEME_SELECTORS.text}
             style={node.attributes?.style || {}}
             onChange={(style) => onChange({
               ...node,
@@ -53,6 +54,7 @@ const Settings: FC<NodeSettingsProps> = () => {
             })}
           />
           <Background2Settings
+            themeOverrideSelector={THEME_SELECTORS.text}
             style={node.attributes?.style || {}}
             onChange={(style) => onChange({
               ...node,
@@ -60,6 +62,7 @@ const Settings: FC<NodeSettingsProps> = () => {
             })}
           />
           <Border2Settings
+            themeOverrideSelector={THEME_SELECTORS.text}
             style={node.attributes?.style || {}}
             onChange={(style) => onChange({
               ...node,
@@ -67,6 +70,7 @@ const Settings: FC<NodeSettingsProps> = () => {
             })}
           />
           <Spacing2Settings
+            themeOverrideSelector={THEME_SELECTORS.text}
             style={node.attributes?.style || {}}
             onChange={(style) => onChange({
               ...node,

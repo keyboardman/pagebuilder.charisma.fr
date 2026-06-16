@@ -8,11 +8,13 @@ import {
   Spacing2Settings,
   Background2Settings,
   Border2Settings,
+  getCardThemeSelector,
 } from "../../Settings";
 
 export function LabelsSettings() {
   const { node, onChange } = useNodeBuilderContext();
   const cardNode = node as NodeCardType;
+  const themeOverrideSelector = getCardThemeSelector(cardNode.content?.container?.position, "label");
 
   const labelsClassName = cardNode.content?.labels?.className || "";
   const labelsStyle = cardNode.content?.labels?.style || {};
@@ -57,6 +59,7 @@ export function LabelsSettings() {
         }
       />
       <Text2Settings
+        themeOverrideSelector={themeOverrideSelector}
         style={labelsStyle}
         onChange={(style) =>
           onChange({
@@ -69,6 +72,7 @@ export function LabelsSettings() {
         }
       />
       <Background2Settings
+        themeOverrideSelector={themeOverrideSelector}
         style={labelsStyle}
         onChange={(style) =>
           onChange({
@@ -81,6 +85,7 @@ export function LabelsSettings() {
         }
       />
       <Border2Settings
+        themeOverrideSelector={themeOverrideSelector}
         style={labelsStyle}
         onChange={(style) =>
           onChange({
@@ -93,6 +98,7 @@ export function LabelsSettings() {
         }
       />
       <Spacing2Settings
+        themeOverrideSelector={themeOverrideSelector}
         style={labelsStyle}
         onChange={(style) =>
           onChange({

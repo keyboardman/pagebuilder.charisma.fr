@@ -6,6 +6,7 @@ import {
   Spacing2Settings,
   Size2Settings,
   Text2Settings,
+  THEME_SELECTORS,
 } from "../Settings";
 import Form from "../../components/form";
 import { type NodeSettingsProps } from "../NodeConfigurationType";
@@ -134,6 +135,7 @@ const Settings: FC<NodeSettingsProps> = () => {
             <>
               <TabsContent value="nav">
                 <Background2Settings
+                  themeOverrideSelector={THEME_SELECTORS.nav}
                   style={node.content?.nav?.style || {}}
                   onChange={(style) =>
                     onChange({
@@ -143,6 +145,7 @@ const Settings: FC<NodeSettingsProps> = () => {
                   }
                 />
                 <Border2Settings
+                  themeOverrideSelector={THEME_SELECTORS.nav}
                   style={node.content?.nav?.style || {}}
                   onChange={(style) =>
                     onChange({
@@ -152,6 +155,7 @@ const Settings: FC<NodeSettingsProps> = () => {
                   }
                 />
                 <Spacing2Settings
+                  themeOverrideSelector={THEME_SELECTORS.nav}
                   style={node.content?.nav?.style || {}}
                   onChange={(style) =>
                     onChange({
@@ -161,6 +165,7 @@ const Settings: FC<NodeSettingsProps> = () => {
                   }
                 />
                 <Size2Settings
+                  themeOverrideSelector={THEME_SELECTORS.nav}
                   style={node.content?.nav?.style || {}}
                   onChange={(style) =>
                     onChange({
@@ -172,6 +177,7 @@ const Settings: FC<NodeSettingsProps> = () => {
               </TabsContent>
               <TabsContent value="burger">
                 <Background2Settings
+                  themeOverrideSelector={THEME_SELECTORS.nav}
                   style={node.content?.burger?.style || {}}
                   onChange={(style) =>
                     onChange({
@@ -181,6 +187,7 @@ const Settings: FC<NodeSettingsProps> = () => {
                   }
                 />
                 <Border2Settings
+                  themeOverrideSelector={THEME_SELECTORS.nav}
                   style={node.content?.burger?.style || {}}
                   onChange={(style) =>
                     onChange({
@@ -190,6 +197,7 @@ const Settings: FC<NodeSettingsProps> = () => {
                   }
                 />
                 <Spacing2Settings
+                  themeOverrideSelector={THEME_SELECTORS.navItem}
                   style={node.content?.burgerItem?.style || {}}
                   onChange={(style) =>
                     onChange({
@@ -199,6 +207,7 @@ const Settings: FC<NodeSettingsProps> = () => {
                   }
                 />
                 <Text2Settings
+                  themeOverrideSelector={THEME_SELECTORS.navItem}
                   style={node.content?.burgerItem?.style || {}}
                   onChange={(style) =>
                     onChange({

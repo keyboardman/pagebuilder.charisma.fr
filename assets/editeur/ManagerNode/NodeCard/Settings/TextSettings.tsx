@@ -5,12 +5,14 @@ import {
   Spacing2Settings,
   Background2Settings,
   Border2Settings,
+  getCardThemeSelector,
 } from "../../Settings";
 import type { NodeCardType } from "../index";
 
 export function TextSettings() {
   const { node, onChange } = useNodeBuilderContext();
   const cardNode = node as NodeCardType;
+  const themeOverrideSelector = getCardThemeSelector(cardNode.content?.container?.position, "text");
   const textStyle = cardNode.content?.text?.style || {};
   const textClassName = cardNode.content?.text?.className || "";
 
@@ -29,6 +31,7 @@ export function TextSettings() {
         }
       />
       <Text2Settings
+        themeOverrideSelector={themeOverrideSelector}
         style={textStyle}
         onChange={(style) =>
           onChange({
@@ -41,6 +44,7 @@ export function TextSettings() {
         }
       />
       <Background2Settings
+        themeOverrideSelector={themeOverrideSelector}
         style={textStyle}
         onChange={(style) =>
           onChange({
@@ -53,6 +57,7 @@ export function TextSettings() {
         }
       />
       <Border2Settings
+        themeOverrideSelector={themeOverrideSelector}
         style={textStyle}
         onChange={(style) =>
           onChange({
@@ -65,6 +70,7 @@ export function TextSettings() {
         }
       />
       <Spacing2Settings
+        themeOverrideSelector={themeOverrideSelector}
         style={textStyle}
         onChange={(style) =>
           onChange({

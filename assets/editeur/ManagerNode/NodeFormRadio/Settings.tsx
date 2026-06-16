@@ -9,7 +9,7 @@ import type {
   NodeFormRadioType,
 } from "./index";
 import { nodeFormRadioDefaultContent } from "./defaults";
-import { Base2Settings, Background2Settings, Border2Settings, Spacing2Settings, Text2Settings } from "../Settings";
+import { Base2Settings, Background2Settings, Border2Settings, Spacing2Settings, Text2Settings, THEME_SELECTORS } from "../Settings";
 import { Button } from "@/editeur/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/editeur/components/ui/tabs";
 import { IoClose } from "react-icons/io5";
@@ -207,27 +207,27 @@ const Settings: FC<NodeSettingsProps> = () => {
 
               <TabsContent value="container">
                 <div className="flex flex-1 flex-col gap-1">
-                  <Background2Settings style={content.container.style} onChange={setContainerStyle} />
-                  <Border2Settings style={content.container.style} onChange={setContainerStyle} />
-                  <Spacing2Settings style={content.container.style} onChange={setContainerStyle} />
+                  <Background2Settings themeOverrideSelector={THEME_SELECTORS.formField} style={content.container.style} onChange={setContainerStyle} />
+                  <Border2Settings themeOverrideSelector={THEME_SELECTORS.formField} style={content.container.style} onChange={setContainerStyle} />
+                  <Spacing2Settings themeOverrideSelector={THEME_SELECTORS.formField} style={content.container.style} onChange={setContainerStyle} />
                 </div>
               </TabsContent>
 
               <TabsContent value="label">
                 <div className="flex flex-1 flex-col gap-1">
-                  <Text2Settings style={content.label.style} onChange={setLabelStyle} />
-                  <Background2Settings style={content.label.style} onChange={setLabelStyle} />
-                  <Border2Settings style={content.label.style} onChange={setLabelStyle} />
-                  <Spacing2Settings style={content.label.style} onChange={setLabelStyle} />
+                  <Text2Settings themeOverrideSelector={THEME_SELECTORS.formLabel} style={content.label.style} onChange={setLabelStyle} />
+                  <Background2Settings themeOverrideSelector={THEME_SELECTORS.formLabel} style={content.label.style} onChange={setLabelStyle} />
+                  <Border2Settings themeOverrideSelector={THEME_SELECTORS.formLabel} style={content.label.style} onChange={setLabelStyle} />
+                  <Spacing2Settings themeOverrideSelector={THEME_SELECTORS.formLabel} style={content.label.style} onChange={setLabelStyle} />
                 </div>
               </TabsContent>
 
               <TabsContent value="radio">
                 <div className="flex flex-1 flex-col gap-1">
-                  <Text2Settings style={content.radio.style} onChange={setRadioStyle} />
-                  <Background2Settings style={content.radio.style} onChange={setRadioStyle} />
-                  <Border2Settings style={content.radio.style} onChange={setRadioStyle} />
-                  <Spacing2Settings style={content.radio.style} onChange={setRadioStyle} />
+                  <Text2Settings themeOverrideSelector={THEME_SELECTORS.formRadioLabel} style={content.radio.style} onChange={setRadioStyle} />
+                  <Background2Settings themeOverrideSelector={THEME_SELECTORS.formRadioLabel} style={content.radio.style} onChange={setRadioStyle} />
+                  <Border2Settings themeOverrideSelector={THEME_SELECTORS.formRadioLabel} style={content.radio.style} onChange={setRadioStyle} />
+                  <Spacing2Settings themeOverrideSelector={THEME_SELECTORS.formRadioLabel} style={content.radio.style} onChange={setRadioStyle} />
                 </div>
               </TabsContent>
             </>

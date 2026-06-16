@@ -36,7 +36,7 @@
                         <td>{{ page.theme.name }}</td>
                         <td class="text-end">
                             <div class="flex gap-2 justify-end items-center">
-                                <a href="{{ path('app_page_preview', { id: page.id }) }}" class="btn btn-ghost btn-sm" target="_blank" rel="noopener">Prévisualiser</a>
+                                <a href="{{ path('app_page_render', { idOrSlug: page.slug }) }}" class="btn btn-ghost btn-sm" target="_blank" rel="noopener">Prévisualiser</a>
                                 <a href="{{ path('app_page_builder', { id: page.id }) }}" class="btn btn-ghost btn-sm" target="_blank" rel="noopener">Builder</a>
                                 <a href="{{ path('app_page_edit', { id: page.id }) }}" class="btn btn-ghost btn-sm">Modifier</a>
                                 <form method="post" action="{{ path('app_page_duplicate', { id: page.id }) }}" class="inline">

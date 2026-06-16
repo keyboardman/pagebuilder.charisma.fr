@@ -2,7 +2,8 @@ import { type FC } from "react";
 import { type NodeSettingsProps } from "../NodeConfigurationType";
 import { useNodeBuilderContext } from "../../services/providers/NodeBuilderContext";
 import { NodeSettingsWrapper } from "../components/NodeSettingsWrapper";
-import { Base2Settings, Background2Settings, Spacing2Settings, Text2Settings } from "../Settings";
+import { Base2Settings, Background2Settings, Spacing2Settings, Text2Settings, THEME_SELECTORS } from "../Settings";
+// theme selectors added below
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/editeur/components/ui/tabs";
 import { Input } from "@/editeur/components/ui/input";
 import Form from "../../components/form";
@@ -46,7 +47,9 @@ const Settings: FC<NodeSettingsProps> = () => {
             <>
               <TabsContent value="general">
                 <Background2Settings
-                  style={containerStyle}
+                  
+            themeOverrideSelector={THEME_SELECTORS.anniversaire}
+            style={containerStyle}
                   onChange={(style) =>
                     onChange({
                       ...node,
@@ -61,7 +64,9 @@ const Settings: FC<NodeSettingsProps> = () => {
                   }
                 />
                 <Spacing2Settings
-                  style={containerStyle}
+                  
+            themeOverrideSelector={THEME_SELECTORS.anniversaire}
+            style={containerStyle}
                   onChange={(style) =>
                     onChange({
                       ...node,
@@ -99,7 +104,9 @@ const Settings: FC<NodeSettingsProps> = () => {
                   />
                 </Form.Group>
                 <Text2Settings
-                  style={titleStyle}
+                  
+            themeOverrideSelector={THEME_SELECTORS.anniversaire}
+            style={titleStyle}
                   onChange={(style) =>
                     onChange({
                       ...node,
@@ -114,7 +121,9 @@ const Settings: FC<NodeSettingsProps> = () => {
                   }
                 />
                 <Background2Settings
-                  style={titleStyle}
+                  
+            themeOverrideSelector={THEME_SELECTORS.anniversaire}
+            style={titleStyle}
                   onChange={(style) =>
                     onChange({
                       ...node,
@@ -129,7 +138,9 @@ const Settings: FC<NodeSettingsProps> = () => {
                   }
                 />
                 <Spacing2Settings
-                  style={titleStyle}
+                  
+            themeOverrideSelector={THEME_SELECTORS.anniversaire}
+            style={titleStyle}
                   onChange={(style) =>
                     onChange({
                       ...node,
@@ -147,7 +158,9 @@ const Settings: FC<NodeSettingsProps> = () => {
 
               <TabsContent value="date">
                 <Text2Settings
-                  style={dayStyle}
+                  
+            themeOverrideSelector={THEME_SELECTORS.anniversaire}
+            style={dayStyle}
                   onChange={(style) =>
                     onChange({
                       ...node,
@@ -162,7 +175,9 @@ const Settings: FC<NodeSettingsProps> = () => {
                   }
                 />
                 <Background2Settings
-                  style={dayStyle}
+                  
+            themeOverrideSelector={THEME_SELECTORS.anniversaire}
+            style={dayStyle}
                   onChange={(style) =>
                     onChange({
                       ...node,
@@ -177,7 +192,9 @@ const Settings: FC<NodeSettingsProps> = () => {
                   }
                 />
                 <Spacing2Settings
-                  style={dayStyle}
+                  
+            themeOverrideSelector={THEME_SELECTORS.anniversaire}
+            style={dayStyle}
                   onChange={(style) =>
                     onChange({
                       ...node,
@@ -195,7 +212,9 @@ const Settings: FC<NodeSettingsProps> = () => {
 
               <TabsContent value="anniversaires">
                 <Text2Settings
-                  style={anniversairesStyle}
+                  
+            themeOverrideSelector={THEME_SELECTORS.anniversaire}
+            style={anniversairesStyle}
                   onChange={(style) =>
                     onChange({
                       ...node,
@@ -210,7 +229,9 @@ const Settings: FC<NodeSettingsProps> = () => {
                   }
                 />
                 <Background2Settings
-                  style={anniversairesStyle}
+                  
+            themeOverrideSelector={THEME_SELECTORS.anniversaire}
+            style={anniversairesStyle}
                   onChange={(style) =>
                     onChange({
                       ...node,
@@ -225,7 +246,9 @@ const Settings: FC<NodeSettingsProps> = () => {
                   }
                 />
                 <Spacing2Settings
-                  style={anniversairesStyle}
+                  
+            themeOverrideSelector={THEME_SELECTORS.anniversaire}
+            style={anniversairesStyle}
                   onChange={(style) =>
                     onChange({
                       ...node,
