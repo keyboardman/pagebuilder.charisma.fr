@@ -1,6 +1,7 @@
 import Form from "../../components/form";
 import { useThemeStylePlaceholder } from "../../services/themeStyleHints";
 import type { ThemeAwareStyleSettingsProps } from "./types";
+import { SettingsSectionTitle } from "./SettingsSectionTitle";
 
 export type Size2SettingsProps = ThemeAwareStyleSettingsProps;
 
@@ -12,7 +13,7 @@ export function Size2Settings({ style, onChange, themeOverrideSelector }: Size2S
 
     return (
         <div className="flex flex-col gap-1 mb-2 mt-1">
-            <div className="text-center text-sm py-0 leading-tight text-muted-foreground bg-gray-200/50">Taille min / max</div>
+            <SettingsSectionTitle>Taille min / max</SettingsSectionTitle>
             <div className="grid grid-cols-2 gap-1">
                 <Form.Group className="mb-0">
                     <Form.Label text="min-width" className="text-foreground" />

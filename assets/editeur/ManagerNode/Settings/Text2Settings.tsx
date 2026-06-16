@@ -2,6 +2,7 @@ import Form from "../../components/form";
 import { useTypographyOptions } from "../../services/typography";
 import { useThemeStylePlaceholder } from "../../services/themeStyleHints";
 import type { ThemeAwareStyleSettingsProps } from "./types";
+import { SettingsSectionTitle } from "./SettingsSectionTitle";
 
 export type Text2SettingsProps = ThemeAwareStyleSettingsProps;
 
@@ -21,7 +22,7 @@ export function Text2Settings({ style, onChange, themeOverrideSelector }: Text2S
 
     return (
         <div className="flex flex-col gap-1 mb-2 mt-1">
-            <div className="text-center text-sm py-0 leading-tight text-muted-foreground bg-gray-200/50">Text</div>
+            <SettingsSectionTitle>Text</SettingsSectionTitle>
             <div className="flex flex-1">
                 <Form.Group className="w-1/2">
                     <Form.Label text="font-size" className="text-foreground" />

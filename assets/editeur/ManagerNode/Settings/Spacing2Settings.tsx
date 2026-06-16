@@ -1,6 +1,7 @@
 import Form from "../../components/form";
 import { useThemeStylePlaceholder } from "../../services/themeStyleHints";
 import type { ThemeAwareStyleSettingsProps } from "./types";
+import { SettingsSectionTitle } from "./SettingsSectionTitle";
 
 export type Spacing2SettingsProps = ThemeAwareStyleSettingsProps;
 
@@ -17,7 +18,7 @@ export function Spacing2Settings({ style, onChange, themeOverrideSelector }: Spa
     return (
         <>
             <div className="flex flex-col gap-1 mb-2 mt-1">
-                <div className="text-center text-sm py-0 leading-tight text-muted-foreground bg-gray-200/50">Margin</div>
+                <SettingsSectionTitle>Margin</SettingsSectionTitle>
                 <div className="grid grid-cols-2 gap-1">
                     <Form.Group className="mb-0">
                         <Form.Label text="top" className="text-foreground" />
@@ -65,7 +66,7 @@ export function Spacing2Settings({ style, onChange, themeOverrideSelector }: Spa
 
             </div>
             <div className="flex flex-col gap-1 mb-2 mt-1">
-                <div className="text-center text-sm py-0 leading-tight text-muted-foreground bg-gray-200/50">Padding</div>
+                <SettingsSectionTitle>Padding</SettingsSectionTitle>
                 <div className="grid grid-cols-2 gap-1">
                     <Form.Group className="mb-0">
                         <Form.Label text="top" className="text-foreground" />

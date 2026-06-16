@@ -7,6 +7,7 @@ import type { FileItem } from "../../ManagerAsset/types";
 import { useAppContext } from "../../services/providers/AppContext";
 import { useThemeStylePlaceholder } from "../../services/themeStyleHints";
 import type { ThemeAwareStyleSettingsProps } from "./types";
+import { SettingsSectionTitle } from "./SettingsSectionTitle";
 
 function toAbsoluteUrl(url: string): string {
     if (typeof window === "undefined" || !url) return url;
@@ -38,7 +39,7 @@ export function Background2Settings({ style, onChange, themeOverrideSelector }: 
 
     return (
         <div className="flex flex-col gap-1 mb-2 mt-1">
-            <div className="text-center text-sm py-0 leading-tight text-muted-foreground bg-gray-200/50">Background</div>
+            <SettingsSectionTitle>Background</SettingsSectionTitle>
 
             <Form.Group className="mb-0">
                 <Form.Label text="background-image" className="text-foreground" />
