@@ -1,0 +1,51 @@
+<?php
+
+declare(strict_types=1);
+
+namespace App\PageBuilder\Api;
+
+use Symfony\Component\HttpFoundation\Request;
+
+final class ApiRequestParamHelper
+{
+    /**
+     * @return array<string, mixed>
+     */
+    public function buildCardCollectionParams(Request $request, string $categoryParamName): array
+    {
+        $params = [
+            'page' => max(1, (int) $request->query->get('page', 1)),
+            'limit' => max(1, min(100, (int) $request->query->get('limit', 20))),
+            'search' => $request->query->get('search'),
+            'sort' => $request->query->get('sort'),
+            'category' => $request->query->get('category'),
+        ];
+
+        if ($categoryParamName !== 'category' && $request->query->has('category')) {
+            $params[$categoryParamName] = $request->query->get('category');
+        }
+
+        return $params;
+    }
+
+    /**
+     * @return array<int, true>
+     */
+    public function parseExcludeIds(Request $request): array
+    {
+        $raw = trim((string) $request->query->get('excludeIds', ''));
+        if ($raw === '') {
+            return [];
+        }
+
+        $ids = [];
+        foreach (explode(',', $raw) as $part) {
+            $id = (int) trim($part);
+            if ($id > 0) {
+                $ids[$id] = true;
+            }
+        }
+
+        return $ids;
+    }
+}
