@@ -10,7 +10,7 @@
     </div>
 
     <p class="text-sm text-muted-foreground">
-        URL de soumission&nbsp;: <code class="text-xs">{{ absolute_url(path('app_builder_form_submit', { slug: builderForm.slug })) }}</code>
+        URL de soumission&nbsp;: <code class="text-xs">{{ absolute_url(path('_api_/page-builder/forms/{slug}/submit_post', { slug: builderForm.slug })) }}</code>
     </p>
 
     {{ form_start(form, { attr: { class: 'space-y-6' } }) }}

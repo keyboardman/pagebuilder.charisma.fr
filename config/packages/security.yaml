@@ -39,7 +39,7 @@ security:
         - { path: ^/login, roles: PUBLIC_ACCESS }
         - { path: ^/page/render/.*, roles: PUBLIC_ACCESS }
         - { path: ^/font, roles: PUBLIC_ACCESS }
-        - { path: ^/submit/form, roles: PUBLIC_ACCESS }
+        - { path: ^/api/page-builder/forms/[^/]+/submit, roles: PUBLIC_ACCESS }
         - { path: ^/, roles: IS_AUTHENTICATED_FULLY }
         
         # - { path: ^/profile, roles: ROLE_USER }

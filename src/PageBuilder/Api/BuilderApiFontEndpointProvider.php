@@ -2,22 +2,18 @@
 
 declare(strict_types=1);
 
-namespace App\Controller\Api;
+namespace App\PageBuilder\Api;
 
 use App\Entity\Font;
 use App\Entity\FontType as FontTypeEnum;
-use App\PageBuilder\Api\ApiRequestParamHelper;
 use App\Service\PageFontResolverService;
 use App\Service\ThemeFontBuilderService;
 use Doctrine\ORM\EntityManagerInterface;
-use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
-use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\Routing\Attribute\Route;
+use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
+use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
-#[Route('/page-builder/api', name: 'app_page_builder_api_')]
-final class PageBuilderApiFontsController extends AbstractController
+final class BuilderApiFontEndpointProvider
 {
     public function __construct(
         private readonly EntityManagerInterface $em,
@@ -27,34 +23,10 @@ final class PageBuilderApiFontsController extends AbstractController
     ) {
     }
 
-    #[Route('/fonts/resolve', name: 'fonts_resolve', methods: ['GET'])]
-    public function resolveFont(Request $request): JsonResponse
-    {
-        $family = trim((string) $request->query->get('family', ''));
-        if ($family === '') {
-            return new JsonResponse(['error' => 'family is required'], Response::HTTP_BAD_REQUEST);
-        }
-
-        $font = $this->pageFontResolverService->findFontByPrimaryFamily($family);
-        if ($font === null || $font->getType() === FontTypeEnum::Native) {
-            return new JsonResponse(null, Response::HTTP_NOT_FOUND);
-        }
-
-        $excludeIds = $this->requestParamHelper->parseExcludeIds($request);
-        if ($font->getId() !== null && isset($excludeIds[$font->getId()])) {
-            return new JsonResponse(null, Response::HTTP_OK);
-        }
-
-        $payload = $this->themeFontBuilderService->buildFontPayload($font);
-        if ($payload === null) {
-            return new JsonResponse(null, Response::HTTP_NOT_FOUND);
-        }
-
-        return new JsonResponse($payload);
-    }
-
-    #[Route('/fonts', name: 'fonts_list', methods: ['GET'])]
-    public function listFonts(Request $request): JsonResponse
+    /**
+     * @return array{items: list<array<string, mixed>>, total: int}
+     */
+    public function listFonts(Request $request): array
     {
         $page = max(1, (int) $request->query->get('page', 1));
         $limit = max(1, min(100, (int) $request->query->get('limit', 20)));
@@ -109,22 +81,52 @@ final class PageBuilderApiFontsController extends AbstractController
             }
         }
 
-        return new JsonResponse(['items' => $items, 'total' => $total]);
+        return ['items' => $items, 'total' => $total];
     }
 
-    #[Route('/fonts/{id}', name: 'fonts_item', methods: ['GET'], requirements: ['id' => '\d+'])]
-    public function fontItem(int $id): JsonResponse
+    /**
+     * @return array<string, mixed>
+     */
+    public function getFont(int $id): array
     {
         $font = $this->em->getRepository(Font::class)->find($id);
         if ($font === null) {
-            return new JsonResponse(['error' => 'Font not found'], Response::HTTP_NOT_FOUND);
+            throw new NotFoundHttpException('Font not found');
         }
 
         $payload = $this->themeFontBuilderService->buildFontPayload($font);
         if ($payload === null) {
-            return new JsonResponse(['error' => 'Font not loadable'], Response::HTTP_NOT_FOUND);
+            throw new NotFoundHttpException('Font not loadable');
         }
 
-        return new JsonResponse($payload);
+        return $payload;
+    }
+
+    /**
+     * @return array<string, mixed>|null
+     */
+    public function resolveFont(Request $request): ?array
+    {
+        $family = trim((string) $request->query->get('family', ''));
+        if ($family === '') {
+            throw new BadRequestHttpException('family is required');
+        }
+
+        $font = $this->pageFontResolverService->findFontByPrimaryFamily($family);
+        if ($font === null || $font->getType() === FontTypeEnum::Native) {
+            throw new NotFoundHttpException('Font not found');
+        }
+
+        $excludeIds = $this->requestParamHelper->parseExcludeIds($request);
+        if ($font->getId() !== null && isset($excludeIds[$font->getId()])) {
+            return null;
+        }
+
+        $payload = $this->themeFontBuilderService->buildFontPayload($font);
+        if ($payload === null) {
+            throw new NotFoundHttpException('Font not found');
+        }
+
+        return $payload;
     }
 }

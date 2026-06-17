@@ -9,11 +9,16 @@ export interface BackendApiMeta {
 }
 
 /**
- * Crée un ApiAdapter qui délègue à l’API Symfony (endpoints page-builder/api).
+ * Crée un ApiAdapter qui délègue à l’API Symfony (endpoints API Platform /api/page-builder).
  * Les réponses serveur sont déjà au format mappé (id, title, description, etc.).
  */
 export function createBackendApiAdapter(meta: BackendApiMeta, baseUrl: string): ApiAdapter {
   const base = baseUrl.replace(/\/$/, "");
+  const fetchJson = async (url: string) =>
+    fetch(url, {
+      credentials: "same-origin",
+      headers: { Accept: "application/json" },
+    });
   return {
     id: meta.id,
     label: meta.label,
@@ -36,7 +41,7 @@ export function createBackendApiAdapter(meta: BackendApiMeta, baseUrl: string): 
       if (params.search != null && params.search !== "") q.set("search", String(params.search));
       if (params.sort != null && params.sort !== "") q.set("sort", String(params.sort));
       if (params.category != null && params.category !== "") q.set("category", String(params.category));
-      const res = await fetch(`${base}/cards/${encodeURIComponent(meta.id)}/items?${q.toString()}`);
+      const res = await fetchJson(`${base}/cards/${encodeURIComponent(meta.id)}/items?${q.toString()}`);
       if (!res.ok) {
         const text = await res.text().catch(() => res.statusText);
         throw new Error(text || "fetchCollection failed");
@@ -46,7 +51,7 @@ export function createBackendApiAdapter(meta: BackendApiMeta, baseUrl: string): 
     },
 
     async fetchItem(id: string) {
-      const res = await fetch(
+      const res = await fetchJson(
         `${base}/cards/${encodeURIComponent(meta.id)}/items/${encodeURIComponent(id)}`
       );
       if (!res.ok) {
@@ -72,10 +77,10 @@ export function createBackendApiAdapter(meta: BackendApiMeta, baseUrl: string): 
     },
 
     async fetchCategories(): Promise<Array<{ id: string; label: string }>> {
-      const res = await fetch(`${base}/cards/${encodeURIComponent(meta.id)}/categories`);
+      const res = await fetchJson(`${base}/cards/${encodeURIComponent(meta.id)}/categories`);
       if (!res.ok) return [];
-      const data = (await res.json()) as Array<{ id: string; label: string }>;
-      return Array.isArray(data) ? data : [];
+      const data = (await res.json()) as unknown;
+      return parseJsonCollection<{ id: string; label: string }>(data);
     },
   };
 }
@@ -88,13 +93,25 @@ export async function registerBackendApis(
   register: (adapter: ApiAdapter) => void
 ): Promise<void> {
   const base = baseUrl.replace(/\/$/, "");
-  const res = await fetch(`${base}/cards`);
+  const res = await fetch(`${base}/cards`, {
+    credentials: "same-origin",
+    headers: { Accept: "application/json" },
+  });
   if (!res.ok) return;
-  const list = (await res.json()) as BackendApiMeta[];
-  if (!Array.isArray(list)) return;
+  const list = parseJsonCollection<BackendApiMeta>(await res.json());
   for (const meta of list) {
     if (meta?.id && meta?.label && meta?.type) {
       register(createBackendApiAdapter(meta, baseUrl));
     }
   }
+}
+
+function parseJsonCollection<T>(data: unknown): T[] {
+  if (Array.isArray(data)) return data as T[];
+  if (data && typeof data === "object") {
+    const record = data as Record<string, unknown>;
+    if (Array.isArray(record.member)) return record.member as T[];
+    if (Array.isArray(record["hydra:member"])) return record["hydra:member"] as T[];
+  }
+  return [];
 }

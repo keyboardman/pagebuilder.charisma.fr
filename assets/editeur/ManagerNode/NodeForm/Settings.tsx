@@ -5,6 +5,7 @@ import { useAppContext } from "../../services/providers/AppContext";
 import { NodeSettingsWrapper } from "../components/NodeSettingsWrapper";
 import Form from "../../components/form";
 import type { NodeFormMethod, NodeFormType } from "./index";
+import { resolveFormSubmitAction } from "./resolveFormSubmitAction";
 import { Base2Settings, Background2Settings, Border2Settings, Spacing2Settings, Text2Settings, THEME_SELECTORS } from "../Settings";
 // theme selectors added below
 
@@ -30,7 +31,10 @@ const Settings: FC<NodeSettingsProps> = () => {
     let cancelled = false;
     (async () => {
       try {
-        const res = await fetch(`${pageBuilderApiBaseUrl}/forms/catalog`, { credentials: "same-origin" });
+        const res = await fetch(`${pageBuilderApiBaseUrl}/forms/catalog`, {
+          credentials: "same-origin",
+          headers: { Accept: "application/json" },
+        });
         if (!res.ok) return;
         const data = (await res.json()) as { items?: CatalogItem[] };
         if (!cancelled && Array.isArray(data.items)) setCatalogItems(data.items);
@@ -74,7 +78,7 @@ const Settings: FC<NodeSettingsProps> = () => {
                     content: {
                       ...content,
                       formConfigId: value,
-                      action: item?.action ?? content.action ?? "",
+                      action: resolveFormSubmitAction(item?.action ?? "", value),
                       method: "POST",
                     },
                   });
@@ -103,7 +107,12 @@ const Settings: FC<NodeSettingsProps> = () => {
           <Form.Group>
             <Form.Label text="URL d'action" />
             <Form.Input
-              value={content.action ?? ""}
+              value={
+                (content.formConfigId ?? "").trim()
+                  ? resolveFormSubmitAction(content.action ?? "", content.formConfigId)
+                  : (content.action ?? "")
+              }
+              readOnly={Boolean((content.formConfigId ?? "").trim())}
               onChange={(action) =>
                 onChange({
                   ...node,

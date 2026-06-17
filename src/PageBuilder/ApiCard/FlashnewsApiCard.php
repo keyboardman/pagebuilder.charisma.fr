@@ -49,6 +49,12 @@ final class FlashnewsApiCard implements ApiCardArticleInterface
         if (!empty($params['sort'])) {
             $query['order[' . (string) $params['sort'] . ']'] = 'asc';
         }
+        if (!empty($params['category'])) {
+            $query['themes'] = (string) $params['category'];
+        }
+        if (!empty($params['themes'])) {
+            $query['themes'] = (string) $params['themes'];
+        }
 
         try {
             $response = $this->httpClient->request('GET', self::BASE_URL . '/api/articles', [
@@ -117,11 +123,44 @@ final class FlashnewsApiCard implements ApiCardArticleInterface
 
     public function fetchCategories(): ?array
     {
-        return null;
+        try {
+            $response = $this->httpClient->request('GET', self::BASE_URL . '/api/themes', [
+                'query' => [
+                    'page' => '1',
+                    'itemsPerPage' => '100',
+                    'pagination' => 'false',
+                ],
+                'timeout' => 30,
+            ]);
+            $data = $response->toArray();
+            $member = $data['member'] ?? [];
+            $categories = [];
+
+            foreach ($member as $item) {
+                if (!\is_array($item)) {
+                    continue;
+                }
+
+                $id = $item['id'] ?? null;
+                $label = $item['nom'] ?? $item['title'] ?? null;
+                if ($id === null || $label === null || $label === '') {
+                    continue;
+                }
+
+                $categories[] = [
+                    'id' => (string) $id,
+                    'label' => (string) $label,
+                ];
+            }
+
+            return $categories === [] ? null : $categories;
+        } catch (\Exception) {
+            return null;
+        }
     }
 
     public function getCategoryQueryParam(): string
     {
-        return 'category';
+        return 'themes';
     }
 }

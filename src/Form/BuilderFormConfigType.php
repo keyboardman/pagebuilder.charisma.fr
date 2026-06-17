@@ -24,7 +24,7 @@ final class BuilderFormConfigType extends AbstractType
         $builder
             ->add('slug', TextType::class, [
                 'label' => 'Identifiant URL (slug)',
-                'help' => 'Utilisé dans l’URL de soumission : /submit/form/{slug}. Lettres minuscules, chiffres, tirets et underscores uniquement.',
+                'help' => 'Utilisé dans l’URL de soumission : /api/page-builder/forms/{slug}/submit. Lettres minuscules, chiffres, tirets et underscores uniquement.',
                 'attr' => [
                     'placeholder' => 'contact', 
                     'class' => 'flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm'

@@ -19,7 +19,7 @@ export interface AppProviderProps {
     themeIcons?: BuilderThemeIcon[] | null;
     themeNodeOverrides?: ThemeNodeOverrides | null;
     themeVars?: ThemeVars | null;
-    /** Base URL API page-builder (GET /forms/catalog, etc.) — identique à apiCardsBaseUrl en pratique. */
+    /** Base URL API legacy page-builder (GET /forms/catalog, /fonts, etc.). */
     pageBuilderApiBaseUrl?: string | null;
     /** Callback appelé quand les nodes changent (intégration embarquée) */
     onSaveCallback?: (nodes: NodesType) => void;

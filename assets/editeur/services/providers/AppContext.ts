@@ -24,7 +24,7 @@ export interface AppType {
     /** Variables CSS du thème (`vars`). */
     themeVars: ThemeVars;
     /**
-     * Base URL de l’API Symfony page-builder (ex. /page-builder/api), pour catalogue formulaires, etc.
+     * Base URL API page builder (ex. /api/page-builder), pour catalogue formulaires et polices.
      */
     pageBuilderApiBaseUrl: string | null;
 }

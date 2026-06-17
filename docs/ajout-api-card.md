@@ -8,9 +8,11 @@ Une **ApiCard** est un service PHP qui :
 
 - implémente `ApiCardInterface` (ou `ApiCardArticleInterface`, `ApiCardVideoInterface`, `ApiCardImageInterface`, `ApiCardListInterface`) ;
 - est **tagué** `app.builder_api_card` dans `config/services.yaml` ;
-- est automatiquement enregistré dans `ApiCardRegistry` et exposé à l’éditeur via `/page-builder/api/cards`.
+- est automatiquement enregistré dans `ApiCardRegistry` et exposé à l’éditeur via l’API builder (`GET /api/page-builder/cards`).
 
-L’éditeur récupère la liste des cartes via cette API et propose chaque carte comme source dans l’interface.
+L’éditeur récupère la liste des cartes via cette API (base `/api/page-builder`) et propose chaque carte comme source dans l’interface.
+
+> Voir aussi [builder-api.md](builder-api.md) pour le détail des endpoints API Platform (cards, formulaires, polices).
 
 > Note: les variantes d’affichage visuel image (ex. `list` / `slider`) sont gérées uniquement dans l’éditeur page builder. Elles ne font pas partie du contrat `ApiCard` backend.
 
@@ -212,7 +214,7 @@ final class MaSourceApiCard implements ApiCardImageInterface, ApiCardBehaviorInt
 }
 ```
 
-Dans la réponse `GET /page-builder/api/cards`, ce mode est exposé via le champ `collectionMode`.
+Dans la réponse `GET /api/page-builder/cards`, ce mode est exposé via le champ `collectionMode`.
 
 ---
 
@@ -231,9 +233,12 @@ Sans ce tag, la carte ne sera pas injectée dans `ApiCardRegistry` et n’appara
 
 ### 5. Vérifier
 
-- L’API liste les cartes : `GET /page-builder/api/cards` → la nouvelle carte doit apparaître avec son `id`, `label`, `type`, `category` (et éventuellement `collectionMode`).
-- Liste d’éléments : `GET /page-builder/api/cards/{id}/items?page=1&limit=20`.
-- Détail d’un élément : `GET /page-builder/api/cards/{id}/items/{itemId}`.
+Endpoints **API Platform** (utilisés par le builder) :
+
+- Liste des cartes : `GET /api/page-builder/cards` → la nouvelle carte doit apparaître avec son `id`, `label`, `type`, `category` (et éventuellement `collectionMode`).
+- Collection : `GET /api/page-builder/cards/{apiId}/items?page=1&limit=20`.
+- Détail : `GET /api/page-builder/cards/{apiId}/items/{itemId}`.
+- Catégories (si implémentées) : `GET /api/page-builder/cards/{apiId}/categories`.
 
 Recharger la page de l’éditeur (ou vider le cache Symfony si besoin) pour voir la nouvelle source dans l’interface.
 
@@ -247,5 +252,7 @@ Recharger la page de l’éditeur (ou vider le cache Symfony si besoin) pour voi
 - **Exemple list** : `StubNavListApiCard.php` (menu de démonstration), `FlashnewsThemeApiList.php` (thèmes Flashnews pour NodeNavApi)
 - **Exemples** : `CharismaArticleAuteurApiCard.php`, `CharismaTemoignageApiCard.php`, `FlashnewsApiCard.php`, `CharismaVideosApiCard.php`
 - **Registre** : `src/PageBuilder/ApiCard/ApiCardRegistry.php`
-- **API HTTP** : `src/Controller/PageBuilderApiController.php`
+- **Logique HTTP partagée** : `src/PageBuilder/Api/ApiCardEndpointProvider.php`
+- **API Platform** : `src/ApiResource/BuilderApiCard*.php`, `src/State/BuilderApiCard*Provider.php`
+- **Vue d’ensemble API** : [builder-api.md](builder-api.md)
 

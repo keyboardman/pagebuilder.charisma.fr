@@ -7,15 +7,16 @@ import type { NodeFormType } from "./index";
 import { cn } from "@/editeur/lib/utils";
 import { IoClose } from "react-icons/io5";
 import { BUILDER_FORM_HONEYPOT_FIELD } from "./builderFormConstants";
+import { resolveFormSubmitAction } from "./resolveFormSubmitAction";
 
 const View: FC<NodeViewProps | NodeEditProps> = () => {
   const { node, getChildren } = useNodeContext();
   const formNode = node as NodeFormType;
   const children = getChildren("main");
   const method = formNode.content?.method ?? "POST";
-  const action = (formNode.content?.action ?? "").trim();
-
+  const storedAction = (formNode.content?.action ?? "").trim();
   const formConfigId = (formNode.content?.formConfigId ?? "").trim();
+  const action = resolveFormSubmitAction(storedAction, formConfigId);
 
   const [submitState, setSubmitState] = useState<{
     status: "idle" | "success" | "error";
@@ -35,7 +36,7 @@ const View: FC<NodeViewProps | NodeEditProps> = () => {
       const contentType = res.headers.get("content-type") ?? "";
       if (contentType.includes("application/json")) {
         const data = await res.json();
-        const ok = res.ok || data?.success === true;
+        const ok = typeof data?.success === "boolean" ? data.success : res.ok;
         const message =
           (typeof data?.message === "string" && data.message) ||
           (typeof data?.successMessage === "string" && data.successMessage) ||

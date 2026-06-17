@@ -16,7 +16,7 @@ final class BuilderFormSubmitFunctionalTest extends WebTestCase
         $client = static::createClient();
         $slug = $this->seedForm();
         try {
-            $client->request('POST', '/submit/form/' . $slug, [
+            $client->request('POST', '/api/page-builder/forms/' . $slug . '/submit', [
                 BuilderFormAntispam::HONEYPOT_FIELD => '',
                 'message' => 'hello',
             ]);
@@ -35,7 +35,7 @@ final class BuilderFormSubmitFunctionalTest extends WebTestCase
         $client = static::createClient();
         $slug = $this->seedForm();
         try {
-            $client->request('POST', '/submit/form/' . $slug, [
+            $client->request('POST', '/api/page-builder/forms/' . $slug . '/submit', [
                 BuilderFormAntispam::HONEYPOT_FIELD => 'bot',
                 'message' => 'spam',
             ]);
@@ -52,7 +52,7 @@ final class BuilderFormSubmitFunctionalTest extends WebTestCase
     public function testUnknownSlugReturns404(): void
     {
         $client = static::createClient();
-        $client->request('POST', '/submit/form/no-such-form-404-test', [
+        $client->request('POST', '/api/page-builder/forms/no-such-form-404-test/submit', [
             BuilderFormAntispam::HONEYPOT_FIELD => '',
         ]);
 
@@ -65,7 +65,7 @@ final class BuilderFormSubmitFunctionalTest extends WebTestCase
         $slug = $this->seedForm();
         try {
             for ($i = 0; $i < 2; ++$i) {
-                $client->request('POST', '/submit/form/' . $slug, [
+                $client->request('POST', '/api/page-builder/forms/' . $slug . '/submit', [
                     BuilderFormAntispam::HONEYPOT_FIELD => '',
                     'field' => 'a' . (string) $i,
                 ]);
@@ -75,7 +75,7 @@ final class BuilderFormSubmitFunctionalTest extends WebTestCase
                 self::assertTrue($row['success'] ?? false, 'soumission ' . $i);
             }
 
-            $client->request('POST', '/submit/form/' . $slug, [
+            $client->request('POST', '/api/page-builder/forms/' . $slug . '/submit', [
                 BuilderFormAntispam::HONEYPOT_FIELD => '',
                 'field' => 'blocked',
             ]);

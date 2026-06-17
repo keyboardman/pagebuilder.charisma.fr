@@ -11,7 +11,7 @@
 
     <p class="text-sm text-muted-foreground max-w-3xl">
         Ces configurations alimentent le catalogue du bloc <strong>NodeForm</strong> dans l’éditeur.
-        Endpoint public de soumission (POST)&nbsp;: <code class="text-xs">/submit/form/{slug}</code>
+        Endpoint public de soumission (POST)&nbsp;: <code class="text-xs">/api/page-builder/forms/{slug}/submit</code>
     </p>
 
     <div class="card overflow-hidden">
@@ -32,7 +32,7 @@
                         <td>{{ f.label }}</td>
                         <td><code class="text-xs">{{ f.slug }}</code></td>
                         <td>
-                            <code class="text-xs break-all">{{ absolute_url(path('app_builder_form_submit', { slug: f.slug })) }}</code>
+                            <code class="text-xs break-all">{{ absolute_url(path('_api_/page-builder/forms/{slug}/submit_post', { slug: f.slug })) }}</code>
                         </td>
                         <td>{{ f.enabled ? 'Oui' : 'Non' }}</td>
                         <td class="text-end">

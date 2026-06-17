@@ -100,6 +100,7 @@ function PageBuilderStandalone({
   backUrl = '',
   pageTitle = '',
   apiCardsBaseUrl = null,
+  pageBuilderApiBaseUrl = null,
   baseUrl = '',
   pageDescription = '',
   themeCssUrl = '',
@@ -182,6 +183,7 @@ function PageBuilderStandalone({
           onChange={handleChange}
           fileManagerConfig={fileManagerConfig ?? getFileManagerConfig({})}
           apiCardsBaseUrl={apiCardsBaseUrl}
+          pageBuilderApiBaseUrl={pageBuilderApiBaseUrl}
           themeIcons={themeIcons}
           themeNodeOverrides={themeNodeOverrides}
           themeVars={themeVars}
@@ -201,6 +203,7 @@ if (dataEl && rootEl) {
   let backUrl = '';
   let pageTitle = '';
   let apiCardsBaseUrl = '';
+  let pageBuilderApiBaseUrl = '';
   let baseUrl = '';
   let pageDescription = '';
   let themeCssUrl = '';
@@ -227,6 +230,7 @@ if (dataEl && rootEl) {
     backUrl = typeof data.backUrl === 'string' ? data.backUrl : '';
     pageTitle = typeof data.pageTitle === 'string' ? data.pageTitle : '';
     apiCardsBaseUrl = typeof data.apiCardsBaseUrl === 'string' ? data.apiCardsBaseUrl : '';
+    pageBuilderApiBaseUrl = typeof data.pageBuilderApiBaseUrl === 'string' ? data.pageBuilderApiBaseUrl : '';
     baseUrl = typeof data.baseUrl === 'string' ? data.baseUrl : '';
     pageDescription = typeof data.pageDescription === 'string' ? data.pageDescription : '';
     themeCssUrl = typeof data.themeCssUrl === 'string' ? data.themeCssUrl : '';
@@ -262,6 +266,7 @@ if (dataEl && rootEl) {
       backUrl={backUrl}
       pageTitle={pageTitle}
       apiCardsBaseUrl={apiCardsBaseUrl || null}
+      pageBuilderApiBaseUrl={pageBuilderApiBaseUrl || null}
       baseUrl={baseUrl}
       pageDescription={pageDescription}
       themeCssUrl={themeCssUrl}

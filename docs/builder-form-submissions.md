@@ -1,22 +1,24 @@
 # Formulaires builder (soumission e-mail / webhook)
 
-Fonctionnalité **sans ApiCard** : les configurations sont en base (`builder_form_config`), exposées au builder via `GET /page-builder/api/forms/catalog` (même accès que l’édition de page : utilisateur authentifié).
+Fonctionnalité **sans ApiCard** : les configurations sont en base (`builder_form_config`), exposées au builder via `GET /api/page-builder/forms/catalog` (même accès que l’édition de page : utilisateur authentifié).
+
+> Vue d’ensemble de l’API builder (cards, polices, formulaires) : [builder-api.md](builder-api.md).
 
 ## Interface d’administration
 
 Liste, création et édition : **`/builder-form`** (menu latéral **Formulaires**, même accès que Pages / Thèmes).
 
-Les mêmes données sont exposées au builder via `GET /page-builder/api/forms/catalog` pour le sélecteur NodeForm.
+Les mêmes données sont exposées au builder via `GET /api/page-builder/forms/catalog` pour le sélecteur NodeForm.
 
 ## Routes
 
 | Méthode | Chemin | Accès | Rôle |
 |---------|--------|-------|------|
 | — | **`/builder-form`** | Authentifié | CRUD des configurations (interface web) |
-| `GET` | `/page-builder/api/forms/catalog` | Authentifié | JSON catalogue pour le builder |
-| `POST` | `/submit/form/{slug}` | Public | Réception du `NodeForm` (multipart), antispam, e-mail, webhook optionnel |
+| `GET` | `/api/page-builder/forms/catalog` | Authentifié | JSON catalogue pour le builder |
+| `POST` | `/api/page-builder/forms/{slug}/submit` | Public | Réception du `NodeForm` (multipart), antispam, e-mail, webhook optionnel |
 
-`action` renvoyée par le catalogue est une URL relative (générée par le routeur Symfony).
+`action` renvoyée par le catalogue est une URL relative (générée par le routeur Symfony). Les pages déjà enregistrées avec l’ancienne URL `/submit/form/{slug}` continuent de fonctionner : le NodeForm résout l’URL au moment de la soumission à partir de `formConfigId` (ou migre le chemin legacy).
 
 ## Antispam
 
@@ -36,6 +38,8 @@ Entité `App\Entity\BuilderFormConfig` :
 ## Paramètres
 
 Dans `config/services.yaml` : `app.builder_form.honeypot_field`, `app.builder_form.rate_limit.*`, `app.builder_form.mail_from`, `app.builder_form.generic_error_message`.
+
+**Mailer (dev)** : `.env.local` utilise en général `MAILER_DSN=smtp://localhost:1025` avec **Mailpit** (`docker compose up -d mailer`). Les ports doivent être mappés en `1025:1025` et `8025:8025` dans `compose.override.yaml` ; interface web Mailpit : http://localhost:8025. Si Mailpit n’est pas démarré, la soumission échoue avec le message générique (voir `var/log/dev.log` : `Builder form mail send failed`).
 
 ## Données de démo (optionnel)
 

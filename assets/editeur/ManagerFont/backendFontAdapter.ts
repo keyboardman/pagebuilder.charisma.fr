@@ -36,7 +36,10 @@ export async function fetchFonts(
     q.set("excludeIds", params.excludeIds.join(","));
   }
 
-  const res = await fetch(`${normalizeBase(baseUrl)}/fonts?${q.toString()}`);
+  const res = await fetch(`${normalizeBase(baseUrl)}/fonts?${q.toString()}`, {
+    credentials: "same-origin",
+    headers: { Accept: "application/json" },
+  });
   if (!res.ok) {
     const text = await res.text().catch(() => res.statusText);
     throw new Error(text || "fetchFonts failed");
@@ -62,7 +65,10 @@ export async function resolveFontFamily(
   if (options.excludeIds?.length) {
     q.set("excludeIds", options.excludeIds.join(","));
   }
-  const res = await fetch(`${normalizeBase(baseUrl)}/fonts/resolve?${q.toString()}`);
+  const res = await fetch(`${normalizeBase(baseUrl)}/fonts/resolve?${q.toString()}`, {
+    credentials: "same-origin",
+    headers: { Accept: "application/json" },
+  });
   if (res.status === 404 || res.status === 204) {
     resolveCache.set(cacheKey, null);
     return null;

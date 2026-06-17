@@ -21,8 +21,10 @@ export interface PageBuilderEmbedProps {
   themeIcons?: BuilderThemeIcon[] | null;
   themeNodeOverrides?: ThemeNodeOverrides | Record<string, unknown> | null;
   themeVars?: ThemeVars | Record<string, unknown> | null;
-  /** Base URL de l’API Symfony (ex. /page-builder/api) pour charger les APIs card enregistrées en PHP */
+  /** Base URL API Platform pour les cards (ex. /api/page-builder). */
   apiCardsBaseUrl?: string | null;
+  /** Base URL API Platform page-builder (ex. /api/page-builder). */
+  pageBuilderApiBaseUrl?: string | null;
 }
 
 /**
@@ -36,13 +38,17 @@ export default function PageBuilderEmbed({
   themeNodeOverrides = null,
   themeVars = null,
   apiCardsBaseUrl = null,
+  pageBuilderApiBaseUrl = null,
 }: PageBuilderEmbedProps) {
-  const pageBuilderApiBase = apiCardsBaseUrl?.trim() ? apiCardsBaseUrl.replace(/\/$/, "") : null;
+  const cardsApiBase = apiCardsBaseUrl?.trim() ? apiCardsBaseUrl.replace(/\/$/, "") : null;
+  const legacyApiBase = pageBuilderApiBaseUrl?.trim()
+    ? pageBuilderApiBaseUrl.replace(/\/$/, "")
+    : cardsApiBase;
   useEffect(() => {
-    if (apiCardsBaseUrl) {
-      registerBackendApis(apiCardsBaseUrl, (adapter) => apiRegistry.register(adapter));
+    if (cardsApiBase) {
+      registerBackendApis(cardsApiBase, (adapter) => apiRegistry.register(adapter));
     }
-  }, [apiCardsBaseUrl]);
+  }, [cardsApiBase]);
 
   const handleSave = useCallback(
     (nodes: NodesType) => {
@@ -59,7 +65,7 @@ export default function PageBuilderEmbed({
       themeIcons={themeIcons}
       themeNodeOverrides={normalizeThemeNodeOverrides(themeNodeOverrides)}
       themeVars={normalizeThemeVars(themeVars)}
-      pageBuilderApiBaseUrl={pageBuilderApiBase}
+      pageBuilderApiBaseUrl={legacyApiBase}
       onSaveCallback={handleSave}
     >
       <BuilderInline>

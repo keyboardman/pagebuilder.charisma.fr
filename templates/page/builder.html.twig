@@ -21,6 +21,7 @@
         {% set base_url = app.request.schemeAndHttpHost ~ app.request.basePath %}
         {% set render_css_paths = encore_entry_css_files('pagePreview') %}
         {% set render_css_urls = render_css_paths|map(p => base_url ~ p)|default([]) %}
+        {% set builder_api_base = path('_api_/page-builder/cards_get_collection')|replace({'/cards': ''}) %}
         <script type="application/json" id="page-builder-data">
         {{ {
             content: content_json,
@@ -34,7 +35,8 @@
             renderCssUrls: render_css_urls, 
             themeFonts: theme_fonts|default([]),
             themeFontIds: theme_font_ids|default([]),
-            apiCardsBaseUrl: path('app_page_builder_api_cards_list')|replace({'/cards': ''}), 
+            apiCardsBaseUrl: builder_api_base,
+            pageBuilderApiBaseUrl: builder_api_base, 
             filemanagerUrl: url('keyboardman_filemanager', {'filesystem': 'default', 'mode': 'iframe'}), 
             resolveUrl: path('keyboardman_filemanager'),
             themeIcons: theme_icons|default([]),

@@ -29,7 +29,7 @@ final class BuilderFormCatalogService
             $out[] = [
                 'id' => $form->getSlug(),
                 'title' => $form->getLabel(),
-                'action' => $this->urlGenerator->generate('app_builder_form_submit', ['slug' => $form->getSlug()]),
+                'action' => $this->urlGenerator->generate('_api_/page-builder/forms/{slug}/submit_post', ['slug' => $form->getSlug()]),
                 'honeypotField' => $this->honeypotField,
             ];
         }
