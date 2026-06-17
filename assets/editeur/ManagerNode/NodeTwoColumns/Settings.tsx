@@ -1,8 +1,11 @@
 import type { FC } from "react";
-import { Base2Settings,
+import {
+  Base2Settings,
   Background2Settings,
   Border2Settings,
-  Spacing2Settings, THEME_SELECTORS } from "../Settings";
+  Spacing2Settings,
+  THEME_SELECTORS,
+} from "../Settings";
 import Button from "../../components/button";
 import Form from "../../components/form";
 import { Switch } from "@/editeur/components/ui/switch";
@@ -18,32 +21,24 @@ import { type NodeSettingsProps } from "../NodeConfigurationType";
 import { useNodeBuilderContext } from "../../services/providers/NodeBuilderContext";
 import { NodeSettingsWrapper } from "../components/NodeSettingsWrapper";
 import { Monitor, Tablet, Phone } from "lucide-react";
-import type {
-  NodeTwoColumnsType,
-  ColumnWidth,
-  NodeTwoColumnsLayout,
-} from "./index";
-
-const widthOptions = [
-  { label: "33-66", value: "33-66" },
-  { label: "50-50", value: "50-50" },
-  { label: "66-33", value: "66-33" },
-  { label: "100-100", value: "100-100" },
-];
+import type { NodeTwoColumnsType } from "./index";
+import type { ColumnWidth, NodeTwoColumnsLayout, PresetColumnWidth } from "./layout";
+import {
+  CUSTOM_DESKTOP_MIN,
+  CUSTOM_DESKTOP_MAX,
+  CUSTOM_DESKTOP_STEP,
+  DEFAULT_LAYOUT,
+  desktopWidthOptions,
+  normalizeCustomDesktop,
+  presetWidthOptions,
+  snapCustomDesktopLeft,
+} from "./layout";
 
 const Settings: FC<NodeSettingsProps> = () => {
   const { node, onChange } = useNodeBuilderContext();
   const twoColumnsNode = node as NodeTwoColumnsType;
-
-  const layout: NodeTwoColumnsLayout =
-    twoColumnsNode.attributes?.layout || {
-      desktop: "50-50",
-      tablet: "50-50",
-      mobile: "50-50",
-      reverseDesktop: false,
-      reverseTablet: false,
-      reverseMobile: false,
-    };
+  const layout = twoColumnsNode.attributes?.layout ?? DEFAULT_LAYOUT;
+  const customDesktop = normalizeCustomDesktop(layout.customDesktop);
 
   const updateLayout = (updates: Partial<NodeTwoColumnsLayout>) => {
     onChange({
@@ -55,32 +50,40 @@ const Settings: FC<NodeSettingsProps> = () => {
     });
   };
 
+  const updateAttributes = (
+    patch: Partial<NonNullable<NodeTwoColumnsType["attributes"]>>
+  ) => {
+    onChange({
+      ...node,
+      attributes: { ...node.attributes, ...patch },
+    });
+  };
+
+  const handleDesktopWidthChange = (value: ColumnWidth) => {
+    const updates: Partial<NodeTwoColumnsLayout> = { desktop: value };
+    if (value === "custom" && !layout.customDesktop) {
+      updates.customDesktop = normalizeCustomDesktop({ left: 50, right: 50 });
+    }
+    updateLayout(updates);
+  };
+
   return (
     <NodeSettingsWrapper
       header={
         <>
           <Base2Settings
             attributes={node.attributes}
-            onChange={(attributes: { className?: string; id?: string }) =>
-              onChange({
-                ...node,
-                attributes: { ...node.attributes, ...attributes },
-              })
-            }
+            onChange={(attributes) => updateAttributes(attributes)}
           />
           <Button
-            onClick={() => {
-              onChange({
-                ...node,
-                attributes: {
-                  ...node.attributes,
-                  options: {
-                    ...node.attributes?.options,
-                    fluid: !(node.attributes?.options?.fluid ?? false),
-                  },
+            onClick={() =>
+              updateAttributes({
+                options: {
+                  ...node.attributes?.options,
+                  fluid: !(node.attributes?.options?.fluid ?? false),
                 },
-              });
-            }}
+              })
+            }
           >
             {node.attributes?.options?.fluid ? "fluid" : "no-fluid"}
           </Button>
@@ -106,68 +109,70 @@ const Settings: FC<NodeSettingsProps> = () => {
               </TableHeader>
               <TableBody>
                 <TableRow className="border-border/50">
-                  <TableCell className="node-block-title py-1 px-2 text-xs">
-                  Col.
-                  </TableCell>
+                  <TableCell className="node-block-title py-1 px-2 text-xs">Col.</TableCell>
                   <TableCell className="py-1 px-2">
                     <Form.Select
                       value={layout.desktop || "50-50"}
-                      onChange={(value) =>
-                        updateLayout({ desktop: value as ColumnWidth })
-                      }
-                      options={widthOptions}
+                      onChange={(value) => handleDesktopWidthChange(value as ColumnWidth)}
+                      options={desktopWidthOptions}
                       className="h-7 text-xs"
                     />
                   </TableCell>
                   <TableCell className="py-1 px-2">
                     <Form.Select
                       value={layout.tablet || "50-50"}
-                      onChange={(value) =>
-                        updateLayout({ tablet: value as ColumnWidth })
-                      }
-                      options={widthOptions}
+                      onChange={(value) => updateLayout({ tablet: value as PresetColumnWidth })}
+                      options={presetWidthOptions}
                       className="h-7 text-xs"
                     />
                   </TableCell>
                   <TableCell className="py-1 px-2">
                     <Form.Select
                       value={layout.mobile || "50-50"}
-                      onChange={(value) =>
-                        updateLayout({ mobile: value as ColumnWidth })
-                      }
-                      options={widthOptions}
+                      onChange={(value) => updateLayout({ mobile: value as PresetColumnWidth })}
+                      options={presetWidthOptions}
                       className="h-7 text-xs"
                     />
                   </TableCell>
                 </TableRow>
+                {layout.desktop === "custom" && (
+                  <TableRow className="border-border/50">
+                    <TableCell className="node-block-title py-1 px-2 text-xs">%</TableCell>
+                    <TableCell className="py-2 px-2" colSpan={3}>
+                      <div className="flex items-center gap-3">
+                        <span className="text-xs tabular-nums w-16 shrink-0 text-muted-foreground">
+                          G. {customDesktop.left}%
+                        </span>
+                        <input
+                          type="range"
+                          min={CUSTOM_DESKTOP_MIN}
+                          max={CUSTOM_DESKTOP_MAX}
+                          step={CUSTOM_DESKTOP_STEP}
+                          value={customDesktop.left}
+                          onChange={(e) => {
+                            const left = snapCustomDesktopLeft(Number(e.target.value));
+                            updateLayout({ customDesktop: { left, right: 100 - left } });
+                          }}
+                          className="flex-1 h-1.5 cursor-pointer accent-primary"
+                          aria-label="Répartition colonne gauche"
+                        />
+                        <span className="text-xs tabular-nums w-16 shrink-0 text-right text-muted-foreground">
+                          D. {customDesktop.right}%
+                        </span>
+                      </div>
+                    </TableCell>
+                  </TableRow>
+                )}
                 <TableRow className="border-border/50">
-                  <TableCell className="node-block-title py-1 px-2 text-xs">
-                    Inv.
-                  </TableCell>
-                  <TableCell className="py-1 px-2 text-center">
-                    <Switch
-                      checked={layout.reverseDesktop || false}
-                      onCheckedChange={(checked) =>
-                        updateLayout({ reverseDesktop: checked })
-                      }
-                    />
-                  </TableCell>
-                  <TableCell className="py-1 px-2 text-center">
-                    <Switch
-                      checked={layout.reverseTablet || false}
-                      onCheckedChange={(checked) =>
-                        updateLayout({ reverseTablet: checked })
-                      }
-                    />
-                  </TableCell>
-                  <TableCell className="py-1 px-2 text-center">
-                    <Switch
-                      checked={layout.reverseMobile || false}
-                      onCheckedChange={(checked) =>
-                        updateLayout({ reverseMobile: checked })
-                      }
-                    />
-                  </TableCell>
+                  <TableCell className="node-block-title py-1 px-2 text-xs">Inv.</TableCell>
+                  {(["reverseDesktop", "reverseTablet", "reverseMobile"] as const).map((key) => (
+                    <TableCell key={key} className="py-1 px-2 text-center">
+                      <Switch
+                        checked={layout[key] || false}
+                        onCheckedChange={(checked) => updateLayout({ [key]: checked })}
+                      />
+                    </TableCell>
+                  ))}
                 </TableRow>
               </TableBody>
             </Table>
@@ -177,37 +182,19 @@ const Settings: FC<NodeSettingsProps> = () => {
       content={
         <>
           <Background2Settings
-            
             themeOverrideSelector={THEME_SELECTORS.twoColumns}
             style={node.attributes?.style || {}}
-            onChange={(style) =>
-              onChange({
-                ...node,
-                attributes: { ...node.attributes, style },
-              })
-            }
+            onChange={(style) => updateAttributes({ style })}
           />
           <Border2Settings
-            
             themeOverrideSelector={THEME_SELECTORS.twoColumns}
             style={node.attributes?.style || {}}
-            onChange={(style) =>
-              onChange({
-                ...node,
-                attributes: { ...node.attributes, style },
-              })
-            }
+            onChange={(style) => updateAttributes({ style })}
           />
           <Spacing2Settings
-            
             themeOverrideSelector={THEME_SELECTORS.twoColumns}
             style={node.attributes?.style || {}}
-            onChange={(style) =>
-              onChange({
-                ...node,
-                attributes: { ...node.attributes, style },
-              })
-            }
+            onChange={(style) => updateAttributes({ style })}
           />
         </>
       }

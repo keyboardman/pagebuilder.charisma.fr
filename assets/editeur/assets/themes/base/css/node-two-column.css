@@ -12,3 +12,14 @@
     max-width: 1280px;
     margin: 0 auto;
 }
+
+@media (min-width: 1024px) {
+    .ce-two_columns .ce-two_columns-grid-custom-lg {
+        grid-template-columns: var(--two-cols-template-lg, minmax(0, 1fr) minmax(0, 1fr)) !important;
+    }
+}
+
+.ce-two_columns-col {
+    min-width: 0;
+    max-width: 100%;
+}
