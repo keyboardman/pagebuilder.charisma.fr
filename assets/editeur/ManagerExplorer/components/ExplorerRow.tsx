@@ -1,13 +1,20 @@
-import { useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import { ChevronDown, ChevronRight, GripVertical } from "lucide-react";
 import { useDraggable } from "@dnd-kit/react";
+import { Input } from "@/editeur/components/ui/input";
 import type { NodeType } from "../../types/NodeType";
+import { useBuilderContext } from "../../services/providers/BuilderContext";
 import {
   getNodeDisplayLabel,
   getNodeTypeLabel,
   hasCustomNodeLabel,
 } from "../utils/explorerTree";
 import { cn } from "@/editeur/lib/utils";
+
+function normalizeEditorLabel(value: string): string | undefined {
+  const trimmed = value.trim();
+  return trimmed.length > 0 ? trimmed : undefined;
+}
 
 export type ExplorerRowProps = {
   node: NodeType;
@@ -30,6 +37,11 @@ export default function ExplorerRow({
   onToggleExpand,
   onSelect,
 }: ExplorerRowProps) {
+  const { updateNode } = useBuilderContext();
+  const [isEditing, setIsEditing] = useState(false);
+  const [draftLabel, setDraftLabel] = useState("");
+  const inputRef = useRef<HTMLInputElement>(null);
+  const cancelledRef = useRef(false);
   const dragId = useRef(`explorer-node-${node.id}`).current;
   const { ref: dragRef, handleRef } = useDraggable({
     id: dragId,
@@ -38,6 +50,57 @@ export default function ExplorerRow({
     data: { id: node.id, parent: node.parent, action: "move-node" },
     disabled: !isDraggable,
   });
+
+  useEffect(() => {
+    if (!isEditing) {
+      return;
+    }
+    cancelledRef.current = false;
+    inputRef.current?.focus();
+    inputRef.current?.select();
+  }, [isEditing]);
+
+  const startEditing = (event: React.MouseEvent) => {
+    event.stopPropagation();
+    event.preventDefault();
+    setDraftLabel(node.editorLabel ?? "");
+    setIsEditing(true);
+  };
+
+  const commitEditing = () => {
+    const nextLabel = normalizeEditorLabel(draftLabel);
+    const currentLabel = normalizeEditorLabel(node.editorLabel ?? "");
+    if (nextLabel !== currentLabel) {
+      updateNode({ ...node, editorLabel: nextLabel });
+    }
+    setIsEditing(false);
+  };
+
+  const cancelEditing = () => {
+    cancelledRef.current = true;
+    setIsEditing(false);
+  };
+
+  const handleInputKeyDown = (event: React.KeyboardEvent<HTMLInputElement>) => {
+    event.stopPropagation();
+    if (event.key === "Enter") {
+      event.preventDefault();
+      commitEditing();
+      return;
+    }
+    if (event.key === "Escape") {
+      event.preventDefault();
+      cancelEditing();
+    }
+  };
+
+  const handleInputBlur = () => {
+    if (cancelledRef.current) {
+      cancelledRef.current = false;
+      return;
+    }
+    commitEditing();
+  };
 
   return (
     <div
@@ -79,13 +142,34 @@ export default function ExplorerRow({
       ) : (
         <span className="h-5 w-5 shrink-0" aria-hidden />
       )}
-      <span className="flex items-baseline gap-1 whitespace-nowrap">
-        <span className="font-medium">{getNodeDisplayLabel(node)}</span>
-        {hasCustomNodeLabel(node) ? (
-          <span className="text-xs text-muted-foreground">
-            ({getNodeTypeLabel(node)})
-          </span>
-        ) : null}
+      <span
+        className="flex min-w-0 flex-1 items-baseline gap-1 whitespace-nowrap"
+        onDoubleClick={startEditing}
+      >
+        {isEditing ? (
+          <Input
+            ref={inputRef}
+            type="text"
+            value={draftLabel}
+            placeholder={getNodeTypeLabel(node)}
+            onChange={(event) => setDraftLabel(event.target.value)}
+            onKeyDown={handleInputKeyDown}
+            onBlur={handleInputBlur}
+            onClick={(event) => event.stopPropagation()}
+            onDoubleClick={(event) => event.stopPropagation()}
+            className="h-6 min-w-[5rem] flex-1 px-1.5 text-sm font-medium"
+            aria-label="Nom dans l'éditeur"
+          />
+        ) : (
+          <>
+            <span className="font-medium">{getNodeDisplayLabel(node)}</span>
+            {hasCustomNodeLabel(node) ? (
+              <span className="text-xs text-muted-foreground">
+                ({getNodeTypeLabel(node)})
+              </span>
+            ) : null}
+          </>
+        )}
       </span>
     </div>
   );
