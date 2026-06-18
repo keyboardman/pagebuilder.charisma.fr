@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useLayoutEffect, useRef, useState } from "react";
 import { DragDropProvider, PointerSensor, KeyboardSensor } from "@dnd-kit/react";
 import {
   APP_MODE,
@@ -22,7 +22,11 @@ type Events = DragDropEvents<Draggable, Droppable, DragDropManager>;
 type DragStartHandler = Events['dragstart'];
 
 import tailwindHelper from "../../utils/tailwindHelper";
-import Explorer, { scrollCanvasToNode } from "../../ManagerExplorer";
+import Explorer, {
+  getCanvasScrollRatio,
+  restoreCanvasScrollRatio,
+  scrollCanvasToNode,
+} from "../../ManagerExplorer";
 import Layout from "../layout";
 import { cn } from "@/editeur/lib/utils";
 import { Button } from "@/editeur/components/ui/button";
@@ -74,6 +78,8 @@ function Builder() {
 
   const { onDragEnd } = useDnd();
   const divRef = useRef<HTMLDivElement>(null);
+  const pendingScrollRatioRef = useRef<number | null>(null);
+  const prevSelectedRef = useRef<string | null>(null);
 
   const { isFullScreen, enterFullScreen, exitFullScreen } = useFullscreen();
 
@@ -104,8 +110,15 @@ function Builder() {
 
   useEffect(() => {
     if (mode !== APP_MODE.EDIT || !selected) {
+      prevSelectedRef.current = selected;
       return;
     }
+
+    if (selected === prevSelectedRef.current) {
+      return;
+    }
+
+    prevSelectedRef.current = selected;
 
     const frameId = requestAnimationFrame(() => {
       scrollCanvasToNode(selected);
@@ -114,11 +127,26 @@ function Builder() {
     return () => cancelAnimationFrame(frameId);
   }, [mode, selected]);
 
+  useLayoutEffect(() => {
+    const ratio = pendingScrollRatioRef.current;
+    if (ratio === null) {
+      return;
+    }
+
+    pendingScrollRatioRef.current = null;
+
+    const restore = () => restoreCanvasScrollRatio(ratio);
+    restore();
+    requestAnimationFrame(restore);
+  }, [mode]);
+
   const handleModeChange = useCallback(
     (nextMode: string) => {
       if (!nextMode || nextMode === mode) {
         return;
       }
+
+      pendingScrollRatioRef.current = getCanvasScrollRatio();
       setMode(nextMode as AppModeType);
     },
     [mode, setMode]
