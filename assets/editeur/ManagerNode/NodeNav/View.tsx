@@ -27,6 +27,7 @@ function useIsTabletOrSmaller(): boolean {
 
 const View: FC<NodeViewProps | NodeEditProps> = () => {
   const { node, getChildren } = useNodeContext();
+  const { mode } = useAppContext();
   const isTabletOrSmaller = useIsTabletOrSmaller();
   const [burgerOpen, setBurgerOpen] = useState(false);
 
@@ -38,13 +39,16 @@ const View: FC<NodeViewProps | NodeEditProps> = () => {
   const variant = options.variant ?? "navbar";
   const showBurger = options.showBurger === true;
   const showBurgerLayout = showBurger && isTabletOrSmaller;
+  const isEdit = mode === APP_MODE.EDIT;
+  const horizontalDropzoneFill = isEdit && !isVertical && !showBurgerLayout;
 
   const containerStyle: React.CSSProperties = {
     display: "flex",
     flexDirection: isVertical ? "column" : "row",
     justifyContent: !showBurgerLayout && options.justify ? options.justify : "flex-start",
     gap: options.gap != null ? `${options.gap * 0.25}rem` : "1rem",
-    flexWrap: "wrap"
+    flexWrap: "wrap",
+    ...(horizontalDropzoneFill ? { width: "100%", minWidth: 0 } : {}),
   };
 
   const navStyle: React.CSSProperties = navNode?.content?.nav?.style ?? {};
@@ -69,7 +73,12 @@ const View: FC<NodeViewProps | NodeEditProps> = () => {
           style={styleForView({ ...containerStyle })}
         >
           {!showBurgerLayout && (
-            <NodeCollection nodes={children} parentId={node.id} zone="main" />
+            <NodeCollection
+              nodes={children}
+              parentId={node.id}
+              zone="main"
+              trailingDropzoneFill={horizontalDropzoneFill}
+            />
           )}
 
           {showBurgerLayout && (

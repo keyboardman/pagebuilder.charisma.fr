@@ -8,10 +8,13 @@ export function NodeCollection({
   nodes,
   parentId,
   zone,
+  trailingDropzoneFill = false,
 }: {
   nodes: Record<NodeID, NodeType>;
   parentId?: NodeID | null;
   zone: string;
+  /** Trailing dropzone grows to fill remaining flex space (e.g. NodeNav horizontal). */
+  trailingDropzoneFill?: boolean;
 }) {
 
   const { mode } = useAppContext();
@@ -25,6 +28,7 @@ export function NodeCollection({
         <DropZone
           parent={{ id: parentId ?? "root", zone, order: nodeCount }}
           isEmptyZone={nodeCount === 0}
+          fillRemaining={trailingDropzoneFill}
         />
       )}
 
