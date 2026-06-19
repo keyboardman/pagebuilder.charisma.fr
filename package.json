@@ -14,16 +14,21 @@
         "@symfony/ux-react": "file:vendor/symfony/ux-react/assets",
         "@symfony/webpack-encore": "^5.3.1",
         "@tailwindcss/postcss": "^4.0.0",
+        "@testing-library/jest-dom": "^6.9.1",
+        "@testing-library/react": "^16.3.2",
+        "@testing-library/user-event": "^14.6.1",
         "@types/lodash": "^4.17.23",
         "@types/node": "^25.0.10",
         "@types/react": "^18.3.27",
         "@types/react-dom": "^18.3.5",
         "@types/shortid": "^2.2.0",
+        "@vitest/coverage-v8": "^2.1.9",
         "concurrently": "^9.1.0",
         "core-js": "^3.36.0",
         "css-loader": "^7.1.4",
         "depcheck": "^1.4.7",
         "fork-ts-checker-webpack-plugin": "^9.1.0",
+        "jsdom": "^24.1.3",
         "knip": "^5.88.1",
         "mini-css-extract-plugin": "^2.10.2",
         "postcss": "^8.4.0",
@@ -35,6 +40,7 @@
         "tailwindcss": "^4.0.0",
         "ts-loader": "^9.5.1",
         "typescript": "^5.9.3",
+        "vitest": "^2.1.9",
         "webpack": "^5.107.2",
         "webpack-cli": "^6.0.1",
         "webpack-notifier": "^1.15.0"
@@ -44,7 +50,10 @@
         "watch": "encore dev --watch",
         "build": "encore production",
         "start": "concurrently -n symfony,webpack -c blue,green \"symfony serve\" \"npm run watch\"",
-        "audit:dead-code": "knip && depcheck --ignores=\"@symfony/stimulus-bridge,@symfony/ux-autocomplete,@symfony/ux-react,@babel/plugin-transform-class-properties,@babel/preset-env,@babel/preset-react,core-js,sass,sass-embedded,webpack,webpack-cli,webpack-notifier,postcss,postcss-loader,css-loader,style-loader,mini-css-extract-plugin,fork-ts-checker-webpack-plugin,ts-loader,typescript,@tailwindcss/postcss,tailwindcss,tailwindcss-animate,concurrently\""
+        "test:frontend": "vitest",
+        "test:frontend:run": "vitest run",
+        "test:frontend:coverage": "vitest run --coverage",
+        "audit:dead-code": "knip && depcheck --ignores=\"@symfony/stimulus-bridge,@symfony/ux-autocomplete,@symfony/ux-react,@babel/plugin-transform-class-properties,@babel/preset-env,@babel/preset-react,core-js,sass,sass-embedded,webpack,webpack-cli,webpack-notifier,postcss,postcss-loader,css-loader,style-loader,mini-css-extract-plugin,fork-ts-checker-webpack-plugin,ts-loader,typescript,@tailwindcss/postcss,tailwindcss,tailwindcss-animate,concurrently,@testing-library/jest-dom,@testing-library/react,@testing-library/user-event,@vitest/coverage-v8,jsdom,vitest\""
     },
     "browserslist": [
         "defaults"

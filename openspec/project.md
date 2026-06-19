@@ -9,7 +9,7 @@
 - **Backend** : Symfony 8, Doctrine ORM, PostgreSQL, API Platform (`/api/page-builder/*`)
 - **Frontend** : React 18, TypeScript, Webpack Encore, Tailwind CSS 4, Lexical (rich text)
 - **Médias** : keyboardman/filesystem-bundle + filemanager-bundle (Flysystem local `public/media`, S3 optionnel)
-- **Tests** : PHPUnit 12 ; PHPStan niveau 3 sur `src/`
+- **Tests** : PHPUnit 12 ; PHPStan niveau 3 sur `src/` ; Vitest + React Testing Library pour `assets/editeur/`
 
 ## Project Conventions
 
@@ -29,11 +29,15 @@
 ### Testing Strategy
 
 ```bash
-composer test       # DB test + migrations + PHPUnit
-composer analyse    # PHPStan
-npm run build       # Encore production
-npm run audit:dead-code  # knip + depcheck (assets/)
+composer test              # DB test + migrations + PHPUnit + tests frontend
+composer analyse           # PHPStan
+npm run test:frontend      # Vitest (mode watch)
+npm run test:frontend:run  # Vitest (CI, une passe)
+npm run build              # Encore production
+npm run audit:dead-code    # knip + depcheck (assets/)
 ```
+
+**Frontend** : placer les tests à côté du code (`*.test.ts(x)` sous `assets/`). Voir `docs/frontend-testing.md` pour les helpers (`createTestNode`, `renderWithNodeBuilder`) et les conventions (utils → hooks → composants avec contexte).
 
 Les exports des `ManagerNode/*/index.ts` sont chargés dynamiquement via `NodeRegistry` : knip peut les signaler comme non utilisés ; les ignorer sauf après vérification grep.
 

@@ -44,6 +44,9 @@ class ThemeCssGenerator
         'assets/editeur/assets/themes/base/css/index.css'
     ];
 
+    /** Chemin web par défaut → fichier {@see public/assets/icons/video.svg} (masque placeholder). */
+    private const DEFAULT_VIDEO_MASK_ICON_WEB_PATH = '/assets/icons/video.svg';
+
     /** Chemin web par défaut → fichier {@see public/assets/icons/play2.svg}. */
     private const DEFAULT_VIDEO_PLAYER_ICON_WEB_PATH = '/assets/icons/play2.svg';
 
@@ -141,22 +144,19 @@ class ThemeCssGenerator
 
     private function buildRootCss(array $config): string
     {
+        $lines = [':root {'];
 
-        $lines[] = ':root {';
-
-        // Build vars
-        $vars = $config['vars'] ?? [];
-        if (!is_array($vars)) {
-            $vars = [];
-        }
-        foreach ($vars as $var) {
-            if($var['value'] === '' || $var['value'] === null) {
-                continue;
-            }
-            $lines[] = '  ' . $var['name'] . ': ' . $this->formatCssValue($this->resolveColorValue($this->valueToString($var['value']), $vars), $var['name']) . ';';
+        $normalizedVars = $this->normalizeThemeVarsConfig($config['vars'] ?? []);
+        foreach ($normalizedVars['entries'] as $var) {
+            $lines[] = '  ' . $var['name'] . ': ' . $this->formatCssValue(
+                $this->resolveColorValue($var['value'], $normalizedVars['map']),
+                $var['name']
+            ) . ';';
         }
 
-        // Build icons
+        $maskPath = str_replace("'", "\\'", $this->resolvePublicWebPath(self::DEFAULT_VIDEO_MASK_ICON_WEB_PATH));
+        $lines[] = "  --ce-builder-icon-video-mask-url: url('" . $maskPath . "');";
+
         $playerIcon = $this->normalizeThemePublicAssetWebPath(
             trim((string) ($config['video_player_icon_url'] ?? ''))
         );
@@ -164,10 +164,54 @@ class ThemeCssGenerator
             $playerIcon = self::DEFAULT_VIDEO_PLAYER_ICON_WEB_PATH;
         }
         $playerPath = str_replace("'", "\\'", $this->resolvePublicWebPath($playerIcon));
-        $lines[] = '  --ce-video-player-icon-url: url(' . $playerPath . ');';
+        $lines[] = "  --ce-video-player-icon-url: url('" . $playerPath . "');";
         $lines[] = '}';
         $lines[] = '';
+
         return implode("\n", $lines);
+    }
+
+    /**
+     * Accepte les vars au format associatif (--name => value) ou liste d'objets { name, value }.
+     *
+     * @param mixed $vars
+     *
+     * @return array{entries: list<array{name: string, value: string}>, map: array<string, string>}
+     */
+    private function normalizeThemeVarsConfig(mixed $vars): array
+    {
+        if (!is_array($vars)) {
+            return ['entries' => [], 'map' => []];
+        }
+
+        $entries = [];
+        $map = [];
+
+        foreach ($vars as $key => $var) {
+            if (is_array($var)) {
+                $name = trim((string) ($var['name'] ?? ''));
+                $value = $var['value'] ?? '';
+            } elseif (is_string($key) && str_starts_with($key, '--')) {
+                $name = $key;
+                $value = $var;
+            } else {
+                continue;
+            }
+
+            if ($name === '' || $value === '' || $value === null) {
+                continue;
+            }
+
+            $valueStr = $this->valueToString($value);
+            if ($valueStr === '') {
+                continue;
+            }
+
+            $entries[] = ['name' => $name, 'value' => $valueStr];
+            $map[$name] = $valueStr;
+        }
+
+        return ['entries' => $entries, 'map' => $map];
     }
 
     /**
@@ -373,9 +417,12 @@ class ThemeCssGenerator
             return $path;
         }
 
-        $base = rtrim($request->getSchemeAndHttpHost(), '/');
+        $basePath = $request->getBasePath();
+        if ($basePath === '' || $basePath === '/') {
+            return $path;
+        }
 
-        return ($base === '' ? '' : $base) . $path;
+        return rtrim($basePath, '/') . $path;
     }
 
     private function buildBaseBuilderCss(): string

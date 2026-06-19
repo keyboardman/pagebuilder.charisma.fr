@@ -12,7 +12,7 @@ use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 class ThemeCssGeneratorTest extends TestCase
 {
     private string $projectDir;
-    /** @var UrlGeneratorInterface&\PHPUnit\Framework\MockObject\MockObject */
+    /** @var UrlGeneratorInterface&\PHPUnit\Framework\MockObject\Stub */
     private $urlGenerator;
     private \Symfony\Component\HttpFoundation\RequestStack $requestStack;
 
@@ -21,7 +21,7 @@ class ThemeCssGeneratorTest extends TestCase
         $this->projectDir = sys_get_temp_dir() . '/theme-css-gen-' . uniqid();
         mkdir($this->projectDir, 0755, true);
         $this->seedPublicAssets();
-        $this->urlGenerator = $this->createMock(UrlGeneratorInterface::class);
+        $this->urlGenerator = $this->createStub(UrlGeneratorInterface::class);
         $this->urlGenerator
             ->method('generate')
             ->willReturn('https://example.test/font-file');

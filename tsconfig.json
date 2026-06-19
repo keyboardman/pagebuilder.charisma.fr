@@ -23,5 +23,14 @@
     "types": ["node"]
   },
   "include": ["assets/**/*"],
-  "exclude": ["node_modules", "public/build", "vendor"]
+  "exclude": [
+    "node_modules",
+    "public/build",
+    "vendor",
+    "assets/**/*.test.ts",
+    "assets/**/*.test.tsx",
+    "assets/**/*.spec.ts",
+    "assets/**/*.spec.tsx",
+    "assets/test"
+  ]
 }

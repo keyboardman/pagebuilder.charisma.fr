@@ -100,7 +100,8 @@
         "test": [
             "symfony console doctrine:database:create --if-not-exists --env=test",
             "symfony console doctrine:migrations:migrate --no-interaction --env=test",
-            "php bin/phpunit"
+            "php bin/phpunit",
+            "npm run test:frontend:run"
         ],
         "analyse": "phpstan analyse --memory-limit=512M"
     },
