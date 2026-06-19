@@ -6,10 +6,12 @@ import { getImageFromNode, getTitleFromNode, getTextFromNode, getLabelsFromNode 
 import type { NodeCardType } from "./index";
 import { styleForView } from "../../utils/styleHelper";
 import { ViewImage, ViewTitle, ViewText, ViewLabel, HasLink } from "./Views/index";
+import { useCanvasNavigation } from "../../hooks/useCanvasNavigation";
 
 const View: FC<NodeViewProps> = () => {
 
     const { node } = useNodeContext();
+    const { runNavigation } = useCanvasNavigation();
 
     const cardStyle = node.content?.card?.style || {};
 
@@ -37,9 +39,11 @@ const View: FC<NodeViewProps> = () => {
                 className={cn(`ce-card-image ce-card-image-ratio-${node.content?.container?.ratio ?? "1_3"}`, _image.className) }
                 style={_image.style}
                 onClick={() => {
-                    if (link) {
-                        window.open(link, "_blank");
-                    }
+                    runNavigation(() => {
+                        if (link) {
+                            window.open(link, "_blank");
+                        }
+                    });
                 }}
             />
             <div 

@@ -1,12 +1,22 @@
-const HasLink = ({ link, children }: { link: string, children: React.ReactNode }) => {
+import type { ReactNode } from "react";
+import { useCanvasNavigation } from "@/editeur/hooks/useCanvasNavigation";
 
-    if (!link) return children;
+const HasLink = ({ link, children }: { link: string; children: ReactNode }) => {
+  const { preventLinkClick } = useCanvasNavigation();
 
-    return (
-        <a href={link} target="_blank" rel="noopener noreferrer" className="ce-card-link">
-            {children}
-        </a>
-    )
-}
+  if (!link) return children;
+
+  return (
+    <a
+      href={link}
+      target="_blank"
+      rel="noopener noreferrer"
+      className="ce-card-link"
+      onClick={preventLinkClick}
+    >
+      {children}
+    </a>
+  );
+};
 
 export default HasLink;
