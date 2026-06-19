@@ -35,7 +35,6 @@ export interface NodeFormRadioType extends NodeType {
 export const NodeFormRadio: NodeConfigurationType = {
   ...defaultNodeConfiguration,
   view: View,
-  edit: View,
   settings: Settings,
   type: NODE_FORM_RADIO_TYPE,
   button: {

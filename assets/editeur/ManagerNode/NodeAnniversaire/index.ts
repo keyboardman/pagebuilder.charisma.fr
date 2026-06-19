@@ -1,6 +1,5 @@
 import { type NodeType } from "../../types/NodeType";
 import View from "./View";
-import Edit from "./Edit";
 import Settings from "./Settings";
 import { defaultNodeConfiguration, type NodeConfigurationType } from "../NodeConfigurationType";
 import { IoGiftOutline } from "react-icons/io5";
@@ -31,7 +30,6 @@ export interface NodeAnniversaireType extends NodeType {
 export const NodeAnniversaire: NodeConfigurationType = {
   ...defaultNodeConfiguration,
   view: View,
-  edit: Edit,
   settings: Settings,
   type: NODE_ANNIVERSAIRE_TYPE,
   button: {

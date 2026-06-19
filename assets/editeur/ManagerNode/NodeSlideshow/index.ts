@@ -1,5 +1,4 @@
 import { type NodeType } from "../../types/NodeType";
-import Edit from "./Edit";
 import Settings from "./Settings";
 import { defaultNodeConfiguration, type NodeConfigurationType } from "../NodeConfigurationType";
 import { IoImageOutline } from "react-icons/io5";
@@ -64,7 +63,6 @@ export interface NodeSlideshowType extends NodeType {
 export const NodeSlideshow: NodeConfigurationType = {
   ...defaultNodeConfiguration,
   view: SlideshowView,
-  edit: Edit,
   settings: Settings,
   type: NODE_SLIDESHOW_TYPE,
   button: {

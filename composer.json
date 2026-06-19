@@ -101,7 +101,8 @@
             "symfony console doctrine:database:create --if-not-exists --env=test",
             "symfony console doctrine:migrations:migrate --no-interaction --env=test",
             "php bin/phpunit"
-        ]
+        ],
+        "analyse": "phpstan analyse --memory-limit=512M"
     },
     "conflict": {
         "symfony/symfony": "*"
@@ -114,6 +115,7 @@
     },
     "require-dev": {
         "doctrine/doctrine-fixtures-bundle": "^4.3.1",
+        "phpstan/phpstan": "^2.2.2",
         "phpunit/phpunit": "^12.5.30",
         "symfony/browser-kit": "8.0.*",
         "symfony/css-selector": "8.0.*",

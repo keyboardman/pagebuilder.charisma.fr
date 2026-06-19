@@ -37,7 +37,6 @@ export interface NodeTwoColumnsType extends NodeType {
 export const NodeTwoColumns: NodeConfigurationType = {
   ...defaultNodeConfiguration,
   view: View,
-  edit: View,
   settings: Settings,
   type: NODE_TWO_COLUMNS_TYPE,
   button: {

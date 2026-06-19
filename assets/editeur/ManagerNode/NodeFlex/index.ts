@@ -31,7 +31,6 @@ export interface NodeFlexType extends NodeType {
 export const NodeFlex: NodeConfigurationType = {
   ...defaultNodeConfiguration,
   view: View,
-  edit: View,
   settings: Settings,
   type: NODE_FLEX_TYPE,
   button: {

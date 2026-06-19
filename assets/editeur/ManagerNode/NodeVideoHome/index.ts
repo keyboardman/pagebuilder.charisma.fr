@@ -1,7 +1,6 @@
 import { type NodeType } from "../../types/NodeType";
 import { defaultNodeConfiguration, type NodeConfigurationType } from "../NodeConfigurationType";
 import View from "./View";
-import Edit from "./Edit";
 import Settings from "./Settings";
 import { IoFilmOutline } from "react-icons/io5";
 import type React from "react";
@@ -39,7 +38,6 @@ export interface NodeVideoHomeType extends NodeType {
 export const NodeVideoHome: NodeConfigurationType = {
   ...defaultNodeConfiguration,
   view: View,
-  edit: Edit,
   settings: Settings,
   type: NODE_VIDEO_HOME_TYPE,
   button: {

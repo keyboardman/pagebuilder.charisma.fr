@@ -19,7 +19,6 @@ export interface NodeVideoType extends NodeType {
 export const NodeVideo: NodeConfigurationType = {
   ...defaultNodeConfiguration,
   view: View,
-  edit: View,
   settings: Settings,
   type: NODE_VIDEO_TYPE,
   button: {

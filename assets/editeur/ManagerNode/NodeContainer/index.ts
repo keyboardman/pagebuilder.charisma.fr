@@ -15,7 +15,6 @@ export interface NodeContainerType extends NodeType {
 export const NodeContainer: NodeConfigurationType = {
     ...defaultNodeConfiguration,
     view: View,
-    edit: View,
     settings: Settings,
     type: NODE_CONTAINER_TYPE,
     button: {

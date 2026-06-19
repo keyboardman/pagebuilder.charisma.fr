@@ -1,7 +1,6 @@
 import { type NodeType } from "../../types/NodeType";
 import { defaultNodeConfiguration, type NodeConfigurationType } from "../NodeConfigurationType";
 import View from "./View";
-import Edit from "./Edit";
 import Settings from "./Settings";
 import { IoEllipseOutline } from "react-icons/io5";
 
@@ -24,7 +23,6 @@ export interface NodeNavItemType extends NodeType {
 export const NodeNavItem: NodeConfigurationType = {
   ...defaultNodeConfiguration,
   view: View,
-  edit: Edit,
   settings: Settings,
   type: NODE_NAV_ITEM_TYPE,
   button: {

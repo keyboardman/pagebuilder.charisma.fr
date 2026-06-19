@@ -4,7 +4,6 @@ import {
     type NodeConfigurationType
 } from '../NodeConfigurationType'
 import View from './View'
-import Edit from './Edit'
 import Settings from './Settings'
 import { IoGridOutline } from 'react-icons/io5'
 
@@ -120,7 +119,6 @@ export interface NodeGridType extends NodeType {
 export const NodeGrid: NodeConfigurationType = {
     ...defaultNodeConfiguration,
     view: View,
-    edit: Edit,
     settings: Settings,
     type: NODE_GRID_TYPE,
     button: {

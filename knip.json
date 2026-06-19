@@ -1,0 +1,42 @@
+{
+  "$schema": "https://unpkg.com/knip@5/schema.json",
+  "entry": [
+    "assets/app.js",
+    "assets/ThemeForm2.tsx",
+    "assets/pageBuilderStandalone.jsx",
+    "assets/pagePreview.jsx"
+  ],
+  "project": ["assets/**/*.{js,jsx,ts,tsx}"],
+  "ignore": ["public/build/**"],
+  "ignoreExportsUsedInFile": {
+    "interface": true,
+    "type": true
+  },
+  "ignoreDependencies": [
+    "@symfony/stimulus-bridge",
+    "@symfony/ux-autocomplete",
+    "@symfony/ux-react",
+    "@babel/plugin-transform-class-properties",
+    "@babel/preset-env",
+    "@babel/preset-react",
+    "core-js",
+    "sass",
+    "sass-embedded",
+    "webpack",
+    "webpack-cli",
+    "webpack-notifier",
+    "postcss",
+    "postcss-loader",
+    "css-loader",
+    "style-loader",
+    "mini-css-extract-plugin",
+    "fork-ts-checker-webpack-plugin",
+    "ts-loader",
+    "typescript",
+    "@tailwindcss/postcss",
+    "tailwindcss",
+    "tailwindcss-animate",
+    "concurrently",
+    "depcheck"
+  ]
+}

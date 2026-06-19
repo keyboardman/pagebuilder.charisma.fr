@@ -1,6 +1,5 @@
 import { type NodeType } from "../../types/NodeType";
 import View from "./View";
-import Edit from "./Edit";
 import Settings from "./Settings";
 import { defaultNodeConfiguration, type NodeConfigurationType } from "../NodeConfigurationType";
 import { IoArrowUpOutline } from "react-icons/io5";
@@ -21,7 +20,6 @@ export interface NodeTopButtonType extends NodeType {
 export const NodeTopButton: NodeConfigurationType = {
   ...defaultNodeConfiguration,
   view: View,
-  edit: Edit,
   settings: Settings,
   type: NODE_TOP_BUTTON_TYPE,
   button: {

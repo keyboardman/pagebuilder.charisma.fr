@@ -1,7 +1,6 @@
 import type React from "react";
 import { type NodeType } from "../../types/NodeType";
 import View from "./View";
-import Edit from "./Edit";
 import Settings from "./Settings";
 import { defaultNodeConfiguration, type NodeConfigurationType } from "../NodeConfigurationType";
 import { IoText } from "react-icons/io5";
@@ -61,7 +60,6 @@ export interface NodeTextIconType extends NodeType {
 export const NodeTextIcon: NodeConfigurationType = {
   ...defaultNodeConfiguration,
   view: View,
-  edit: Edit,
   settings: Settings,
   type: NODE_TEXT_ICON_TYPE,
   button: {

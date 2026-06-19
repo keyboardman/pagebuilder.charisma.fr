@@ -17,7 +17,7 @@ use Symfony\Component\HttpKernel\Profiler\Profiler;
  */
 final class DisableProfilerOnMediaUploadListener implements EventSubscriberInterface
 {
-    private const UPLOAD_PATH_PREFIXES = ['/media/api/upload', '/api/filesystem/upload'];
+    private const UPLOAD_PATH_PREFIXES = ['/api/filesystem/upload'];
     private const ATTR_PROFILER_DISABLED = '_profiler_disabled_by_media_upload';
 
     public function __construct(

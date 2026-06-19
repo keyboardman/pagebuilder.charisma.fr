@@ -1,7 +1,6 @@
 import { type NodeType } from "../../types/NodeType";
 import { defaultNodeConfiguration, type NodeConfigurationType } from "../NodeConfigurationType";
 import View from "./View";
-import Edit from "./Edit";
 import Settings from "./Settings";
 import { IoCard } from "react-icons/io5";
 
@@ -90,7 +89,6 @@ export interface NodeCardType extends NodeType {
 export const NodeCard: NodeConfigurationType = {
     ...defaultNodeConfiguration,
     view: View,
-    edit: Edit,
     settings: Settings,
     type: NODE_CARD_TYPE,
     button: {

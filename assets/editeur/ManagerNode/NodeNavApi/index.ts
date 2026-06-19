@@ -51,7 +51,6 @@ export interface NodeNavApiType extends NodeType {
 export const NodeNavApi: NodeConfigurationType = {
   ...defaultNodeConfiguration,
   view: View,
-  edit: View,
   settings: Settings,
   type: NODE_NAV_API_TYPE,
   button: {

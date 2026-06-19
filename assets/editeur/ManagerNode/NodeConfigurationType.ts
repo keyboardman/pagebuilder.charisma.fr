@@ -3,6 +3,7 @@ import type { IconType } from "react-icons/lib";
 
 // Ces types sont placeholders, donc on permet un objet vide
 export type NodeViewProps = Record<string, never>
+/** @deprecated Conservé pour compatibilité des signatures View ; le canevas ne monte plus de composant edit distinct. */
 export type NodeEditProps = Record<string, never>
 
 export type NodeSettingsProps= Record<string, never>;
@@ -19,7 +20,6 @@ export const defaultNodeConfiguration: Partial<NodeConfigurationType> = {
 
 export interface NodeConfigurationType {
     view: FC<NodeViewProps>;
-    edit: FC<NodeEditProps>;
     settings: FC<NodeSettingsProps>;
     type: string;
     button?: {

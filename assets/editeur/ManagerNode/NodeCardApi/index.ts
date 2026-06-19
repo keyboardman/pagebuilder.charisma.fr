@@ -93,7 +93,6 @@ export interface NodeCardApiType extends NodeType {
 export const NodeCardApi: NodeConfigurationType = {
     ...defaultNodeConfiguration,
     view: View,
-    edit: View,
     settings: Settings,
     type: NODE_CARD_API_TYPE,
     button: {

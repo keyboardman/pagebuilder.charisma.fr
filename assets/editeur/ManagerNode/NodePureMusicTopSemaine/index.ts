@@ -1,7 +1,6 @@
 import { type NodeType } from "../../types/NodeType";
 import { defaultNodeConfiguration, type NodeConfigurationType } from "../NodeConfigurationType";
 import View from "./View";
-import Edit from "./Edit";
 import Settings from "./Settings";
 import { IoMusicalNotesOutline } from "react-icons/io5";
 import type React from "react";
@@ -52,7 +51,6 @@ export interface NodePureMusicTopSemaineType extends NodeType {
 export const NodePureMusicTopSemaine: NodeConfigurationType = {
   ...defaultNodeConfiguration,
   view: View,
-  edit: Edit,
   settings: Settings,
   type: NODE_PUREMUSIC_TOP_SEMAINE_TYPE,
   button: {

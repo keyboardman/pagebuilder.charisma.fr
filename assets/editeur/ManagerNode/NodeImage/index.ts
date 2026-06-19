@@ -20,7 +20,6 @@ export interface NodeImageType extends NodeType {
 export const NodeImage: NodeConfigurationType = {
     ...defaultNodeConfiguration,
     view: View,
-    edit: View,
     settings: Settings,
     type: NODE_IMAGE_TYPE,
     button: {

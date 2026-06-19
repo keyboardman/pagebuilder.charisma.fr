@@ -35,7 +35,6 @@ export interface NodeFormSelectType extends NodeType {
 export const NodeFormSelect: NodeConfigurationType = {
   ...defaultNodeConfiguration,
   view: View,
-  edit: View,
   settings: Settings,
   type: NODE_FORM_SELECT_TYPE,
   button: {

@@ -16,7 +16,6 @@ export interface NodeYoutubeType extends NodeType {
 export const NodeYoutube: NodeConfigurationType = {
   ...defaultNodeConfiguration,
   view: View,
-  edit: View,
   settings: Settings,
   type: NODE_YOUTUBE_TYPE,
   button: {

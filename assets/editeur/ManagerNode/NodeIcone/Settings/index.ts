@@ -1,2 +1,1 @@
-export { ContainerStyleSettings } from "./ContainerStyleSettings";
-export { IconStyleSettings } from "./IconStyleSettings";
+export { IconStyleSettings, ContainerStyleSettings } from "../../shared/iconNodeStyleSettings";

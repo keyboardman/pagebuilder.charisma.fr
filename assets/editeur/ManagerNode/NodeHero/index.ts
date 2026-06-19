@@ -18,7 +18,6 @@ export type {
 export const NodeHero: NodeConfigurationType = {
   ...defaultNodeConfiguration,
   view: View,
-  edit: View,
   settings: Settings,
   type: NODE_HERO_TYPE,
   button: {

@@ -38,7 +38,6 @@ export interface NodeFormInputType extends NodeType {
 export const NodeFormInput: NodeConfigurationType = {
   ...defaultNodeConfiguration,
   view: View,
-  edit: View,
   settings: Settings,
   type: NODE_FORM_INPUT_TYPE,
   button: {

@@ -1,6 +1,5 @@
 import { type NodeType } from "../../types/NodeType";
 import View from "./View";
-import Edit from "./Edit";
 import Settings from "./Settings";
 import { defaultNodeConfiguration, type NodeConfigurationType } from "../NodeConfigurationType";
 import { IoTextOutline } from "react-icons/io5";
@@ -18,7 +17,6 @@ export interface NodeHeaderType extends NodeType {
 export const NodeHeader: NodeConfigurationType = {
     ...defaultNodeConfiguration,
     view: View,
-    edit: Edit,
     settings: Settings,
     type: NODE_HEADER_TYPE,
     button: {

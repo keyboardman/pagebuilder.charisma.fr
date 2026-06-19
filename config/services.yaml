@@ -8,8 +8,6 @@
 # https://symfony.com/doc/current/best_practices.html#use-parameters-for-application-configuration
 parameters:
     storage.fonts.path: '%kernel.project_dir%/var/storage/fonts'
-    # /media/api/* (list, upload, mkdir, delete, etc.) lit/écrit dans public/media ; les fichiers sont servis en direct à /media/{path}
-    storage.media.path: '%kernel.project_dir%/public/media'
     app.builder_form.honeypot_field: '_builder_form_hp'
     app.builder_form.rate_limit.max_attempts: 25
     app.builder_form.rate_limit.window_seconds: 3600
@@ -30,16 +28,6 @@ services:
     League\Flysystem\FilesystemOperator:
         alias: font_storage.filesystem
 
-    media_storage.adapter:
-        class: League\Flysystem\Local\LocalFilesystemAdapter
-        arguments:
-            $location: '%storage.media.path%'
-
-    media_storage.filesystem:
-        class: League\Flysystem\Filesystem
-        arguments:
-            $adapter: '@media_storage.adapter'
-
     # default configuration for services in *this* file
     _defaults:
         autowire: true      # Automatically injects dependencies in your services.
@@ -53,10 +41,6 @@ services:
     App\Service\FontStorage:
         arguments:
             $filesystem: '@font_storage.filesystem'
-
-    App\Service\MediaStorage:
-        arguments:
-            $filesystem: '@media_storage.filesystem'
 
     App\Service\ThemeCssGenerator:
         arguments:

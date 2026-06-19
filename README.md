@@ -1,49 +1,64 @@
-# Créer une base de données postgres
+# Page Builder Charisma
 
-- psql -U postgres 
-  - psql → client en ligne de commande PostgreSQL.
-  - U postgres → se connecter avec l’utilisateur postgres (l’admin par défaut).
-  - Après ça, tu es sur le prompt postgres=#, prêt à taper des commandes SQL.
-  
-- CREATE USER {DB_USER} WITH PASSWORD '{DB_PASSWORD}' ;
-  - CREATE USER → crée un nouvel utilisateur PostgreSQL.
-  - {DB_USER} → le nom que tu veux donner à l’utilisateur.
-  - WITH PASSWORD '{DB_PASSWORD}' → définit le mot de passe de cet utilisateur.
+Application Symfony 8 + React pour créer et éditer des pages web via un **page builder** visuel (grille, flex, cards API, formulaires, thèmes DaisyUI).
 
-- CREATE DATABASE {DB_NAME} OWNER {DB_USER};
-  - CREATE DATABASE → crée une nouvelle base.
-  - {DB_NAME} → nom de la base.
-  - OWNER {DB_USER} → le propriétaire de la base, qui aura tous les droits par défaut sur cette base.
+## Prérequis
 
-- psql -U postgres -h localhost -d {DB_NAME}
-  - -h localhost → se connecter sur le serveur local (utile si pas en sudo).
-  - -d {DB_NAME} → se connecter directement à cette base.
+- PHP 8.4+, Composer
+- Node.js 20.19+ (recommandé pour knip / outils récents)
+- Docker (PostgreSQL)
 
-- GRANT CONNECT ON DATABASE {DB_NAME} TO {DB_USER};
-  - Permet à {DB_USER} de se connecter à la base {DB_NAME}.
-  - Sans ça, l’utilisateur ne peut même pas accéder à la base.
+## Démarrage rapide
 
-- GRANT USAGE ON SCHEMA public TO {DB_USER};
-  - public → schema par défaut de PostgreSQL.
-  - GRANT USAGE → permet à l’utilisateur d’utiliser ce schema (nécessaire pour créer ou manipuler des objets dedans).
+```bash
+# Base de données
+docker compose up -d
+symfony console doctrine:database:create
+symfony console doctrine:migrations:migrate --no-interaction
 
-- GRANT SELECT, INSERT, UPDATE, DELETE ON ALL TABLES IN SCHEMA public TO {DB_USER};
-  - SELECT → lire les données.
-  - INSERT → ajouter des lignes
-  - UPDATE → modifier des lignes.
-  - DELETE → supprimer des lignes.
-  - ON ALL TABLES IN SCHEMA public → s’applique à toutes les tables déjà créées dans le schema public.
+# Frontend
+npm install
+npm run watch   # ou npm run build
 
-- ALTER DEFAULT PRIVILEGES IN SCHEMA public GRANT SELECT, INSERT, UPDATE, DELETE ON TABLES TO {DB_USER};
-  - Les tables créées après cette commande dans le schema public auront automatiquement ces droits pour {DB_USER}.
-  - Évite de devoir refaire un GRANT à chaque nouvelle table.
+# Serveur
+symfony serve
+# ou npm run start  # symfony + webpack en parallèle
+```
 
-- ALTER DEFAULT PRIVILEGES IN SCHEMA public GRANT USAGE, SELECT ON SEQUENCES TO {DB_USER};
-  - Séquences → utilisées pour les champs SERIAL ou BIGSERIAL.
-  - USAGE → permet d’utiliser la séquence.
-  - SELECT → permet de lire la valeur actuelle de la séquence.
-  - Important pour que l’utilisateur puisse insérer de nouvelles lignes avec des clés auto-incrémentées.
+## Entrypoints Webpack (Encore)
 
-- REVOKE CREATE ON SCHEMA public FROM {DB_USER};
-  - Interdit à l’utilisateur de créer de nouvelles tables, vues ou objets dans le schema public.
-  - Utile pour limiter les droits si tu veux que l’utilisateur ne fasse que manipuler les données, pas créer de structures.
+| Entry | Rôle |
+|-------|------|
+| `app` | Back-office Symfony (Stimulus, UX React) |
+| `ThemeForm2` | Éditeur de thème |
+| `pageBuilderStandalone` | Builder de page |
+| `pagePreview` | Prévisualisation standalone |
+
+## Tests et qualité
+
+```bash
+composer test              # PHPUnit (base test + migrations)
+composer analyse           # PHPStan (niveau 3, src/)
+npm run audit:dead-code    # knip + depcheck sur assets/
+npm run build              # Compilation production Encore
+```
+
+## Documentation
+
+- [OpenSpec / conventions](openspec/AGENTS.md)
+- [Contexte projet](openspec/project.md)
+- [API cards du builder](docs/builder-api.md)
+- [Soumissions de formulaires](docs/builder-form-submissions.md)
+- [File manager keyboardman](docs/FILEMANAGER_KEYBOARDMAN.md)
+
+## Base de données PostgreSQL (manuel)
+
+Voir aussi `openspec/project.md` pour l’initialisation via Docker.
+
+```bash
+psql -U postgres
+CREATE USER {DB_USER} WITH PASSWORD '{DB_PASSWORD}';
+CREATE DATABASE {DB_NAME} OWNER {DB_USER};
+```
+
+Variables : `DATABASE_URL` dans `.env` / `.env.local` (format Doctrine, service `database` de `compose.yaml`).

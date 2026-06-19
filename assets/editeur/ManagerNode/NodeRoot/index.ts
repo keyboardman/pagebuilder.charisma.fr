@@ -2,7 +2,6 @@ import { type NodeType } from "../../types/NodeType";
 import { defaultNodeConfiguration, type NodeConfigurationType } from "../NodeConfigurationType";
 import Settings from "./Settings";
 import View from "./View";
-import Edit from "./Edit";
 
 export const NODE_ROOT_TYPE = "node-root" as const;
 
@@ -63,7 +62,6 @@ export const NodeRoot: NodeConfigurationType = {
     ...defaultNodeConfiguration,
     type: NODE_ROOT_TYPE,
     view: View,
-    edit: Edit,
     settings: Settings,
     default: {
       ...defaultNodeConfiguration.default,
