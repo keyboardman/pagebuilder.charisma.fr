@@ -82,6 +82,10 @@ export function InputEditor({
         selection.addRange(range);
     };
 
+    const stopCanvasPropagation = (e: React.SyntheticEvent) => {
+        e.stopPropagation();
+    };
+
     const props: Record<string, unknown> = {
         ref,
         contentEditable: true,
@@ -89,6 +93,8 @@ export function InputEditor({
         className: cn("outline-1", className),
         id,
         style,
+        onMouseDown: stopCanvasPropagation,
+        onClick: stopCanvasPropagation,
         onFocus: () => {
             onFocus?.();
         },

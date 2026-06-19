@@ -161,6 +161,10 @@
     pointer-events: none;
 }
 
+.admin-layout[data-mode=edit] .admin-layout__main [contenteditable="true"] {
+    pointer-events: auto;
+}
+
 /* Titres et labels des blocs : couleur en dur (pas de var --foreground selon le thème) */
 .theme-preview-scope .node-block-title,
 .theme-view-scope .node-block-title,

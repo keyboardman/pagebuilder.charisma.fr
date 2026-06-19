@@ -1,6 +1,9 @@
 import React, { type CSSProperties, type FC } from "react";
 import { type NodeViewProps } from "../NodeConfigurationType";
 import { useNodeContext } from "../../services/providers/NodeContext";
+import { APP_MODE, useAppContext } from "../../services/providers/AppContext";
+import { useOptionalNodeBuilderContext } from "../../services/providers/NodeBuilderContext";
+import Form from "../../components/form";
 import type { NodeTextIconType } from "./index";
 import { styleForView } from "../../utils/styleHelper";
 import { cn } from "@/editeur/lib/utils";
@@ -19,6 +22,8 @@ import {
 
 const View: FC<NodeViewProps> = () => {
   const { node } = useNodeContext();
+  const { mode } = useAppContext();
+  const builder = useOptionalNodeBuilderContext();
   const textNode = node as NodeTextIconType;
   const tag = resolveNodeTextIconTag(textNode.content?.tag);
   const textBodyClassName = nodeTextIconBodyClassName(tag);
@@ -30,6 +35,8 @@ const View: FC<NodeViewProps> = () => {
   const linkUrl = textNode.content?.linkUrl ?? "";
   const horizontalAlign = textNode.content?.horizontalAlign ?? "left";
   const verticalAlign = textNode.content?.verticalAlign ?? "middle";
+  const isInlineEditing = mode === APP_MODE.EDIT && builder?.isSelected();
+
   const containerStyle: CSSProperties = {
     display: "flex",
     justifyContent: toJustifyContent(horizontalAlign),
@@ -40,12 +47,6 @@ const View: FC<NodeViewProps> = () => {
   const textStyle = styleForView(resolveNodeTextIconTextStyle(textNode));
   const iconMediaStyle = styleForView(resolveNodeTextIconIconMediaStyle(textNode));
 
-  const textElement = React.createElement(tag, {
-    className: textBodyClassName,
-    style: textStyle,
-    dangerouslySetInnerHTML: { __html: html },
-  });
-
   const iconElement = (
     <NodeTextIconMedia
       iconSource={iconSource}
@@ -55,25 +56,48 @@ const View: FC<NodeViewProps> = () => {
       iconImageUrl={textNode.content?.iconImageUrl}
       iconSizeVariant={iconSizeVariant}
       style={iconMediaStyle}
-
     />
   );
 
-  const linkedText = linkUrl ? (
-    <a href={linkUrl} className="ce-text-icon__link" target="_blank">
-      {textElement}
-    </a>
-  ) : (
-    textElement
-  );
+  const textElement =
+    isInlineEditing && builder ? (
+      <Form.InputEditor
+        value={html}
+        tagName={tag}
+        onBlur={(value) =>
+          builder.onChange({
+            ...node,
+            content: { ...node.content, html: value },
+          })
+        }
+        className={textBodyClassName}
+        style={textStyle}
+      />
+    ) : (
+      React.createElement(tag, {
+        className: textBodyClassName,
+        style: textStyle,
+        dangerouslySetInnerHTML: { __html: html },
+      })
+    );
 
-  const linkedIcon = linkUrl ? (
-    <a href={linkUrl} className="ce-text-icon__link" target="_blank">
-      {iconElement}
-    </a>
-  ) : (
-    iconElement
-  );
+  const linkedText =
+    linkUrl && !isInlineEditing ? (
+      <a href={linkUrl} className="ce-text-icon__link" target="_blank">
+        {textElement}
+      </a>
+    ) : (
+      textElement
+    );
+
+  const linkedIcon =
+    linkUrl && !isInlineEditing ? (
+      <a href={linkUrl} className="ce-text-icon__link" target="_blank">
+        {iconElement}
+      </a>
+    ) : (
+      iconElement
+    );
 
   return (
     <div
@@ -82,7 +106,6 @@ const View: FC<NodeViewProps> = () => {
       style={containerStyle}
       data-ce-id={node.id}
       data-ce-type={node.type}
-      
     >
       {iconPosition === "before" && linkedIcon}
       {linkedText}

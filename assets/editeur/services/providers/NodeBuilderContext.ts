@@ -29,3 +29,7 @@ export const useNodeBuilderContext = <T extends NodeType = NodeType>(): NodeBuil
   }
   return context;
 };
+
+export const useOptionalNodeBuilderContext = <T extends NodeType = NodeType>(): NodeBuilderValues<T> | null => {
+  return useContext(NodeBuilderContext) as NodeBuilderValues<T> | null;
+};

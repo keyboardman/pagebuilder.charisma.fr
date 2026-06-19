@@ -114,11 +114,22 @@ const TagNameEditable = ({
     onChange(ref.current.textContent ?? "");
   };
 
+  const stopCanvasPropagation = (e: React.SyntheticEvent) => {
+    e.stopPropagation();
+  };
+
   const editable = createElement(tagName, {
     ref,
     contentEditable: true,
     suppressContentEditableWarning: true,
     ...rest,
+    onMouseDown: stopCanvasPropagation,
+    onClick: (e: React.MouseEvent<HTMLElement>) => {
+      stopCanvasPropagation(e);
+      if (typeof rest.onClick === "function") {
+        (rest.onClick as (event: React.MouseEvent<HTMLElement>) => void)(e);
+      }
+    },
     onKeyDown: handleKeyDown,
     onKeyPress: handleKeyPress,
     onPaste: handlePaste,
