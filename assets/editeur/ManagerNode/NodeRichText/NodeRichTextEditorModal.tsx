@@ -34,6 +34,7 @@ export const NodeRichTextEditorModal: FC<NodeRichTextEditorModalProps> = ({
           html={html}
           onHtmlChange={onHtmlChange}
           className="ce-rich-text-modal editor-shell"
+          showFloatingToolbar={false}
         />
       ) : null}
     </DialogContent>

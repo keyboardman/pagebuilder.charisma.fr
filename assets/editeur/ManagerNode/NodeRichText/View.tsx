@@ -1,4 +1,4 @@
-import React, { type FC, useCallback, useContext, useEffect } from "react";
+import React, { type FC, useCallback, useContext, useEffect, useRef } from "react";
 import { type NodeViewProps } from "../NodeConfigurationType";
 import { useNodeContext } from "../../services/providers/NodeContext";
 import { APP_MODE, useAppContext } from "../../services/providers/AppContext";
@@ -19,11 +19,19 @@ const View: FC<NodeViewProps> = () => {
   const isEdit = mode === APP_MODE.EDIT;
   const selected = isEdit && builder?.isSelected() === true && richTextEditor !== null;
   const modalOpen = selected && richTextEditor!.isEditorOpen(node.id);
+  const wasSelectedRef = useRef(false);
 
+  // Ouvre la modale à la sélection (front montant uniquement) ; ne rouvre pas après fermeture manuelle.
   useEffect(() => {
-    if (selected && richTextEditor) {
+    if (!richTextEditor) return;
+
+    if (selected && !wasSelectedRef.current) {
       richTextEditor.openEditor(node.id);
     }
+    if (!selected) {
+      richTextEditor.closeEditor();
+    }
+    wasSelectedRef.current = selected;
   }, [selected, node.id, richTextEditor]);
 
   const handleHtmlChange = useCallback(

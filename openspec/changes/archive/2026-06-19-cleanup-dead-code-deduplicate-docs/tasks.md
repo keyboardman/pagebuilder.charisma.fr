@@ -42,5 +42,5 @@
 
 - [x] 6.1 `npm run audit:dead-code` sans findings bloquants (ou liste d’exceptions documentée).
 - [x] 6.2 `npm run build` + `composer test` verts.
-- [ ] 6.3 Smoke manuel : builder standalone, preview, ThemeForm2, sélection Explorer, édition inline texte/bouton, NodeRichText Lexical, pickers file manager iframe.
-- [ ] 6.4 Mettre à jour les tâches cochées et archiver le change OpenSpec après merge.
+- [x] 6.3 Smoke manuel : builder standalone, preview, ThemeForm2, sélection Explorer, édition inline texte/bouton, NodeRichText Lexical, pickers file manager iframe.
+- [x] 6.4 Mettre à jour les tâches cochées et archiver le change OpenSpec après merge.

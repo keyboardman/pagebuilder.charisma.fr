@@ -689,6 +689,8 @@ export type RichTextEditorShellProps = {
   html: string;
   onHtmlChange: (html: string) => void;
   className?: string;
+  /** Barre flottante sur sélection de texte ; désactivée en modale (toolbar fixe déjà présente). */
+  showFloatingToolbar?: boolean;
 };
 
 export const RichTextEditorShell: FC<RichTextEditorShellProps> = ({
@@ -696,6 +698,7 @@ export const RichTextEditorShell: FC<RichTextEditorShellProps> = ({
   html,
   onHtmlChange,
   className,
+  showFloatingToolbar = true,
 }) => {
   const initialConfig = useMemo(() => createRichTextLexicalConfig(nodeId), [nodeId]);
 
@@ -705,7 +708,7 @@ export const RichTextEditorShell: FC<RichTextEditorShellProps> = ({
         <div className="editor-container">
           <InitialHtmlPlugin html={html} />
           <ToolbarPlugin />
-          <FloatingInlineToolbarPlugin />
+          {showFloatingToolbar ? <FloatingInlineToolbarPlugin /> : null}
           <EditorFocusPlugin />
           <div className="editor-scroller">
             <div className="editor">
