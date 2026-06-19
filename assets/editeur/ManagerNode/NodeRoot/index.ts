@@ -15,11 +15,32 @@ export interface DefaultStyle {
   color: string;
 }
 
+export type NodeRootBackground =
+  | { type: 'default' }
+  | { type: 'color'; color: string }
+  | {
+      type: 'image';
+      url: string;
+      position?: string;
+      size?: string;
+      repeat?: string;
+      color?: string;
+    }
+  | {
+      type: 'video';
+      url: string;
+      poster?: string;
+      objectFit?: string;
+      objectPosition?: string;
+      color?: string;
+    };
+
 export interface NodeRootType extends NodeType {
   type: 'node-root';
   content: {
     title: string;
     defaultStyles?: Partial<Record<TypographyElement, DefaultStyle>>;
+    background?: NodeRootBackground;
   };
 };
 
@@ -46,9 +67,10 @@ export const NodeRoot: NodeConfigurationType = {
     settings: Settings,
     default: {
       ...defaultNodeConfiguration.default,
-      content: { 
+      content: {
         title: "",
-        defaultStyles: DEFAULT_TYPOGRAPHY_STYLES
+        defaultStyles: DEFAULT_TYPOGRAPHY_STYLES,
+        background: { type: "default" },
       }
     },
     button: null

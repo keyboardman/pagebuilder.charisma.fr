@@ -34,7 +34,14 @@ const View: FC<NodeViewProps|NodeEditProps> = () => {
   // Injecter les styles dans le head du document courant en dernier pour surcharger index.css
   useTypographyStyles(targetDoc, rootNode.content?.defaultStyles, true);
 
-  return <Content nodes={_nodes} nodeId={node.id} breakpoint={breakpoint} />;
+  return (
+    <Content
+      nodes={_nodes}
+      nodeId={node.id}
+      breakpoint={breakpoint}
+      background={rootNode.content?.background}
+    />
+  );
 }
 
 export default View;

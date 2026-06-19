@@ -22,7 +22,14 @@ const Edit: FC<NodeViewProps|NodeEditProps> = () => {
   const currentDoc = iframeRef?.current?.contentDocument || null;
   useTypographyStyles(currentDoc, rootNode.content?.defaultStyles, false);
 
-  return <Content nodes={_nodes} nodeId={node.id} breakpoint={breakpoint} />;
+  return (
+    <Content
+      nodes={_nodes}
+      nodeId={node.id}
+      breakpoint={breakpoint}
+      background={rootNode.content?.background}
+    />
+  );
 }
 
 export default Edit;
