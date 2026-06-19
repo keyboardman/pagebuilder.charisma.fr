@@ -17,6 +17,8 @@ export interface BuilderType {
   // sidebar
   sidebarLeftCollapsed: boolean;
   setSidebarLeftCollapsed: React.Dispatch<React.SetStateAction<boolean>>;
+  sidebarRightCollapsed: boolean;
+  setSidebarRightCollapsed: React.Dispatch<React.SetStateAction<boolean>>;
   sidebarLeftTab: SidebarLeftTab;
   setSidebarLeftTab: React.Dispatch<React.SetStateAction<SidebarLeftTab>>;
 

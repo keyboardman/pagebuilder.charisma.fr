@@ -40,11 +40,19 @@ export const BuilderProvider: FC<BuilderContextProviderProps> = ({
   const [pendingNodes, setPendingNodes] = useState<NodesType | null>(null);
   const [iframeRef, setInternalIframeRef] = useState<React.RefObject<HTMLIFrameElement | null> | null>(null);
 
-  const [selected, setSelected] = useState<NodeID | null>(null);
+  const [selected, setSelectedState] = useState<NodeID | null>(null);
   const [deleteTarget, setDeleteTarget] = useState<NodeType | null>(null);
 
   const [sidebarLeftCollapsed, setSidebarLeftCollapsed] = useState<boolean>(false);
+  const [sidebarRightCollapsed, setSidebarRightCollapsed] = useState<boolean>(false);
   const [sidebarLeftTab, setSidebarLeftTab] = useState<SidebarLeftTab>("blocks");
+
+  const setSelected = useCallback((id: NodeID | null) => {
+    setSelectedState(id);
+    if (id !== null) {
+      setSidebarRightCollapsed(false);
+    }
+  }, []);
 
   const [historiques, setHistoriques] = useState<HistoriqueState>({
     past: [],
@@ -124,7 +132,7 @@ export const BuilderProvider: FC<BuilderContextProviderProps> = ({
       setSelected(null);
     }
     setDeleteTarget(null);
-  }, [deleteTarget, removeNode, selected]);
+  }, [deleteTarget, removeNode, selected, setSelected]);
 
   const duplicateNode = useCallback((node: NodeType): void => {
     // Créer une copie du nœud avec un nouvel ID et order + 1
@@ -138,7 +146,7 @@ export const BuilderProvider: FC<BuilderContextProviderProps> = ({
     
     // Sélectionner le nœud dupliqué
     setSelected(duplicatedNode.id);
-  }, [nodes]);
+  }, [nodes, setSelected]);
 
   // Undo
   const undo = useCallback(() => {
@@ -201,6 +209,8 @@ export const BuilderProvider: FC<BuilderContextProviderProps> = ({
         // sidebar
         sidebarLeftCollapsed,
         setSidebarLeftCollapsed,
+        sidebarRightCollapsed,
+        setSidebarRightCollapsed,
         sidebarLeftTab,
         setSidebarLeftTab,
 

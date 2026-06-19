@@ -73,6 +73,8 @@ function Builder() {
     canUndo,
     sidebarLeftCollapsed,
     setSidebarLeftCollapsed,
+    sidebarRightCollapsed,
+    setSidebarRightCollapsed,
     sidebarLeftTab,
     setSidebarLeftTab,
     save,
@@ -201,7 +203,8 @@ function Builder() {
           ref={divRef}
           className={cn(
             "admin-layout relative flex h-full min-h-0 flex-col overflow-hidden",
-            mode === APP_MODE.EDIT && sidebarLeftCollapsed && "admin-layout--sidebar-collapsed"
+            mode === APP_MODE.EDIT && sidebarLeftCollapsed && "admin-layout--sidebar-left-collapsed",
+            mode === APP_MODE.EDIT && sidebarRightCollapsed && "admin-layout--sidebar-right-collapsed"
           )}
           data-mode={mode}
         >
@@ -382,7 +385,11 @@ function Builder() {
             </Layout.SidebarLeft>
           )}
           {mode === APP_MODE.EDIT && (
-            <Layout.SidebarRight dark={theme === "dark"}>
+            <Layout.SidebarRight
+              collapsed={sidebarRightCollapsed}
+              onToggle={() => setSidebarRightCollapsed(!sidebarRightCollapsed)}
+              dark={theme === "dark"}
+            >
               <NodeSettings />
             </Layout.SidebarRight>
           )}
