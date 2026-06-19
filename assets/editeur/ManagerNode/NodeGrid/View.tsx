@@ -6,7 +6,15 @@ import { type NodeEditProps, type NodeViewProps } from "../NodeConfigurationType
 import type { NodeGridType, NodeGridLayout } from "./index";
 import { styleForView } from "../../utils/styleHelper";
 import { cn } from "@/editeur/lib/utils";
-import { GRID_COLS, SM_GRID_COLS, LG_GRID_COLS, GAP_CLASS, type BreakpointKey, cols, rows } from "./index";
+import {
+  GRID_COLS,
+  SM_GRID_COLS,
+  LG_GRID_COLS,
+  GAP_CLASS,
+  type BreakpointKey,
+  buildDesktopCellZones,
+  cols,
+} from "./index";
 
 
 const View: FC<NodeViewProps | NodeEditProps> = () => {
@@ -37,30 +45,17 @@ const View: FC<NodeViewProps | NodeEditProps> = () => {
   );
 
   const isViewMode = mode === APP_MODE.VIEW;
-  const isEditMode = mode === APP_MODE.EDIT;
-
+  const isPreviewMode = mode === APP_MODE.PREVIEW;
   const currentBreakpoint: BreakpointKey = breakpoint || "desktop";
-  const currentConfig =
-    layout[currentBreakpoint] || layout.desktop || { columns: 2, rows: 2 };
-  const currentColumns = currentConfig.columns ?? 2;
-  const currentRows = currentConfig.rows ?? 2;
+  const desktopZones = buildDesktopCellZones(layout);
 
   let gridClasses: string;
   let cells: ReactNode[];
 
   if (isViewMode) {
-    // Mode view : grille responsive (viewport réel), zones = structure desktop pour le contenu
     const cMobile = cols(layout, "mobile");
     const cTablet = cols(layout, "tablet");
     const cDesktop = cols(layout, "desktop");
-    const rDesktop = rows(layout, "desktop");
-
-    const cellList: { zone: string }[] = [];
-    for (let row = 0; row < rDesktop; row++) {
-      for (let col = 0; col < cDesktop; col++) {
-        cellList.push({ zone: `cell-${row}-${col}` });
-      }
-    }
 
     gridClasses = [
       "grid",
@@ -70,33 +65,24 @@ const View: FC<NodeViewProps | NodeEditProps> = () => {
       gapClass,
     ].join(" ");
 
-    cells = cellList.map(({ zone }) => (
-      <div key={zone} >
+    cells = desktopZones.map((zone) => (
+      <div key={zone}>
+        <NodeCollection nodes={getChildren(zone)} parentId={node.id} zone={zone} />
+      </div>
+    ));
+  } else if (isPreviewMode) {
+    const previewColumns = cols(layout, currentBreakpoint);
+
+    gridClasses = ["grid", GRID_COLS[previewColumns] ?? "grid-cols-2", gapClass].join(" ");
+
+    cells = desktopZones.map((zone) => (
+      <div key={zone}>
         <NodeCollection nodes={getChildren(zone)} parentId={node.id} zone={zone} />
       </div>
     ));
   } else {
-    // Mode edit / preview : grille figée sur le breakpoint sélectionné (réactif au sélecteur)
-    const columns = currentColumns;
-    const rowsCount = currentRows;
-
-    gridClasses = ["grid", GRID_COLS[columns] ?? "grid-cols-2", gapClass].join(" ");
-
+    gridClasses = ["grid", GRID_COLS[2], gapClass].join(" ");
     cells = [];
-    for (let row = 0; row < rowsCount; row++) {
-      for (let col = 0; col < columns; col++) {
-        const zone = `cell-${row}-${col}`;
-        const children = getChildren(zone);
-        cells.push(
-          <div
-            key={zone}
-            className={`min-h-[100px] ${isEditMode ? "border border-black-900 border-border rounded" : ""}`}
-          >
-            <NodeCollection nodes={children} parentId={node.id} zone={zone} />
-          </div>
-        );
-      }
-    }
   }
 
   return (

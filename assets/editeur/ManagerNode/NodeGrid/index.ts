@@ -75,6 +75,19 @@ export const cols = (layout: NodeGridLayout, key: BreakpointKey) =>
 export const rows = (layout: NodeGridLayout, key: BreakpointKey) =>
     layout[key]?.rows ?? layout.desktop?.rows ?? 2;
 
+/** Zones `cell-{row}-{col}` dérivées de la structure desktop. */
+export const buildDesktopCellZones = (layout: NodeGridLayout): string[] => {
+    const cDesktop = cols(layout, 'desktop')
+    const rDesktop = rows(layout, 'desktop')
+    const zones: string[] = []
+    for (let row = 0; row < rDesktop; row++) {
+        for (let col = 0; col < cDesktop; col++) {
+            zones.push(`cell-${row}-${col}`)
+        }
+    }
+    return zones
+}
+
 export interface NodeGridLayout {
     desktop?: {
         columns?: number
