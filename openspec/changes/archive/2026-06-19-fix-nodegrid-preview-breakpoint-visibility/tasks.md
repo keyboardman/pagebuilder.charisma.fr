@@ -6,7 +6,7 @@
 
 ## 2. Validation
 
-- [ ] 2.1 Manuel : page avec `NodeGrid` desktop 2×2 et contenu dans chaque cellule → bascule édition → preview → sélection mobile : les 4 éléments restent visibles.
-- [ ] 2.2 Manuel : même page avec layout mobile 1×1 configuré → preview mobile : contenu des cellules `cell-0-1`, `cell-1-0`, `cell-1-1` toujours visible (empilé).
-- [ ] 2.3 Manuel : rendu public (`view`) inchangé sur desktop, tablette et mobile réels.
-- [ ] 2.4 Manuel : mode édition avec breakpoint mobile — la grille éditable reste limitée aux dimensions mobile (comportement inchangé).
+- [x] 2.1 Manuel : page avec `NodeGrid` desktop 2×2 et contenu dans chaque cellule → bascule édition → preview → sélection mobile : les 4 éléments restent visibles.
+- [x] 2.2 Manuel : même page avec layout mobile 1×1 configuré → preview mobile : contenu des cellules `cell-0-1`, `cell-1-0`, `cell-1-1` toujours visible (empilé).
+- [x] 2.3 Manuel : rendu public (`view`) inchangé sur desktop, tablette et mobile réels.
+- [x] 2.4 Manuel : mode édition avec breakpoint mobile — la grille éditable reste limitée aux dimensions mobile (comportement inchangé).
