@@ -23,9 +23,11 @@ type DragStartHandler = Events['dragstart'];
 
 import tailwindHelper from "../../utils/tailwindHelper";
 import Explorer, {
-  getCanvasScrollRatio,
-  restoreCanvasScrollRatio,
+  captureCanvasScrollAnchor,
+  scheduleCanvasScrollAnchorRestore,
   scrollCanvasToNode,
+  type CanvasScrollAnchor,
+  type CanvasScrollRestoreReason,
 } from "../../ManagerExplorer";
 import Layout from "../layout";
 import { cn } from "@/editeur/lib/utils";
@@ -78,7 +80,10 @@ function Builder() {
 
   const { onDragEnd } = useDnd();
   const divRef = useRef<HTMLDivElement>(null);
-  const pendingScrollRatioRef = useRef<number | null>(null);
+  const pendingScrollRestoreRef = useRef<{
+    anchor: CanvasScrollAnchor;
+    reason: CanvasScrollRestoreReason;
+  } | null>(null);
   const prevSelectedRef = useRef<string | null>(null);
 
   const { isFullScreen, enterFullScreen, exitFullScreen } = useFullscreen();
@@ -127,18 +132,22 @@ function Builder() {
     return () => cancelAnimationFrame(frameId);
   }, [mode, selected]);
 
+  const captureScrollAnchor = useCallback((reason: CanvasScrollRestoreReason) => {
+    pendingScrollRestoreRef.current = {
+      anchor: captureCanvasScrollAnchor(),
+      reason,
+    };
+  }, []);
+
   useLayoutEffect(() => {
-    const ratio = pendingScrollRatioRef.current;
-    if (ratio === null) {
+    const pending = pendingScrollRestoreRef.current;
+    if (!pending) {
       return;
     }
 
-    pendingScrollRatioRef.current = null;
-
-    const restore = () => restoreCanvasScrollRatio(ratio);
-    restore();
-    requestAnimationFrame(restore);
-  }, [mode]);
+    pendingScrollRestoreRef.current = null;
+    scheduleCanvasScrollAnchorRestore(pending.anchor, pending.reason);
+  }, [mode, breakpoint]);
 
   const handleModeChange = useCallback(
     (nextMode: string) => {
@@ -146,20 +155,22 @@ function Builder() {
         return;
       }
 
-      pendingScrollRatioRef.current = getCanvasScrollRatio();
+      captureScrollAnchor("mode");
       setMode(nextMode as AppModeType);
     },
-    [mode, setMode]
+    [captureScrollAnchor, mode, setMode]
   );
 
   const handleBreakpointChange = useCallback(
     (value: string) => {
-      if (!value) {
+      if (!value || value === breakpoint) {
         return;
       }
+
+      captureScrollAnchor("breakpoint");
       setBreakpoint(value as BreakpointType);
     },
-    [setBreakpoint]
+    [breakpoint, captureScrollAnchor, setBreakpoint]
   );
 
   const toggleFullscreen = useCallback(() => {
