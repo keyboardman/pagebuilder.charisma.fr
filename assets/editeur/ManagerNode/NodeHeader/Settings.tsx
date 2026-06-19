@@ -10,6 +10,7 @@ const Settings: FC<NodeSettingsProps> = () => {
   const { node, onChange } = useNodeBuilderContext();
   const headerNode = node as NodeHeaderType;
   const currentTag = headerNode.content?.tag ?? "h1";
+  const html = headerNode.content?.html ?? "";
   const themeOverrideSelector = headerTagSelector(currentTag);
 
   const tagOptions = [
@@ -36,6 +37,19 @@ const Settings: FC<NodeSettingsProps> = () => {
                 });
               }}
               options={tagOptions}
+            />
+          </Form.Group>
+          <Form.Group>
+            <Form.Label text="Contenu" />
+            <Form.Textarea
+              value={html}
+              onChange={(value) =>
+                onChange({
+                  ...node,
+                  content: { ...node.content, html: value },
+                })
+              }
+              className="min-h-[5rem] text-sm"
             />
           </Form.Group>
           <Base2Settings 

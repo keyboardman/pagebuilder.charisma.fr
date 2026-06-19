@@ -29,7 +29,7 @@ const View: FC<NodeViewProps | NodeEditProps> = () => {
   const isEdit = mode === APP_MODE.EDIT;
   // flex-1 sur la dropzone finale casse center / flex-end / space-* : réservé à flex-start
   const horizontalDropzoneFill = isEdit && isHorizontal && justify === "flex-start";
-  const flexWrap = isEdit ? "wrap" : (options.wrap ?? "nowrap");
+  const flexWrap = options.wrap ?? "nowrap";
 
   const flexStyle: React.CSSProperties = {
     flexDirection: direction,

@@ -7,6 +7,7 @@ import { NODE_BUTTON_VARIANT_OPTIONS, NODE_BUTTON_SIZE_OPTIONS } from "./index";
 
 import { NodeSettingsWrapper } from "../components/NodeSettingsWrapper";
 import { Base2Settings, Background2Settings, Text2Settings, Border2Settings, Size2Settings, Spacing2Settings, THEME_SELECTORS } from "../Settings";
+import TagNameEditable from "./components/TagNameEditable";
 
 const BUTTON_TYPE_OPTIONS: { value: NodeButtonButtonType; label: string }[] = [
   { value: "button", label: "Bouton" },
@@ -27,6 +28,7 @@ const Settings: FC<NodeSettingsProps> = () => {
   const target = buttonNode.content?.target ?? "_self";
   const variant = buttonNode.content?.variant ?? "default";
   const size = buttonNode.content?.size ?? "medium";
+  const label = buttonNode.content?.label ?? "";
 
   return (
     <NodeSettingsWrapper
@@ -78,6 +80,24 @@ const Settings: FC<NodeSettingsProps> = () => {
               </Form.Group>
             </>
           )}
+          <Form.Group>
+            <Form.Label text="Libellé" />
+            <div className="rounded-md border border-border bg-background p-2">
+              <TagNameEditable
+                tagName="div"
+                label={label}
+                onChange={(value) =>
+                  onChange({
+                    ...node,
+                    content: { ...node.content, label: value },
+                  })
+                }
+                allowPartialBold
+                className="min-h-[2rem] w-full text-sm"
+                style={{}}
+              />
+            </div>
+          </Form.Group>
           <Form.Group>
             <Form.Label text="Variant" />
             <Form.Select

@@ -22,11 +22,7 @@ export const NodeBuilderProvider: FC<NodeBuilderProps> = ({ children }: NodeBuil
     });
 
     const onSelect = () => {
-        if (selected === node.id) {
-            setSelected(null);
-        } else {
-            setSelected(node.id);
-        }
+        setSelected(node.id);
     };
 
     const onChange =(node: NodeType) => {

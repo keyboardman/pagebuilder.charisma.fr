@@ -7,52 +7,66 @@ import { useNodeBuilderContext } from "../../services/providers/NodeBuilderConte
 import { type ReactNode } from "react";
 import DropZone from "./DropZone";
 import NodeRegistry, { isKnownNode } from "./NodeRegistry";
+import { cn } from "@/editeur/lib/utils";
 
-// Composant qui rend un node sans menu mais avec les fonctionnalités d'édition
 function NodeChildBuilder({ children }: { children: ReactNode }) {
-    const { node, index } = useNodeContext();
-    const { drag } = useNodeBuilderContext();
+  const { node, index } = useNodeContext();
+  const { drag, isSelected, onSelect } = useNodeBuilderContext();
+  const selected = isSelected();
 
-    return (
-        <>
-            <DropZone parent={{ ...node.parent, order: index }} />
-            <div
-                ref={drag.ref}
-                className="relative"
-            >
-                {/* Pas de NodeMenu ici - les enfants n'ont pas de menu */}
-                {children}
-            </div>
-        </>
-    );
+  const handleClick = (e: React.MouseEvent<HTMLDivElement>) => {
+    e.preventDefault();
+    e.stopPropagation();
+    onSelect();
+  };
+
+  return (
+    <>
+      <DropZone parent={{ ...node.parent, order: index }} />
+      <div
+        ref={drag.ref}
+        className={cn(
+          "relative cursor-pointer rounded-sm",
+          selected && "outline outline-1 outline-primary/60 outline-offset-1"
+        )}
+        onClick={handleClick}
+      >
+        {children}
+      </div>
+    </>
+  );
 }
 
 function NodeChildComponent() {
-    const { mode } = useAppContext();
-    const { node } = useNodeContext();
-    
-    if (!node || !isKnownNode(node)) {
-        return null;
-    }
+  const { mode } = useAppContext();
+  const { node } = useNodeContext();
 
-    const Component = mode === APP_MODE.EDIT ? NodeRegistry[node.type]['edit'] : NodeRegistry[node.type]['view'];
+  if (!node || !isKnownNode(node)) {
+    return null;
+  }
 
-    return mode === APP_MODE.EDIT ? (<NodeChildBuilder><Component /></NodeChildBuilder>) : <Component />;
+  const Component = NodeRegistry[node.type].view;
+
+  return mode === APP_MODE.EDIT ? (
+    <NodeChildBuilder>
+      <Component />
+    </NodeChildBuilder>
+  ) : (
+    <Component />
+  );
 }
 
-// Composant principal qui rend un node enfant sans menu
-export default function NodeChild({ node, index }: { node: NodeType, index: number }) {
-    const { mode } = useAppContext();
-    return (
-        <NodeProvider node={node} index={index}>
-            {mode === APP_MODE.EDIT ? (
-                <NodeBuilderProvider>
-                    <NodeChildComponent />
-                </NodeBuilderProvider>
-            ) : (
-                <NodeChildComponent />
-            )}
-        </NodeProvider>
-    );
+export default function NodeChild({ node, index }: { node: NodeType; index: number }) {
+  const { mode } = useAppContext();
+  return (
+    <NodeProvider node={node} index={index}>
+      {mode === APP_MODE.EDIT ? (
+        <NodeBuilderProvider>
+          <NodeChildComponent />
+        </NodeBuilderProvider>
+      ) : (
+        <NodeChildComponent />
+      )}
+    </NodeProvider>
+  );
 }
-

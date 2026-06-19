@@ -159,6 +159,7 @@ const Settings: FC<NodeSettingsProps> = () => {
   const linkUrl = textNode.content?.linkUrl ?? "";
   const horizontalAlign = textNode.content?.horizontalAlign ?? "left";
   const verticalAlign = textNode.content?.verticalAlign ?? "middle";
+  const html = textNode.content?.html ?? "";
 
   const themeIconOptions = [
     { value: "", label: "Aucune" },
@@ -465,6 +466,19 @@ const Settings: FC<NodeSettingsProps> = () => {
                 <IconStyleSettings />
               </TabsContent>
               <TabsContent value="text" className="mt-0">
+                <Form.Group>
+                  <Form.Label text="Contenu" />
+                  <Form.Textarea
+                    value={html}
+                    onChange={(value) =>
+                      onChange({
+                        ...node,
+                        content: { ...node.content, html: value },
+                      })
+                    }
+                    className="min-h-[6rem] text-sm"
+                  />
+                </Form.Group>
                 <TextStyleSettings />
               </TabsContent>
             </>

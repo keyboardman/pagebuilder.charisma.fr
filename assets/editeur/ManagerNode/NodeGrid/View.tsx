@@ -45,7 +45,6 @@ const View: FC<NodeViewProps | NodeEditProps> = () => {
   );
 
   const isViewMode = mode === APP_MODE.VIEW;
-  const isPreviewMode = mode === APP_MODE.PREVIEW;
   const currentBreakpoint: BreakpointKey = breakpoint || "desktop";
   const desktopZones = buildDesktopCellZones(layout);
 
@@ -70,7 +69,7 @@ const View: FC<NodeViewProps | NodeEditProps> = () => {
         <NodeCollection nodes={getChildren(zone)} parentId={node.id} zone={zone} />
       </div>
     ));
-  } else if (isPreviewMode) {
+  } else {
     const previewColumns = cols(layout, currentBreakpoint);
 
     gridClasses = ["grid", GRID_COLS[previewColumns] ?? "grid-cols-2", gapClass].join(" ");
@@ -80,9 +79,6 @@ const View: FC<NodeViewProps | NodeEditProps> = () => {
         <NodeCollection nodes={getChildren(zone)} parentId={node.id} zone={zone} />
       </div>
     ));
-  } else {
-    gridClasses = ["grid", GRID_COLS[2], gapClass].join(" ");
-    cells = [];
   }
 
   return (

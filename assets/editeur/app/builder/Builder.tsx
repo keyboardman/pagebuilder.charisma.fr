@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useLayoutEffect, useRef, useState } from "react";
 import { DragDropProvider, PointerSensor, KeyboardSensor } from "@dnd-kit/react";
+import { PointerActivationConstraints } from "@dnd-kit/dom";
 import {
   APP_MODE,
   type AppModeType,
@@ -185,7 +186,11 @@ function Builder() {
     <TooltipProvider delayDuration={100}>
       <DragDropProvider
         sensors={[
-          PointerSensor.configure({ activationConstraints: () => undefined }),
+          PointerSensor.configure({
+            activationConstraints: [
+              new PointerActivationConstraints.Distance({ value: 8 }),
+            ],
+          }),
           KeyboardSensor,
         ]}
         onDragStart={handleDragStart}

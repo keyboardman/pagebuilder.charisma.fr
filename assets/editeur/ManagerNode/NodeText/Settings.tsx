@@ -9,6 +9,7 @@ const Settings: FC<NodeSettingsProps> = () => {
   const { node, onChange } = useNodeBuilderContext();
   const textNode = node as NodeTextType;
   const currentTag = textNode.content?.tag ?? "div";
+  const html = textNode.content?.html ?? "";
 
   const tagOptions = [
     { value: "div", label: "Div" },
@@ -42,6 +43,19 @@ const Settings: FC<NodeSettingsProps> = () => {
               }
             })}
           />
+          <Form.Group>
+            <Form.Label text="Contenu" />
+            <Form.Textarea
+              value={html}
+              onChange={(value) =>
+                onChange({
+                  ...node,
+                  content: { ...node.content, html: value },
+                })
+              }
+              className="min-h-[6rem] text-sm"
+            />
+          </Form.Group>
 
         </>}
         content={<>
