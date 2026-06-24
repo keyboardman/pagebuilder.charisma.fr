@@ -141,8 +141,8 @@ final class FlashnewsApiCard implements ApiCardArticleInterface
                     continue;
                 }
 
-                $id = $item['id'] ?? null;
-                $label = $item['nom'] ?? $item['title'] ?? null;
+                $id = $item['nom'] ?? null;
+                $label = $item['nom'] ?? null;
                 if ($id === null || $label === null || $label === '') {
                     continue;
                 }

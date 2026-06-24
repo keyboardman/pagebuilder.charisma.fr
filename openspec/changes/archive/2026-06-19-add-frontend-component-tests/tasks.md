@@ -21,5 +21,5 @@
 
 - [x] 4.1 npm run test:frontend:run vert
 - [x] 4.2 npm run build vert
-- [ ] 4.3 composer test vert (échec migrations DB test préexistant — hors périmètre)
+- [x] 4.3 composer test / phpunit vert (51 tests)
 - [x] 4.4 openspec validate add-frontend-component-tests --strict

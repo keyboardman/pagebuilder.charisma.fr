@@ -16,4 +16,4 @@ Le builder (`assets/editeur/`) n'a aucun test automatisé frontend. Les régress
 ## Impact
 
 - Affected specs: `page-builder`
-- Affected code: `package.json`, `vitest.config.ts`, `assets/test/`, `assets/editeur/**/*.test.ts(x)`, `composer.json`, `docs/frontend-testing.md`
+- Affected code: `package.json`, `vitest.config.mts`, `assets/test/`, `assets/editeur/**/*.test.ts(x)`, `composer.json`, `docs/frontend-testing.md`
