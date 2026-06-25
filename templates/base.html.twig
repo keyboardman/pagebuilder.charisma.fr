@@ -24,19 +24,18 @@
                 <a href="{{ path('app_dashboard_index') }}" class="nav-link {{ app.request.attributes.get('_route') == 'app_dashboard_index' ? 'active' : '' }}">
                     Dashboard
                 </a>
-                <a href="{{ path('app_font_index') }}" class="nav-link {{ (app.request.attributes.get('_route')|default(''))|slice(0, 8) == 'app_font' ? 'active' : '' }}">
-                    Polices
+                <a href="{{ path('app_page_index') }}" class="nav-link {{ (app.request.attributes.get('_route')|default(''))|slice(0, 10) == 'app_page_' ? 'active' : '' }}">
+                    Pages
                 </a>
                 <a href="{{ path('app_theme_index') }}" class="nav-link {{ (app.request.attributes.get('_route')|default(''))|slice(0, 10) == 'app_theme' and app.request.attributes.get('_route') != 'app_theme_showcase' ? 'active' : '' }}">
                     Thèmes
                 </a>
-                
                 <a href="{{ path('keyboardman_filemanager') }}" class="nav-link {{ (app.request.attributes.get('_route')|default('')) == 'keyboardman_filemanager' ? 'active' : '' }}" target="_blank">
                     Médias
                 </a> 
-                
-                <a href="{{ path('app_page_index') }}" class="nav-link {{ (app.request.attributes.get('_route')|default(''))|slice(0, 10) == 'app_page_' ? 'active' : '' }}">
-                    Pages
+
+                <a href="{{ path('app_font_index') }}" class="nav-link {{ (app.request.attributes.get('_route')|default(''))|slice(0, 8) == 'app_font' ? 'active' : '' }}">
+                    Polices
                 </a>
                 <a href="{{ path('app_builder_form_config_index') }}" class="nav-link {{ app.request.attributes.get('_route')|default('') starts with 'app_builder_form_config' ? 'active' : '' }}">
                     Formulaires

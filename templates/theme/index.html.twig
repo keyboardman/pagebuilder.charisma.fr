@@ -30,6 +30,10 @@
                             <div class="flex gap-2 justify-end items-center">
                                 <a href="{{ path('app_theme_edit', { id: theme.id }) }}" class="btn btn-ghost btn-sm">Polices & config</a>
                                 <a href="{{ path('app_theme_showcase', { id: theme.id }) }}" class="btn btn-ghost btn-sm">Prévisualisation</a>
+                                <form method="post" action="{{ path('app_theme_duplicate', { id: theme.id }) }}" class="inline">
+                                    <input type="hidden" name="_token" value="{{ csrf_token('duplicate' ~ theme.id) }}">
+                                    <button type="submit" class="btn btn-ghost btn-sm">Dupliquer</button>
+                                </form>
                                 <form method="post" action="{{ path('app_theme_delete', { id: theme.id }) }}" class="inline" onsubmit="return confirm('Supprimer le thème « {{ theme.name|e('js') }} » ?');">
                                     <input type="hidden" name="_token" value="{{ csrf_token('delete' ~ theme.id) }}">
                                     <button type="submit" class="btn btn-ghost btn-sm text-destructive">Supprimer</button>

@@ -194,6 +194,35 @@ class ThemeController extends AbstractController
 
     
 
+    #[Route('/duplicate/{id}', name: 'duplicate', methods: ['POST'], requirements: ['id' => '\d+'])]
+    public function duplicate(Request $request, Theme $theme): Response
+    {
+        $token = $request->request->getString('_token');
+        if (!$this->isCsrfTokenValid('duplicate' . $theme->getId(), $token)) {
+            $this->addFlash('error', 'Le jeton de securite est invalide.');
+            return $this->redirectToRoute('app_theme_index');
+        }
+
+        $copyName = $theme->getName() . ' (copie)';
+        $copy = new Theme();
+        $copy->setName($copyName);
+        $copy->setSlug($this->generateUniqueCopySlug($theme));
+
+        $sourceDto = $theme->getConfigDto();
+        if ($sourceDto !== null) {
+            $copyDto = ThemeConfigDTO::fromArray($sourceDto->toArray());
+            $copyDto->setName($copyName);
+            $copy->setConfigDto($copyDto);
+        }
+
+        $this->em->persist($copy);
+        $this->em->flush();
+
+        $this->addFlash('success', sprintf('Thème « %s » dupliqué.', $copy->getName()));
+
+        return $this->redirectToRoute('app_theme_edit', ['id' => $copy->getId()]);
+    }
+
     #[Route('/font/{id}/delete', name: 'delete', methods: ['POST'], requirements: ['id' => '\d+'])]
     public function delete(Request $request, Theme $theme): Response
     {
@@ -219,6 +248,20 @@ class ThemeController extends AbstractController
         $fonts = $this->em->getRepository(Font::class)->findBy(['id' => array_map('intval', $ids)]);
 
         return array_values(array_filter($fonts, fn (Font $f): bool => $f->getType() === FontTypeEnum::Google || $f->getType() === FontTypeEnum::Custom));
+    }
+
+    private function generateUniqueCopySlug(Theme $sourceTheme): string
+    {
+        $baseSlug = $this->slugger->slug(($sourceTheme->getSlug() ?? $sourceTheme->getName()) . '-copie')->lower()->toString();
+        $slug = $baseSlug;
+        $suffix = 2;
+
+        while ($this->em->getRepository(Theme::class)->findOneBy(['slug' => $slug]) !== null) {
+            $slug = sprintf('%s-%d', $baseSlug, $suffix);
+            ++$suffix;
+        }
+
+        return $slug;
     }
 
     /** @param list<Font> $fonts */
