@@ -16,7 +16,8 @@
     {% include '_page_fonts.html.twig' %}
 </head>
 <body class="theme-view-scope min-h-screen m-0">
-    <div id="page-preview-root" data-json="{{ (page.content ?? {})|json_encode(constant('JSON_UNESCAPED_UNICODE'))|e('html_attr') }}" data-api-cards-base-url="{{ path('_api_/page-builder/cards_get_collection')|replace({'/cards': ''})|e('html_attr') }}"></div>
+    {% import 'page/_builder_api_base_url.html.twig' as builder_api %}
+    <div id="page-preview-root" data-json="{{ (page.content ?? {})|json_encode(constant('JSON_UNESCAPED_UNICODE'))|e('html_attr') }}" data-api-cards-base-url="{{ builder_api.base_url()|e('html_attr') }}"></div>
     {{ encore_entry_script_tags('pagePreview') }}
 </body>
 </html>

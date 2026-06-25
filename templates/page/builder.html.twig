@@ -21,7 +21,8 @@
         {% set base_url = app.request.schemeAndHttpHost ~ app.request.basePath %}
         {% set render_css_paths = encore_entry_css_files('pagePreview') %}
         {% set render_css_urls = render_css_paths|map(p => base_url ~ p)|default([]) %}
-        {% set builder_api_base = path('_api_/page-builder/cards_get_collection')|replace({'/cards': ''}) %}
+        {% import 'page/_builder_api_base_url.html.twig' as builder_api %}
+        {% set builder_api_base = builder_api.base_url() %}
         <script type="application/json" id="page-builder-data">
         {{ {
             content: content_json,

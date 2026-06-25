@@ -1,0 +1,3 @@
+{% macro base_url() %}
+    {{- absolute_url(path('_api_/page-builder/cards_get_collection')|replace({'/cards': ''})) -}}
+{% endmacro %}

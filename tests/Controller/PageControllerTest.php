@@ -64,6 +64,21 @@ class PageControllerTest extends WebTestCase
         self::assertSame($source->getRender(), $copy->getRender());
     }
 
+    public function testRenderPageContainsAbsoluteApiBaseUrl(): void
+    {
+        $client = static::createClient();
+        $page = $this->createPage('Public Page', 'public-page');
+
+        $client->request('GET', '/page/render/' . $page->getSlug());
+
+        self::assertResponseIsSuccessful();
+        $apiBaseUrl = $client->getCrawler()->filter('#page-preview-root')->attr('data-api-cards-base-url');
+        self::assertMatchesRegularExpression(
+            '#^https?://[^/]+/api/page-builder$#',
+            (string) $apiBaseUrl,
+        );
+    }
+
     public function testDuplicatePageWithInvalidCsrfIsRefused(): void
     {
         $client = static::createClient();

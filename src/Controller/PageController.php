@@ -241,6 +241,7 @@ class PageController extends AbstractController
         ]);
         $baseUrl = rtrim($request->getSchemeAndHttpHost() . $request->getBasePath(), '/');
         $html = preg_replace('#(href|src)="/(?!\/)#', '$1="' . $baseUrl . '/', $html) ?? $html;
+        $html = preg_replace('#(data-[a-z0-9-]+)="/(?!\/)#i', '$1="' . $baseUrl . '/', $html) ?? $html;
 
         return new Response($html, 200, ['Content-Type' => 'text/html']);
     }
