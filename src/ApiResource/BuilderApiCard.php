@@ -14,7 +14,7 @@ use App\State\BuilderApiCardListProvider;
             uriTemplate: '/page-builder/cards',
             provider: BuilderApiCardListProvider::class,
             paginationEnabled: false,
-            security: 'is_granted("IS_AUTHENTICATED_FULLY")',
+            security: 'true',
             stateless: false,
         ),
     ],

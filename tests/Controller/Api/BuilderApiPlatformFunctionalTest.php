@@ -30,14 +30,16 @@ final class BuilderApiPlatformFunctionalTest extends WebTestCase
         self::ensureKernelShutdown();
     }
 
-    public function testCardsListRequiresAuthentication(): void
+    public function testCardsListIsPubliclyAccessible(): void
     {
         $client = static::createClient();
         $client->request('GET', '/api/page-builder/cards', server: [
             'HTTP_ACCEPT' => 'application/json',
         ]);
 
-        self::assertResponseRedirects('/login');
+        self::assertResponseIsSuccessful();
+        $data = json_decode($client->getResponse()->getContent() ?: '[]', true);
+        self::assertIsArray($data);
     }
 
     public function testCardsListReturnsRegisteredApis(): void

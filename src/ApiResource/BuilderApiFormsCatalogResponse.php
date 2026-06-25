@@ -13,7 +13,7 @@ use App\State\BuilderApiFormsCatalogProvider;
         new Get(
             uriTemplate: '/page-builder/forms/catalog',
             provider: BuilderApiFormsCatalogProvider::class,
-            security: 'is_granted("IS_AUTHENTICATED_FULLY")',
+            security: 'true',
             stateless: false,
         ),
     ],

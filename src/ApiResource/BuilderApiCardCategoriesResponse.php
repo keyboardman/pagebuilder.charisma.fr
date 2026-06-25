@@ -13,7 +13,7 @@ use App\State\BuilderApiCardCategoriesProvider;
         new Get(
             uriTemplate: '/page-builder/cards/{apiId}/categories',
             provider: BuilderApiCardCategoriesProvider::class,
-            security: 'is_granted("IS_AUTHENTICATED_FULLY")',
+            security: 'true',
             stateless: false,
         ),
     ],

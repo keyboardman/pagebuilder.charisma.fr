@@ -13,7 +13,7 @@ use App\State\BuilderApiFontResolveProvider;
         new Get(
             uriTemplate: '/page-builder/fonts/resolve',
             provider: BuilderApiFontResolveProvider::class,
-            security: 'is_granted("IS_AUTHENTICATED_FULLY")',
+            security: 'true',
             stateless: false,
         ),
     ],

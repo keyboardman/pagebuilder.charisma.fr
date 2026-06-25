@@ -13,7 +13,7 @@ use App\State\BuilderApiFontsPageProvider;
         new Get(
             uriTemplate: '/page-builder/fonts',
             provider: BuilderApiFontsPageProvider::class,
-            security: 'is_granted("IS_AUTHENTICATED_FULLY")',
+            security: 'true',
             stateless: false,
         ),
     ],

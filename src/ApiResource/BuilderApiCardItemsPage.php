@@ -14,7 +14,7 @@ use App\State\BuilderApiCardItemsPageProvider;
         new Get(
             uriTemplate: '/page-builder/cards/{apiId}/items',
             provider: BuilderApiCardItemsPageProvider::class,
-            security: 'is_granted("IS_AUTHENTICATED_FULLY")',
+            security: 'true',
             stateless: false,
         ),
     ],

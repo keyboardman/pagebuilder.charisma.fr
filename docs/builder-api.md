@@ -1,6 +1,6 @@
 # API Page Builder (API Platform)
 
-L’API du page builder est exposée via **API Platform** sous le préfixe **`/api/page-builder`**. Le builder (standalone, preview, éditeur) consomme ces endpoints avec la session Symfony (`credentials: "same-origin"`) : l’utilisateur doit être **authentifié** comme pour l’édition de pages.
+L’API du page builder est exposée via **API Platform** sous le préfixe **`/api/page-builder`**. Les routes sous **`/api/*`** sont accessibles **sans authentification** (phase actuelle). Le builder et le rendu public consomment ces endpoints en `fetch` ; la session Symfony peut être envoyée si l’utilisateur est connecté (`credentials: "same-origin"`), mais ce n’est pas requis pour lire les cards.
 
 La documentation interactive OpenAPI est disponible sur **`/api`** (Swagger UI / ReDoc).
 

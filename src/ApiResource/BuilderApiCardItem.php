@@ -14,7 +14,7 @@ use App\State\BuilderApiCardItemProvider;
             uriTemplate: '/page-builder/cards/{apiId}/items/{itemId}',
             provider: BuilderApiCardItemProvider::class,
             requirements: ['itemId' => '.+'],
-            security: 'is_granted("IS_AUTHENTICATED_FULLY")',
+            security: 'true',
             stateless: false,
         ),
     ],

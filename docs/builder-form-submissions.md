@@ -15,7 +15,7 @@ Les mêmes données sont exposées au builder via `GET /api/page-builder/forms/c
 | Méthode | Chemin | Accès | Rôle |
 |---------|--------|-------|------|
 | — | **`/builder-form`** | Authentifié | CRUD des configurations (interface web) |
-| `GET` | `/api/page-builder/forms/catalog` | Authentifié | JSON catalogue pour le builder |
+| `GET` | `/api/page-builder/forms/catalog` | Public | JSON catalogue pour le builder |
 | `POST` | `/api/page-builder/forms/{slug}/submit` | Public | Réception du `NodeForm` (multipart), antispam, e-mail, webhook optionnel |
 
 `action` renvoyée par le catalogue est une URL relative (générée par le routeur Symfony). Les pages déjà enregistrées avec l’ancienne URL `/submit/form/{slug}` continuent de fonctionner : le NodeForm résout l’URL au moment de la soumission à partir de `formConfigId` (ou migre le chemin legacy).

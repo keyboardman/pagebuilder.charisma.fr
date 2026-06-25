@@ -14,7 +14,7 @@ use App\State\BuilderApiFontItemProvider;
             uriTemplate: '/page-builder/fonts/{id}',
             provider: BuilderApiFontItemProvider::class,
             requirements: ['id' => '\d+'],
-            security: 'is_granted("IS_AUTHENTICATED_FULLY")',
+            security: 'true',
             stateless: false,
         ),
     ],
