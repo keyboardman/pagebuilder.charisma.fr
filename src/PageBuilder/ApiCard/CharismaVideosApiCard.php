@@ -41,7 +41,7 @@ final class CharismaVideosApiCard implements ApiCardVideoInterface
     public function fetchCollection(array $params): array
     {
         $query = [
-            'sites' => '1',
+            //'sites' => '1',
             'page' => (string) max(1, (int) ($params['page'] ?? 1)),
             'itemsPerPage' => (string) max(1, min(100, (int) ($params['limit'] ?? 50))),
         ];
@@ -51,14 +51,15 @@ final class CharismaVideosApiCard implements ApiCardVideoInterface
         $sort = !empty($params['sort']) ? (string) $params['sort'] : 'title';
         $query['order[' . $sort . ']'] = 'asc';
         if (!empty($params['category'])) {
-            $query['categoriesWebTV'] = (string) $params['category'];
+            $query['viewCategorie'] = (string) $params['category'];
         }
 
         try {
             $response = $this->httpClient->request('GET', self::BASE_URL . '/media.jsonld', [
-            'query' => $query,
-            'timeout' => 30,
-        ]);
+                'query' => $query,
+                'timeout' => 30,
+            ]);
+
             $data = $response->toArray();
             $member = $data['hydra:member'] ?? [];
             $totalItems = (int) ($data['hydra:totalItems'] ?? 0);
@@ -117,7 +118,7 @@ final class CharismaVideosApiCard implements ApiCardVideoInterface
     {
         try {
             $response = $this->httpClient->request('GET', self::BASE_URL . '/categories.json', [
-                'query' => ['order[nom]' => 'asc', 'pagination' => 'false',],
+                'query' => ['order[fullTitle]' => 'asc', 'pagination' => 'false',],
                 'timeout' => 30,
             ]);
             $data = $response->toArray();
@@ -129,8 +130,9 @@ final class CharismaVideosApiCard implements ApiCardVideoInterface
                 $c = is_array($cat) ? (object) $cat : $cat;
                 $id = $c->id ?? null;
                 $nom = $c->nom ?? '';
+                $fullTitle = "{$c->fullTitle} ({$c->mediaCount})" ?? '';
                 if ($id !== null) {
-                    $out[] = ['id' => (string) $id, 'label' => (string) $nom];
+                    $out[] = ['id' => (string) $nom, 'label' => (string) $fullTitle];
                 }
             }
             return $out;
@@ -141,6 +143,6 @@ final class CharismaVideosApiCard implements ApiCardVideoInterface
 
     public function getCategoryQueryParam(): string
     {
-        return 'categoriesWebTV';
+        return 'viewCategorie';
     }
 }

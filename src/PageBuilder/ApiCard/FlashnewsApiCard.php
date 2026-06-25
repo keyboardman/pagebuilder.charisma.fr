@@ -61,6 +61,8 @@ final class FlashnewsApiCard implements ApiCardArticleInterface
                 'query' => $query,
                 'timeout' => 30,
             ]);
+
+            
             $data = $response->toArray();
             $member = $data['member'] ?? [];
             $totalItems = (int) ($data['totalItems'] ?? 0);
