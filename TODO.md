@@ -6,3 +6,4 @@
 4. OK Restructurer Api on ne voit pas bien separer fonts, cards
 5. interface dans src/PageBuilder/ApiCard ApiCardImageInterface doit retourner 'image' on ne doit pas le déclarer à chaque implementation
 6. OK l'api ne fonctionne avec le filtre par catégorie
+7. fix css public
