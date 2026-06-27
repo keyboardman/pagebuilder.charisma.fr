@@ -41,13 +41,13 @@ class PageControllerTest extends WebTestCase
 
         $token = $this->fetchDuplicateTokenFromPagesList($client, (int) $source->getId());
 
-        $client->request('POST', '/page/duplicate/' . $source->getId(), [
+        $client->request('POST', '/admin/page/duplicate/' . $source->getId(), [
             '_token' => $token,
         ]);
 
         self::assertResponseRedirects();
         $location = (string) $client->getResponse()->headers->get('Location');
-        self::assertMatchesRegularExpression('#/page/edit/\d+$#', $location);
+        self::assertMatchesRegularExpression('#/admin/page/edit/\d+$#', $location);
 
         /** @var Page[] $pages */
         $pages = $this->entityManager->getRepository(Page::class)->findBy([], ['id' => 'ASC']);
@@ -86,11 +86,11 @@ class PageControllerTest extends WebTestCase
         $source = $this->createPage('Pricing', 'pricing');
         $client->loginUser($admin);
 
-        $client->request('POST', '/page/duplicate/' . $source->getId(), [
+        $client->request('POST', '/admin/page/duplicate/' . $source->getId(), [
             '_token' => 'invalid-token',
         ]);
 
-        self::assertResponseRedirects('/page/');
+        self::assertResponseRedirects('/admin/page/');
         /** @var Page[] $pages */
         $pages = $this->entityManager->getRepository(Page::class)->findBy([]);
         self::assertCount(1, $pages);
@@ -98,8 +98,8 @@ class PageControllerTest extends WebTestCase
 
     private function fetchDuplicateTokenFromPagesList($client, int $pageId): string
     {
-        $crawler = $client->request('GET', '/page/');
-        $tokenInput = $crawler->filter(sprintf('form[action="/page/duplicate/%d"] input[name="_token"]', $pageId));
+        $crawler = $client->request('GET', '/admin/page/');
+        $tokenInput = $crawler->filter(sprintf('form[action="/admin/page/duplicate/%d"] input[name="_token"]', $pageId));
         self::assertGreaterThan(0, $tokenInput->count());
 
         return (string) $tokenInput->attr('value');

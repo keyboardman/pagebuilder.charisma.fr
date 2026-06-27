@@ -12,7 +12,7 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
 
-#[Route('/builder-form', name: 'app_builder_form_config_')]
+#[Route('/admin/builder-form', name: 'app_builder_form_config_')]
 final class BuilderFormConfigController extends AbstractController
 {
     private const DEFAULT_SUBJECT = '{{ form_label }} — nouveau message';

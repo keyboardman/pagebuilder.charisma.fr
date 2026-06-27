@@ -113,7 +113,7 @@ class ThemeCssGeneratorTest extends TestCase
     public function testBuildCssVideoIconMaskUrlIncludesRequestBasePath(): void
     {
         $request = \Symfony\Component\HttpFoundation\Request::create(
-            'http://localhost/myapp/theme/1/css',
+            'http://localhost/myapp/assets/theme/1/css',
             'GET',
             [],
             [],

@@ -19,7 +19,7 @@ Le système SHALL fournir une entité `Page` avec : `title` (string, obligatoire
 
 ### Requirement: CRUD Page (liste, création, édition, suppression)
 
-Le système SHALL fournir un CRUD pour les pages, sur le même modèle que le CRUD Thème : liste des pages (`/page`), création (`/page/new`), édition (`/page/edit/{id}`), suppression (POST avec token CSRF) et duplication (`/page/duplicate/{id}` ou route équivalente). Les routes SHALL utiliser le préfixe `app_page_*`. La liste SHALL afficher au minimum titre, slug et thème associé, avec liens vers édition, action de duplication et action de suppression.
+Le système SHALL fournir un CRUD pour les pages, sur le même modèle que le CRUD Thème : liste des pages (`/admin/page`), création (`/admin/page/new`), édition (`/admin/page/edit/{id}`), suppression (POST avec token CSRF) et duplication (`/admin/page/duplicate/{id}` ou route équivalente). Les routes SHALL utiliser le préfixe de nom `app_page_*`. La liste SHALL afficher au minimum titre, slug et thème associé, avec liens vers édition, action de duplication et action de suppression. Les routes de rendu public (`/page/render/*`) SHALL rester hors du préfixe `/admin`.
 
 #### Scenario: Liste des pages
 
@@ -43,12 +43,12 @@ Le système SHALL fournir un CRUD pour les pages, sur le même modèle que le CR
 
 ### Requirement: Chargement du CSS du thème pour une page
 
-Lors de l’affichage ou de l’édition d’une page, le système SHALL charger le fichier CSS du thème associé à la page (via `Theme.generatedCssPath`), par exemple en incluant un lien vers la route existante `app_theme_css` pour le thème de la page, afin que le rendu utilise les styles de ce thème.
+Lors de l'affichage ou de l'édition d'une page, le système SHALL charger le fichier CSS du thème associé à la page via la route publique d'assets `app_theme_css` (URL `/assets/theme/{id}/css`), afin que le rendu utilise les styles de ce thème en back-office comme en rendu public.
 
 #### Scenario: Édition de page avec CSS du thème
 
-- **WHEN** l’utilisateur ouvre la page d’édition d’une page ayant un thème avec un fichier CSS généré
-- **THEN** la feuille de style du thème est chargée (lien vers `app_theme_css` avec l’id du thème) et le formulaire est affiché avec les styles du thème
+- **WHEN** l'utilisateur ouvre la page d'édition d'une page ayant un thème avec un fichier CSS généré
+- **THEN** la feuille de style du thème est chargée (lien vers `/assets/theme/{id}/css`) et le formulaire est affiché avec les styles du thème
 
 ### Requirement: Formulaire Page en React avec shadcn/ui
 
@@ -66,7 +66,7 @@ Le formulaire de création et d'édition de page SHALL être implémenté en Rea
 
 ### Requirement: Lien « Pages » dans la sidebar
 
-Le système SHALL afficher un lien « Pages » dans la sidebar (`templates/base.html.twig`) pointant vers la liste des pages (`/page` ou la route équivalente), de la même manière que les liens « Thèmes » et « Médias », afin que l’utilisateur puisse accéder au CRUD des pages depuis la navigation.
+Le système SHALL afficher un lien « Pages » dans la sidebar (`templates/base.html.twig`) pointant vers la liste des pages (`/admin/page` ou la route équivalente), de la même manière que les liens « Thèmes » et « Médias », afin que l'utilisateur puisse accéder au CRUD des pages depuis la navigation.
 
 #### Scenario: Accès au CRUD pages depuis le menu
 

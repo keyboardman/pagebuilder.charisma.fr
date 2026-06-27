@@ -18,39 +18,14 @@ use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\String\Slugger\SluggerInterface;
 use Symfony\Component\Form\FormInterface;
 
-#[Route('/font', name: 'app_font_')]
+#[Route('/admin/font', name: 'app_font_')]
 class FontController extends AbstractController
 {
-    private const FONT_MIMES = [
-        'woff2' => 'font/woff2',
-        'woff' => 'font/woff',
-        'ttf' => 'font/ttf',
-    ];
-
     public function __construct(
         private readonly EntityManagerInterface $em,
         private readonly FontStorage $fontStorage,
         private readonly SluggerInterface $slugger,
     ) {
-    }
-
-    #[Route('/file/{path}', name: 'file', methods: ['GET'], requirements: ['path' => '.+'])]
-    public function serveFile(string $path): Response
-    {
-
-        $path = str_replace(['..', "\0"], ['', ''], $path);
-
-        if ($path === '' || !$this->fontStorage->fileExists($path)) {
-            throw $this->createNotFoundException('Fichier police introuvable.');
-        }
-        $ext = strtolower(pathinfo($path, PATHINFO_EXTENSION));
-        $mime = self::FONT_MIMES[$ext] ?? 'application/octet-stream';
-        $content = $this->fontStorage->read($path);
-
-        return new Response($content, 200, [
-            'Content-Type' => $mime,
-            'Content-Disposition' => 'inline; filename="' . basename($path) . '"',
-        ]);
     }
 
     #[Route('', name: 'index', methods: ['GET'])]

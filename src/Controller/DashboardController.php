@@ -8,13 +8,14 @@ use App\Entity\Font;
 use App\Entity\Theme;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
 
 #[Route(name: 'app_dashboard_')]
 class DashboardController extends AbstractController
 {
-    #[Route('/', name: 'index', methods: ['GET'])]
+    #[Route('/admin', name: 'index', methods: ['GET'])]
     public function index(EntityManagerInterface $em): Response
     {
         $fontCount = $em->getRepository(Font::class)->count([]);
@@ -24,5 +25,11 @@ class DashboardController extends AbstractController
             'font_count' => $fontCount,
             'theme_count' => $themeCount,
         ]);
+    }
+
+    #[Route('/', name: 'root_redirect', methods: ['GET'])]
+    public function rootRedirect(): RedirectResponse
+    {
+        return $this->redirectToRoute('app_dashboard_index');
     }
 }

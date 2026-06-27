@@ -8,7 +8,7 @@ export const ThemeName = () => {
                 {getThemeName() || 'Sans nom'}
             </span>
             <a 
-                href={`/theme/showcase?theme=2`} 
+                href={`/admin/theme/showcase?theme=2`} 
                 className="btn btn-secondary btn-sm" 
                 target="_blank"
                 rel="noopener"

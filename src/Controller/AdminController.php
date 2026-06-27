@@ -22,12 +22,6 @@ class AdminController extends AbstractController
     )
     {
     }
-    #[Route(path: '/', name: 'app_admin')]
-    public function index(): Response
-    {
-       return $this->redirectToRoute('app_admin_comptes');
-    }
-
     #[Route(path: '/comptes', name: 'app_admin_comptes')]
     public function comptes(UserRepository $userRepository): Response
     {

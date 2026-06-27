@@ -121,7 +121,7 @@ use Symfony\Component\Config\Loader\ParamConfigurator as Param;
  * }
  * @psalm-type ServicesConfig = array{
  *     _defaults?: DefaultsType,
- *     _instanceof?: InstanceofType,
+ *     _instanceof?: array<class-string, InstanceofType>,
  *     ...<string, DefinitionType|AliasType|PrototypeType|StackType|ArgumentsType|null>
  * }
  * @psalm-type ExtensionType = array<string, mixed>
@@ -1470,6 +1470,10 @@ use Symfony\Component\Config\Loader\ParamConfigurator as Param;
  *     iframe?: array{
  *         enabled?: bool|Param, // Default: false
  *         tokens?: mixed, // Default: []
+ *     },
+ *     upload?: array{
+ *         chunk_size?: int|Param, // Taille maximale de chaque fragment en octets (défaut 1 Mo, plafonnée par upload_max_filesize) // Default: 1048576
+ *         chunk_threshold?: int|Param, // Seuil au-delà duquel l'upload fragmenté est utilisé (défaut 1 Mo, plafonné par upload_max_filesize) // Default: 1048576
  *     },
  * }
  * @psalm-type FlysystemConfig = array{

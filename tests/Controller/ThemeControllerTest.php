@@ -40,13 +40,13 @@ class ThemeControllerTest extends WebTestCase
 
         $token = $this->fetchDuplicateTokenFromThemesList($client, (int) $source->getId());
 
-        $client->request('POST', '/theme/duplicate/' . $source->getId(), [
+        $client->request('POST', '/admin/theme/duplicate/' . $source->getId(), [
             '_token' => $token,
         ]);
 
         self::assertResponseRedirects();
         $location = (string) $client->getResponse()->headers->get('Location');
-        self::assertMatchesRegularExpression('#/theme/edit/\d+$#', $location);
+        self::assertMatchesRegularExpression('#/admin/theme/edit/\d+$#', $location);
 
         $this->entityManager->clear();
 
@@ -75,11 +75,11 @@ class ThemeControllerTest extends WebTestCase
         $source = $this->createTheme('Minimal', 'minimal');
         $client->loginUser($admin);
 
-        $client->request('POST', '/theme/duplicate/' . $source->getId(), [
+        $client->request('POST', '/admin/theme/duplicate/' . $source->getId(), [
             '_token' => 'invalid-token',
         ]);
 
-        self::assertResponseRedirects('/theme/');
+        self::assertResponseRedirects('/admin/theme/');
         /** @var Theme[] $themes */
         $themes = $this->entityManager->getRepository(Theme::class)->findBy([]);
         self::assertCount(1, $themes);
@@ -87,8 +87,8 @@ class ThemeControllerTest extends WebTestCase
 
     private function fetchDuplicateTokenFromThemesList($client, int $themeId): string
     {
-        $crawler = $client->request('GET', '/theme/');
-        $tokenInput = $crawler->filter(sprintf('form[action="/theme/duplicate/%d"] input[name="_token"]', $themeId));
+        $crawler = $client->request('GET', '/admin/theme/');
+        $tokenInput = $crawler->filter(sprintf('form[action="/admin/theme/duplicate/%d"] input[name="_token"]', $themeId));
         self::assertGreaterThan(0, $tokenInput->count());
 
         return (string) $tokenInput->attr('value');
