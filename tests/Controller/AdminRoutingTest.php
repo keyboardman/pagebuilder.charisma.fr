@@ -71,6 +71,15 @@ class AdminRoutingTest extends WebTestCase
         self::assertResponseIsSuccessful();
     }
 
+    public function testLegacyFontFileRedirectIsPublic(): void
+    {
+        $client = static::createClient();
+
+        $client->request('GET', '/font/file/legacy-test/test.woff2');
+
+        self::assertResponseRedirects('/assets/font/file/legacy-test/test.woff2', 301);
+    }
+
     public function testMediaFileIsPublicAndHasCorsHeader(): void
     {
         $client = static::createClient();

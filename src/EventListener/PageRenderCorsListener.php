@@ -19,6 +19,7 @@ final class PageRenderCorsListener implements EventSubscriberInterface
         'app_page_render',
         'app_page_render_by_id',
         'app_font_file',
+        'app_font_legacy_file',
         'app_media_file',
     ];
 
