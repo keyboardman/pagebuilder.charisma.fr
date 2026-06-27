@@ -71,6 +71,22 @@ class AdminRoutingTest extends WebTestCase
         self::assertResponseIsSuccessful();
     }
 
+    public function testMediaFileIsPublicAndHasCorsHeader(): void
+    {
+        $client = static::createClient();
+        $projectDir = static::getContainer()->getParameter('kernel.project_dir');
+        $mediaDir = $projectDir . '/public/media/icons';
+        if (!is_dir($mediaDir)) {
+            mkdir($mediaDir, 0755, true);
+        }
+        file_put_contents($mediaDir . '/phone.svg', '<svg xmlns="http://www.w3.org/2000/svg"></svg>');
+
+        $client->request('GET', '/media/icons/phone.svg');
+
+        self::assertResponseIsSuccessful();
+        self::assertSame('*', $client->getResponse()->headers->get('Access-Control-Allow-Origin'));
+    }
+
     public function testRootRedirectsToAdminDashboardWhenAuthenticated(): void
     {
         $client = static::createClient();
