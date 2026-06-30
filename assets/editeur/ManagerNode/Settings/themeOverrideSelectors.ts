@@ -31,6 +31,7 @@ export const THEME_SELECTORS = {
     cardVideo: ".ce-card-video",
     cardApi: ".ce-card-api",
     textIcon: ".ce-text-icon",
+    icone: ".ce-icone",
 } as const;
 
 export function headerTagSelector(tag: string): string {

@@ -3,6 +3,7 @@ import { type NodeSettingsProps } from "../NodeConfigurationType";
 import { NodeSettingsWrapper } from "../components/NodeSettingsWrapper";
 import { Base2Settings } from "../Settings";
 import Form from "../../components/form";
+import { InputFile } from "../../components/form/InputFile";
 import { useNodeBuilderContext } from "../../services/providers/NodeBuilderContext";
 import { apiRegistry } from "../../ManagerApi/ApiRegistry";
 import { ApiManagerModal } from "../../ManagerApi/ApiManagerModal";
@@ -587,10 +588,10 @@ const Settings: FC<NodeSettingsProps> = () => {
                       </p>
                       <Form.Group>
                         <Form.Label text="Source (URL)" />
-                        <Form.Input
+                        <InputFile
                           type="text"
                           value={selectedSlide?.src ?? ""}
-                          onChange={(value) => {
+                          onChange={(value: string) => {
                             const nextSlides = [...manualSlides];
                             if (!nextSlides[selectedIndex]) return;
                             nextSlides[selectedIndex] = {
@@ -599,8 +600,8 @@ const Settings: FC<NodeSettingsProps> = () => {
                             };
                             updateContent({ slides: nextSlides });
                           }}
-
-                          className="h-7"
+                          typeMedia="image"
+                          className="h-7 text-sm"
                         />
                       </Form.Group>
                       <Form.Group>

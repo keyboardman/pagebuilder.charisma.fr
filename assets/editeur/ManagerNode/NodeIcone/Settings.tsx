@@ -83,16 +83,18 @@ function SettingsIconPreview({
   className,
   iconSizeVariant,
   customSizeStyle,
+  iconColor,
 }: {
   url: string;
   className: string;
   iconSizeVariant: NodeIconeSizeVariant;
   customSizeStyle?: CSSProperties;
+  iconColor?: string;
 }) {
   const trimmedUrl = url.trim();
   const cls = sanitizeThemeIconClass(className);
   const sizeClass = ceIconClassNames(iconSizeVariant);
-  const sizeStyle: CSSProperties = { flexShrink: 0, ...customSizeStyle };
+  const sizeStyle: CSSProperties = { flexShrink: 0, ...customSizeStyle, ...(iconColor ? { color: iconColor } : {}) };
 
   if (cls) {
     return (
@@ -149,6 +151,7 @@ const Settings: FC<NodeSettingsProps> = () => {
   const { iconSizeVariant, customSizeStyle } = resolveNodeIconeIconSize(iconeNode.content);
   const iconWidth = resolveIconWidth(iconeNode.content ?? {});
   const linkUrl = iconeNode.content?.linkUrl ?? "";
+  const iconColor = iconeNode.content?.iconMedia?.style?.color?.toString() ?? "";
   const horizontalAlign = iconeNode.content?.horizontalAlign ?? "left";
   const verticalAlign = iconeNode.content?.verticalAlign ?? "middle";
 
@@ -361,6 +364,7 @@ const Settings: FC<NodeSettingsProps> = () => {
                           className={themeIconClass}
                           iconSizeVariant={iconSizeVariant}
                           customSizeStyle={customSizeStyle}
+                          iconColor={iconColor}
                         />
                       </div>
                     )}
@@ -408,6 +412,7 @@ const Settings: FC<NodeSettingsProps> = () => {
                         className=""
                         iconSizeVariant={iconSizeVariant}
                         customSizeStyle={customSizeStyle}
+                        iconColor={iconColor}
                       />
                     </div>
                     {!!fileManagerConfig?.filemanagerUrl && (
