@@ -1,5 +1,6 @@
 import type { CSSProperties, FC } from "react";
 import {
+  Base2Settings,
   Background2Settings,
   Border2Settings,
   Object2Settings,
@@ -36,6 +37,15 @@ const Settings: FC<NodeSettingsProps> = () => {
                 <TabsTrigger value="style">Style</TabsTrigger>
               </TabsList>
               <TabsContent value="video" className="mt-0">
+                <Base2Settings
+                  attributes={node.attributes}
+                  onChange={(attributes) =>
+                    onChange({
+                      ...node,
+                      attributes: { ...node.attributes, ...attributes },
+                    })
+                  }
+                />
                 <Form.Group>
                   <Form.Label text="Source" />
                   <InputFile

@@ -1,5 +1,6 @@
 import { type CSSProperties, type FC } from "react";
 import {
+  Base2Settings,
   Background2Settings,
   Border2Settings,
   Object2Settings,
@@ -42,6 +43,15 @@ const Settings: FC<NodeSettingsProps> = () => {
                 <TabsTrigger value="image">Image</TabsTrigger>
               </TabsList>
               <TabsContent value="link" className="mt-0">
+                <Base2Settings
+                  attributes={node.attributes}
+                  onChange={(attributes) =>
+                    onChange({
+                      ...node,
+                      attributes: { ...node.attributes, ...attributes },
+                    })
+                  }
+                />
                 <Form.Group>
                   <Form.Label text="URL (href)" />
                   <Form.Input

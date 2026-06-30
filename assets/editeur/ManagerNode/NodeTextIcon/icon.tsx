@@ -1,7 +1,7 @@
 import type { CSSProperties } from "react";
 import { cn } from "@/editeur/lib/utils";
 import type { NodeTextIconName, NodeTextIconSizeVariant, NodeTextIconSource } from "./index";
-import { ceIconBackgroundImageStyle, ceIconClassNames, sanitizeThemeIconClass } from "./shared";
+import { ceIconClassNames, ceIconUrlStyle, sanitizeThemeIconClass } from "./shared";
 
 
 interface MediaProps {
@@ -14,7 +14,7 @@ interface MediaProps {
   style?: CSSProperties;
 }
 
-/** Rendu : `<i className="ce-icon">` (+ small/large), image ou URL thème via `backgroundImage`. */
+/** Rendu : `<i className="ce-icon">` (+ small/large), image ou URL thème via masque SVG ou background-image. */
 export function NodeTextIconMedia({
   iconSource,
   presetIcon,
@@ -35,7 +35,7 @@ export function NodeTextIconMedia({
     return (
       <i
         className={sizeClass}
-        style={{ ...baseStyle, ...ceIconBackgroundImageStyle(url) }}
+        style={{ ...baseStyle, ...ceIconUrlStyle(url) }}
         aria-hidden
       />
     );
@@ -53,7 +53,7 @@ export function NodeTextIconMedia({
     return (
       <i
         className={sizeClass}
-        style={{ ...baseStyle, ...ceIconBackgroundImageStyle(u) }}
+        style={{ ...baseStyle, ...ceIconUrlStyle(u) }}
         aria-hidden
       />
     );

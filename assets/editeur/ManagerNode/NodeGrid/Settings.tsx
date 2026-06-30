@@ -1,8 +1,11 @@
-import { type FC, useMemo } from "react";
-import { Base2Settings,
+import { type CSSProperties, type FC, useMemo } from "react";
+import {
+  Base2Settings,
   Background2Settings,
   Border2Settings,
-  Spacing2Settings, THEME_SELECTORS } from "../Settings";
+  Spacing2Settings,
+  THEME_SELECTORS,
+} from "../Settings";
 import Form from "../../components/form";
 import {
   Table,
@@ -16,6 +19,7 @@ import { Monitor, Tablet, Phone } from "lucide-react";
 import { type NodeSettingsProps } from "../NodeConfigurationType";
 import { useNodeBuilderContext } from "../../services/providers/NodeBuilderContext";
 import { NodeSettingsWrapper } from "../components/NodeSettingsWrapper";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/editeur/components/ui/tabs";
 import type { NodeGridType, NodeGridLayout } from "./index";
 
 const Settings: FC<NodeSettingsProps> = () => {
@@ -49,6 +53,12 @@ const Settings: FC<NodeSettingsProps> = () => {
       } as NodeGridType["attributes"],
     });
   };
+
+  const updateStyle = (style: CSSProperties) =>
+    onChange({
+      ...node,
+      attributes: { ...node.attributes, style },
+    });
 
   const desktopCells =
     (layout.desktop?.columns ?? 2) * (layout.desktop?.rows ?? 2);
@@ -84,185 +94,153 @@ const Settings: FC<NodeSettingsProps> = () => {
   );
 
   return (
-    <NodeSettingsWrapper
-      header={
-        <>
-          <Base2Settings
-            attributes={node.attributes}
-            onChange={(attributes: { className?: string; id?: string }) =>
-              onChange({
-                ...node,
-                attributes: { ...node.attributes, ...attributes },
-              })
-            }
-          />
-
-          {hasDifferentCellCount && (
-            <div className="mb-2 p-2 bg-amber-500/10 border border-amber-500/30 rounded text-xs">
-              <p className="node-block-title text-amber-700 dark:text-amber-200">
-                Le nombre de cellules diffère (D: {desktopCells}, T:{" "}
-                {tabletCells}, M: {mobileCells}). Peut affecter l&apos;affichage.
-              </p>
-            </div>
-          )}
-
-          <div className="mt-2">
-            <p className="node-block-title text-sm font-medium mb-1.5">
-              Configuration de la grille
-            </p>
-            <div className="flex items-center gap-2 mb-2">
-              <span className="node-block-title text-xs w-14 shrink-0">
-                Gap
-              </span>
-              <Form.Input
-                type="number"
-                value={(gridNode?.attributes?.options?.gap ?? 4).toString()}
-                onChange={(value: string) => {
-                  const numValue = parseInt(value, 10);
-                  if (!isNaN(numValue) && numValue >= 0 && numValue <= 20) {
+    <Tabs className="flex h-full min-h-0 flex-1 flex-col overflow-hidden" defaultValue="general">
+      <div className="flex h-full min-h-0 flex-1 flex-col overflow-hidden">
+        <NodeSettingsWrapper
+          header={
+            <>
+              <TabsList className="mb-3 w-full justify-center">
+                <TabsTrigger value="general">Général</TabsTrigger>
+                <TabsTrigger value="container">Container</TabsTrigger>
+              </TabsList>
+              <TabsContent value="general" className="mt-0">
+                <Base2Settings
+                  attributes={node.attributes}
+                  onChange={(attributes: { className?: string; id?: string }) =>
                     onChange({
                       ...node,
-                      attributes: {
-                        ...gridNode.attributes,
-                        options: {
-                          ...gridNode.attributes?.options,
-                          gap: numValue,
-                        },
-                      },
-                    });
+                      attributes: { ...node.attributes, ...attributes },
+                    })
                   }
-                }}
-                className="h-7 text-sm flex-1"
-                min="0"
-                max="20"
+                />
+
+                {hasDifferentCellCount && (
+                  <div className="mb-2 p-2 bg-amber-500/10 border border-amber-500/30 rounded text-xs">
+                    <p className="node-block-title text-amber-700 dark:text-amber-200">
+                      Le nombre de cellules diffère (D: {desktopCells}, T: {tabletCells}, M:{" "}
+                      {mobileCells}). Peut affecter l&apos;affichage.
+                    </p>
+                  </div>
+                )}
+
+                <div className="mt-2">
+                  <p className="node-block-title text-sm font-medium mb-1.5">
+                    Configuration de la grille
+                  </p>
+                  <div className="flex items-center gap-2 mb-2">
+                    <span className="node-block-title text-xs w-14 shrink-0">Gap</span>
+                    <Form.Input
+                      type="number"
+                      value={(gridNode?.attributes?.options?.gap ?? 4).toString()}
+                      onChange={(value: string) => {
+                        const numValue = parseInt(value, 10);
+                        if (!isNaN(numValue) && numValue >= 0 && numValue <= 20) {
+                          onChange({
+                            ...node,
+                            attributes: {
+                              ...gridNode.attributes,
+                              options: {
+                                ...gridNode.attributes?.options,
+                                gap: numValue,
+                              },
+                            },
+                          });
+                        }
+                      }}
+                      className="h-7 text-sm flex-1"
+                      min="0"
+                      max="20"
+                    />
+                  </div>
+                  <Table>
+                    <TableHeader>
+                      <TableRow className="border-border/50">
+                        <TableHead className="node-block-title py-1.5 px-2 text-xs font-medium" />
+                        <TableHead
+                          className="node-block-title py-1.5 px-2 text-xs font-medium text-center"
+                          title="Desktop"
+                        >
+                          <Monitor className="h-4 w-4 mx-auto" />
+                        </TableHead>
+                        <TableHead
+                          className="node-block-title py-1.5 px-2 text-xs font-medium text-center"
+                          title="Tablet"
+                        >
+                          <Tablet className="h-4 w-4 mx-auto" />
+                        </TableHead>
+                        <TableHead
+                          className="node-block-title py-1.5 px-2 text-xs font-medium text-center"
+                          title="Mobile"
+                        >
+                          <Phone className="h-4 w-4 mx-auto" />
+                        </TableHead>
+                      </TableRow>
+                    </TableHeader>
+                    <TableBody>
+                      <TableRow className="border-border/50">
+                        <TableCell className="node-block-title py-1 px-2 text-xs">C.</TableCell>
+                        <TableCell className="py-1 px-2">
+                          {numInput(layout.desktop?.columns ?? 2, 1, 12, (n) =>
+                            updateLayout("desktop", { columns: n })
+                          )}
+                        </TableCell>
+                        <TableCell className="py-1 px-2">
+                          {numInput(layout.tablet?.columns ?? 2, 1, 12, (n) =>
+                            updateLayout("tablet", { columns: n })
+                          )}
+                        </TableCell>
+                        <TableCell className="py-1 px-2">
+                          {numInput(layout.mobile?.columns ?? 2, 1, 12, (n) =>
+                            updateLayout("mobile", { columns: n })
+                          )}
+                        </TableCell>
+                      </TableRow>
+                      <TableRow className="border-border/50">
+                        <TableCell className="node-block-title py-1 px-2 text-xs">L.</TableCell>
+                        <TableCell className="py-1 px-2">
+                          {numInput(layout.desktop?.rows ?? 2, 1, 12, (n) =>
+                            updateLayout("desktop", { rows: n })
+                          )}
+                        </TableCell>
+                        <TableCell className="py-1 px-2">
+                          {numInput(layout.tablet?.rows ?? 2, 1, 12, (n) =>
+                            updateLayout("tablet", { rows: n })
+                          )}
+                        </TableCell>
+                        <TableCell className="py-1 px-2">
+                          {numInput(layout.mobile?.rows ?? 2, 1, 12, (n) =>
+                            updateLayout("mobile", { rows: n })
+                          )}
+                        </TableCell>
+                      </TableRow>
+                    </TableBody>
+                  </Table>
+                </div>
+              </TabsContent>
+            </>
+          }
+          content={
+            <TabsContent value="container" className="mt-0">
+              <Background2Settings
+                themeOverrideSelector={THEME_SELECTORS.grid}
+                style={node.attributes?.style || {}}
+                onChange={updateStyle}
               />
-            </div>
-            <Table>
-              <TableHeader>
-                <TableRow className="border-border/50">
-                  <TableHead className="node-block-title py-1.5 px-2 text-xs font-medium" />
-                  <TableHead
-                    className="node-block-title py-1.5 px-2 text-xs font-medium text-center"
-                    title="Desktop"
-                  >
-                    <Monitor className="h-4 w-4 mx-auto" />
-                  </TableHead>
-                  <TableHead
-                    className="node-block-title py-1.5 px-2 text-xs font-medium text-center"
-                    title="Tablet"
-                  >
-                    <Tablet className="h-4 w-4 mx-auto" />
-                  </TableHead>
-                  <TableHead
-                    className="node-block-title py-1.5 px-2 text-xs font-medium text-center"
-                    title="Mobile"
-                  >
-                    <Phone className="h-4 w-4 mx-auto" />
-                  </TableHead>
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                <TableRow className="border-border/50">
-                  <TableCell className="node-block-title py-1 px-2 text-xs">
-                    C.
-                  </TableCell>
-                  <TableCell className="py-1 px-2">
-                    {numInput(
-                      layout.desktop?.columns ?? 2,
-                      1,
-                      12,
-                      (n) => updateLayout("desktop", { columns: n })
-                    )}
-                  </TableCell>
-                  <TableCell className="py-1 px-2">
-                    {numInput(
-                      layout.tablet?.columns ?? 2,
-                      1,
-                      12,
-                      (n) => updateLayout("tablet", { columns: n })
-                    )}
-                  </TableCell>
-                  <TableCell className="py-1 px-2">
-                    {numInput(
-                      layout.mobile?.columns ?? 2,
-                      1,
-                      12,
-                      (n) => updateLayout("mobile", { columns: n })
-                    )}
-                  </TableCell>
-                </TableRow>
-                <TableRow className="border-border/50">
-                  <TableCell className="node-block-title py-1 px-2 text-xs">
-                    L.
-                  </TableCell>
-                  <TableCell className="py-1 px-2">
-                    {numInput(
-                      layout.desktop?.rows ?? 2,
-                      1,
-                      12,
-                      (n) => updateLayout("desktop", { rows: n })
-                    )}
-                  </TableCell>
-                  <TableCell className="py-1 px-2">
-                    {numInput(
-                      layout.tablet?.rows ?? 2,
-                      1,
-                      12,
-                      (n) => updateLayout("tablet", { rows: n })
-                    )}
-                  </TableCell>
-                  <TableCell className="py-1 px-2">
-                    {numInput(
-                      layout.mobile?.rows ?? 2,
-                      1,
-                      12,
-                      (n) => updateLayout("mobile", { rows: n })
-                    )}
-                  </TableCell>
-                </TableRow>
-              </TableBody>
-            </Table>
-          </div>
-        </>
-      }
-      content={
-        <>
-          <Background2Settings
-            
-            themeOverrideSelector={THEME_SELECTORS.grid}
-            style={node.attributes?.style || {}}
-            onChange={(style) =>
-              onChange({
-                ...node,
-                attributes: { ...node.attributes, style },
-              })
-            }
-          />
-          <Border2Settings
-            
-            themeOverrideSelector={THEME_SELECTORS.grid}
-            style={node.attributes?.style || {}}
-            onChange={(style) =>
-              onChange({
-                ...node,
-                attributes: { ...node.attributes, style },
-              })
-            }
-          />
-          <Spacing2Settings
-            
-            themeOverrideSelector={THEME_SELECTORS.grid}
-            style={node.attributes?.style || {}}
-            onChange={(style) =>
-              onChange({
-                ...node,
-                attributes: { ...node.attributes, style },
-              })
-            }
-          />
-        </>
-      }
-    />
+              <Border2Settings
+                themeOverrideSelector={THEME_SELECTORS.grid}
+                style={node.attributes?.style || {}}
+                onChange={updateStyle}
+              />
+              <Spacing2Settings
+                themeOverrideSelector={THEME_SELECTORS.grid}
+                style={node.attributes?.style || {}}
+                onChange={updateStyle}
+              />
+            </TabsContent>
+          }
+        />
+      </div>
+    </Tabs>
   );
 };
 

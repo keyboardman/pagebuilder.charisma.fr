@@ -26,7 +26,7 @@ import {
   resolveNodeTextIconSource,
   sanitizeThemeIconClass,
   ceIconClassNames,
-  ceIconBackgroundImageStyle,
+  ceIconUrlStyle,
 } from "../NodeTextIcon/shared";
 
 import {
@@ -122,7 +122,7 @@ function SettingsIconPreview({
     >
       <i
         className={sizeClass}
-        style={{ ...ceIconBackgroundImageStyle(trimmedUrl), ...sizeStyle }}
+        style={{ ...ceIconUrlStyle(trimmedUrl), ...sizeStyle }}
         aria-hidden
       />
     </div>

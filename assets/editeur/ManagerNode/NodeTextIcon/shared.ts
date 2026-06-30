@@ -94,13 +94,56 @@ export function ceIconClassNames(variant: NodeTextIconSizeVariant): string {
   return parts.join(" ");
 }
 
-/** Style `background-image` sûr pour une URL d’icône (image / thème sans classe). */
+/** Style `background-image` sûr pour une URL d’icône raster (PNG, JPG, …). */
 export function ceIconBackgroundImageStyle(url: string): Pick<CSSProperties, "backgroundImage"> {
   const u = url.trim();
   if (!u) {
     return {};
   }
   return { backgroundImage: `url(${JSON.stringify(u)})` };
+}
+
+export function isSvgIconUrl(url: string): boolean {
+  const trimmed = url.trim();
+  if (!trimmed) {
+    return false;
+  }
+  try {
+    const path = new URL(trimmed, "http://localhost").pathname;
+    return path.toLowerCase().endsWith(".svg");
+  } catch {
+    const path = trimmed.split("?")[0]?.split("#")[0] ?? "";
+    return path.toLowerCase().endsWith(".svg");
+  }
+}
+
+/** SVG : masque + currentColor pour suivre `style.color` (comme les icônes du thème). */
+export function ceIconSvgMaskStyle(url: string): CSSProperties {
+  const u = url.trim();
+  if (!u) {
+    return {};
+  }
+  const quoted = JSON.stringify(u);
+  return {
+    backgroundColor: "currentColor",
+    backgroundImage: "none",
+    WebkitMaskImage: `url(${quoted})`,
+    maskImage: `url(${quoted})`,
+    WebkitMaskSize: "contain",
+    maskSize: "contain",
+    WebkitMaskRepeat: "no-repeat",
+    maskRepeat: "no-repeat",
+    WebkitMaskPosition: "center",
+    maskPosition: "center",
+  };
+}
+
+/** Choisit masque SVG ou background-image selon l’extension de l’URL. */
+export function ceIconUrlStyle(url: string): CSSProperties {
+  if (isSvgIconUrl(url)) {
+    return ceIconSvgMaskStyle(url);
+  }
+  return ceIconBackgroundImageStyle(url);
 }
 
 /** Classe utilisable dans le DOM (sans `.`, caractères sûrs). */

@@ -28,7 +28,7 @@ import {
   resolveNodeTextIconTag,
   sanitizeThemeIconClass,
   ceIconClassNames,
-  ceIconBackgroundImageStyle,
+  ceIconUrlStyle,
 } from "./shared";
 
 const ICON_SIZE_VARIANT_OPTIONS: { value: NodeTextIconSizeVariant; label: string }[] = [
@@ -124,7 +124,7 @@ function SettingsIconPreview({
     >
       <i
         className={sizeClass}
-        style={{ ...ceIconBackgroundImageStyle(trimmedUrl), flexShrink: 0 }}
+        style={{ ...ceIconUrlStyle(trimmedUrl), flexShrink: 0 }}
         aria-hidden
       />
     </div>

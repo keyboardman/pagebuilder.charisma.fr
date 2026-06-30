@@ -62,10 +62,10 @@ Utiliser le helper `renderWithNodeBuilder` (`assets/test/renderWithNodeBuilder.t
 import { screen } from "@testing-library/react";
 import { createTestNode } from "../../../test/nodeFixtures";
 import { renderWithNodeBuilder } from "../../../test/renderWithNodeBuilder";
-import NodeEditorLabelField from "./NodeEditorLabelField";
+import MyNodeSettings from "../NodeText/Settings";
 
 const node = createTestNode({ type: "node-text" });
-const { onChange } = renderWithNodeBuilder(<NodeEditorLabelField />, node);
+renderWithNodeBuilder(<MyNodeSettings />, node);
 ```
 
 ### 4. Composants complexes (à reporter)
@@ -110,7 +110,7 @@ vi.mock("../ManagerNode/components/NodeRegistry", () => ({
 }));
 ```
 
-Voir les exemples dans `nodeLabel.test.ts` et `NodeEditorLabelField.test.tsx`.
+Voir les exemples dans `nodeLabel.test.ts` et `useCanvasNavigation.test.tsx`.
 
 ### Imports CSS / Tailwind
 
@@ -129,4 +129,3 @@ Les fichiers `*.test.ts(x)` et le dossier `assets/test/` sont exclus de `tsconfi
 
 - `assets/editeur/utils/nodeLabel.test.ts`
 - `assets/editeur/hooks/useCanvasNavigation.test.tsx`
-- `assets/editeur/ManagerNode/components/NodeEditorLabelField.test.tsx`
