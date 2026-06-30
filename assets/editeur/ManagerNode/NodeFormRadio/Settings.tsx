@@ -112,31 +112,27 @@ const Settings: FC<NodeSettingsProps> = () => {
   };
 
   return (
-    <Tabs className="flex min-h-0 flex-1 flex-col overflow-hidden" defaultValue="general">
-      <div className="flex min-h-0 flex-1 flex-col overflow-hidden">
+    <Tabs className="flex h-full min-h-0 flex-1 flex-col overflow-hidden" defaultValue="general">
+      <div className="flex h-full min-h-0 flex-1 flex-col overflow-hidden">
         <NodeSettingsWrapper
           header={
             <>
-              <Base2Settings
-                attributes={node.attributes}
-                onChange={(attributes) =>
-                  onChange({ ...node, attributes: { ...node.attributes, ...attributes } })
-                }
-              />
-              <TabsList className="justify-center w-full">
+              <TabsList className="mb-3 w-full justify-center">
                 <TabsTrigger value="general">Général</TabsTrigger>
                 <TabsTrigger value="options">Options</TabsTrigger>
               </TabsList>
-              <TabsList className="justify-center w-full">
+              <TabsList className="mb-3 w-full justify-center">
                 <TabsTrigger value="container">Container</TabsTrigger>
                 <TabsTrigger value="label">Label</TabsTrigger>
                 <TabsTrigger value="radio">Radio</TabsTrigger>
               </TabsList>
-            </>
-          }
-          content={
-            <>
-              <TabsContent value="general">
+              <TabsContent value="general" className="mt-0">
+                <Base2Settings
+                  attributes={node.attributes}
+                  onChange={(attributes) =>
+                    onChange({ ...node, attributes: { ...node.attributes, ...attributes } })
+                  }
+                />
                 <div className="flex flex-col gap-2">
                   <Form.Group>
                     <Form.Label text="Nom du groupe (radio.name)" />
@@ -172,8 +168,11 @@ const Settings: FC<NodeSettingsProps> = () => {
                   </Form.Group>
                 </div>
               </TabsContent>
-
-              <TabsContent value="options">
+            </>
+          }
+          content={
+            <>
+              <TabsContent value="options" className="mt-0">
                 <div className="flex flex-col">
                   <div className="flex items-center justify-between mb-1">
                     <span className="text-xs font-semibold text-muted-foreground">Options (valeur, label)</span>
@@ -205,7 +204,7 @@ const Settings: FC<NodeSettingsProps> = () => {
                 </div>
               </TabsContent>
 
-              <TabsContent value="container">
+              <TabsContent value="container" className="mt-0">
                 <div className="flex flex-1 flex-col gap-1">
                   <Background2Settings themeOverrideSelector={THEME_SELECTORS.formField} style={content.container.style} onChange={setContainerStyle} />
                   <Border2Settings themeOverrideSelector={THEME_SELECTORS.formField} style={content.container.style} onChange={setContainerStyle} />
@@ -213,7 +212,7 @@ const Settings: FC<NodeSettingsProps> = () => {
                 </div>
               </TabsContent>
 
-              <TabsContent value="label">
+              <TabsContent value="label" className="mt-0">
                 <div className="flex flex-1 flex-col gap-1">
                   <Text2Settings themeOverrideSelector={THEME_SELECTORS.formLabel} style={content.label.style} onChange={setLabelStyle} />
                   <Background2Settings themeOverrideSelector={THEME_SELECTORS.formLabel} style={content.label.style} onChange={setLabelStyle} />
@@ -222,7 +221,7 @@ const Settings: FC<NodeSettingsProps> = () => {
                 </div>
               </TabsContent>
 
-              <TabsContent value="radio">
+              <TabsContent value="radio" className="mt-0">
                 <div className="flex flex-1 flex-col gap-1">
                   <Text2Settings themeOverrideSelector={THEME_SELECTORS.formRadioLabel} style={content.radio.style} onChange={setRadioStyle} />
                   <Background2Settings themeOverrideSelector={THEME_SELECTORS.formRadioLabel} style={content.radio.style} onChange={setRadioStyle} />

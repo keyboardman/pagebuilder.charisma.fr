@@ -9,4 +9,5 @@
 7. fix css public
 8. slideshow en edition ne motre pas les images
 9. Pour les containers, serait-il possible d'avoir un bouton pour appliquer un padding ou un margin à tous les côtés en une fois plutôt que de devoir réécrire la même valeur 4 fois ?
-10. zz
+10. ouvrir l'editeur texte riche uniquement si on clique le bouton.
+11. ss

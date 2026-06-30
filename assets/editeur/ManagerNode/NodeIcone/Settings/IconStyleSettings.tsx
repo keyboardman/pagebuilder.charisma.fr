@@ -23,7 +23,6 @@ export function IconStyleSettings() {
 
   return (
     <div className="mb-2 mt-1 flex flex-col gap-1">
-      <SettingsSectionTitle>Icone</SettingsSectionTitle>
       <Form.Group className="mb-0">
         <Form.Label text="color" className="text-foreground" />
         <Form.InputColor

@@ -183,470 +183,229 @@ const Settings: FC<NodeSettingsProps> = () => {
   }, [slidesMode, apiId]);
 
   return (
-    <Tabs className="flex min-h-0 flex-1 flex-col overflow-hidden" defaultValue="main">
+    <Tabs className="flex h-full min-h-0 flex-1 flex-col overflow-hidden" defaultValue="general">
+      <div className="flex h-full min-h-0 flex-1 flex-col overflow-hidden">
+        <NodeSettingsWrapper
+          header={
+            <>
+              <TabsList className="mb-3 w-full justify-center">
+                <TabsTrigger value="general">Général</TabsTrigger>
+                <TabsTrigger value="images">Images</TabsTrigger>
+              </TabsList>
 
-      <NodeSettingsWrapper
-        header={
-          <>
-            <Base2Settings
-              attributes={node.attributes}
-              onChange={(attributes: { className?: string; id?: string }) =>
-                onChange({
-                  ...node,
-                  attributes: { ...node.attributes, ...attributes },
-                })
-              }
-            />
-            <TabsList className="justify-center w-full">
-              <TabsTrigger value="main">Général</TabsTrigger>
-              <TabsTrigger value="images">Images</TabsTrigger>
-            </TabsList>
+            </>
+          }
+          content={
+            <>
+              <TabsContent value="general" className="mt-0">
+                <Base2Settings
+                  attributes={node.attributes}
+                  onChange={(attributes: { className?: string; id?: string }) =>
+                    onChange({
+                      ...node,
+                      attributes: { ...node.attributes, ...attributes },
+                    })
+                  }
+                />
+                <div className="space-y-2">
+                  <div className="flex items-center justify-between gap-3">
+                    <span className="node-block-title font-medium text-foreground text-xs">
+                      Navigation
+                    </span>
+                    <Switch
+                      checked={navigationEnabled}
+                      onCheckedChange={(checked) => updateContent({ navigationEnabled: checked })}
+                    />
+                  </div>
+                  <div className="flex items-center justify-between gap-3">
+                    <span className="node-block-title font-medium text-foreground text-xs">
+                      Pagination
+                    </span>
+                    <Switch
+                      checked={paginationEnabled}
+                      onCheckedChange={(checked) => updateContent({ paginationEnabled: checked })}
+                    />
+                  </div>
+                  <div className="flex items-center justify-between gap-3">
+                    <span className="node-block-title font-medium text-foreground text-xs">
+                      Autoplay
+                    </span>
+                    <Switch
+                      checked={autoplayEnabled}
+                      onCheckedChange={(checked) =>
+                        updateContent({ autoplayEnabled: checked })
+                      }
+                    />
+                  </div>
+                  {autoplayEnabled && (
+                    <Form.Group>
+                      <Form.Label text="Délai autoplay (ms)" />
+                      <Form.Input
+                        type="number"
+                        min={0}
+                        step={100}
+                        value={String(autoplayDelayMs)}
+                        onChange={(value) => {
+                          const num = parseInt(value, 10);
+                          if (!Number.isNaN(num) && num >= 0) {
+                            updateContent({ autoplayDelayMs: num });
+                          }
+                        }}
+                        className="h-7"
+                      />
+                    </Form.Group>
+                  )}
 
-          </>
-
-
-
-        }
-        content={
-          <>
-            <TabsContent value="main">
-              <div className="space-y-2">
-                <div className="flex items-center justify-between gap-3">
-                  <span className="node-block-title font-medium text-foreground text-xs">
-                    Navigation
-                  </span>
-                  <Switch
-                    checked={navigationEnabled}
-                    onCheckedChange={(checked) => updateContent({ navigationEnabled: checked })}
-                  />
-                </div>
-                <div className="flex items-center justify-between gap-3">
-                  <span className="node-block-title font-medium text-foreground text-xs">
-                    Pagination
-                  </span>
-                  <Switch
-                    checked={paginationEnabled}
-                    onCheckedChange={(checked) => updateContent({ paginationEnabled: checked })}
-                  />
-                </div>
-                <div className="flex items-center justify-between gap-3">
-                  <span className="node-block-title font-medium text-foreground text-xs">
-                    Autoplay
-                  </span>
-                  <Switch
-                    checked={autoplayEnabled}
-                    onCheckedChange={(checked) =>
-                      updateContent({ autoplayEnabled: checked })
-                    }
-                  />
-                </div>
-                {autoplayEnabled && (
+                  <div className="mt-2 space-y-2">
+                    <p className="node-block-title font-medium text-foreground text-xs m-0">
+                      Slides visibles
+                    </p>
+                    <Table>
+                      <TableHeader>
+                        <TableRow>
+                          <TableHead>
+                            <Monitor className="h-4 w-4 mx-auto" />
+                          </TableHead>
+                          <TableHead>
+                            <Tablet className="h-4 w-4 mx-auto" />
+                          </TableHead>
+                          <TableHead>
+                            <Phone className="h-4 w-4 mx-auto" />
+                          </TableHead>
+                        </TableRow>
+                      </TableHeader>
+                      <TableBody>
+                        <TableRow>
+                          <TableCell>
+                            <Form.Input
+                              type="number"
+                              min={1}
+                              step={1}
+                              value={String(slidesPerViewByBreakpoint.desktop ?? 1)}
+                              onChange={(value) => updateSlidesPerView("desktop", value)}
+                              className="h-7"
+                            />
+                          </TableCell>
+                          <TableCell>
+                            <Form.Input
+                              type="number"
+                              min={1}
+                              step={1}
+                              value={String(slidesPerViewByBreakpoint.tablet ?? 1)}
+                              onChange={(value) => updateSlidesPerView("tablet", value)}
+                              className="h-7"
+                            />
+                          </TableCell>
+                          <TableCell>
+                            <Form.Input
+                              type="number"
+                              min={1}
+                              step={1}
+                              value={String(slidesPerViewByBreakpoint.mobile ?? 1)}
+                              onChange={(value) => updateSlidesPerView("mobile", value)}
+                              className="h-7"
+                            />
+                          </TableCell>
+                        </TableRow>
+                      </TableBody>
+                    </Table>
+                  </div>
                   <Form.Group>
-                    <Form.Label text="Délai autoplay (ms)" />
+                    <Form.Label text="Vitesse (ms)" />
                     <Form.Input
                       type="number"
                       min={0}
-                      step={100}
-                      value={String(autoplayDelayMs)}
+                      step={50}
+                      value={String(speedMs)}
                       onChange={(value) => {
                         const num = parseInt(value, 10);
                         if (!Number.isNaN(num) && num >= 0) {
-                          updateContent({ autoplayDelayMs: num });
+                          updateContent({ speedMs: num });
                         }
                       }}
                       className="h-7"
                     />
                   </Form.Group>
-                )}
 
-                <div className="mt-2 space-y-2">
-                  <p className="node-block-title font-medium text-foreground text-xs m-0">
-                    Slides visibles
-                  </p>
-                  <Table>
-                    <TableHeader>
-                      <TableRow>
-                        <TableHead>
-                          <Monitor className="h-4 w-4 mx-auto" />
-                        </TableHead>
-                        <TableHead>
-                          <Tablet className="h-4 w-4 mx-auto" />
-                        </TableHead>
-                        <TableHead>
-                          <Phone className="h-4 w-4 mx-auto" />
-                        </TableHead>
-                      </TableRow>
-                    </TableHeader>
-                    <TableBody>
-                      <TableRow>
-                        <TableCell>
-                          <Form.Input
-                            type="number"
-                            min={1}
-                            step={1}
-                            value={String(slidesPerViewByBreakpoint.desktop ?? 1)}
-                            onChange={(value) => updateSlidesPerView("desktop", value)}
-                            className="h-7"
-                          />
-                        </TableCell>
-                        <TableCell>
-                          <Form.Input
-                            type="number"
-                            min={1}
-                            step={1}
-                            value={String(slidesPerViewByBreakpoint.tablet ?? 1)}
-                            onChange={(value) => updateSlidesPerView("tablet", value)}
-                            className="h-7"
-                          />
-                        </TableCell>
-                        <TableCell>
-                          <Form.Input
-                            type="number"
-                            min={1}
-                            step={1}
-                            value={String(slidesPerViewByBreakpoint.mobile ?? 1)}
-                            onChange={(value) => updateSlidesPerView("mobile", value)}
-                            className="h-7"
-                          />
-                        </TableCell>
-                      </TableRow>
-                    </TableBody>
-                  </Table>
-                </div>
-                <Form.Group>
-                  <Form.Label text="Vitesse (ms)" />
-                  <Form.Input
-                    type="number"
-                    min={0}
-                    step={50}
-                    value={String(speedMs)}
-                    onChange={(value) => {
-                      const num = parseInt(value, 10);
-                      if (!Number.isNaN(num) && num >= 0) {
-                        updateContent({ speedMs: num });
+                  <Form.Group>
+                    <Form.Label text="Effet de transition" />
+                    <Form.Select
+                      value={effect}
+                      onChange={(value) =>
+                        updateContent({
+                          effect: (value as NodeSlideshowType["content"]["effect"]) || "slide",
+                        })
                       }
-                    }}
-                    className="h-7"
-                  />
-                </Form.Group>
+                      options={[
+                        { value: "slide", label: "Slide (défaut)" },
+                        { value: "fade", label: "Fade" },
+                        { value: "cube", label: "Cube" },
+                        { value: "coverflow", label: "Coverflow" },
+                        { value: "flip", label: "Flip" },
+                        { value: "cards", label: "Cards" },
+                        { value: "creative", label: "Creative" },
+                      ]}
+                      className="h-7"
+                    />
+                  </Form.Group>
 
-                <Form.Group>
-                  <Form.Label text="Effet de transition" />
-                  <Form.Select
-                    value={effect}
-                    onChange={(value) =>
-                      updateContent({
-                        effect: (value as NodeSlideshowType["content"]["effect"]) || "slide",
-                      })
-                    }
-                    options={[
-                      { value: "slide", label: "Slide (défaut)" },
-                      { value: "fade", label: "Fade" },
-                      { value: "cube", label: "Cube" },
-                      { value: "coverflow", label: "Coverflow" },
-                      { value: "flip", label: "Flip" },
-                      { value: "cards", label: "Cards" },
-                      { value: "creative", label: "Creative" },
-                    ]}
-                    className="h-7"
-                  />
-                </Form.Group>
+                  <Form.Group>
+                    <Form.Label text="Gap entre images (px)" />
+                    <Form.Input
+                      type="number"
+                      min={0}
+                      step={1}
+                      value={String(gap)}
+                      onChange={(value) => {
+                        const num = parseInt(value, 10);
+                        if (!Number.isNaN(num) && num >= 0) {
+                          updateContent({ gap: num });
+                        }
+                      }}
+                      className="h-7"
+                    />
+                  </Form.Group>
 
-                <Form.Group>
-                  <Form.Label text="Gap entre images (px)" />
-                  <Form.Input
-                    type="number"
-                    min={0}
-                    step={1}
-                    value={String(gap)}
-                    onChange={(value) => {
-                      const num = parseInt(value, 10);
-                      if (!Number.isNaN(num) && num >= 0) {
-                        updateContent({ gap: num });
-                      }
-                    }}
-                    className="h-7"
-                  />
-                </Form.Group>
+                  <Form.Group>
+                    <Form.Label text="Aspect ratio" />
+                    <Form.Input
+                      type="text"
+                      value={aspectRatio}
+                      placeholder="Ex: 16/9, 4/3, 1/1, auto"
+                      onChange={(value) => updateContent({ aspectRatio: value })}
+                      className="h-7"
+                    />
 
-                <Form.Group>
-                  <Form.Label text="Aspect ratio" />
-                  <Form.Input
-                    type="text"
-                    value={aspectRatio}
-                    placeholder="Ex: 16/9, 4/3, 1/1, auto"
-                    onChange={(value) => updateContent({ aspectRatio: value })}
-                    className="h-7"
-                  />
-
-                </Form.Group>
-                <Form.Group>
-                  <Form.Label text="Arrondi image (border-radius)" />
-                  <Form.Input
-                    type="text"
-                    value={imageBorderRadius}
-                    placeholder="Ex: 12px, 1rem, 20%"
-                    onChange={(value) => updateContent({ imageBorderRadius: value ?? "0px" })}
-                    className="h-7"
-                  />
-                </Form.Group>
-              </div>
-            </TabsContent>
-            <TabsContent value="images">
-              <div className="flex flex-col gap-3 text-sm">
-
-
-                <div className="space-y-2">
-                  <div className="flex items-center justify-between gap-2">
-                    <p className="node-block-title font-medium text-xs m-0">Slides</p>
-                    <div className="flex gap-3 items-center">
-                      <Form.Select
-                        value={slidesMode}
-                        onChange={(value) => {
-                          const nextMode = (value as "manual" | "api-endpoint") || "manual";
-                          if (nextMode === "manual") {
-                            setApiPreviewSlides([]);
-                            updateContent({
-                              slidesMode: "manual",
-                              apiId: undefined,
-                              slides: [
-                                {
-                                  src: DEFAULT_SLIDE_SRC,
-                                  alt: "",
-                                  source: "media" as const,
-                                  link: "",
-                                },
-                              ],
-                            });
-                            setSelectedIndex(0);
-                          } else {
-                            setApiPreviewSlides([]);
-                            updateContent({
-                              slidesMode: "api-endpoint",
-                              apiId: apiId || undefined,
-                              slides: [],
-                            });
-                            setSelectedIndex(0);
-                          }
-                        }}
-                        options={[
-                          { value: "manual", label: "Liste manuelle" },
-                          { value: "api-endpoint", label: "Depuis endpoint API" },
-                        ]}
-                      />
-                    </div>
-                  </div>
-
-                  {slidesMode === "manual" ? (
-                    <div className="flex">
-                      <Button
-                        type="button"
-                        variant="outline"
-                        size="sm"
-                        onClick={() => {
-                          const nextSlides = [
-                            ...manualSlides,
-                            {
-                              src: DEFAULT_SLIDE_SRC,
-                              alt: "",
-                              source: "media" as const,
-                              link: "",
-                            },
-                          ];
-                          updateContent({ slides: nextSlides });
-                          setSelectedIndex(nextSlides.length - 1);
-                        }}
-                      >
-                        Ajouter une slide
-                      </Button>
-                    </div>
-                  ) : (
-                    <div className="space-y-2">
-                      {selectedApiAdapter && (
-                        <p className="text-xs text-muted-foreground">
-                          API : <span className="font-medium text-foreground">{selectedApiAdapter.label}</span>
-                        </p>
-                      )}
-                      <Button
-                        type="button"
-                        variant="outline"
-                        size="sm"
-                        onClick={() => setApiModalOpen(true)}
-                      >
-                        <Database className="h-4 w-4 mr-2" />
-                        {apiId ? "Changer l'API" : "Sélectionner une API"}
-                      </Button>
-                      <ApiManagerModal
-                        open={apiModalOpen}
-                        onOpenChange={setApiModalOpen}
-                        apiId={apiId}
-                        typeFilter="image"
-                        collectionModeFilter="fixed"
-                        selectionMode="api"
-                        onSelect={(nextApiId) => {
-                          setApiPreviewSlides([]);
-                          updateContent({
-                            slidesMode: "api-endpoint",
-                            apiId: nextApiId,
-                            slides: [],
-                          });
-                        }}
-                      />
-                      {apiLoading && <p className="text-xs text-muted-foreground">Chargement...</p>}
-                      {apiError && (
-                        <p className="text-xs text-destructive bg-destructive/10 border border-destructive/20 rounded p-2">
-                          {apiError}
-                        </p>
-                      )}
-                      <div className="flex">
-                        <Button
-                          type="button"
-                          variant="outline"
-                          size="sm"
-                          onClick={() => {
-                            if (!apiId) return;
-                            void loadSlidesFromApi(apiId);
-                          }}
-                          disabled={!apiId || apiLoading}
-                        >
-                          Recharger
-                        </Button>
-                      </div>
-                    </div>
-                  )}
-
-                  <div className="flex flex-wrap gap-2">
-                    {displaySlides.map((slide, idx) => (
-                      <div
-                        key={`${slide.itemId ?? slide.src}-${idx}`}
-                        draggable={slidesMode === "manual"}
-                        onDragStart={(e) => {
-                          if (slidesMode !== "manual") return;
-                          e.dataTransfer.effectAllowed = "move";
-                          e.dataTransfer.setData("text/plain", String(idx));
-                          setDraggingIndex(idx);
-                          setDragOverIndex(idx);
-                        }}
-                        onDragOver={(e) => {
-                          if (slidesMode !== "manual") return;
-                          e.preventDefault();
-                          setDragOverIndex(idx);
-                        }}
-                        onDrop={(e) => {
-                          if (slidesMode !== "manual") return;
-                          e.preventDefault();
-                          if (draggingIndex == null) return;
-                          if (draggingIndex === idx) return;
-                          const nextSlides = moveIndex(manualSlides, draggingIndex, idx);
-                          const nextSelected = computeNewSelectedIndex(
-                            draggingIndex,
-                            idx,
-                            selectedIndex
-                          );
-                          updateContent({ slides: nextSlides });
-                          setSelectedIndex(nextSelected);
-                          setDraggingIndex(null);
-                          setDragOverIndex(null);
-                        }}
-                        onDragEnd={() => {
-                          setDraggingIndex(null);
-                          setDragOverIndex(null);
-                        }}
-                        onClick={() => setSelectedIndex(idx)}
-                        className={cn(
-                          "ce-slideshow-thumb relative rounded border p-1",
-                          slidesMode === "manual" ? "cursor-pointer" : "cursor-default",
-                          idx === selectedIndex
-                            ? "border-primary"
-                            : "border-border/50 hover:border-border/80",
-                          dragOverIndex === idx && draggingIndex !== null
-                            ? "ring-2 ring-primary/30"
-                            : ""
-                        )}
-                      >
-                        <img
-                          src={slide.src}
-                          alt={slide.alt ?? ""}
-                          className="w-20 h-14 object-cover rounded" 
-                          loading="lazy"
-                        />
-                        <div className="mt-1 text-[10px] text-muted-foreground text-center">
-                          {idx + 1}
-                        </div>
-                      </div>
-                    ))}
-                  </div>
+                  </Form.Group>
+                  <Form.Group>
+                    <Form.Label text="Arrondi image (border-radius)" />
+                    <Form.Input
+                      type="text"
+                      value={imageBorderRadius}
+                      placeholder="Ex: 12px, 1rem, 20%"
+                      onChange={(value) => updateContent({ imageBorderRadius: value ?? "0px" })}
+                      className="h-7"
+                    />
+                  </Form.Group>
                 </div>
+              </TabsContent>
+              <TabsContent value="images" className="mt-0">
+                <div className="flex flex-col gap-3 text-sm">
 
-                <div className="space-y-2">
 
-
-                  {slidesMode === "manual" && (
-                    <>
-                      <p className="node-block-title font-medium text-xs m-0">
-                        Image sélectionnée: {selectedIndex + 1}
-                      </p>
-                      <Form.Group>
-                        <Form.Label text="Source (URL)" />
-                        <InputFile
-                          type="text"
-                          value={selectedSlide?.src ?? ""}
-                          onChange={(value: string) => {
-                            const nextSlides = [...manualSlides];
-                            if (!nextSlides[selectedIndex]) return;
-                            nextSlides[selectedIndex] = {
-                              ...nextSlides[selectedIndex],
-                              src: value ?? DEFAULT_SLIDE_SRC,
-                            };
-                            updateContent({ slides: nextSlides });
-                          }}
-                          typeMedia="image"
-                          className="h-7 text-sm"
-                        />
-                      </Form.Group>
-                      <Form.Group>
-                        <Form.Label text="Alt" />
-                        <Form.Input
-                          type="text"
-                          value={selectedSlide?.alt ?? ""}
+                  <div className="space-y-2">
+                    <div className="flex items-center justify-between gap-2">
+                      <p className="node-block-title font-medium text-xs m-0">Slides</p>
+                      <div className="flex gap-3 items-center">
+                        <Form.Select
+                          value={slidesMode}
                           onChange={(value) => {
-                            const nextSlides = [...manualSlides];
-                            if (!nextSlides[selectedIndex]) return;
-                            nextSlides[selectedIndex] = {
-                              ...nextSlides[selectedIndex],
-                              alt: value ?? "",
-                            };
-                            updateContent({ slides: nextSlides });
-                          }}
-                          className="h-7"
-                        />
-                      </Form.Group>
-                      <Form.Group>
-                        <Form.Label text="Lien (optionnel)" />
-                        <Form.Input
-                          type="text"
-                          value={selectedSlide?.link ?? ""}
-                          placeholder="https://..."
-                          onChange={(value) => {
-                            const nextSlides = [...manualSlides];
-                            if (!nextSlides[selectedIndex]) return;
-                            nextSlides[selectedIndex] = {
-                              ...nextSlides[selectedIndex],
-                              link: value ?? "",
-                            };
-                            updateContent({ slides: nextSlides });
-                          }}
-                          className="h-7"
-                        />
-                      </Form.Group>
-                      <div className="flex gap-2">
-                        <Button
-                          type="button"
-                          variant="destructive"
-                          size="sm"
-                          onClick={() => {
-                            if (manualSlides.length <= 1) {
+                            const nextMode = (value as "manual" | "api-endpoint") || "manual";
+                            if (nextMode === "manual") {
+                              setApiPreviewSlides([]);
                               updateContent({
+                                slidesMode: "manual",
+                                apiId: undefined,
                                 slides: [
                                   {
                                     src: DEFAULT_SLIDE_SRC,
@@ -657,25 +416,264 @@ const Settings: FC<NodeSettingsProps> = () => {
                                 ],
                               });
                               setSelectedIndex(0);
-                              return;
+                            } else {
+                              setApiPreviewSlides([]);
+                              updateContent({
+                                slidesMode: "api-endpoint",
+                                apiId: apiId || undefined,
+                                slides: [],
+                              });
+                              setSelectedIndex(0);
                             }
-                            const nextSlides = manualSlides.filter((_, idx) => idx !== selectedIndex);
-                            const nextSelected = Math.min(selectedIndex, nextSlides.length - 1);
+                          }}
+                          options={[
+                            { value: "manual", label: "Liste manuelle" },
+                            { value: "api-endpoint", label: "Depuis endpoint API" },
+                          ]}
+                        />
+                      </div>
+                    </div>
+
+                    {slidesMode === "manual" ? (
+                      <div className="flex">
+                        <Button
+                          type="button"
+                          variant="outline"
+                          size="sm"
+                          onClick={() => {
+                            const nextSlides = [
+                              ...manualSlides,
+                              {
+                                src: DEFAULT_SLIDE_SRC,
+                                alt: "",
+                                source: "media" as const,
+                                link: "",
+                              },
+                            ];
                             updateContent({ slides: nextSlides });
-                            setSelectedIndex(nextSelected);
+                            setSelectedIndex(nextSlides.length - 1);
                           }}
                         >
-                          Supprimer
+                          Ajouter une slide
                         </Button>
                       </div>
-                    </>
-                  )}
+                    ) : (
+                      <div className="space-y-2">
+                        {selectedApiAdapter && (
+                          <p className="text-xs text-muted-foreground">
+                            API : <span className="font-medium text-foreground">{selectedApiAdapter.label}</span>
+                          </p>
+                        )}
+                        <Button
+                          type="button"
+                          variant="outline"
+                          size="sm"
+                          onClick={() => setApiModalOpen(true)}
+                        >
+                          <Database className="h-4 w-4 mr-2" />
+                          {apiId ? "Changer l'API" : "Sélectionner une API"}
+                        </Button>
+                        <ApiManagerModal
+                          open={apiModalOpen}
+                          onOpenChange={setApiModalOpen}
+                          apiId={apiId}
+                          typeFilter="image"
+                          collectionModeFilter="fixed"
+                          selectionMode="api"
+                          onSelect={(nextApiId) => {
+                            setApiPreviewSlides([]);
+                            updateContent({
+                              slidesMode: "api-endpoint",
+                              apiId: nextApiId,
+                              slides: [],
+                            });
+                          }}
+                        />
+                        {apiLoading && <p className="text-xs text-muted-foreground">Chargement...</p>}
+                        {apiError && (
+                          <p className="text-xs text-destructive bg-destructive/10 border border-destructive/20 rounded p-2">
+                            {apiError}
+                          </p>
+                        )}
+                        <div className="flex">
+                          <Button
+                            type="button"
+                            variant="outline"
+                            size="sm"
+                            onClick={() => {
+                              if (!apiId) return;
+                              void loadSlidesFromApi(apiId);
+                            }}
+                            disabled={!apiId || apiLoading}
+                          >
+                            Recharger
+                          </Button>
+                        </div>
+                      </div>
+                    )}
+
+                    <div className="flex flex-wrap gap-2">
+                      {displaySlides.map((slide, idx) => (
+                        <div
+                          key={`${slide.itemId ?? slide.src}-${idx}`}
+                          draggable={slidesMode === "manual"}
+                          onDragStart={(e) => {
+                            if (slidesMode !== "manual") return;
+                            e.dataTransfer.effectAllowed = "move";
+                            e.dataTransfer.setData("text/plain", String(idx));
+                            setDraggingIndex(idx);
+                            setDragOverIndex(idx);
+                          }}
+                          onDragOver={(e) => {
+                            if (slidesMode !== "manual") return;
+                            e.preventDefault();
+                            setDragOverIndex(idx);
+                          }}
+                          onDrop={(e) => {
+                            if (slidesMode !== "manual") return;
+                            e.preventDefault();
+                            if (draggingIndex == null) return;
+                            if (draggingIndex === idx) return;
+                            const nextSlides = moveIndex(manualSlides, draggingIndex, idx);
+                            const nextSelected = computeNewSelectedIndex(
+                              draggingIndex,
+                              idx,
+                              selectedIndex
+                            );
+                            updateContent({ slides: nextSlides });
+                            setSelectedIndex(nextSelected);
+                            setDraggingIndex(null);
+                            setDragOverIndex(null);
+                          }}
+                          onDragEnd={() => {
+                            setDraggingIndex(null);
+                            setDragOverIndex(null);
+                          }}
+                          onClick={() => setSelectedIndex(idx)}
+                          className={cn(
+                            "ce-slideshow-thumb relative rounded border p-1",
+                            slidesMode === "manual" ? "cursor-pointer" : "cursor-default",
+                            idx === selectedIndex
+                              ? "border-primary"
+                              : "border-border/50 hover:border-border/80",
+                            dragOverIndex === idx && draggingIndex !== null
+                              ? "ring-2 ring-primary/30"
+                              : ""
+                          )}
+                        >
+                          <img
+                            src={slide.src}
+                            alt={slide.alt ?? ""}
+                            className="w-20 h-14 object-cover rounded"
+                            loading="lazy"
+                          />
+                          <div className="mt-1 text-[10px] text-muted-foreground text-center">
+                            {idx + 1}
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+
+                  <div className="space-y-2">
+
+
+                    {slidesMode === "manual" && (
+                      <>
+                        <p className="node-block-title font-medium text-xs m-0">
+                          Image sélectionnée: {selectedIndex + 1}
+                        </p>
+                        <Form.Group>
+                          <Form.Label text="Source (URL)" />
+                          <InputFile
+                            type="text"
+                            value={selectedSlide?.src ?? ""}
+                            onChange={(value: string) => {
+                              const nextSlides = [...manualSlides];
+                              if (!nextSlides[selectedIndex]) return;
+                              nextSlides[selectedIndex] = {
+                                ...nextSlides[selectedIndex],
+                                src: value ?? DEFAULT_SLIDE_SRC,
+                              };
+                              updateContent({ slides: nextSlides });
+                            }}
+                            typeMedia="image"
+                            className="h-7 text-sm"
+                          />
+                        </Form.Group>
+                        <Form.Group>
+                          <Form.Label text="Alt" />
+                          <Form.Input
+                            type="text"
+                            value={selectedSlide?.alt ?? ""}
+                            onChange={(value) => {
+                              const nextSlides = [...manualSlides];
+                              if (!nextSlides[selectedIndex]) return;
+                              nextSlides[selectedIndex] = {
+                                ...nextSlides[selectedIndex],
+                                alt: value ?? "",
+                              };
+                              updateContent({ slides: nextSlides });
+                            }}
+                            className="h-7"
+                          />
+                        </Form.Group>
+                        <Form.Group>
+                          <Form.Label text="Lien (optionnel)" />
+                          <Form.Input
+                            type="text"
+                            value={selectedSlide?.link ?? ""}
+                            placeholder="https://..."
+                            onChange={(value) => {
+                              const nextSlides = [...manualSlides];
+                              if (!nextSlides[selectedIndex]) return;
+                              nextSlides[selectedIndex] = {
+                                ...nextSlides[selectedIndex],
+                                link: value ?? "",
+                              };
+                              updateContent({ slides: nextSlides });
+                            }}
+                            className="h-7"
+                          />
+                        </Form.Group>
+                        <div className="flex gap-2">
+                          <Button
+                            type="button"
+                            variant="destructive"
+                            size="sm"
+                            onClick={() => {
+                              if (manualSlides.length <= 1) {
+                                updateContent({
+                                  slides: [
+                                    {
+                                      src: DEFAULT_SLIDE_SRC,
+                                      alt: "",
+                                      source: "media" as const,
+                                      link: "",
+                                    },
+                                  ],
+                                });
+                                setSelectedIndex(0);
+                                return;
+                              }
+                              const nextSlides = manualSlides.filter((_, idx) => idx !== selectedIndex);
+                              const nextSelected = Math.min(selectedIndex, nextSlides.length - 1);
+                              updateContent({ slides: nextSlides });
+                              setSelectedIndex(nextSelected);
+                            }}
+                          >
+                            Supprimer
+                          </Button>
+                        </div>
+                      </>
+                    )}
+                  </div>
                 </div>
-              </div>
-            </TabsContent>
-          </>
-        }
-      />
+              </TabsContent>
+            </>
+          }
+        />
+      </div>
     </Tabs>
   );
 };

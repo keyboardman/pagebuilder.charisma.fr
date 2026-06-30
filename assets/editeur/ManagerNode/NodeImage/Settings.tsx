@@ -33,16 +33,22 @@ const Settings: FC<NodeSettingsProps> = () => {
   };
 
   return (
-    <Tabs className="flex min-h-0 flex-1 flex-col overflow-hidden" defaultValue="link">
+    <Tabs className="flex min-h-0 flex-1 flex-col overflow-hidden" defaultValue="general">
       <div className="flex min-h-0 flex-1 flex-col overflow-hidden">
         <NodeSettingsWrapper
           header={
             <>
               <TabsList className="mb-3 w-full justify-center">
+                <TabsTrigger value="general">Général</TabsTrigger>
                 <TabsTrigger value="link">Lien</TabsTrigger>
                 <TabsTrigger value="image">Image</TabsTrigger>
               </TabsList>
-              <TabsContent value="link" className="mt-0">
+
+            </>
+          }
+          content={
+            <>
+              <TabsContent value="general" className="mt-0">
                 <Base2Settings
                   attributes={node.attributes}
                   onChange={(attributes) =>
@@ -52,36 +58,6 @@ const Settings: FC<NodeSettingsProps> = () => {
                     })
                   }
                 />
-                <Form.Group>
-                  <Form.Label text="URL (href)" />
-                  <Form.Input
-                    type="text"
-                    value={content.href}
-                    onChange={(value) =>
-                      onChange({
-                        ...node,
-                        content: { ...node.content, href: value ?? "" },
-                      })
-                    }
-                    className="h-7 text-sm"
-                    placeholder="https://..."
-                  />
-                </Form.Group>
-                <Form.Group>
-                  <Form.Label text="Cible (target)" />
-                  <Form.Select
-                    value={content.target}
-                    onChange={(value) =>
-                      onChange({
-                        ...node,
-                        content: { ...node.content, target: value ?? "_self" },
-                      })
-                    }
-                    options={TARGET_OPTIONS}
-                  />
-                </Form.Group>
-              </TabsContent>
-              <TabsContent value="image" className="mt-0">
                 <Form.Group>
                   <Form.Label text="Source" />
                   <InputFile
@@ -112,36 +88,67 @@ const Settings: FC<NodeSettingsProps> = () => {
                   />
                 </Form.Group>
               </TabsContent>
+              <TabsContent value="link" className="mt-0">
+
+                <Form.Group>
+                  <Form.Label text="URL (href)" />
+                  <Form.Input
+                    type="text"
+                    value={content.href}
+                    onChange={(value) =>
+                      onChange({
+                        ...node,
+                        content: { ...node.content, href: value ?? "" },
+                      })
+                    }
+                    className="h-7 text-sm"
+                    placeholder="https://..."
+                  />
+                </Form.Group>
+                <Form.Group>
+                  <Form.Label text="Cible (target)" />
+                  <Form.Select
+                    value={content.target}
+                    onChange={(value) =>
+                      onChange({
+                        ...node,
+                        content: { ...node.content, target: value ?? "_self" },
+                      })
+                    }
+                    options={TARGET_OPTIONS}
+                  />
+                </Form.Group>
+              </TabsContent>
+
+              <TabsContent value="image" className="mt-0">
+                <Object2Settings
+                  themeOverrideSelector={THEME_SELECTORS.image}
+                  style={style}
+                  onChange={updateStyle}
+                />
+                <Background2Settings
+                  themeOverrideSelector={THEME_SELECTORS.image}
+                  style={style}
+                  onChange={updateStyle}
+                />
+                <Border2Settings
+                  themeOverrideSelector={THEME_SELECTORS.image}
+                  style={style}
+                  onChange={updateStyle}
+                />
+                <Spacing2Settings
+                  themeOverrideSelector={THEME_SELECTORS.image}
+                  style={style}
+                  onChange={updateStyle}
+                />
+                <Size2Settings
+                  themeOverrideSelector={THEME_SELECTORS.image}
+                  style={style}
+                  onChange={updateStyle}
+                />
+              </TabsContent>
             </>
-          }
-          content={
-            <TabsContent value="image" className="mt-0">
-              <Object2Settings
-                themeOverrideSelector={THEME_SELECTORS.image}
-                style={style}
-                onChange={updateStyle}
-              />
-              <Background2Settings
-                themeOverrideSelector={THEME_SELECTORS.image}
-                style={style}
-                onChange={updateStyle}
-              />
-              <Border2Settings
-                themeOverrideSelector={THEME_SELECTORS.image}
-                style={style}
-                onChange={updateStyle}
-              />
-              <Spacing2Settings
-                themeOverrideSelector={THEME_SELECTORS.image}
-                style={style}
-                onChange={updateStyle}
-              />
-              <Size2Settings
-                themeOverrideSelector={THEME_SELECTORS.image}
-                style={style}
-                onChange={updateStyle}
-              />
-            </TabsContent>
+
           }
         />
       </div>

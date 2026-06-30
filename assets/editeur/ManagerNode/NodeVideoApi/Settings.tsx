@@ -1,16 +1,21 @@
-import { type FC, useEffect, useState } from "react";
+import { type CSSProperties, type FC, useEffect, useState } from "react";
 import { useNodeBuilderContext } from "../../services/providers/NodeBuilderContext";
 import { type NodeSettingsProps } from "../NodeConfigurationType";
 import type { NodeVideoApiType } from "./index";
 import { ApiManagerModal } from "../../ManagerApi/ApiManagerModal";
 import { apiRegistry } from "../../ManagerApi/ApiRegistry";
-import { Loader2, AlertCircle } from "lucide-react";
+import { Loader2, AlertCircle, Database } from "lucide-react";
 import { Button } from "@/editeur/components/ui/button";
-import { Database } from "lucide-react";
 import { NodeSettingsWrapper } from "../components/NodeSettingsWrapper";
-import { Base2Settings, Background2Settings, Spacing2Settings, Border2Settings, Object2Settings, Text2Settings } from "../Settings";
-import { Tabs, TabsList, TabsTrigger } from "@/editeur/components/ui/tabs";
-import { TabsContent } from "@/editeur/components/ui/tabs";
+import {
+  Base2Settings,
+  Background2Settings,
+  Spacing2Settings,
+  Border2Settings,
+  Object2Settings,
+  Text2Settings,
+} from "../Settings";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/editeur/components/ui/tabs";
 import { Switch } from "@/editeur/components/ui/switch";
 
 const Settings: FC<NodeSettingsProps> = () => {
@@ -21,9 +26,6 @@ const Settings: FC<NodeSettingsProps> = () => {
   const [error, setError] = useState<string | null>(null);
   const [modalOpen, setModalOpen] = useState<boolean>(false);
 
-  console.log("node", node);
-
-  // Charger automatiquement l'item si apiId et itemId sont définis
   useEffect(() => {
     const loadItem = async () => {
       if (!content.apiId || !content.itemId) {
@@ -43,15 +45,10 @@ const Settings: FC<NodeSettingsProps> = () => {
         const item = await adapter.fetchItem(content.itemId);
         const mappedData = adapter.mapItem(item);
 
-        // Mapper les données de l'API vers les champs de la vidéo
-        // src depuis src (pour les APIs vidéo), link, ou image si aucun n'est disponible
-        const videoSrc = (mappedData as any).src || mappedData.link || mappedData.image || "";
-        // poster depuis image
+        const videoSrc = (mappedData as { src?: string }).src || mappedData.link || mappedData.image || "";
         const videoPoster = mappedData.image || "";
-        // titre depuis title
         const videoTitle = mappedData.title || "";
 
-        // Mettre à jour le contenu avec les données mappées
         onChange({
           ...node,
           content: {
@@ -60,12 +57,10 @@ const Settings: FC<NodeSettingsProps> = () => {
             itemId: content.itemId,
             src: videoSrc,
             poster: videoPoster,
-            // Préserver les styles existants du titre lors du mapping
             title: {
               ...(videoApiNode.content?.title || { className: "", style: {} }),
               text: videoTitle,
             },
-            // Autoplay et controls toujours à true
             autoplay: true,
             controls: true,
           },
@@ -81,19 +76,20 @@ const Settings: FC<NodeSettingsProps> = () => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [content.apiId, content.itemId]);
 
-  const handleItemSelect = (apiId: string, itemId: string, mappedData: {
-    id: string;
-    title: string;
-    description?: string;
-    image?: string;
-    link?: string;
-    raw: unknown;
-  }) => {
-    // Mapper les données de l'API vers les champs de la vidéo
-    // src depuis src (pour les APIs vidéo), link, ou image si aucun n'est disponible
-    const videoSrc = (mappedData as any).src || mappedData.link || mappedData.image || "";
+  const handleItemSelect = (
+    apiId: string,
+    itemId: string,
+    mappedData: {
+      id: string;
+      title: string;
+      description?: string;
+      image?: string;
+      link?: string;
+      raw: unknown;
+    }
+  ) => {
+    const videoSrc = (mappedData as { src?: string }).src || mappedData.link || mappedData.image || "";
     const videoPoster = mappedData.image || "";
-    // titre depuis title
     const videoTitle = mappedData.title || "";
 
     onChange({
@@ -104,12 +100,10 @@ const Settings: FC<NodeSettingsProps> = () => {
         itemId,
         src: videoSrc,
         poster: videoPoster,
-        // Préserver les styles existants du titre lors du mapping
         title: {
           ...(videoApiNode.content?.title || { className: "", style: {} }),
           text: videoTitle,
         },
-        // Autoplay et controls toujours à true
         autoplay: true,
         controls: true,
       },
@@ -136,8 +130,12 @@ const Settings: FC<NodeSettingsProps> = () => {
         )}
         {content.apiId && selectedAdapter && (
           <div className="p-2 bg-muted/50 rounded text-xs">
-            <p className="node-block-title text-foreground text-sm">API: <span className="font-medium">{selectedAdapter.label}</span></p>
-            <p className="node-block-title text-foreground mt-1 text-sm">Item: <span className="font-medium">{selectedItemTitle}</span></p>
+            <p className="node-block-title text-foreground text-sm">
+              API: <span className="font-medium">{selectedAdapter.label}</span>
+            </p>
+            <p className="node-block-title text-foreground mt-1 text-sm">
+              Item: <span className="font-medium">{selectedItemTitle}</span>
+            </p>
           </div>
         )}
         <Button
@@ -165,124 +163,88 @@ const Settings: FC<NodeSettingsProps> = () => {
   const titleStyle = content.title?.style || {};
   const imageStyle = content.image?.style || {};
 
+  const updateCardStyle = (style: CSSProperties) =>
+    onChange({
+      ...node,
+      content: { ...node.content, card: { ...node.content?.card, style } },
+    });
+
+  const updateTitleStyle = (style: CSSProperties) =>
+    onChange({
+      ...node,
+      content: { ...node.content, title: { ...node.content?.title, style } },
+    });
+
+  const updateImageStyle = (style: CSSProperties) =>
+    onChange({
+      ...node,
+      content: { ...node.content, image: { ...node.content?.image, style } },
+    });
+
   return (
-    <Tabs className="flex min-h-0 flex-1 flex-col overflow-hidden" defaultValue="card">
-      <div className="flex min-h-0 flex-1 flex-col overflow-hidden">
-        <NodeSettingsWrapper 
-          header={<>
-            {renderApiSection()}
-            <Base2Settings
-              attributes={node.attributes}
-              onChange={(attributes: { className?: string; id?: string }) => onChange({
-                ...node,
-                attributes: {
-                  ...node.attributes,
-                  ...attributes
-                }
-              })}
-
-            />
-            <TabsList className="justify-center w-full">
-              <TabsTrigger value="card">Card</TabsTrigger>
-              <TabsTrigger value="title">Title</TabsTrigger>
-              <TabsTrigger value="image">Image</TabsTrigger>
-            </TabsList>
-          </>} 
-          content={<>
-            <TabsContent value="card">
-              
-              <Background2Settings
-                style={cardStyle}
-                onChange={(style) => onChange({
-                  ...node,
-                  content: { ...node.content, card: { ...node.content?.card, style } }
-                })}
-              />
-              <Border2Settings
-                style={cardStyle}
-                onChange={(style) => onChange({
-                  ...node,
-                  content: { ...node.content, card: { ...node.content?.card, style } }
-                })}
-              />
-              <Spacing2Settings
-                style={cardStyle}
-                onChange={(style) => onChange({
-                  ...node,
-                  content: { ...node.content, card: { ...node.content?.card, style } }
-                })}
-              />
-
-            </TabsContent>
-            <TabsContent value="title">
-              <div>
-                Visible&nbsp;
-                <Switch
-                  checked={content?.showTitle !== false}
-                  onCheckedChange={(checked) => {
+    <Tabs className="flex h-full min-h-0 flex-1 flex-col overflow-hidden" defaultValue="general">
+      <div className="flex h-full min-h-0 flex-1 flex-col overflow-hidden">
+        <NodeSettingsWrapper
+          header={
+            <>
+              <TabsList className="mb-3 w-full justify-center">
+                <TabsTrigger value="general">Général</TabsTrigger>
+                <TabsTrigger value="card">Card</TabsTrigger>
+                <TabsTrigger value="title">Titre</TabsTrigger>
+                <TabsTrigger value="image">Image</TabsTrigger>
+              </TabsList>
+              <TabsContent value="general" className="mt-0">
+                {renderApiSection()}
+                <Base2Settings
+                  attributes={node.attributes}
+                  onChange={(attributes: { className?: string; id?: string }) =>
                     onChange({
                       ...node,
-                      content: {
-                        ...node.content,
-                        showTitle: checked,
+                      attributes: {
+                        ...node.attributes,
+                        ...attributes,
                       },
-                    });
-                  }}
+                    })
+                  }
                 />
-              </div>
-              <Text2Settings
-                style={titleStyle}
-                onChange={(style) => onChange({
-                  ...node,
-                  content: { ...node.content, title: { ...node.content?.title, style } }
-                })}
-              />
-              <Background2Settings
-                style={titleStyle}
-                onChange={(style) => onChange({
-                  ...node,
-                  content: { ...node.content, title: { ...node.content?.title, style } }
-                })}
-              />
-              <Border2Settings
-                style={titleStyle}
-                onChange={(style) => onChange({
-                  ...node,
-                  content: { ...node.content, title: { ...node.content?.title, style } }
-                })}
-              />
-              <Spacing2Settings
-                style={titleStyle}
-                onChange={(style) => onChange({
-                  ...node,
-                  content: { ...node.content, title: { ...node.content?.title, style } }
-                })}
-              />
-            </TabsContent>
-            <TabsContent value="image">
-              <Object2Settings
-                style={imageStyle}
-                onChange={(style) => onChange({
-                  ...node,
-                  content: { ...node.content, image: { ...node.content?.image, style } }
-                })}
-              />
-              <Border2Settings
-                style={imageStyle}
-                onChange={(style) => onChange({
-                  ...node,
-                  content: { ...node.content, image: { ...node.content?.image, style } }
-                })}
-              />
-              <Spacing2Settings
-                style={imageStyle}
-                onChange={(style) => onChange({
-                  ...node,
-                  content: { ...node.content, image: { ...node.content?.image, style } }
-                })}
-              />
-            </TabsContent>
-          </>} 
+              </TabsContent>
+            </>
+          }
+          content={
+            <>
+              <TabsContent value="card" className="mt-0">
+                <Background2Settings style={cardStyle} onChange={updateCardStyle} />
+                <Border2Settings style={cardStyle} onChange={updateCardStyle} />
+                <Spacing2Settings style={cardStyle} onChange={updateCardStyle} />
+              </TabsContent>
+              <TabsContent value="title" className="mt-0">
+                <div>
+                  Visible&nbsp;
+                  <Switch
+                    checked={content?.showTitle !== false}
+                    onCheckedChange={(checked) => {
+                      onChange({
+                        ...node,
+                        content: {
+                          ...node.content,
+                          showTitle: checked,
+                        },
+                      });
+                    }}
+                  />
+                </div>
+                <Text2Settings style={titleStyle} onChange={updateTitleStyle} />
+                <Background2Settings style={titleStyle} onChange={updateTitleStyle} />
+                <Border2Settings style={titleStyle} onChange={updateTitleStyle} />
+                <Spacing2Settings style={titleStyle} onChange={updateTitleStyle} />
+              </TabsContent>
+              <TabsContent value="image" className="mt-0">
+                <Object2Settings style={imageStyle} onChange={updateImageStyle} />
+                <Border2Settings style={imageStyle} onChange={updateImageStyle} />
+                <Spacing2Settings style={imageStyle} onChange={updateImageStyle} />
+              </TabsContent>
+            </>
+          }
         />
       </div>
     </Tabs>

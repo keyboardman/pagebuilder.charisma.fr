@@ -218,75 +218,78 @@ const Settings: FC<NodeSettingsProps> = () => {
   };
 
   return (
-    <Tabs className="flex min-h-0 flex-1 flex-col overflow-hidden" defaultValue="container">
-      <div className="flex min-h-0 flex-1 flex-col overflow-hidden">
+    <Tabs className="flex h-full min-h-0 flex-1 flex-col overflow-hidden" defaultValue="general">
+      <div className="flex h-full min-h-0 flex-1 flex-col overflow-hidden">
         <NodeSettingsWrapper
           header={
             <>
-              <Base2Settings
-                attributes={node.attributes}
-                onChange={(attributes: { className?: string; id?: string }) =>
-                  onChange({ ...node, attributes: { ...node.attributes, ...attributes } })
-                }
-              />
-              <Form.Group>
-                <Form.Label text="Type de tag" />
-                <Form.Select
-                  value={currentTag}
-                  onChange={(value) =>
-                    onChange({
-                      ...node,
-                      content: { ...node.content, tag: value as NodeTextIconTag },
-                    })
-                  }
-                  options={TAG_OPTIONS}
-                />
-              </Form.Group>
-              <Form.Group>
-                <Form.Label text="Lien texte (URL)" />
-                <Form.Input
-                  type="text"
-                  value={linkUrl}
-                  onChange={(value) =>
-                    onChange({
-                      ...node,
-                      content: { ...node.content, linkUrl: value ?? "" },
-                    })
-                  }
-                  placeholder="https://..."
-                />
-              </Form.Group>
-              <Form.Group>
-                <Form.Label text="Alignement horizontal" />
-                <Form.Select
-                  value={horizontalAlign}
-                  onChange={(value) =>
-                    onChange({
-                      ...node,
-                      content: { ...node.content, horizontalAlign: value as NodeTextIconHorizontalAlign },
-                    })
-                  }
-                  options={HORIZONTAL_ALIGN_OPTIONS}
-                />
-              </Form.Group>
-              <Form.Group>
-                <Form.Label text="Alignement vertical" />
-                <Form.Select
-                  value={verticalAlign}
-                  onChange={(value) =>
-                    onChange({
-                      ...node,
-                      content: { ...node.content, verticalAlign: value as NodeTextIconVerticalAlign },
-                    })
-                  }
-                  options={VERTICAL_ALIGN_OPTIONS}
-                />
-              </Form.Group>
               <TabsList className="mb-3 w-full justify-center">
+                <TabsTrigger value="general">Général</TabsTrigger>
                 <TabsTrigger value="container">Conteneur</TabsTrigger>
                 <TabsTrigger value="icon">Icône</TabsTrigger>
                 <TabsTrigger value="text">Texte</TabsTrigger>
               </TabsList>
+              <TabsContent value="general" className="mt-0">
+                <Base2Settings
+                  attributes={node.attributes}
+                  onChange={(attributes: { className?: string; id?: string }) =>
+                    onChange({ ...node, attributes: { ...node.attributes, ...attributes } })
+                  }
+                />
+                <Form.Group>
+                  <Form.Label text="Type de tag" />
+                  <Form.Select
+                    value={currentTag}
+                    onChange={(value) =>
+                      onChange({
+                        ...node,
+                        content: { ...node.content, tag: value as NodeTextIconTag },
+                      })
+                    }
+                    options={TAG_OPTIONS}
+                  />
+                </Form.Group>
+                <Form.Group>
+                  <Form.Label text="Lien texte (URL)" />
+                  <Form.Input
+                    type="text"
+                    value={linkUrl}
+                    onChange={(value) =>
+                      onChange({
+                        ...node,
+                        content: { ...node.content, linkUrl: value ?? "" },
+                      })
+                    }
+                    placeholder="https://..."
+                  />
+                </Form.Group>
+                <Form.Group>
+                  <Form.Label text="Alignement horizontal" />
+                  <Form.Select
+                    value={horizontalAlign}
+                    onChange={(value) =>
+                      onChange({
+                        ...node,
+                        content: { ...node.content, horizontalAlign: value as NodeTextIconHorizontalAlign },
+                      })
+                    }
+                    options={HORIZONTAL_ALIGN_OPTIONS}
+                  />
+                </Form.Group>
+                <Form.Group>
+                  <Form.Label text="Alignement vertical" />
+                  <Form.Select
+                    value={verticalAlign}
+                    onChange={(value) =>
+                      onChange({
+                        ...node,
+                        content: { ...node.content, verticalAlign: value as NodeTextIconVerticalAlign },
+                      })
+                    }
+                    options={VERTICAL_ALIGN_OPTIONS}
+                  />
+                </Form.Group>
+              </TabsContent>
             </>
           }
           content={

@@ -5,15 +5,21 @@ import { type NodeSettingsProps } from "../NodeConfigurationType";
 import type { NodeCardApiType } from "./index";
 import { ApiManagerModal } from "../../ManagerApi/ApiManagerModal";
 import { apiRegistry } from "../../ManagerApi/ApiRegistry";
-import { Loader2, AlertCircle } from "lucide-react";
+import { Loader2, AlertCircle, Database } from "lucide-react";
 import { Button } from "@/editeur/components/ui/button";
-import { Database } from "lucide-react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/editeur/components/ui/tabs";
 import { NodeSettingsWrapper } from "../components/NodeSettingsWrapper";
-import { CardSettings, ContainerSettings, ImageSettings, TitleSettings, TextSettings, LabelsSettings } from "./Settings/index";
+import {
+  CardSettings,
+  ContainerSettings,
+  ImageSettings,
+  TitleSettings,
+  TextSettings,
+  LabelsSettings,
+} from "./Settings/index";
 
-function extractText(mappedData: { text?: string; description?: string; }): string {
-  return mappedData?.text?.trim() as string || "";
+function extractText(mappedData: { text?: string; description?: string }): string {
+  return (mappedData?.text?.trim() as string) || "";
 }
 
 function extractLabels(mappedData: { labels?: string[] | string; raw: unknown }): string[] {
@@ -39,7 +45,6 @@ const Settings: FC<NodeSettingsProps> = () => {
   const [error, setError] = useState<string | null>(null);
   const [modalOpen, setModalOpen] = useState<boolean>(false);
 
-  // Charger automatiquement l'item si apiId et itemId sont définis
   useEffect(() => {
     const loadItem = async () => {
       if (!content.apiId || !content.itemId) {
@@ -61,17 +66,14 @@ const Settings: FC<NodeSettingsProps> = () => {
         const nextText = extractText(mappedData);
         const nextLabels = extractLabels(mappedData);
 
-        // Mettre à jour le contenu avec les données mappées
         onChange({
           ...node,
           content: {
             ...cardApiNode.content,
-            // Conserver les autres champs existants
             apiId: content.apiId,
             itemId: content.itemId,
             container: {
               ...(cardApiNode.content?.container ?? {}),
-              // Utiliser le lien de l'API si disponible, sinon conserver le lien existant
               link: mappedData.link || cardApiNode.content?.container?.link || "#",
             },
             title: {
@@ -89,7 +91,7 @@ const Settings: FC<NodeSettingsProps> = () => {
             },
             labels: {
               ...(cardApiNode.content?.labels ?? {}),
-              items: nextLabels.length > 0 ? nextLabels : (content.labels?.items || []),
+              items: nextLabels.length > 0 ? nextLabels : content.labels?.items || [],
             },
           },
         });
@@ -104,14 +106,18 @@ const Settings: FC<NodeSettingsProps> = () => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [content.apiId, content.itemId]);
 
-  const handleItemSelect = (apiId: string, itemId: string, mappedData: {
-    id: string;
-    title: string;
-    description?: string;
-    image?: string;
-    link?: string;
-    raw: unknown;
-  }) => {
+  const handleItemSelect = (
+    apiId: string,
+    itemId: string,
+    mappedData: {
+      id: string;
+      title: string;
+      description?: string;
+      image?: string;
+      link?: string;
+      raw: unknown;
+    }
+  ) => {
     const nextText = extractText(mappedData);
     const nextLabels = extractLabels(mappedData);
     onChange({
@@ -122,7 +128,6 @@ const Settings: FC<NodeSettingsProps> = () => {
         itemId,
         container: {
           ...(cardApiNode.content?.container ?? {}),
-          // Utiliser le lien de l'API si disponible, sinon conserver le lien existant
           link: mappedData.link || cardApiNode.content?.container?.link || "#",
         },
         title: {
@@ -150,7 +155,7 @@ const Settings: FC<NodeSettingsProps> = () => {
     const selectedAdapter = content.apiId ? apiRegistry.get(content.apiId) : null;
 
     return (
-      <div className="flex flex-1 flex-col gap-1 p-1 m-1 border border-border/30 rounded-lg">
+      <div className="flex flex-1 flex-col gap-1 p-1 m-1 border border-border/30 rounded-lg mb-3">
         <label className="node-block-title text-sm text-center font-medium">Sélection API</label>
         {loading && (
           <div className="flex items-center justify-center py-4">
@@ -165,7 +170,9 @@ const Settings: FC<NodeSettingsProps> = () => {
         )}
         {content.apiId && selectedAdapter && (
           <div className="px-2 bg-muted/50 rounded text-xs">
-            <p className="node-block-title text-sm text-muted-foreground">API: <span className="font-medium">{selectedAdapter.label}</span></p>
+            <p className="node-block-title text-sm text-muted-foreground">
+              API: <span className="font-medium text-foreground">{selectedAdapter.label}</span>
+            </p>
           </div>
         )}
         <Button
@@ -190,57 +197,59 @@ const Settings: FC<NodeSettingsProps> = () => {
   };
 
   return (
-    <Tabs className="flex min-h-0 flex-1 flex-col overflow-hidden" defaultValue="card">
-      <div className="flex min-h-0 flex-1 flex-col overflow-hidden">
+    <Tabs className="flex h-full min-h-0 flex-1 flex-col overflow-hidden" defaultValue="general">
+      <div className="flex h-full min-h-0 flex-1 flex-col overflow-hidden">
         <NodeSettingsWrapper
-        header={
-          <>
-            {renderApiSection()}
-            <Base2Settings
-              attributes={node.attributes}
-              onChange={(attributes: { className?: string; id?: string }) =>
-                onChange({ ...node, attributes: { ...node.attributes, ...attributes } })
-              }
-            />
-            <TabsList className="justify-center w-full">
-              <TabsTrigger value="card">Card</TabsTrigger>
-              <TabsTrigger value="container">Container</TabsTrigger>
-            </TabsList>
-            <TabsList className="justify-center w-full">
-              <TabsTrigger value="image">Image</TabsTrigger>
-              <TabsTrigger value="title">Titre</TabsTrigger>
-              <TabsTrigger value="text">Texte</TabsTrigger>
-              <TabsTrigger value="labels">Label</TabsTrigger>
-            </TabsList>
-
-          </>
-        }
-        content={<>
-          <TabsContent value="card">
-            <CardSettings />
-          </TabsContent>
-          <TabsContent value="container">
-            <ContainerSettings />
-          </TabsContent>
-          <TabsContent value="image">
-            <ImageSettings />
-          </TabsContent>
-          <TabsContent value="title">
-            <TitleSettings />
-          </TabsContent>
-          <TabsContent value="text">
-            <TextSettings />
-          </TabsContent>
-          <TabsContent value="labels">
-            <LabelsSettings />
-          </TabsContent>
-        </>}
-      />
+          header={
+            <>
+              <TabsList className="mb-3 w-full justify-center">
+                <TabsTrigger value="general">Général</TabsTrigger>
+                <TabsTrigger value="card">Card</TabsTrigger>
+                <TabsTrigger value="container">Container</TabsTrigger>
+              </TabsList>
+              <TabsList className="mb-3 w-full justify-center">
+                <TabsTrigger value="image">Image</TabsTrigger>
+                <TabsTrigger value="title">Titre</TabsTrigger>
+                <TabsTrigger value="text">Texte</TabsTrigger>
+                <TabsTrigger value="labels">Labels</TabsTrigger>
+              </TabsList>
+              <TabsContent value="general" className="mt-0">
+                {renderApiSection()}
+                <Base2Settings
+                  attributes={node.attributes}
+                  onChange={(attributes: { className?: string; id?: string }) =>
+                    onChange({ ...node, attributes: { ...node.attributes, ...attributes } })
+                  }
+                />
+              </TabsContent>
+            </>
+          }
+          content={
+            <>
+              <TabsContent value="card" className="mt-0">
+                <CardSettings />
+              </TabsContent>
+              <TabsContent value="container" className="mt-0">
+                <ContainerSettings />
+              </TabsContent>
+              <TabsContent value="image" className="mt-0">
+                <ImageSettings />
+              </TabsContent>
+              <TabsContent value="title" className="mt-0">
+                <TitleSettings />
+              </TabsContent>
+              <TabsContent value="text" className="mt-0">
+                <TextSettings />
+              </TabsContent>
+              <TabsContent value="labels" className="mt-0">
+                <LabelsSettings />
+              </TabsContent>
+            </>
+          }
+        />
       </div>
     </Tabs>
-
-  )
-
+  );
 };
 
 export default Settings;

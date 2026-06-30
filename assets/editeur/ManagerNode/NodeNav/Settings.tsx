@@ -29,118 +29,147 @@ const Settings: FC<NodeSettingsProps> = () => {
   const { node: navNode, onChange } = useNodeBuilderContext();
   const node = navNode as NodeNavType;
 
-
   return (
-    <Tabs defaultValue="nav" className="flex min-h-0 flex-1 flex-col overflow-hidden">
-      <div className="flex min-h-0 flex-1 flex-col overflow-hidden">
+    <Tabs className="flex h-full min-h-0 flex-1 flex-col overflow-hidden" defaultValue="general">
+      <div className="flex h-full min-h-0 flex-1 flex-col overflow-hidden">
         <NodeSettingsWrapper
           header={
             <>
-              <Base2Settings
-                attributes={node.attributes}
-                onChange={(attributes: { className?: string; id?: string }) =>
-                  onChange({ ...node, attributes: { ...node.attributes, ...attributes } })
-                }
-              />
-
-              {/** Zone d’options générales Nav (toujours visible dans l’onglet courant) */}
-              <div className="mt-2 space-y-2 text-xs">
-                <p className="node-block-title font-medium text-foreground text-sm">Menu Nav</p>
-                <div className="flex items-center gap-2">
-                  <span className="node-block-title w-14 shrink-0 text-foreground text-sm">Direction</span>
-                  <Form.Select
-                    value={node.content?.options?.direction as string ?? "horizontal"}
-                    onChange={(v) => onChange({
-                      ...node,
-                      content: { ...node.content, options: { ...node.content?.options, direction: v as NodeNavDirection } }
-                    })}
-                    options={DIRECTION_OPTIONS}
-                    className="h-7 flex-1 min-w-0 text-[0.75rem]"
-                  />
-                </div>
-                <div className="flex items-center gap-2">
-                  <span className="node-block-title w-14 shrink-0 text-foreground text-sm">Variante</span>
-                  <Form.Select
-                    value={(node.content?.options?.variant as string) ?? "navbar"}
-                    onChange={(v) => onChange({
-                      ...node,
-                      content: { ...node.content, options: { ...node.content?.options, variant: v as NodeNavVariant } }
-                    })}
-                    options={VARIANT_OPTIONS}
-                    className="h-7 flex-1 min-w-0 text-[0.75rem]"
-                  />
-                </div>
-                <div className="flex items-center gap-2">
-                  <span className="node-block-title w-14 shrink-0 text-foreground text-sm">Justify</span>
-                  <Form.Select
-                    value={(node.content?.options?.justify as string) ?? "flex-start"}
-                    onChange={
-                      (v) => onChange({
-                        ...node,
-                        content: { ...node.content, options: { ...node.content?.options, justify: v  } }
-                      })
-                    }
-                    options={[
-                      { value: "flex-start", label: "Début" },
-                      { value: "center", label: "Centre" },
-                      { value: "flex-end", label: "Fin" },
-                      { value: "space-between", label: "Between" },
-                      { value: "space-around", label: "Around" },
-                      { value: "space-evenly", label: "Evenly" },
-                    ]}
-                    className="h-7 flex-1 min-w-0 text-[0.75rem]"
-                  />
-                </div>
-                <div className="flex items-center gap-2">
-                  <span className="node-block-title w-14 shrink-0 text-foreground text-sm">Gap</span>
-                  <Form.Input
-                    type="number"
-                    value={(node.content?.options?.gap ?? 0).toString()}
-                    onChange={(value: string) => {
-                      const num = parseInt(value, 10);
-                      if (!Number.isNaN(num) && num >= 0 && num <= 20) {
-                        onChange({
-                          ...node,
-                          content: { ...node.content, options: { ...node.content?.options, gap: num } }
-                        })
-                      }
-                    }}
-                    className="h-7 flex-1 min-w-0 text-[0.75rem]"
-                    min={0}
-                    max={20}
-                  />
-                </div>
-                <div className="flex items-center gap-2">
-                  <span className="node-block-title w-14 shrink-0 text-foreground text-sm">
-                    Icône burger
-                  </span>
-                  <input
-                    type="checkbox"
-                    checked={node.content?.options?.showBurger === true}
-                    onChange={(e) => onChange({
-                      ...node,
-                      content: { ...node.content, options: { ...node.content?.options, showBurger: e.target.checked } }
-                    })}
-                    className="h-4 w-4 rounded border-input"
-                  />
-                </div>
-              </div>
-              <TabsList className="justify-center w-full mt-2">
+              <TabsList className="mb-3 w-full justify-center">
+                <TabsTrigger value="general">Général</TabsTrigger>
                 <TabsTrigger value="nav">Nav</TabsTrigger>
                 <TabsTrigger value="burger">Burger</TabsTrigger>
               </TabsList>
+              <TabsContent value="general" className="mt-0">
+                <Base2Settings
+                  attributes={node.attributes}
+                  onChange={(attributes: { className?: string; id?: string }) =>
+                    onChange({ ...node, attributes: { ...node.attributes, ...attributes } })
+                  }
+                />
+
+                <div className="mt-2 space-y-2 text-xs">
+                  <p className="node-block-title font-medium text-foreground text-sm">Menu Nav</p>
+                  <div className="flex items-center gap-2">
+                    <span className="node-block-title w-14 shrink-0 text-foreground text-sm">Direction</span>
+                    <Form.Select
+                      value={(node.content?.options?.direction as string) ?? "horizontal"}
+                      onChange={(v) =>
+                        onChange({
+                          ...node,
+                          content: {
+                            ...node.content,
+                            options: { ...node.content?.options, direction: v as NodeNavDirection },
+                          },
+                        })
+                      }
+                      options={DIRECTION_OPTIONS}
+                      className="h-7 flex-1 min-w-0 text-[0.75rem]"
+                    />
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <span className="node-block-title w-14 shrink-0 text-foreground text-sm">Variante</span>
+                    <Form.Select
+                      value={(node.content?.options?.variant as string) ?? "navbar"}
+                      onChange={(v) =>
+                        onChange({
+                          ...node,
+                          content: {
+                            ...node.content,
+                            options: { ...node.content?.options, variant: v as NodeNavVariant },
+                          },
+                        })
+                      }
+                      options={VARIANT_OPTIONS}
+                      className="h-7 flex-1 min-w-0 text-[0.75rem]"
+                    />
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <span className="node-block-title w-14 shrink-0 text-foreground text-sm">Justify</span>
+                    <Form.Select
+                      value={(node.content?.options?.justify as string) ?? "flex-start"}
+                      onChange={(v) =>
+                        onChange({
+                          ...node,
+                          content: {
+                            ...node.content,
+                            options: { ...node.content?.options, justify: v },
+                          },
+                        })
+                      }
+                      options={[
+                        { value: "flex-start", label: "Début" },
+                        { value: "center", label: "Centre" },
+                        { value: "flex-end", label: "Fin" },
+                        { value: "space-between", label: "Between" },
+                        { value: "space-around", label: "Around" },
+                        { value: "space-evenly", label: "Evenly" },
+                      ]}
+                      className="h-7 flex-1 min-w-0 text-[0.75rem]"
+                    />
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <span className="node-block-title w-14 shrink-0 text-foreground text-sm">Gap</span>
+                    <Form.Input
+                      type="number"
+                      value={(node.content?.options?.gap ?? 0).toString()}
+                      onChange={(value: string) => {
+                        const num = parseInt(value, 10);
+                        if (!Number.isNaN(num) && num >= 0 && num <= 20) {
+                          onChange({
+                            ...node,
+                            content: {
+                              ...node.content,
+                              options: { ...node.content?.options, gap: num },
+                            },
+                          });
+                        }
+                      }}
+                      className="h-7 flex-1 min-w-0 text-[0.75rem]"
+                      min={0}
+                      max={20}
+                    />
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <span className="node-block-title w-14 shrink-0 text-foreground text-sm">
+                      Icône burger
+                    </span>
+                    <input
+                      type="checkbox"
+                      checked={node.content?.options?.showBurger === true}
+                      onChange={(e) =>
+                        onChange({
+                          ...node,
+                          content: {
+                            ...node.content,
+                            options: { ...node.content?.options, showBurger: e.target.checked },
+                          },
+                        })
+                      }
+                      className="h-4 w-4 rounded border-input"
+                    />
+                  </div>
+                </div>
+              </TabsContent>
             </>
           }
           content={
             <>
-              <TabsContent value="nav">
+              <TabsContent value="nav" className="mt-0">
                 <Background2Settings
                   themeOverrideSelector={THEME_SELECTORS.nav}
                   style={node.content?.nav?.style || {}}
                   onChange={(style) =>
                     onChange({
                       ...node,
-                      content: { ...node.content, nav: { ...node.content?.nav, style, className: node.content?.nav?.className ?? "" } }
+                      content: {
+                        ...node.content,
+                        nav: {
+                          ...node.content?.nav,
+                          style,
+                          className: node.content?.nav?.className ?? "",
+                        },
+                      },
                     })
                   }
                 />
@@ -150,7 +179,7 @@ const Settings: FC<NodeSettingsProps> = () => {
                   onChange={(style) =>
                     onChange({
                       ...node,
-                      content: { ...node.content, nav: { ...node.content?.nav, style } }
+                      content: { ...node.content, nav: { ...node.content?.nav, style } },
                     })
                   }
                 />
@@ -160,7 +189,7 @@ const Settings: FC<NodeSettingsProps> = () => {
                   onChange={(style) =>
                     onChange({
                       ...node,
-                      content: { ...node.content, nav: { ...node.content?.nav, style } }
+                      content: { ...node.content, nav: { ...node.content?.nav, style } },
                     })
                   }
                 />
@@ -170,19 +199,19 @@ const Settings: FC<NodeSettingsProps> = () => {
                   onChange={(style) =>
                     onChange({
                       ...node,
-                      content: { ...node.content, nav: { ...node.content?.nav, style } }
+                      content: { ...node.content, nav: { ...node.content?.nav, style } },
                     })
                   }
                 />
               </TabsContent>
-              <TabsContent value="burger">
+              <TabsContent value="burger" className="mt-0">
                 <Background2Settings
                   themeOverrideSelector={THEME_SELECTORS.nav}
                   style={node.content?.burger?.style || {}}
                   onChange={(style) =>
                     onChange({
                       ...node,
-                      content: { ...node.content, burger: { ...node.content?.burger, style } }
+                      content: { ...node.content, burger: { ...node.content?.burger, style } },
                     })
                   }
                 />
@@ -192,7 +221,7 @@ const Settings: FC<NodeSettingsProps> = () => {
                   onChange={(style) =>
                     onChange({
                       ...node,
-                      content: { ...node.content, burger: { ...node.content?.burger, style } }
+                      content: { ...node.content, burger: { ...node.content?.burger, style } },
                     })
                   }
                 />
@@ -202,7 +231,7 @@ const Settings: FC<NodeSettingsProps> = () => {
                   onChange={(style) =>
                     onChange({
                       ...node,
-                      content: { ...node.content, burgerItem: { ...node.content?.burgerItem, style } }
+                      content: { ...node.content, burgerItem: { ...node.content?.burgerItem, style } },
                     })
                   }
                 />
@@ -212,7 +241,7 @@ const Settings: FC<NodeSettingsProps> = () => {
                   onChange={(style) =>
                     onChange({
                       ...node,
-                      content: { ...node.content, burgerItem: { ...node.content?.burgerItem, style } }
+                      content: { ...node.content, burgerItem: { ...node.content?.burgerItem, style } },
                     })
                   }
                 />
