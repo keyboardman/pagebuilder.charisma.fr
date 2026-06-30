@@ -96,6 +96,32 @@ class AdminRoutingTest extends WebTestCase
         self::assertSame('*', $client->getResponse()->headers->get('Access-Control-Allow-Origin'));
     }
 
+    public function testFilemanagerMediaRouteIsPublicAndHasCorsHeader(): void
+    {
+        $client = static::createClient();
+        $projectDir = static::getContainer()->getParameter('kernel.project_dir');
+        $mediaDir = $projectDir . '/public/media';
+        if (!is_dir($mediaDir)) {
+            mkdir($mediaDir, 0755, true);
+        }
+        file_put_contents($mediaDir . '/les_cultes.png', base64_decode('iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mP8z8BQDwAEhQGAhKmMIQAAAABJRU5ErkJggg=='));
+
+        $client->request('GET', '/kbd/filemanager/media/default/les_cultes.png');
+
+        self::assertResponseIsSuccessful();
+        self::assertSame('image/png', $client->getResponse()->headers->get('Content-Type'));
+        self::assertSame('*', $client->getResponse()->headers->get('Access-Control-Allow-Origin'));
+    }
+
+    public function testFilemanagerUiRequiresAuthentication(): void
+    {
+        $client = static::createClient();
+
+        $client->request('GET', '/kbd/filemanager');
+
+        self::assertResponseRedirects('/login');
+    }
+
     public function testRootRedirectsToAdminDashboardWhenAuthenticated(): void
     {
         $client = static::createClient();

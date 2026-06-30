@@ -41,9 +41,10 @@ security:
         - { path: ^/font/file, roles: PUBLIC_ACCESS }
         - { path: ^/assets/, roles: PUBLIC_ACCESS }
         - { path: ^/media/, roles: PUBLIC_ACCESS }
+        - { path: ^/kbd/filemanager/media/, roles: PUBLIC_ACCESS }
         - { path: ^/api/, roles: PUBLIC_ACCESS }
         - { path: ^/admin, roles: IS_AUTHENTICATED_FULLY }
-        - { path: ^/filemanager, roles: IS_AUTHENTICATED_FULLY }
+        - { path: ^/kbd/filemanager, roles: IS_AUTHENTICATED_FULLY }
         - { path: ^/, roles: IS_AUTHENTICATED_FULLY }
         
         # - { path: ^/profile, roles: ROLE_USER }

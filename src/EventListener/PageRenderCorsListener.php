@@ -21,10 +21,12 @@ final class PageRenderCorsListener implements EventSubscriberInterface
         'app_font_file',
         'app_font_legacy_file',
         'app_media_file',
+        'keyboardman_filemanager_media',
     ];
 
     private const CORS_PATH_PREFIXES = [
         '/media/',
+        '/kbd/filemanager/media/',
     ];
 
     public static function getSubscribedEvents(): array
