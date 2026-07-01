@@ -9,7 +9,7 @@ use Symfony\Contracts\HttpClient\HttpClientInterface;
 /**
  * API card « Flashnews » : articles depuis https://www.flashnews.fr/api/articles
  */
-final class FlashnewsApiCard implements ApiCardArticleInterface
+final class FlashnewsApiCard extends AbstractApiCardArticle
 {
     private const BASE_URL = 'https://www.flashnews.fr';
 
@@ -25,11 +25,6 @@ final class FlashnewsApiCard implements ApiCardArticleInterface
     public function getLabel(): string
     {
         return 'Flashnews';
-    }
-
-    public function getType(): string
-    {
-        return 'article';
     }
 
     public function getCategory(): ?string

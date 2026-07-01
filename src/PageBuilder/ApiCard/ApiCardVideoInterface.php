@@ -9,5 +9,4 @@ namespace App\PageBuilder\ApiCard;
  */
 interface ApiCardVideoInterface extends ApiCardInterface
 {
-    public function getType(): string; // retourne "video"
 }

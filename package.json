@@ -22,6 +22,7 @@
         "@types/react": "^18.3.27",
         "@types/react-dom": "^18.3.5",
         "@types/shortid": "^2.2.0",
+        "@types/video.js": "^7.3.58",
         "@vitest/coverage-v8": "^2.1.9",
         "concurrently": "^9.1.0",
         "core-js": "^3.36.0",
@@ -102,7 +103,8 @@
         "swiper": "^12.1.2",
         "tailwind-merge": "^3.4.0",
         "tailwindcss-animate": "^1.0.7",
-        "tom-select": "^2.4.3"
+        "tom-select": "^2.4.3",
+        "video.js": "^8.23.9"
     },
     "allowScripts": {
         "@parcel/watcher@2.5.6": true,

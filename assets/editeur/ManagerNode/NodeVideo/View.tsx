@@ -13,6 +13,8 @@ import {
 import { VisuallyHidden } from "@/editeur/components/ui/visually-hidden";
 import { styleForView } from "../../utils/styleHelper";
 import { VideoPlayOverlayIcon } from "../components/VideoPlayOverlayIcon";
+import LazyCharismaVideoPlayer from "../components/LazyCharismaVideoPlayer";
+import { getVideoModalDataAttributes } from "../../components/video/videoModalAttributes";
 
 const VideoPlaceholder: FC<{ text?: string }> = ({ text = "Aucune vidéo" }) => {
   return (
@@ -34,7 +36,7 @@ const VideoPoster = ({ poster, alt = "" }: { poster: string, alt?: string }) => 
   );
 }
 
-const VideoWrapper = ({ children, node, className, style, id, onClick, onKeyDown }: { children: React.ReactNode, node: NodeVideoType, className?: string, style?: React.CSSProperties, id?: string, onClick?: () => void, onKeyDown?: (e: React.KeyboardEvent<HTMLDivElement>) => void }) => {
+const VideoWrapper = ({ children, node, className, style, id, onClick, onKeyDown, videoModalAttrs }: { children: React.ReactNode, node: NodeVideoType, className?: string, style?: React.CSSProperties, id?: string, onClick?: () => void, onKeyDown?: (e: React.KeyboardEvent<HTMLDivElement>) => void, videoModalAttrs?: Record<string, string> }) => {
   return (
     <div
       data-ce-id={node.id}
@@ -44,6 +46,7 @@ const VideoWrapper = ({ children, node, className, style, id, onClick, onKeyDown
       id={id ?? ""}
       onClick={onClick}
       onKeyDown={onKeyDown}
+      {...videoModalAttrs}
     >
       {children}
     </div>
@@ -58,7 +61,7 @@ const ModalPlayer = ({ modalOpen, setModalOpen, src, poster }: { modalOpen: bool
           <DialogTitle>Vidéo</DialogTitle>
         </VisuallyHidden>
         <div className="relative w-full aspect-video bg-black rounded-lg overflow-hidden">
-          <video className="w-full h-full" src={src} poster={poster} controls={true} autoPlay={true} />
+          <LazyCharismaVideoPlayer src={src} poster={poster} />
           <button
           onClick={() => setModalOpen(false)}
           className="absolute right-4 top-4 z-50
@@ -85,6 +88,12 @@ const View: FC<NodeViewProps | NodeEditProps> = () => {
   const hasVideo = !!content.src;
   const hasPoster = !!content.poster;
   const isEditMode = mode === APP_MODE.EDIT;
+  const isViewMode = mode === APP_MODE.VIEW;
+  const videoModalAttrs = getVideoModalDataAttributes({
+    isViewMode,
+    src: content.src,
+    poster: content.poster,
+  });
 
   const handleVideoClick = () => {
     if (isEditMode) return;
@@ -109,11 +118,14 @@ const View: FC<NodeViewProps | NodeEditProps> = () => {
             handleVideoClick();
           }
         }}
+        videoModalAttrs={videoModalAttrs}
       >
         {hasPoster && <VideoPoster poster={content.poster} alt="" />}
        <VideoPlayOverlayIcon />
       </VideoWrapper>
-      <ModalPlayer modalOpen={modalOpen} setModalOpen={setModalOpen} src={content.src} poster={content.poster} />
+      {!isViewMode ? (
+        <ModalPlayer modalOpen={modalOpen} setModalOpen={setModalOpen} src={content.src} poster={content.poster} />
+      ) : null}
     </>
   );
 

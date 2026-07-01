@@ -9,5 +9,4 @@ namespace App\PageBuilder\ApiCard;
  */
 interface ApiCardListInterface extends ApiCardInterface
 {
-    public function getType(): string; // retourne "list"
 }

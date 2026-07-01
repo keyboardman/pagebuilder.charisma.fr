@@ -7,7 +7,7 @@ namespace App\PageBuilder\ApiCard;
 /**
  * Implémentation stub d'une API card « article » pour tests et démo.
  */
-final class StubApiCard implements ApiCardArticleInterface
+final class StubApiCard extends AbstractApiCardArticle
 {
     public function getId(): string
     {
@@ -17,11 +17,6 @@ final class StubApiCard implements ApiCardArticleInterface
     public function getLabel(): string
     {
         return 'Articles (démo)';
-    }
-
-    public function getType(): string
-    {
-        return 'article';
     }
 
     public function getCategory(): ?string

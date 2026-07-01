@@ -34,6 +34,8 @@ export interface NodeVideoApiType extends NodeType {
       style?: React.CSSProperties;
     };
     showTitle?: boolean;
+    /** Nombre de likes issu de raw.favori (API Charisma). */
+    favoriCount?: number;
   };
 }
 

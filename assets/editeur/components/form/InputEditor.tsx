@@ -1,4 +1,4 @@
-import React, { useRef, useEffect } from "react";
+import React, { useRef, useEffect, useState } from "react";
 import { cn } from "@/editeur/lib/utils";
 
 interface InputEditorProps {
@@ -9,6 +9,29 @@ interface InputEditorProps {
     tagName?: keyof HTMLElementTagNameMap;
     onFocus?: () => void;
     onBlur?: (value: string) => void;
+}
+
+const NBSP = "\u00A0";
+
+const spacesToNbspEntity = (text: string): string =>
+    text.replace(/ /g, "&nbsp;").replace(/\u00A0/g, "&nbsp;");
+
+/** Normalise le HTML produit par contentEditable (sauts de ligne navigateur, espaces → &nbsp;). */
+export function normalizeContentEditableHtml(html: string): string {
+    const trimmed = html.trim();
+    if (!trimmed || trimmed === "<br>" || /^<div><br><\/div>$/i.test(trimmed)) {
+        return "";
+    }
+
+    const normalized = trimmed
+        .replace(/<div><br><\/div>/gi, "<br>")
+        .replace(/<div>([\s\S]*?)<\/div>/gi, (_, inner: string) => {
+            const content = inner.replace(/<br\s*\/?>/gi, "").trim();
+            return content ? `${content}<br>` : "<br>";
+        })
+        .replace(/(<br\s*\/?>\s*)+$/i, "");
+
+    return spacesToNbspEntity(normalized);
 }
 
 export function InputEditor({
@@ -24,42 +47,36 @@ export function InputEditor({
     const ref = useRef<HTMLElement | null>(null);
     const previousTagNameRef = useRef(tagName);
     const initializedRef = useRef(false);
+    const [focused, setFocused] = useState(false);
 
-    // ✅ Réinitialiser le contenu quand le tagName change ou à l'initialisation
     useEffect(() => {
         if (!ref.current) return;
-        
+
         const tagChanged = previousTagNameRef.current !== tagName;
-        
-        // Si le tag a changé, réinitialiser le contenu
+
         if (tagChanged) {
             ref.current.innerHTML = value || "";
             initializedRef.current = true;
             previousTagNameRef.current = tagName;
-        } 
-        // Sinon, initialiser une seule fois si pas déjà fait
-        else if (!initializedRef.current) {
+        } else if (!initializedRef.current) {
             ref.current.innerHTML = value || "";
             initializedRef.current = true;
         }
     }, [value, tagName]);
 
-    const handlePaste = (e: React.ClipboardEvent<HTMLElement>) => {
-        e.preventDefault();
+    useEffect(() => {
+        if (!ref.current || focused) return;
+        ref.current.innerHTML = value || "";
+    }, [value, focused]);
 
-        const text = e.clipboardData.getData("text/plain");
-        if (!text) return;
-
+    const insertTextAtCursor = (text: string) => {
         const el = ref.current;
         if (!el) return;
 
-        // focus sur l'élément
         el.focus();
-
         const selection = window.getSelection();
         if (!selection) return;
 
-        // si pas de range sélectionné, on en crée un à la fin
         let range: Range;
         if (selection.rangeCount > 0 && el.contains(selection.anchorNode)) {
             range = selection.getRangeAt(0);
@@ -69,17 +86,44 @@ export function InputEditor({
             range.collapse(false);
         }
 
-        // insérer le texte
-        range.deleteContents();
-        const textNode = document.createTextNode(text);
-        range.insertNode(textNode);
-
-        // placer le curseur après le texte
-        range.setStartAfter(textNode);
-        range.collapse(true);
+        const lines = text.split(/\r?\n/);
+        lines.forEach((line, index) => {
+            if (index > 0) {
+                const br = document.createElement("br");
+                range.insertNode(br);
+                range.setStartAfter(br);
+                range.collapse(true);
+            }
+            if (line) {
+                const textNode = document.createTextNode(line.replace(/ /g, NBSP));
+                range.insertNode(textNode);
+                range.setStartAfter(textNode);
+                range.collapse(true);
+            }
+        });
 
         selection.removeAllRanges();
         selection.addRange(range);
+    };
+
+    const handleKeyDown = (e: React.KeyboardEvent<HTMLElement>) => {
+        if (e.key === " ") {
+            e.preventDefault();
+            insertTextAtCursor(NBSP);
+        }
+    };
+
+    const handleKeyPress = (e: React.KeyboardEvent<HTMLElement>) => {
+        if (e.key === " ") e.preventDefault();
+    };
+
+    const handlePaste = (e: React.ClipboardEvent<HTMLElement>) => {
+        e.preventDefault();
+
+        const text = e.clipboardData.getData("text/plain");
+        if (!text) return;
+
+        insertTextAtCursor(text);
     };
 
     const stopCanvasPropagation = (e: React.SyntheticEvent) => {
@@ -96,12 +140,16 @@ export function InputEditor({
         onMouseDown: stopCanvasPropagation,
         onClick: stopCanvasPropagation,
         onFocus: () => {
+            setFocused(true);
             onFocus?.();
         },
         onBlur: () => {
+            setFocused(false);
             if (!ref.current) return;
-            onBlur?.(ref.current.innerHTML);
+            onBlur?.(normalizeContentEditableHtml(ref.current.innerHTML));
         },
+        onKeyDown: handleKeyDown,
+        onKeyPress: handleKeyPress,
         onPaste: handlePaste,
         ...rest,
     };

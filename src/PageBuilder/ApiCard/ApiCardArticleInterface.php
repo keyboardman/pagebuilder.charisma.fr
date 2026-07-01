@@ -9,5 +9,4 @@ namespace App\PageBuilder\ApiCard;
  */
 interface ApiCardArticleInterface extends ApiCardInterface
 {
-    public function getType(): string; // retourne "article"
 }

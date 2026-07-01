@@ -17,6 +17,7 @@ Encore.setOutputPath('public/build/')
     .addEntry('pageBuilderStandalone', './assets/pageBuilderStandalone.jsx')
     // preview standalone
     .addEntry('pagePreview', './assets/pagePreview.jsx')
+    .addEntry('videoPlayer', './assets/videoPlayer.js')
     
     .enableStimulusBridge('./assets/controllers.json')
     .splitEntryChunks()

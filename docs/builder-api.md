@@ -65,7 +65,7 @@ src/Serializer/           # Normalizers (formats JSON compatibles builder)
 | Formulaires | `BuilderApiFormEndpointProvider` | `BuilderApiFormsCatalogResponse`, `BuilderApiFormSubmitResponse` |
 | Polices | `BuilderApiFontEndpointProvider` | `BuilderApiFontsPage`, `BuilderApiFontItem`, `BuilderApiFontResolveResponse` |
 
-Registre des cartes : services tagués `app.builder_api_card` → `ApiCardRegistry`.
+Registre des cartes : services tagués `app.builder_api_card` → `ApiCardRegistry`. Les classes concrètes étendent une `AbstractApiCard*` (type fourni automatiquement).
 
 ## Frontend
 

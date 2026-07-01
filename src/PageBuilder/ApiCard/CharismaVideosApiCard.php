@@ -9,7 +9,7 @@ use Symfony\Contracts\HttpClient\HttpClientInterface;
 /**
  * API card « Videos » : médias vidéo depuis https://content.charisma.fr/web/api/media
  */
-final class CharismaVideosApiCard implements ApiCardVideoInterface
+final class CharismaVideosApiCard extends AbstractApiCardVideo
 {
     private const BASE_URL = 'https://content.charisma.fr/web/api';
 
@@ -26,11 +26,6 @@ final class CharismaVideosApiCard implements ApiCardVideoInterface
     public function getLabel(): string
     {
         return 'Videos';
-    }
-
-    public function getType(): string
-    {
-        return 'video';
     }
 
     public function getCategory(): ?string

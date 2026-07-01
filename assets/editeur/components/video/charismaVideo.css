@@ -1,0 +1,51 @@
+.video-js .vjs-charisma-favori .vjs-icon-placeholder::before {
+  content: none;
+}
+
+.video-js .vjs-charisma-favori {
+  color: #dc2626;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 5.75em;
+  min-width: 5.75em;
+  padding: 0 0.25em;
+}
+
+.video-js .vjs-charisma-favori__inner {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  line-height: 0;
+}
+
+.video-js .vjs-charisma-favori__svg {
+  width: 4.25em;
+  height: 2.75em;
+}
+
+.video-js .vjs-charisma-favori__count {
+  font-family: Arial, Helvetica, sans-serif;
+  font-size: 12px;
+  font-weight: 700;
+  pointer-events: none;
+  user-select: none;
+  paint-order: stroke fill;
+  stroke: rgba(0, 0, 0, 0.35);
+  stroke-width: 0.4px;
+}
+
+.video-js .vjs-charisma-favori:hover:not(.vjs-charisma-favori--disabled) {
+  color: #ef4444;
+}
+
+.video-js .vjs-charisma-favori--disabled {
+  color: #dc2626;
+  cursor: default;
+  opacity: 0.45;
+}
+
+.video-js .vjs-charisma-favori--disabled .vjs-charisma-favori__count {
+  fill: #ffffff;
+}

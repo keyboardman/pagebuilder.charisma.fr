@@ -17,6 +17,7 @@ import {
 } from "../Settings";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/editeur/components/ui/tabs";
 import { Switch } from "@/editeur/components/ui/switch";
+import { parseFavoriCount } from "../../components/video/favoriCount";
 
 const Settings: FC<NodeSettingsProps> = () => {
   const { node, onChange } = useNodeBuilderContext();
@@ -48,6 +49,7 @@ const Settings: FC<NodeSettingsProps> = () => {
         const videoSrc = (mappedData as { src?: string }).src || mappedData.link || mappedData.image || "";
         const videoPoster = mappedData.image || "";
         const videoTitle = mappedData.title || "";
+        const favoriCount = parseFavoriCount(mappedData.raw);
 
         onChange({
           ...node,
@@ -57,6 +59,7 @@ const Settings: FC<NodeSettingsProps> = () => {
             itemId: content.itemId,
             src: videoSrc,
             poster: videoPoster,
+            favoriCount,
             title: {
               ...(videoApiNode.content?.title || { className: "", style: {} }),
               text: videoTitle,
@@ -91,6 +94,7 @@ const Settings: FC<NodeSettingsProps> = () => {
     const videoSrc = (mappedData as { src?: string }).src || mappedData.link || mappedData.image || "";
     const videoPoster = mappedData.image || "";
     const videoTitle = mappedData.title || "";
+    const favoriCount = parseFavoriCount(mappedData.raw);
 
     onChange({
       ...node,
@@ -100,6 +104,7 @@ const Settings: FC<NodeSettingsProps> = () => {
         itemId,
         src: videoSrc,
         poster: videoPoster,
+        favoriCount,
         title: {
           ...(videoApiNode.content?.title || { className: "", style: {} }),
           text: videoTitle,

@@ -63,6 +63,11 @@ export function createBackendApiAdapter(meta: BackendApiMeta, baseUrl: string): 
 
     mapItem(item: unknown) {
       const o = item as Record<string, unknown>;
+      const nestedRaw = o?.raw;
+      const raw =
+        nestedRaw != null && typeof nestedRaw === "object"
+          ? nestedRaw
+          : item;
 
       return {
         id: String(o?.id ?? ""),
@@ -72,7 +77,7 @@ export function createBackendApiAdapter(meta: BackendApiMeta, baseUrl: string): 
         labels: Array.isArray(o?.labels) ? (o.labels as string[]) : undefined,
         link: o?.link != null ? String(o.link) : undefined,
         text: o?.text != null ? String(o.text) : undefined,
-        raw: item,
+        raw,
       };
     },
 

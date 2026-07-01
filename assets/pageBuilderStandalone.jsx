@@ -29,7 +29,7 @@ function makeLinksAbsolute(html, baseUrl) {
     .replace(/\s+src="\/(?!\/)/g, ` src="${base}/`);
 }
 
-function buildFullDocument(bodyInnerHTML, { baseUrl = '', pageTitle = '', pageMetaTitle = '', pageDescription = '', themeCssUrl = '', renderCssUrls = [] }) {
+function buildFullDocument(bodyInnerHTML, { baseUrl = '', pageTitle = '', pageMetaTitle = '', pageDescription = '', themeCssUrl = '', renderCssUrls = [], renderScriptUrls = [] }) {
   const base = baseUrl.replace(/\/$/, '');
   const themeCssHref = themeCssUrl ? (themeCssUrl.startsWith('http') ? themeCssUrl : base + (themeCssUrl.startsWith('/') ? themeCssUrl : '/' + themeCssUrl)) : '';
   const documentTitle = pageMetaTitle || pageTitle;
@@ -42,6 +42,12 @@ function buildFullDocument(bodyInnerHTML, { baseUrl = '', pageTitle = '', pageMe
         .map((url) => `<link rel="stylesheet" href="${String(url).replace(/"/g, '&quot;')}">`)
         .join('\n')
     : '';
+  const scriptTags = Array.isArray(renderScriptUrls)
+    ? renderScriptUrls
+        .filter((url) => url && typeof url === 'string')
+        .map((url) => `<script src="${String(url).replace(/"/g, '&quot;')}"></script>`)
+        .join('\n')
+    : '';
   return (
     '<!DOCTYPE html>\n<html lang="fr">\n<head>\n' +
     '<meta charset="UTF-8">\n<meta name="viewport" content="width=device-width, initial-scale=1.0">\n' +
@@ -51,6 +57,7 @@ function buildFullDocument(bodyInnerHTML, { baseUrl = '', pageTitle = '', pageMe
     (cssLinks ? `\n${cssLinks}\n` : '') +
     '</head>\n<body>\n' +
     bodyInnerHTML +
+    (scriptTags ? `\n${scriptTags}\n` : '') +
     '\n</body>\n</html>'
   );
 }
@@ -107,6 +114,7 @@ function PageBuilderStandalone({
   pageDescription = '',
   themeCssUrl = '',
   renderCssUrls = [],
+  renderScriptUrls = [],
   fileManagerConfig = null,
   themeIcons = [],
   themeNodeOverrides = {},
@@ -153,12 +161,13 @@ function PageBuilderStandalone({
       pageDescription,
       themeCssUrl,
       renderCssUrls,
+      renderScriptUrls,
       apiCardsBaseUrl,
     };
     generateFullRenderHtml(content, opts).then((fullHtml) => {
       saveContent(content, fullHtml);
     });
-  }, [saveContent, content, baseUrl, pageTitle, pageMetaTitle, pageDescription, themeCssUrl, renderCssUrls, apiCardsBaseUrl]);
+  }, [saveContent, content, baseUrl, pageTitle, pageMetaTitle, pageDescription, themeCssUrl, renderCssUrls, renderScriptUrls, apiCardsBaseUrl]);
 
   return (
     <div className="page-builder-standalone-shell relative grid min-h-0 flex-1 grid-rows-[auto_1fr] overflow-hidden">
@@ -212,6 +221,7 @@ if (dataEl && rootEl) {
   let pageDescription = '';
   let themeCssUrl = '';
   let renderCssUrls = [];
+  let renderScriptUrls = [];
   let fileManagerConfig = null;
   let themeIcons = [];
   let themeNodeOverrides = {};
@@ -240,6 +250,7 @@ if (dataEl && rootEl) {
     pageDescription = typeof data.pageDescription === 'string' ? data.pageDescription : '';
     themeCssUrl = typeof data.themeCssUrl === 'string' ? data.themeCssUrl : '';
     renderCssUrls = Array.isArray(data.renderCssUrls) ? data.renderCssUrls : [];
+    renderScriptUrls = Array.isArray(data.renderScriptUrls) ? data.renderScriptUrls : [];
     fileManagerConfig = getFileManagerConfig(data);
     themeIcons = Array.isArray(data.themeIcons) ? data.themeIcons : [];
     themeNodeOverrides = normalizeThemeNodeOverrides(data.themeNodeOverrides);
@@ -260,7 +271,9 @@ if (dataEl && rootEl) {
         console.warn('Erreur enregistrement police:', font?.name, e);
       }
     });
-  } catch (_) {}
+  } catch (error) {
+    console.error('page-builder-data: échec du parsing JSON', error);
+  }
   const root = createRoot(rootEl);
 
   root.render(
@@ -277,6 +290,7 @@ if (dataEl && rootEl) {
       pageDescription={pageDescription}
       themeCssUrl={themeCssUrl}
       renderCssUrls={renderCssUrls}
+      renderScriptUrls={renderScriptUrls}
       fileManagerConfig={fileManagerConfig}
       themeIcons={themeIcons}
       themeNodeOverrides={themeNodeOverrides}

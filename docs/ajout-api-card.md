@@ -6,9 +6,11 @@ Ce guide décrit comment exposer une nouvelle source de contenu (articles, vidé
 
 Une **ApiCard** est un service PHP qui :
 
-- implémente `ApiCardInterface` (ou `ApiCardArticleInterface`, `ApiCardVideoInterface`, `ApiCardImageInterface`, `ApiCardListInterface`) ;
+- **étend** la classe abstraite correspondant à son type (`AbstractApiCardArticle`, `AbstractApiCardVideo`, `AbstractApiCardImage`, `AbstractApiCardList`) — ou implémente directement `ApiCardInterface` pour un cas exceptionnel ;
 - est **tagué** `app.builder_api_card` dans `config/services.yaml` ;
 - est automatiquement enregistré dans `ApiCardRegistry` et exposé à l’éditeur via l’API builder (`GET /api/page-builder/cards`).
+
+Les classes abstraites fournissent `getType()` automatiquement (`article`, `video`, `image` ou `list`) : inutile de le redéclarer dans chaque implémentation.
 
 L’éditeur récupère la liste des cartes via cette API (base `/api/page-builder`) et propose chaque carte comme source dans l’interface.
 
@@ -20,12 +22,22 @@ L’éditeur récupère la liste des cartes via cette API (base `/api/page-build
 
 ## Étapes
 
-### 1. Choisir l’interface
+### 1. Choisir le type
 
-- **Articles** (actualités, blog, témoignages…) → `ApiCardArticleInterface` → `getType()` retourne `"article"`.
-- **Vidéos** → `ApiCardVideoInterface` → `getType()` retourne `"video"`.
-- **Images** → `ApiCardImageInterface` → `getType()` retourne `"image"`.
-- **Listes / menus** → `ApiCardListInterface` → `getType()` retourne `"list"` (consommées par le nœud **NodeNavApi**).
+Chaque type dispose d’une **interface marqueur** et d’une **classe abstraite** qui fournit `getType()` :
+
+| Type | Interface | Classe abstraite | `getType()` |
+|------|-----------|------------------|-------------|
+| Articles (actualités, blog, témoignages…) | `ApiCardArticleInterface` | `AbstractApiCardArticle` | `article` |
+| Vidéos | `ApiCardVideoInterface` | `AbstractApiCardVideo` | `video` |
+| Images | `ApiCardImageInterface` | `AbstractApiCardImage` | `image` |
+| Listes / menus (nœud **NodeNavApi**) | `ApiCardListInterface` | `AbstractApiCardList` | `list` |
+
+La classe concrète **étend** la classe abstraite (`extends AbstractApiCardArticle`, etc.). Pour combiner un type avec `ApiCardBehaviorInterface`, utiliser `extends` + `implements` :
+
+```php
+final class MaSourceApiCard extends AbstractApiCardImage implements ApiCardBehaviorInterface
+```
 
 Types supportés côté builder : `article`, `video`, `image`, `list`.
 
@@ -42,7 +54,7 @@ namespace App\PageBuilder\ApiCard;
 
 use Symfony\Contracts\HttpClient\HttpClientInterface;
 
-final class MaSourceApiCard implements ApiCardArticleInterface
+final class MaSourceApiCard extends AbstractApiCardArticle
 {
     private const BASE_URL = 'https://api.example.com';
 
@@ -59,11 +71,6 @@ final class MaSourceApiCard implements ApiCardArticleInterface
     public function getLabel(): string
     {
         return 'Ma source';  // libellé affiché dans l’éditeur
-    }
-
-    public function getType(): string
-    {
-        return 'article';  // ou "video"
     }
 
     public function getCategory(): ?string
@@ -203,9 +210,9 @@ declare(strict_types=1);
 
 namespace App\PageBuilder\ApiCard;
 
-final class MaSourceApiCard implements ApiCardImageInterface, ApiCardBehaviorInterface
+final class MaSourceApiCard extends AbstractApiCardImage implements ApiCardBehaviorInterface
 {
-    // ... autres méthodes ApiCardInterface
+    // ... autres méthodes ApiCardInterface (getId, getLabel, fetchCollection, etc.)
 
     public function getCollectionMode(): string
     {
@@ -248,7 +255,8 @@ Recharger la page de l’éditeur (ou vider le cache Symfony si besoin) pour voi
 
 - **Contrat** : `src/PageBuilder/ApiCard/ApiCardInterface.php`
 - **Comportement optionnel** : `src/PageBuilder/ApiCard/ApiCardBehaviorInterface.php`
-- **Types** : `ApiCardArticleInterface`, `ApiCardVideoInterface`, `ApiCardImageInterface`, `ApiCardListInterface`
+- **Types (interfaces)** : `ApiCardArticleInterface`, `ApiCardVideoInterface`, `ApiCardImageInterface`, `ApiCardListInterface`
+- **Types (classes abstraites, `getType()` inclus)** : `AbstractApiCardArticle`, `AbstractApiCardVideo`, `AbstractApiCardImage`, `AbstractApiCardList`
 - **Exemple list** : `StubNavListApiCard.php` (menu de démonstration), `FlashnewsThemeApiList.php` (thèmes Flashnews pour NodeNavApi)
 - **Exemples** : `CharismaArticleAuteurApiCard.php`, `CharismaTemoignageApiCard.php`, `FlashnewsApiCard.php`, `CharismaVideosApiCard.php`
 - **Registre** : `src/PageBuilder/ApiCard/ApiCardRegistry.php`

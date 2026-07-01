@@ -9,7 +9,7 @@ use Symfony\Contracts\HttpClient\HttpClientInterface;
 /**
  * API card « Evenements » : événements depuis https://api.charisma.fr/api/charisma/evenements
  */
-final class CharismaEvenementApiCard implements ApiCardImageInterface, ApiCardBehaviorInterface
+final class CharismaEvenementApiCard extends AbstractApiCardImage implements ApiCardBehaviorInterface
 {
     private const BASE_URL = 'https://api.charisma.fr';
 
@@ -25,11 +25,6 @@ final class CharismaEvenementApiCard implements ApiCardImageInterface, ApiCardBe
     public function getLabel(): string
     {
         return 'Evènements';
-    }
-
-    public function getType(): string
-    {
-        return 'image';
     }
 
     public function getCategory(): ?string

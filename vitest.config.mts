@@ -15,6 +15,18 @@ export default defineConfig({
     setupFiles: ["./assets/test/setup.ts"],
     include: ["assets/**/*.{test,spec}.{ts,tsx}"],
     css: true,
+    coverage: {
+      provider: "v8",
+      include: ["assets/**/*.{ts,tsx,js,jsx}"],
+      exclude: [
+        "node_modules/**",
+        "vendor/**",
+        "**/node_modules/**",
+        "**/vendor/**",
+        "assets/**/*.{test,spec}.{ts,tsx}",
+        "assets/test/**",
+      ],
+    },
   },
   resolve: {
     alias: {

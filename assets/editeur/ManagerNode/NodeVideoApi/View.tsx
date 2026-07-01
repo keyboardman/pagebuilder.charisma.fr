@@ -1,4 +1,4 @@
-import { type FC, useState } from "react";
+import { type FC, useEffect, useState } from "react";
 import { type NodeEditProps, type NodeViewProps } from "../NodeConfigurationType";
 import type { NodeVideoApiType } from ".";
 import { useNodeContext } from "../../services/providers/NodeContext";
@@ -8,6 +8,10 @@ import { cn } from "@/editeur/lib/utils";
 //import { Card, CardImage, CardContent } from "@editeur/components/card";
 import { styleForView } from "../../utils/styleHelper";
 import { VideoPlayOverlayIcon } from "../components/VideoPlayOverlayIcon";
+import LazyCharismaVideoPlayer from "../components/LazyCharismaVideoPlayer";
+import { getVideoModalDataAttributes } from "../../components/video/videoModalAttributes";
+import { parseFavoriCount } from "../../components/video/favoriCount";
+import { apiRegistry } from "../../ManagerApi/ApiRegistry";
 
 import {
   Dialog,
@@ -32,13 +36,14 @@ const ViewTitle: FC<{
   );
 };
 
-const VideoWrapper = ({ children, className, style, onClick, onKeyDown }: { children: React.ReactNode, className?: string, style?: React.CSSProperties, onClick?: () => void, onKeyDown?: (e: React.KeyboardEvent<HTMLDivElement>) => void }) => {
+const VideoWrapper = ({ children, className, style, onClick, onKeyDown, videoModalAttrs }: { children: React.ReactNode, className?: string, style?: React.CSSProperties, onClick?: () => void, onKeyDown?: (e: React.KeyboardEvent<HTMLDivElement>) => void, videoModalAttrs?: Record<string, string> }) => {
   return (
     <div
       className={className}
       style={styleForView(style ?? {})}
       onClick={onClick}
       onKeyDown={onKeyDown}
+      {...videoModalAttrs}
     >
       {children}
     </div>
@@ -66,7 +71,7 @@ const VideoPlaceholder: FC<{ text?: string }> = ({ text = "Aucune vidéo" }) => 
   );
 };
 
-const ModalPlayer = ({ modalOpen, setModalOpen, src, poster }: { modalOpen: boolean, setModalOpen: (open: boolean) => void, src: string, poster: string }) => {
+const ModalPlayer = ({ modalOpen, setModalOpen, src, poster, mediaId, favoriCount }: { modalOpen: boolean, setModalOpen: (open: boolean) => void, src: string, poster: string, mediaId?: string, favoriCount?: number }) => {
   return (
     <Dialog open={modalOpen} onOpenChange={setModalOpen}>
       <DialogContent className="fixed left-[50%] top-[50%] z-50 w-full max-w-4xl translate-x-[-50%] translate-y-[-50%] p-0 bg-transparent border-0 shadow-none [&>button]:hidden">
@@ -74,7 +79,7 @@ const ModalPlayer = ({ modalOpen, setModalOpen, src, poster }: { modalOpen: bool
           <DialogTitle>Vidéo</DialogTitle>
         </VisuallyHidden>
         <div className="relative w-full aspect-video bg-black rounded-lg overflow-hidden">
-          <video className="w-full h-full" src={src} poster={poster} controls={true} autoPlay={true} />
+          <LazyCharismaVideoPlayer src={src} poster={poster} mediaId={mediaId} favoriCount={favoriCount} />
           <button
           onClick={() => setModalOpen(false)}
           className="absolute right-4 top-4 z-50
@@ -98,12 +103,47 @@ const View: FC<NodeViewProps | NodeEditProps> = () => {
   const { id, className, style } = node.attributes ?? {};
   const [modalOpen, setModalOpen] = useState(false);
   const content = node.content || {};
+  const [favoriCount, setFavoriCount] = useState<number | undefined>(content.favoriCount);
   const hasVideo = content.src && (content.apiId || content.itemId);
   const hasPoster = !!content.poster;
   const showTitle = content.showTitle !== false; // true par défaut pour rétrocompatibilité
   const titleText = content.title?.text || "";
   const shouldShowTitle = showTitle && titleText.trim() !== "";
   const isEditMode = mode === APP_MODE.EDIT;
+  const isViewMode = mode === APP_MODE.VIEW;
+
+  useEffect(() => {
+    setFavoriCount(content.favoriCount);
+  }, [content.favoriCount]);
+
+  useEffect(() => {
+    if (!content.apiId || !content.itemId) return;
+
+    const adapter = apiRegistry.get(content.apiId);
+    if (!adapter) return;
+
+    let cancelled = false;
+    void adapter
+      .fetchItem(content.itemId)
+      .then((item) => {
+        if (cancelled) return;
+        const mapped = adapter.mapItem(item);
+        setFavoriCount(parseFavoriCount(mapped.raw));
+      })
+      .catch(() => undefined);
+
+    return () => {
+      cancelled = true;
+    };
+  }, [content.apiId, content.itemId]);
+
+  const videoModalAttrs = getVideoModalDataAttributes({
+    isViewMode,
+    src: content.src,
+    poster: content.poster,
+    mediaId: content.itemId,
+    favoriCount,
+  });
 
   // Afficher un message si aucun item n'est sélectionné
   if (!content.apiId || !content.itemId) {
@@ -143,6 +183,7 @@ const View: FC<NodeViewProps | NodeEditProps> = () => {
               handleImageClick();
             }
           }}
+          videoModalAttrs={videoModalAttrs}
         >
           {hasPoster && (
             <VideoPoster poster={content.poster} alt="Video thumbnail" style={imageStyle} />
@@ -159,7 +200,16 @@ const View: FC<NodeViewProps | NodeEditProps> = () => {
         )}
       </div>
 
-      <ModalPlayer modalOpen={modalOpen} setModalOpen={setModalOpen} src={content.src} poster={content.poster} />      
+      {!isViewMode ? (
+        <ModalPlayer
+          modalOpen={modalOpen}
+          setModalOpen={setModalOpen}
+          src={content.src}
+          poster={content.poster}
+          mediaId={content.itemId}
+          favoriCount={favoriCount}
+        />
+      ) : null}
     </>
   );
 }

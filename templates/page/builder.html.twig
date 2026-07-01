@@ -14,13 +14,18 @@
     
 </head>
 <body class="page-builder-standalone-body">
+    {# Scripts du builder AVANT encore_entry_js_files('videoPlayer') : sinon runtime.js est marqué
+       comme déjà rendu et n'est plus inclus dans les balises script du builder (page blanche). #}
+    {{ encore_entry_script_tags('pageBuilderStandalone') }}
 
     <main class="page-builder-standalone-body__main">
         {% set default_content = '{"cylsqgudkwtz":{"id":"cylsqgudkwtz","type":"node-root","parent":null,"content":{"title":""}}}' %}
         {% set content_json = (page.content is defined and page.content is not empty) ? (page.content|json_encode(constant('JSON_UNESCAPED_UNICODE'))) : default_content %}
         {% set base_url = app.request.schemeAndHttpHost ~ app.request.basePath %}
-        {% set render_css_paths = encore_entry_css_files('pagePreview') %}
+        {% set render_css_paths = encore_entry_css_files('pagePreview')|merge(encore_entry_css_files('videoPlayer')) %}
         {% set render_css_urls = render_css_paths|map(p => base_url ~ p)|default([]) %}
+        {% set render_script_paths = encore_entry_js_files('videoPlayer') %}
+        {% set render_script_urls = render_script_paths|map(p => base_url ~ p)|default([]) %}
         {% import 'page/_builder_api_base_url.html.twig' as builder_api %}
         {% set builder_api_base = builder_api.base_url() %}
         <script type="application/json" id="page-builder-data">
@@ -34,7 +39,8 @@
             pageDescription: page.description|default(''),
             baseUrl: base_url, 
             themeCssUrl: page.theme.generatedCssPath ? path('app_theme_css', { id: page.theme.id }) : '', 
-            renderCssUrls: render_css_urls, 
+            renderCssUrls: render_css_urls,
+            renderScriptUrls: render_script_urls, 
             themeFonts: theme_fonts|default([]),
             themeFontIds: theme_font_ids|default([]),
             apiCardsBaseUrl: builder_api_base,
@@ -49,6 +55,5 @@
         
         <div id="page-builder-standalone-root" class="page-builder-standalone-body__root"></div>
     </main>
-    {{ encore_entry_script_tags('pageBuilderStandalone') }}
 </body>
 </html>

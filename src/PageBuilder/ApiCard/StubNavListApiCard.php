@@ -7,7 +7,7 @@ namespace App\PageBuilder\ApiCard;
 /**
  * Liste de navigation de démonstration pour NodeNavApi.
  */
-final class StubNavListApiCard implements ApiCardListInterface, ApiCardBehaviorInterface
+final class StubNavListApiCard extends AbstractApiCardList implements ApiCardBehaviorInterface
 {
     /** @var list<object{id: string, label: string, href: string}> */
     private const ITEMS = [
@@ -25,11 +25,6 @@ final class StubNavListApiCard implements ApiCardListInterface, ApiCardBehaviorI
     public function getLabel(): string
     {
         return 'Menu navigation (démo)';
-    }
-
-    public function getType(): string
-    {
-        return 'list';
     }
 
     public function getCategory(): ?string

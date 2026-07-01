@@ -9,7 +9,7 @@ use Symfony\Contracts\HttpClient\HttpClientInterface;
 /**
  * API list « Flashnews thèmes » : rubriques depuis https://www.flashnews.fr/api/themes
  */
-final class FlashnewsThemeApiList implements ApiCardListInterface, ApiCardBehaviorInterface
+final class FlashnewsThemeApiList extends AbstractApiCardList implements ApiCardBehaviorInterface
 {
     private const BASE_URL = 'https://www.flashnews.fr';
 
@@ -26,11 +26,6 @@ final class FlashnewsThemeApiList implements ApiCardListInterface, ApiCardBehavi
     public function getLabel(): string
     {
         return 'Flashnews thèmes';
-    }
-
-    public function getType(): string
-    {
-        return 'list';
     }
 
     public function getCategory(): ?string

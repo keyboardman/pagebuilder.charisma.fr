@@ -9,7 +9,7 @@ use Symfony\Contracts\HttpClient\HttpClientInterface;
 /**
  * API card « Articles Auteur » : articles depuis https://api.charisma.fr/api/charisma/article/auteurs
  */
-final class CharismaArticleAuteurApiCard implements ApiCardArticleInterface
+final class CharismaArticleAuteurApiCard extends AbstractApiCardArticle
 {
     private const BASE_URL = 'https://api.charisma.fr';
 
@@ -26,11 +26,6 @@ final class CharismaArticleAuteurApiCard implements ApiCardArticleInterface
     public function getLabel(): string
     {
         return 'Articles Auteur';
-    }
-
-    public function getType(): string
-    {
-        return 'article';
     }
 
     public function getCategory(): ?string

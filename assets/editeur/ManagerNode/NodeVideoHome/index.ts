@@ -13,6 +13,7 @@ export interface NodeVideoHomeItem {
   type: "charisma" | "youtube";
   source: string;
   poster: string;
+  favoriCount?: number;
 }
 
 export interface NodeVideoHomeType extends NodeType {

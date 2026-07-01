@@ -6,6 +6,9 @@ import { cn } from "@/editeur/lib/utils";
 import type { NodeVideoHomeItem, NodeVideoHomeType } from "./index";
 import { styleForView } from "../../utils/styleHelper";
 import { VideoPlayOverlayIcon } from "../components/VideoPlayOverlayIcon";
+import LazyCharismaVideoPlayer from "../components/LazyCharismaVideoPlayer";
+import { getVideoModalDataAttributes } from "../../components/video/videoModalAttributes";
+import { parseFavoriCount } from "../../components/video/favoriCount";
 import { Dialog, DialogContent, DialogTitle } from "@/editeur/components/ui/dialog";
 import { VisuallyHidden } from "@/editeur/components/ui/visually-hidden";
 import { X } from "lucide-react";
@@ -18,6 +21,8 @@ type VideoHomeApiResponse = {
     source?: string;
     poster?: string;
     uuid?: string;
+    favori?: number | string;
+    raw?: { favori?: number | string };
   }>;
 };
 
@@ -107,7 +112,19 @@ const View: FC<NodeViewProps> = () => {
 
         {!loading && !error ? (
           <div className={gridClassName}>
-            {displayVideos.map((video, index) => (
+            {displayVideos.map((video, index) => {
+              const videoModalAttrs =
+                video.type === "charisma"
+                  ? getVideoModalDataAttributes({
+                      isViewMode,
+                      src: video.source,
+                      poster: video.poster,
+                      mediaId: video.id,
+                      favoriCount: video.favoriCount,
+                    })
+                  : {};
+
+              return (
               <article
                 key={video.id}
                 className={cn("ce-video-home-item", index === EXPECTED_VIDEOS_COUNT - 1 && "ce-video-home-item-last")}
@@ -117,13 +134,14 @@ const View: FC<NodeViewProps> = () => {
                   style={styleForView(cardStyle)}
                   role="button"
                   tabIndex={0}
+                  {...videoModalAttrs}
                   onClick={() => {
-                    if (!isEditMode && video.source) {
+                    if (!isEditMode && !isViewMode && video.source) {
                       setSelectedVideo(video);
                     }
                   }}
                   onKeyDown={(event) => {
-                    if (isEditMode || !video.source) return;
+                    if (isEditMode || isViewMode || !video.source) return;
                     if (event.key === "Enter" || event.key === " ") {
                       event.preventDefault();
                       setSelectedVideo(video);
@@ -154,11 +172,13 @@ const View: FC<NodeViewProps> = () => {
                   />
                 </div>
               </article>
-            ))}
+            );
+            })}
           </div>
         ) : null}
       </section>
 
+      {!isViewMode ? (
       <Dialog open={!!selectedVideo} onOpenChange={(open) => !open && setSelectedVideo(null)}>
         <DialogContent className="fixed left-[50%] top-[50%] z-50 w-full max-w-4xl translate-x-[-50%] translate-y-[-50%] p-0 bg-transparent border-0 shadow-none [&>button]:hidden">
           <VisuallyHidden>
@@ -175,12 +195,11 @@ const View: FC<NodeViewProps> = () => {
                   allowFullScreen
                 />
               ) : (
-                <video
-                  className="w-full h-full"
+                <LazyCharismaVideoPlayer
                   src={selectedVideo.source}
                   poster={selectedVideo.poster}
-                  controls
-                  autoPlay
+                  mediaId={selectedVideo.id}
+                  favoriCount={selectedVideo.favoriCount}
                 />
               )
             ) : null}
@@ -194,6 +213,7 @@ const View: FC<NodeViewProps> = () => {
           </div>
         </DialogContent>
       </Dialog>
+      ) : null}
     </>
   );
 };
@@ -202,7 +222,7 @@ function mapVideos(items: VideoHomeApiResponse["member"]): NodeVideoHomeItem[] {
   if (!Array.isArray(items)) return [];
 
   return items
-    .map((item, index) => {
+    .map((item, index): NodeVideoHomeItem | null => {
       const id = String(item?.id ?? item?.uuid ?? index);
       const title = (item?.titre ?? "").trim();
       const rawType = (item?.type ?? "").trim().toLowerCase();
@@ -220,7 +240,8 @@ function mapVideos(items: VideoHomeApiResponse["member"]): NodeVideoHomeItem[] {
         type,
         source,
         poster,
-      } satisfies NodeVideoHomeItem;
+        favoriCount: parseFavoriCount(item?.raw ?? item),
+      };
     })
     .filter((item): item is NodeVideoHomeItem => item !== null)
     .slice(0, EXPECTED_VIDEOS_COUNT);
