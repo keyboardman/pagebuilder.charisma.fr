@@ -6,13 +6,9 @@ import { cn } from "@/editeur/lib/utils";
 import type { NodeVideoHomeItem, NodeVideoHomeType } from "./index";
 import { styleForView } from "../../utils/styleHelper";
 import { VideoPlayOverlayIcon } from "../components/VideoPlayOverlayIcon";
-import LazyCharismaVideoPlayer from "../components/LazyCharismaVideoPlayer";
 import { getVideoModalDataAttributes } from "../../components/video/videoModalAttributes";
 import { openCharismaVideoModal, openEmbedVideoModal } from "../../components/video/charismaVideoModal";
 import { parseFavoriCount } from "../../components/video/favoriCount";
-import { Dialog, DialogContent, DialogTitle } from "@/editeur/components/ui/dialog";
-import { VisuallyHidden } from "@/editeur/components/ui/visually-hidden";
-import { X } from "lucide-react";
 
 type VideoHomeApiResponse = {
   member?: Array<{
@@ -44,7 +40,6 @@ const View: FC<NodeViewProps> = () => {
   const [videos, setVideos] = useState<NodeVideoHomeItem[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(false);
-  const [selectedVideo, setSelectedVideo] = useState<NodeVideoHomeItem | null>(null);
 
   useEffect(() => {
     let cancelled = false;
@@ -88,22 +83,20 @@ const View: FC<NodeViewProps> = () => {
   const hasExpectedCount = videos.length === EXPECTED_VIDEOS_COUNT;
   const displayVideos = useMemo(() => videos.slice(0, EXPECTED_VIDEOS_COUNT), [videos]);
 
-  const openVideoModal = (video: NodeVideoHomeItem) => {
+  const openVideoModal = (video: NodeVideoHomeItem, e?: React.SyntheticEvent) => {
     if (!video.source) return;
-    if (isViewMode) {
-      if (video.type === "youtube") {
-        openEmbedVideoModal({ src: video.source, title: video.title || "Vidéo Youtube" });
-        return;
-      }
-      openCharismaVideoModal({
-        src: video.source,
-        poster: video.poster,
-        mediaId: video.id,
-        favoriCount: video.favoriCount,
-      });
+    e?.preventDefault();
+    e?.stopPropagation();
+    if (video.type === "youtube") {
+      openEmbedVideoModal({ src: video.source, title: video.title || "Vidéo Youtube" });
       return;
     }
-    setSelectedVideo(video);
+    openCharismaVideoModal({
+      src: video.source,
+      poster: video.poster,
+      mediaId: video.id,
+      favoriCount: video.favoriCount,
+    });
   };
 
   return (
@@ -154,16 +147,15 @@ const View: FC<NodeViewProps> = () => {
                   role="button"
                   tabIndex={0}
                   {...videoModalAttrs}
-                  onClick={() => {
+                  onClick={(e) => {
                     if (!isEditMode) {
-                      openVideoModal(video);
+                      openVideoModal(video, e);
                     }
                   }}
                   onKeyDown={(event) => {
                     if (isEditMode || !video.source) return;
                     if (event.key === "Enter" || event.key === " ") {
-                      event.preventDefault();
-                      openVideoModal(video);
+                      openVideoModal(video, event);
                     }
                   }}
                 >
@@ -196,43 +188,6 @@ const View: FC<NodeViewProps> = () => {
           </div>
         ) : null}
       </section>
-
-      {!isViewMode ? (
-      <Dialog open={!!selectedVideo} onOpenChange={(open) => !open && setSelectedVideo(null)}>
-        <DialogContent className="fixed left-[50%] top-[50%] z-50 w-full max-w-4xl translate-x-[-50%] translate-y-[-50%] p-0 bg-transparent border-0 shadow-none [&>button]:hidden">
-          <VisuallyHidden>
-            <DialogTitle>{selectedVideo?.title ?? "Video"}</DialogTitle>
-          </VisuallyHidden>
-          <div className="relative w-full aspect-video bg-black rounded-lg overflow-hidden">
-            {selectedVideo ? (
-              selectedVideo.type === "youtube" ? (
-                <iframe
-                  className="w-full h-full"
-                  src={selectedVideo.source}
-                  title={selectedVideo.title || "Video Youtube"}
-                  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
-                  allowFullScreen
-                />
-              ) : (
-                <LazyCharismaVideoPlayer
-                  src={selectedVideo.source}
-                  poster={selectedVideo.poster}
-                  mediaId={selectedVideo.id}
-                  favoriCount={selectedVideo.favoriCount}
-                />
-              )
-            ) : null}
-            <button
-              onClick={() => setSelectedVideo(null)}
-              className="absolute right-4 top-4 z-50 rounded-full bg-black/70 text-white p-2 hover:bg-black focus:outline-none focus:ring-2 focus:ring-white"
-              aria-label="Fermer"
-            >
-              <X className="h-4 w-4" />
-            </button>
-          </div>
-        </DialogContent>
-      </Dialog>
-      ) : null}
     </>
   );
 };

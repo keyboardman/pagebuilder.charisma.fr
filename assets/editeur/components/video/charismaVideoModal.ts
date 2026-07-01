@@ -15,10 +15,29 @@ export interface CharismaVideoModalOptions {
   favoriCount?: number;
 }
 
+let activeVideoModalClose: (() => void) | null = null;
+
+export function closeActiveVideoModal(): void {
+  activeVideoModalClose?.();
+  activeVideoModalClose = null;
+}
+
+function registerActiveVideoModal(close: () => void): void {
+  closeActiveVideoModal();
+  activeVideoModalClose = close;
+}
+
+function unregisterActiveVideoModal(close: () => void): void {
+  if (activeVideoModalClose === close) {
+    activeVideoModalClose = null;
+  }
+}
+
 export function openCharismaVideoModal(options: CharismaVideoModalOptions): () => void {
   const { src, poster = "", mediaId, favoriCount } = options;
   if (!src) return () => undefined;
 
+  closeActiveVideoModal();
   const overlay = document.createElement("div");
   overlay.className =
     "fixed inset-0 z-[100] flex items-center justify-center bg-black/80 p-4";
@@ -50,8 +69,10 @@ export function openCharismaVideoModal(options: CharismaVideoModalOptions): () =
     disposeCharismaVideoPlayer(player);
     player = null;
     overlay.remove();
+    unregisterActiveVideoModal(close);
   };
 
+  registerActiveVideoModal(close);
   closeButton.addEventListener("click", close);
   overlay.addEventListener("click", (event) => {
     if (event.target === overlay) close();
@@ -90,6 +111,7 @@ export function openEmbedVideoModal(options: EmbedVideoModalOptions): () => void
   const { src, title = "Vidéo" } = options;
   if (!src) return () => undefined;
 
+  closeActiveVideoModal();
   const overlay = document.createElement("div");
   overlay.className =
     "fixed inset-0 z-[100] flex items-center justify-center bg-black/80 p-4";
@@ -113,8 +135,10 @@ export function openEmbedVideoModal(options: EmbedVideoModalOptions): () => void
 
   const close = () => {
     overlay.remove();
+    unregisterActiveVideoModal(close);
   };
 
+  registerActiveVideoModal(close);
   closeButton.addEventListener("click", close);
   overlay.addEventListener("click", (event) => {
     if (event.target === overlay) close();
@@ -141,6 +165,7 @@ function bindCharismaVideoModalTrigger(element: HTMLElement): void {
 
   element.addEventListener("click", (event) => {
     event.preventDefault();
+    event.stopPropagation();
     const src = element.getAttribute("data-video-src");
     if (!src) return;
 

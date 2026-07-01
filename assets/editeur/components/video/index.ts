@@ -6,4 +6,4 @@ export { renderCharismaFavoriHeart } from "./heartIcon";
 export { createCompteurTracker } from "./compteurTracker";
 export { CharismaVideoPlayer } from "./CharismaVideoPlayer";
 export { createCharismaVideoPlayer, disposeCharismaVideoPlayer } from "./createCharismaVideoPlayer";
-export { initCharismaVideoModals, openCharismaVideoModal, openEmbedVideoModal } from "./charismaVideoModal";
+export { initCharismaVideoModals, openCharismaVideoModal, openEmbedVideoModal, closeActiveVideoModal } from "./charismaVideoModal";

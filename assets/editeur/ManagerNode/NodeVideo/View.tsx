@@ -1,19 +1,11 @@
-import { type FC, useState } from "react";
+import { type FC } from "react";
 import { type NodeEditProps, type NodeViewProps } from "../NodeConfigurationType";
 import type { NodeVideoType } from ".";
 import { useNodeContext } from "../../services/providers/NodeContext";
 import { useAppContext, APP_MODE } from "../../services/providers/AppContext";
-import { X } from "lucide-react";
 import { cn } from "@/editeur/lib/utils";
-import {
-  Dialog,
-  DialogContent,
-  DialogTitle,
-} from "@/editeur/components/ui/dialog";
-import { VisuallyHidden } from "@/editeur/components/ui/visually-hidden";
 import { styleForView } from "../../utils/styleHelper";
 import { VideoPlayOverlayIcon } from "../components/VideoPlayOverlayIcon";
-import LazyCharismaVideoPlayer from "../components/LazyCharismaVideoPlayer";
 import { getVideoModalDataAttributes } from "../../components/video/videoModalAttributes";
 import { openCharismaVideoModal } from "../../components/video/charismaVideoModal";
 
@@ -37,7 +29,7 @@ const VideoPoster = ({ poster, alt = "" }: { poster: string, alt?: string }) => 
   );
 }
 
-const VideoWrapper = ({ children, node, className, style, id, onClick, onKeyDown, videoModalAttrs }: { children: React.ReactNode, node: NodeVideoType, className?: string, style?: React.CSSProperties, id?: string, onClick?: () => void, onKeyDown?: (e: React.KeyboardEvent<HTMLDivElement>) => void, videoModalAttrs?: Record<string, string> }) => {
+const VideoWrapper = ({ children, node, className, style, id, onClick, onKeyDown, videoModalAttrs }: { children: React.ReactNode, node: NodeVideoType, className?: string, style?: React.CSSProperties, id?: string, onClick?: (e: React.MouseEvent<HTMLDivElement>) => void, onKeyDown?: (e: React.KeyboardEvent<HTMLDivElement>) => void, videoModalAttrs?: Record<string, string> }) => {
   return (
     <div
       data-ce-id={node.id}
@@ -54,37 +46,10 @@ const VideoWrapper = ({ children, node, className, style, id, onClick, onKeyDown
   );
 }
 
-const ModalPlayer = ({ modalOpen, setModalOpen, src, poster }: { modalOpen: boolean, setModalOpen: (open: boolean) => void, src: string, poster: string }) => {
-  return (
-    <Dialog open={modalOpen} onOpenChange={setModalOpen}>
-      <DialogContent className="fixed left-[50%] top-[50%] z-50 w-full max-w-4xl translate-x-[-50%] translate-y-[-50%] p-0 bg-transparent border-0 shadow-none [&>button]:hidden">
-        <VisuallyHidden>
-          <DialogTitle>Vidéo</DialogTitle>
-        </VisuallyHidden>
-        <div className="relative w-full aspect-video bg-black rounded-lg overflow-hidden">
-          <LazyCharismaVideoPlayer src={src} poster={poster} />
-          <button
-          onClick={() => setModalOpen(false)}
-          className="absolute right-4 top-4 z-50
-             rounded-full bg-black/70 text-white
-             p-2 hover:bg-black
-             focus:outline-none focus:ring-2 focus:ring-white"
-          aria-label="Fermer"
-        >
-          <X className="h-4 w-4" />
-        </button>
-        </div>
-        
-      </DialogContent>
-    </Dialog>
-  );
-}
-
 const View: FC<NodeViewProps | NodeEditProps> = () => {
   const { node } = useNodeContext() as { node: NodeVideoType };
   const { mode } = useAppContext();
   const { id, className, style } = node.attributes ?? {};
-  const [modalOpen, setModalOpen] = useState(false);
   const content = node.content ?? { src: "", poster: "", autoplay: false, controls: false };
   const hasVideo = !!content.src;
   const hasPoster = !!content.poster;
@@ -96,17 +61,14 @@ const View: FC<NodeViewProps | NodeEditProps> = () => {
     poster: content.poster,
   });
 
-  const handleVideoClick = () => {
-    if (isEditMode) return;
-    if (!hasVideo) return;
-    if (isViewMode) {
-      openCharismaVideoModal({
-        src: content.src,
-        poster: content.poster,
-      });
-      return;
-    }
-    setModalOpen(true);
+  const handleVideoClick = (e: React.MouseEvent<HTMLDivElement>) => {
+    if (isEditMode || !hasVideo) return;
+    e.preventDefault();
+    e.stopPropagation();
+    openCharismaVideoModal({
+      src: content.src,
+      poster: content.poster,
+    });
   };
 
   if (!hasVideo) {
@@ -114,30 +76,27 @@ const View: FC<NodeViewProps | NodeEditProps> = () => {
   }
 
   return (
-    <>
-      <VideoWrapper
-        node={node}
-        className={cn("ce-video", !isEditMode && "cursor-pointer", className)}
-        style={styleForView(style ?? {})}
-        id={id}
-        onClick={handleVideoClick}
-        onKeyDown={(e) => {
-          if (!isEditMode && (e.key === "Enter" || e.key === " ")) {
-            e.preventDefault();
-            handleVideoClick();
-          }
-        }}
-        videoModalAttrs={videoModalAttrs}
-      >
-        {hasPoster && <VideoPoster poster={content.poster} alt="" />}
-       <VideoPlayOverlayIcon />
-      </VideoWrapper>
-      {!isViewMode ? (
-        <ModalPlayer modalOpen={modalOpen} setModalOpen={setModalOpen} src={content.src} poster={content.poster} />
-      ) : null}
-    </>
+    <VideoWrapper
+      node={node}
+      className={cn("ce-video", !isEditMode && "cursor-pointer", className)}
+      style={styleForView(style ?? {})}
+      id={id}
+      onClick={handleVideoClick}
+      onKeyDown={(e) => {
+        if (!isEditMode && (e.key === "Enter" || e.key === " ")) {
+          e.preventDefault();
+          openCharismaVideoModal({
+            src: content.src,
+            poster: content.poster,
+          });
+        }
+      }}
+      videoModalAttrs={videoModalAttrs}
+    >
+      {hasPoster && <VideoPoster poster={content.poster} alt="" />}
+      <VideoPlayOverlayIcon />
+    </VideoWrapper>
   );
-
 };
 
 export default View;

@@ -112,6 +112,15 @@ describe("openCharismaVideoModal", () => {
 
     expect(createCharismaVideoPlayer).not.toHaveBeenCalled();
   });
+
+  it("ferme la modale précédente à l'ouverture d'une nouvelle", async () => {
+    openCharismaVideoModal({ src: "https://example.com/first.mp4" });
+    expect(document.body.querySelectorAll(".fixed.inset-0")).toHaveLength(1);
+
+    openCharismaVideoModal({ src: "https://example.com/second.mp4" });
+    expect(document.body.querySelectorAll(".fixed.inset-0")).toHaveLength(1);
+    expect(disposeCharismaVideoPlayer).toHaveBeenCalled();
+  });
 });
 
 describe("initCharismaVideoModals", () => {
