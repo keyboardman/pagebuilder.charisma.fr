@@ -36,12 +36,12 @@ describe("mediaApi", () => {
     expect(fetchImpl).toHaveBeenNthCalledWith(
       1,
       buildCharismaMediaFavoriUrl("159"),
-      { method: "PUT", credentials: "include" }
+      { method: "PUT", mode: "cors", credentials: "include" }
     );
     expect(fetchImpl).toHaveBeenNthCalledWith(
       2,
       buildCharismaMediaCompteurUrl("159"),
-      { method: "POST", credentials: "include" }
+      { method: "PUT", mode: "cors", credentials: "include" }
     );
   });
 
@@ -53,8 +53,53 @@ describe("mediaApi", () => {
 
     await expect(fetchCharismaMediaFavoriCount("159", fetchImpl)).resolves.toBe(1027);
     expect(fetchImpl).toHaveBeenCalledWith(buildCharismaMediaItemUrl("159"), {
-      credentials: "include",
+      mode: "cors",
     });
+  });
+
+  it("récupère le compteur favori via le proxy page-builder", async () => {
+    const fetchImpl = vi
+      .fn()
+      .mockResolvedValueOnce({
+        ok: true,
+        json: async () => ({ raw: { favori: 42 } }),
+      });
+
+    await expect(
+      fetchCharismaMediaFavoriCount("159", {
+        fetchImpl,
+        apiCardsBaseUrl: "https://pb.example/api/page-builder",
+        apiId: "videos",
+      })
+    ).resolves.toBe(42);
+
+    expect(fetchImpl).toHaveBeenCalledWith(
+      "https://pb.example/api/page-builder/cards/videos/items/159",
+      {
+        credentials: "same-origin",
+        headers: { Accept: "application/json" },
+      }
+    );
+  });
+
+  it("retombe sur l'API directe si le proxy échoue", async () => {
+    const fetchImpl = vi
+      .fn()
+      .mockResolvedValueOnce({ ok: false })
+      .mockResolvedValueOnce({
+        ok: true,
+        json: async () => ({ favori: 7 }),
+      });
+
+    await expect(
+      fetchCharismaMediaFavoriCount("159", {
+        fetchImpl,
+        apiCardsBaseUrl: "https://pb.example/api/page-builder",
+        apiId: "videos",
+      })
+    ).resolves.toBe(7);
+
+    expect(fetchImpl).toHaveBeenCalledTimes(2);
   });
 
   it("retourne 0 si la réponse item est en erreur", async () => {

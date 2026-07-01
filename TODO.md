@@ -15,3 +15,5 @@
 13. OK SEO champ meta title
 14. OK menu flottant afin que flex soit plus représentatif
 15. compteur de vues et like pour videoApi
+16. enlever node-root-style n'est plus nécessaire
+17. favicon erreur

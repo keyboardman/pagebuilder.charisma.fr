@@ -52,7 +52,7 @@ describe("openCharismaVideoModal", () => {
         expect.objectContaining({
           src: "https://example.com/video.mp4",
           mediaId: "159",
-          favoriCount: 42,
+          favoriCount: 99,
         })
       );
     });
@@ -78,14 +78,15 @@ describe("openCharismaVideoModal", () => {
     expect(document.body.children).toHaveLength(0);
   });
 
-  it("charge le compteur favori si absent", async () => {
+  it("charge le compteur favori à l'ouverture quand mediaId est présent", async () => {
     openCharismaVideoModal({
       src: "https://example.com/video.mp4",
       mediaId: "159",
+      favoriCount: 0,
     });
 
     await vi.waitFor(() => {
-      expect(fetchCharismaMediaFavoriCount).toHaveBeenCalledWith("159");
+      expect(fetchCharismaMediaFavoriCount).toHaveBeenCalledWith("159", expect.any(Object));
       expect(createCharismaVideoPlayer).toHaveBeenCalledWith(
         expect.any(HTMLVideoElement),
         expect.objectContaining({ favoriCount: 99 })
@@ -127,7 +128,9 @@ describe("initCharismaVideoModals", () => {
   beforeEach(() => {
     document.body.innerHTML = "";
     createCharismaVideoPlayer.mockReset();
+    fetchCharismaMediaFavoriCount.mockReset();
     createCharismaVideoPlayer.mockReturnValue({ isDisposed: () => false });
+    fetchCharismaMediaFavoriCount.mockResolvedValue(99);
   });
 
   it("attache un gestionnaire de clic sur data-video-src", async () => {
@@ -149,7 +152,10 @@ describe("initCharismaVideoModals", () => {
     initCharismaVideoModals(document);
     createCharismaVideoPlayer.mockClear();
     trigger.click();
-    expect(createCharismaVideoPlayer).toHaveBeenCalledTimes(1);
+
+    await vi.waitFor(() => {
+      expect(createCharismaVideoPlayer).toHaveBeenCalledTimes(1);
+    });
   });
 
   it("ignore les éléments sans data-video-src au clic", () => {

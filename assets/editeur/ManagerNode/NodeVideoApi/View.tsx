@@ -120,6 +120,7 @@ const View: FC<NodeViewProps | NodeEditProps> = () => {
       poster: content.poster,
       mediaId: content.itemId,
       favoriCount,
+      apiId: content.apiId,
     });
   };
 

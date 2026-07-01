@@ -13,6 +13,13 @@ export interface CharismaVideoModalOptions {
   poster?: string;
   mediaId?: string;
   favoriCount?: number;
+  apiId?: string;
+}
+
+function readApiCardsBaseUrl(): string | undefined {
+  const fromDataset =
+    document.querySelector<HTMLElement>("[data-api-cards-base-url]")?.dataset.apiCardsBaseUrl;
+  return fromDataset?.trim() || undefined;
 }
 
 let activeVideoModalClose: (() => void) | null = null;
@@ -34,7 +41,7 @@ function unregisterActiveVideoModal(close: () => void): void {
 }
 
 export function openCharismaVideoModal(options: CharismaVideoModalOptions): () => void {
-  const { src, poster = "", mediaId, favoriCount } = options;
+  const { src, poster = "", mediaId, apiId } = options;
   if (!src) return () => undefined;
 
   closeActiveVideoModal();
@@ -84,9 +91,12 @@ export function openCharismaVideoModal(options: CharismaVideoModalOptions): () =
   document.body.appendChild(overlay);
 
   void (async () => {
-    let resolvedFavoriCount = favoriCount;
-    if (mediaId && resolvedFavoriCount === undefined) {
-      resolvedFavoriCount = await fetchCharismaMediaFavoriCount(mediaId);
+    let resolvedFavoriCount = options.favoriCount;
+    if (mediaId) {
+      resolvedFavoriCount = await fetchCharismaMediaFavoriCount(mediaId, {
+        apiCardsBaseUrl: readApiCardsBaseUrl(),
+        apiId: apiId ?? "videos",
+      });
     }
     if (closed) return;
 
