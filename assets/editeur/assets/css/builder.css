@@ -38,7 +38,6 @@
 }
 
 .admin-layout[data-mode=edit] {
-    --node-menu-height: 2.25rem;
     display: grid;
     grid-template-areas:
         "header header header"

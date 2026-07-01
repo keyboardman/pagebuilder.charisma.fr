@@ -12,3 +12,5 @@
 10. OK ouvrir l'editeur texte riche uniquement si on clique le bouton.
 11. NodeText et NodeHeader pouvoir editer directement en ligne
 12. NodeFlex et les menu des enfants pose un problème graphique
+13. SEO champ meta title
+14. menu flottant afin que flex soit plus représentatif

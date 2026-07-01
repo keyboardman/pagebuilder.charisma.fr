@@ -14,7 +14,7 @@ export default function NodeMenu() {
   const { node, drag, onDuplicate, onSelect, onDelete } = useNodeBuilderContext();
   const richTextEditor = useNodeRichTextEditorSafe();
   const isRichText = node.type === NODE_RICH_TEXT_TYPE;
-  const title = getNodeDisplayLabel(node);
+  const title = hasCustomNodeLabel(node) ? getNodeDisplayLabel(node) : getNodeTypeLabel(node);
   const typeLabel = getNodeTypeLabel(node);
   const showTypeHint = hasCustomNodeLabel(node);
 
@@ -26,7 +26,7 @@ export default function NodeMenu() {
   return (
     <div
       className={cn(
-        "flex w-full items-center gap-1 rounded-t-md border-b border-primary/20 bg-accent px-1 text-sm text-accent-foreground transition-colors"
+        "absolute bottom-full left-0 z-20 mb-0.5 flex min-w-24 items-center gap-1 rounded-md border border-primary/20 bg-accent px-1 text-sm text-accent-foreground shadow-md transition-colors"
       )}
       onClick={handleClick}
     >
@@ -39,7 +39,7 @@ export default function NodeMenu() {
         <GripVertical className="h-4 w-4" />
       </Button>
       <div
-        className="flex min-w-0 flex-1 cursor-pointer flex-col items-center overflow-hidden rounded-sm px-1 py-0 text-center hover:bg-accent/50"
+        className="flex max-w-[8rem] min-w-0 cursor-pointer flex-col items-center overflow-hidden rounded-sm px-1 py-0 text-center hover:bg-accent/50"
         title={showTypeHint ? typeLabel : undefined}
       >
         <span

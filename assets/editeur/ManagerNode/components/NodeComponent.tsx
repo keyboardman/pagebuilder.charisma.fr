@@ -34,7 +34,7 @@ function NodeBuilderComponent({ children }: { children: ReactNode }) {
         ref={drag.ref}
         data-ce-id={node.id}
         className={cn(
-          "m-1 cursor-pointer rounded-b-sm border p-1 transition-colors",
+          "relative cursor-pointer overflow-visible rounded-sm border transition-colors",
           selected ? "border-primary/60" : "border-border/50",
           hovered && !selected && "border-primary/40"
         )}
@@ -42,8 +42,8 @@ function NodeBuilderComponent({ children }: { children: ReactNode }) {
         onMouseLeave={() => setHovered(false)}
         onClick={handleClick}
       >
-        {selected ? <NodeMenu /> : null}
         <div>{children}</div>
+        {selected ? <NodeMenu /> : null}
       </div>
     </>
   );
