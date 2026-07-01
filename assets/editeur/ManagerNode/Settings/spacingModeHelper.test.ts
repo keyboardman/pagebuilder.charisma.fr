@@ -2,6 +2,7 @@ import { describe, expect, it } from "vitest";
 import {
     applyPerSideValue,
     applyUnifiedValue,
+    buildShorthandSpacing,
     collapsePerSideToUnified,
     detectSpacingMode,
     expandUnifiedToPerSide,
@@ -51,8 +52,17 @@ describe("getUnifiedValue", () => {
         ).toBe("1rem");
     });
 
-    it("retourne une chaîne vide pour des longhands asymétriques", () => {
+    it("retourne une chaîne vide pour des longhands partiels", () => {
         expect(getUnifiedValue({ paddingTop: "1rem", paddingBottom: "2rem" }, "padding")).toBe("");
+    });
+
+    it("dérive une shorthand à deux valeurs depuis les longhands", () => {
+        expect(
+            getUnifiedValue(
+                { paddingTop: "10px", paddingRight: "5px", paddingBottom: "10px", paddingLeft: "5px" },
+                "padding",
+            ),
+        ).toBe("10px 5px");
     });
 });
 
@@ -89,6 +99,68 @@ describe("expandUnifiedToPerSide", () => {
             marginLeft: "1rem",
         });
     });
+
+    it("décompose une shorthand à deux valeurs (vertical horizontal)", () => {
+        expect(expandUnifiedToPerSide({ padding: "10px 5px" }, "padding")).toEqual({
+            paddingTop: "10px",
+            paddingRight: "5px",
+            paddingBottom: "10px",
+            paddingLeft: "5px",
+        });
+    });
+
+    it("décompose une shorthand à trois valeurs (top horizontal bottom)", () => {
+        expect(expandUnifiedToPerSide({ margin: "10px 5px 5px" }, "margin")).toEqual({
+            marginTop: "10px",
+            marginRight: "5px",
+            marginBottom: "5px",
+            marginLeft: "5px",
+        });
+    });
+
+    it("décompose une shorthand à quatre valeurs (top right bottom left)", () => {
+        expect(expandUnifiedToPerSide({ padding: "10px 5px 5px 10px" }, "padding")).toEqual({
+            paddingTop: "10px",
+            paddingRight: "5px",
+            paddingBottom: "5px",
+            paddingLeft: "10px",
+        });
+    });
+
+    it("préserve calc() lors du découpage", () => {
+        expect(expandUnifiedToPerSide({ margin: "calc(10px + 5px) 2rem" }, "margin")).toEqual({
+            marginTop: "calc(10px + 5px)",
+            marginRight: "2rem",
+            marginBottom: "calc(10px + 5px)",
+            marginLeft: "2rem",
+        });
+    });
+});
+
+describe("buildShorthandSpacing", () => {
+    it("retourne une valeur unique quand les quatre côtés sont égaux", () => {
+        expect(
+            buildShorthandSpacing({ top: "1rem", right: "1rem", bottom: "1rem", left: "1rem" }),
+        ).toBe("1rem");
+    });
+
+    it("retourne deux valeurs (vertical horizontal)", () => {
+        expect(
+            buildShorthandSpacing({ top: "10px", right: "5px", bottom: "10px", left: "5px" }),
+        ).toBe("10px 5px");
+    });
+
+    it("retourne trois valeurs (top horizontal bottom)", () => {
+        expect(
+            buildShorthandSpacing({ top: "10px", right: "5px", bottom: "5px", left: "5px" }),
+        ).toBe("10px 5px 5px");
+    });
+
+    it("retourne quatre valeurs quand tous les côtés diffèrent", () => {
+        expect(
+            buildShorthandSpacing({ top: "10px", right: "5px", bottom: "5px", left: "10px" }),
+        ).toBe("10px 5px 5px 10px");
+    });
 });
 
 describe("collapsePerSideToUnified", () => {
@@ -101,7 +173,34 @@ describe("collapsePerSideToUnified", () => {
         ).toEqual({ padding: "1rem" });
     });
 
-    it("ne modifie pas des longhands asymétriques", () => {
+    it("convertit des longhands à deux valeurs en shorthand", () => {
+        expect(
+            collapsePerSideToUnified(
+                { marginTop: "10px", marginRight: "5px", marginBottom: "10px", marginLeft: "5px" },
+                "margin",
+            ),
+        ).toEqual({ margin: "10px 5px" });
+    });
+
+    it("convertit des longhands à trois valeurs en shorthand", () => {
+        expect(
+            collapsePerSideToUnified(
+                { paddingTop: "10px", paddingRight: "5px", paddingBottom: "5px", paddingLeft: "5px" },
+                "padding",
+            ),
+        ).toEqual({ padding: "10px 5px 5px" });
+    });
+
+    it("convertit des longhands à quatre valeurs distinctes en shorthand", () => {
+        expect(
+            collapsePerSideToUnified(
+                { marginTop: "10px", marginRight: "5px", marginBottom: "5px", marginLeft: "10px" },
+                "margin",
+            ),
+        ).toEqual({ margin: "10px 5px 5px 10px" });
+    });
+
+    it("ne modifie pas des longhands partiels", () => {
         const style = { marginTop: "1rem", marginBottom: "2rem" };
         expect(collapsePerSideToUnified(style, "margin")).toEqual(style);
     });

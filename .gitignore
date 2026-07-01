@@ -45,3 +45,4 @@ _old/
 assets/editeur2/_old
 assets/editeur2_bck
 config/tokens/filemanager_tokens.json
+coverage/

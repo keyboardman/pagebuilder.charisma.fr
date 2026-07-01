@@ -37,6 +37,8 @@ class PageControllerTest extends WebTestCase
         $client = static::createClient();
         $admin = $this->createUser('admin-page@example.test');
         $source = $this->createPage('Landing Page', 'landing-page');
+        $source->setMetaTitle('Landing SEO Title');
+        $this->entityManager->flush();
         $client->loginUser($admin);
 
         $token = $this->fetchDuplicateTokenFromPagesList($client, (int) $source->getId());
@@ -60,6 +62,7 @@ class PageControllerTest extends WebTestCase
         self::assertStringStartsWith('landing-page-copie', $copy->getSlug());
         self::assertSame($source->getTheme()?->getId(), $copy->getTheme()?->getId());
         self::assertSame($source->getDescription(), $copy->getDescription());
+        self::assertSame($source->getMetaTitle(), $copy->getMetaTitle());
         self::assertSame($source->getContent(), $copy->getContent());
         self::assertSame($source->getRender(), $copy->getRender());
     }
@@ -77,6 +80,55 @@ class PageControllerTest extends WebTestCase
             '#^https?://[^/]+/api/page-builder$#',
             (string) $apiBaseUrl,
         );
+    }
+
+    public function testRenderPageUsesMetaTitleInDocumentTitle(): void
+    {
+        $client = static::createClient();
+        $page = $this->createPage('Public Page', 'public-page-meta');
+        $page->setMetaTitle('SEO Meta Title');
+        $this->entityManager->flush();
+
+        $crawler = $client->request('GET', '/page/render/' . $page->getSlug());
+
+        self::assertResponseIsSuccessful();
+        self::assertSame('SEO Meta Title', trim($crawler->filter('title')->text()));
+    }
+
+    public function testRenderPageFallsBackToTitleWhenMetaTitleIsEmpty(): void
+    {
+        $client = static::createClient();
+        $page = $this->createPage('Fallback Title', 'fallback-title-page');
+
+        $crawler = $client->request('GET', '/page/render/' . $page->getSlug());
+
+        self::assertResponseIsSuccessful();
+        self::assertSame('Fallback Title', trim($crawler->filter('title')->text()));
+    }
+
+    public function testEditPagePersistsMetaTitle(): void
+    {
+        $client = static::createClient();
+        $admin = $this->createUser('admin-page-meta@example.test');
+        $page = $this->createPage('Editable Page', 'editable-page');
+        $client->loginUser($admin);
+
+        $crawler = $client->request('GET', '/admin/page/edit/' . $page->getId());
+        self::assertResponseIsSuccessful();
+
+        $form = $crawler->selectButton('Enregistrer')->form([
+            'admin_page_form[metaTitle]' => 'Nouveau titre SEO',
+            'admin_page_form[title]' => 'Editable Page',
+            'admin_page_form[description]' => 'Description test',
+        ]);
+
+        $client->submit($form);
+        self::assertResponseRedirects('/admin/page/edit/' . $page->getId());
+
+        $this->entityManager->clear();
+        $updated = $this->entityManager->getRepository(Page::class)->find($page->getId());
+        self::assertNotNull($updated);
+        self::assertSame('Nouveau titre SEO', $updated->getMetaTitle());
     }
 
     public function testDuplicatePageWithInvalidCsrfIsRefused(): void

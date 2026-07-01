@@ -29,9 +29,10 @@ function makeLinksAbsolute(html, baseUrl) {
     .replace(/\s+src="\/(?!\/)/g, ` src="${base}/`);
 }
 
-function buildFullDocument(bodyInnerHTML, { baseUrl = '', pageTitle = '', pageDescription = '', themeCssUrl = '', renderCssUrls = [] }) {
+function buildFullDocument(bodyInnerHTML, { baseUrl = '', pageTitle = '', pageMetaTitle = '', pageDescription = '', themeCssUrl = '', renderCssUrls = [] }) {
   const base = baseUrl.replace(/\/$/, '');
   const themeCssHref = themeCssUrl ? (themeCssUrl.startsWith('http') ? themeCssUrl : base + (themeCssUrl.startsWith('/') ? themeCssUrl : '/' + themeCssUrl)) : '';
+  const documentTitle = pageMetaTitle || pageTitle;
   const descMeta = pageDescription
     ? `<meta name="description" content="${String(pageDescription).replace(/"/g, '&quot;')}">`
     : '';
@@ -44,7 +45,7 @@ function buildFullDocument(bodyInnerHTML, { baseUrl = '', pageTitle = '', pageDe
   return (
     '<!DOCTYPE html>\n<html lang="fr">\n<head>\n' +
     '<meta charset="UTF-8">\n<meta name="viewport" content="width=device-width, initial-scale=1.0">\n' +
-    `<title>${String(pageTitle).replace(/</g, '&lt;').replace(/>/g, '&gt;')}</title>\n` +
+    `<title>${String(documentTitle).replace(/</g, '&lt;').replace(/>/g, '&gt;')}</title>\n` +
     descMeta +
     (themeCssHref ? `\n<link rel="stylesheet" href="${themeCssHref}">\n` : '') +
     (cssLinks ? `\n${cssLinks}\n` : '') +
@@ -99,6 +100,7 @@ function PageBuilderStandalone({
   saveUrl,
   backUrl = '',
   pageTitle = '',
+  pageMetaTitle = '',
   apiCardsBaseUrl = null,
   pageBuilderApiBaseUrl = null,
   baseUrl = '',
@@ -147,6 +149,7 @@ function PageBuilderStandalone({
     const opts = {
       baseUrl,
       pageTitle,
+      pageMetaTitle,
       pageDescription,
       themeCssUrl,
       renderCssUrls,
@@ -155,7 +158,7 @@ function PageBuilderStandalone({
     generateFullRenderHtml(content, opts).then((fullHtml) => {
       saveContent(content, fullHtml);
     });
-  }, [saveContent, content, baseUrl, pageTitle, pageDescription, themeCssUrl, renderCssUrls, apiCardsBaseUrl]);
+  }, [saveContent, content, baseUrl, pageTitle, pageMetaTitle, pageDescription, themeCssUrl, renderCssUrls, apiCardsBaseUrl]);
 
   return (
     <div className="page-builder-standalone-shell relative grid min-h-0 flex-1 grid-rows-[auto_1fr] overflow-hidden">
@@ -202,6 +205,7 @@ if (dataEl && rootEl) {
   let saveUrl = '';
   let backUrl = '';
   let pageTitle = '';
+  let pageMetaTitle = '';
   let apiCardsBaseUrl = '';
   let pageBuilderApiBaseUrl = '';
   let baseUrl = '';
@@ -229,6 +233,7 @@ if (dataEl && rootEl) {
     saveUrl = data.saveUrl ?? '';
     backUrl = typeof data.backUrl === 'string' ? data.backUrl : '';
     pageTitle = typeof data.pageTitle === 'string' ? data.pageTitle : '';
+    pageMetaTitle = typeof data.pageMetaTitle === 'string' ? data.pageMetaTitle : '';
     apiCardsBaseUrl = typeof data.apiCardsBaseUrl === 'string' ? data.apiCardsBaseUrl : '';
     pageBuilderApiBaseUrl = typeof data.pageBuilderApiBaseUrl === 'string' ? data.pageBuilderApiBaseUrl : '';
     baseUrl = typeof data.baseUrl === 'string' ? data.baseUrl : '';
@@ -265,6 +270,7 @@ if (dataEl && rootEl) {
       saveUrl={saveUrl}
       backUrl={backUrl}
       pageTitle={pageTitle}
+      pageMetaTitle={pageMetaTitle}
       apiCardsBaseUrl={apiCardsBaseUrl || null}
       pageBuilderApiBaseUrl={pageBuilderApiBaseUrl || null}
       baseUrl={baseUrl}

@@ -32,6 +32,70 @@ function longhandKeys(property: SpacingProperty): (keyof CSSProperties)[] {
     return SIDES.map((side) => LONGHAND_KEYS[property][side]);
 }
 
+/** Découpe une valeur shorthand CSS (margin/padding) en tokens, sans casser calc() etc. */
+function tokenizeShorthand(value: string): string[] {
+    const tokens: string[] = [];
+    let current = "";
+    let depth = 0;
+
+    for (const char of value.trim()) {
+        if (char === "(") {
+            depth++;
+        } else if (char === ")") {
+            depth--;
+        } else if (char === " " && depth === 0) {
+            if (current) {
+                tokens.push(current);
+                current = "";
+            }
+            continue;
+        }
+        current += char;
+    }
+
+    if (current) {
+        tokens.push(current);
+    }
+
+    return tokens;
+}
+
+/** Parse une shorthand margin/padding en valeurs top, right, bottom, left. */
+export function parseShorthandSpacing(value: string): Record<SpacingSide, string> {
+    const tokens = tokenizeShorthand(value);
+
+    if (tokens.length === 0) {
+        return { top: "", right: "", bottom: "", left: "" };
+    }
+    if (tokens.length === 1) {
+        return { top: tokens[0], right: tokens[0], bottom: tokens[0], left: tokens[0] };
+    }
+    if (tokens.length === 2) {
+        return { top: tokens[0], right: tokens[1], bottom: tokens[0], left: tokens[1] };
+    }
+    if (tokens.length === 3) {
+        return { top: tokens[0], right: tokens[1], bottom: tokens[2], left: tokens[1] };
+    }
+
+    return { top: tokens[0], right: tokens[1], bottom: tokens[2], left: tokens[3] };
+}
+
+/** Construit la shorthand CSS minimale à partir des quatre côtés. */
+export function buildShorthandSpacing(sides: Record<SpacingSide, string>): string {
+    const { top, right, bottom, left } = sides;
+
+    if (top === right && right === bottom && bottom === left) {
+        return top;
+    }
+    if (top === bottom && right === left) {
+        return `${top} ${right}`;
+    }
+    if (right === left) {
+        return `${top} ${right} ${bottom}`;
+    }
+    return `${top} ${right} ${bottom} ${left}`;
+}
+
 function sideValues(style: CSSProperties | undefined, property: SpacingProperty): string[] {
     return SIDES.map((side) => toStr(style?.[LONGHAND_KEYS[property][side]]));
 }
@@ -66,8 +130,16 @@ export function getUnifiedValue(style: CSSProperties | undefined, property: Spac
     }
 
     const values = sideValues(style, property);
-    if (values.every((value) => value !== "") && new Set(values).size === 1) {
-        return values[0];
+    if (values.every((value) => value !== "")) {
+        if (new Set(values).size === 1) {
+            return values[0];
+        }
+        return buildShorthandSpacing({
+            top: values[0],
+            right: values[1],
+            bottom: values[2],
+            left: values[3],
+        });
     }
 
     return "";
@@ -131,9 +203,10 @@ export function expandUnifiedToPerSide(
     delete next[property];
 
     if (value) {
+        const parsed = parseShorthandSpacing(value);
         for (const side of SIDES) {
             const key = LONGHAND_KEYS[property][side];
-            (next as Record<string, string>)[key as string] = value;
+            (next as Record<string, string>)[key as string] = parsed[side];
         }
     }
 
@@ -152,7 +225,16 @@ export function collapsePerSideToUnified(
 
     const first = values[0];
     if (!values.every((value) => value === first)) {
-        return { ...(style ?? {}) };
+        return applyUnifiedValue(
+            style,
+            property,
+            buildShorthandSpacing({
+                top: values[0],
+                right: values[1],
+                bottom: values[2],
+                left: values[3],
+            }),
+        );
     }
 
     return applyUnifiedValue(style, property, first);

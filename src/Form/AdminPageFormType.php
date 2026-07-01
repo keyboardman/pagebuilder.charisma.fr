@@ -30,6 +30,14 @@ class AdminPageFormType extends AbstractType
                 ],
                 'required' => true,
             ])
+            ->add('metaTitle', TextType::class, [
+                'label' => 'Titre SEO',
+                'required' => false,
+                'attr' => [
+                    'placeholder' => 'Titre affiché dans la balise <title>',
+                ],
+                'help' => 'Remplace le titre de la page dans la balise <title> si renseigné.',
+            ])
             ->add('description', TextareaType::class, [
                 'label' => 'Description',
                 'attr' => [

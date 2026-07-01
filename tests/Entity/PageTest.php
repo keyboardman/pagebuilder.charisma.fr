@@ -39,4 +39,30 @@ class PageTest extends KernelTestCase
         $this->assertSame('Description SEO', $page->getDescription());
         $this->assertSame(['body' => 'Contenu de la page'], $page->getContent());
     }
+
+    public function testGetEffectiveMetaTitleUsesMetaTitleWhenSet(): void
+    {
+        $page = new Page();
+        $page->setTitle('Titre interne');
+        $page->setMetaTitle('Titre SEO');
+
+        $this->assertSame('Titre SEO', $page->getEffectiveMetaTitle());
+    }
+
+    public function testGetEffectiveMetaTitleFallsBackToTitleWhenMetaTitleIsNull(): void
+    {
+        $page = new Page();
+        $page->setTitle('Titre interne');
+
+        $this->assertSame('Titre interne', $page->getEffectiveMetaTitle());
+    }
+
+    public function testGetEffectiveMetaTitleFallsBackToTitleWhenMetaTitleIsEmpty(): void
+    {
+        $page = new Page();
+        $page->setTitle('Titre interne');
+        $page->setMetaTitle('   ');
+
+        $this->assertSame('Titre interne', $page->getEffectiveMetaTitle());
+    }
 }

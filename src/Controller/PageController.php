@@ -106,6 +106,7 @@ class PageController extends AbstractController
         $copy->setTitle($page->getTitle() . ' (copie)');
         $copy->setSlug($this->generateUniqueCopySlug($page));
         $copy->setTheme($page->getTheme());
+        $copy->setMetaTitle($page->getMetaTitle());
         $copy->setDescription($page->getDescription());
         $copy->setContent($page->getContent());
         $copy->setRender($page->getRender());

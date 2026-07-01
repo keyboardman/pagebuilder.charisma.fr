@@ -31,6 +31,9 @@ class Page
     #[Assert\NotNull]
     private ?Theme $theme = null;
 
+    #[ORM\Column(type: 'string', length: 255, nullable: true)]
+    private ?string $metaTitle = null;
+
     #[ORM\Column(type: 'text', nullable: true)]
     private ?string $description = null;
 
@@ -85,6 +88,24 @@ class Page
     {
         $this->theme = $theme;
         return $this;
+    }
+
+    public function getMetaTitle(): ?string
+    {
+        return $this->metaTitle;
+    }
+
+    public function setMetaTitle(?string $metaTitle): static
+    {
+        $this->metaTitle = $metaTitle;
+        return $this;
+    }
+
+    public function getEffectiveMetaTitle(): string
+    {
+        $metaTitle = trim((string) $this->metaTitle);
+
+        return $metaTitle !== '' ? $metaTitle : $this->title;
     }
 
     public function getDescription(): ?string
