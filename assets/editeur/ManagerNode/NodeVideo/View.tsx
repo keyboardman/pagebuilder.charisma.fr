@@ -15,6 +15,7 @@ import { styleForView } from "../../utils/styleHelper";
 import { VideoPlayOverlayIcon } from "../components/VideoPlayOverlayIcon";
 import LazyCharismaVideoPlayer from "../components/LazyCharismaVideoPlayer";
 import { getVideoModalDataAttributes } from "../../components/video/videoModalAttributes";
+import { openCharismaVideoModal } from "../../components/video/charismaVideoModal";
 
 const VideoPlaceholder: FC<{ text?: string }> = ({ text = "Aucune vidéo" }) => {
   return (
@@ -97,7 +98,15 @@ const View: FC<NodeViewProps | NodeEditProps> = () => {
 
   const handleVideoClick = () => {
     if (isEditMode) return;
-    if (hasVideo) setModalOpen(true);
+    if (!hasVideo) return;
+    if (isViewMode) {
+      openCharismaVideoModal({
+        src: content.src,
+        poster: content.poster,
+      });
+      return;
+    }
+    setModalOpen(true);
   };
 
   if (!hasVideo) {

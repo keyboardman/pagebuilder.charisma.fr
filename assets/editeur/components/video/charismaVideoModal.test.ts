@@ -173,4 +173,28 @@ describe("initCharismaVideoModals", () => {
       );
     });
   });
+
+  it("attache les déclencheurs ajoutés dynamiquement quand observe est activé", async () => {
+    const container = document.createElement("div");
+    document.body.appendChild(container);
+
+    initCharismaVideoModals(container, { observe: true });
+
+    const trigger = document.createElement("button");
+    trigger.setAttribute("data-video-src", "https://example.com/late.mp4");
+    container.appendChild(trigger);
+
+    await vi.waitFor(() => {
+      expect(trigger.dataset.videoModalInit).toBe("1");
+    });
+
+    trigger.click();
+
+    await vi.waitFor(() => {
+      expect(createCharismaVideoPlayer).toHaveBeenCalledWith(
+        expect.any(HTMLVideoElement),
+        expect.objectContaining({ src: "https://example.com/late.mp4" })
+      );
+    });
+  });
 });

@@ -4,6 +4,7 @@ import AppProvider from './editeur/services/providers/AppProvider';
 import App from './editeur/app/App';
 import { registerBackendApis } from './editeur/ManagerApi/backendApiAdapter';
 import { apiRegistry } from './editeur/ManagerApi/ApiRegistry';
+import { initCharismaVideoModals } from './editeur/components/video/charismaVideoModal';
 import './editeur/assets/css/index.css';
 
 function PagePreviewApp({ json, apiCardsBaseUrl }) {
@@ -29,6 +30,15 @@ function PagePreviewApp({ json, apiCardsBaseUrl }) {
       cancelled = true;
     };
   }, [apiCardsBaseUrl]);
+
+  useEffect(() => {
+    if (!ready) return;
+
+    const root = document.getElementById('page-preview-root');
+    if (!root) return;
+
+    initCharismaVideoModals(root, { observe: true });
+  }, [ready]);
 
   if (!ready) {
     return null;

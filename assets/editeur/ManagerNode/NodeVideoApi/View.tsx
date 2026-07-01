@@ -10,6 +10,7 @@ import { styleForView } from "../../utils/styleHelper";
 import { VideoPlayOverlayIcon } from "../components/VideoPlayOverlayIcon";
 import LazyCharismaVideoPlayer from "../components/LazyCharismaVideoPlayer";
 import { getVideoModalDataAttributes } from "../../components/video/videoModalAttributes";
+import { openCharismaVideoModal } from "../../components/video/charismaVideoModal";
 import { parseFavoriCount } from "../../components/video/favoriCount";
 import { apiRegistry } from "../../ManagerApi/ApiRegistry";
 
@@ -152,13 +153,18 @@ const View: FC<NodeViewProps | NodeEditProps> = () => {
   }
 
   const handleImageClick = () => {
-    // En mode édition, ne pas ouvrir la modale pour permettre la sélection du node
-    if (isEditMode) {
+    if (isEditMode) return;
+    if (!hasVideo) return;
+    if (isViewMode) {
+      openCharismaVideoModal({
+        src: content.src,
+        poster: content.poster,
+        mediaId: content.itemId,
+        favoriCount,
+      });
       return;
     }
-    if (hasVideo) {
-      setModalOpen(true);
-    }
+    setModalOpen(true);
   };
 
   const cardStyle = content.card?.style || {};

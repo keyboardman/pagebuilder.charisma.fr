@@ -8,6 +8,7 @@ import { styleForView } from "../../utils/styleHelper";
 import { VideoPlayOverlayIcon } from "../components/VideoPlayOverlayIcon";
 import LazyCharismaVideoPlayer from "../components/LazyCharismaVideoPlayer";
 import { getVideoModalDataAttributes } from "../../components/video/videoModalAttributes";
+import { openCharismaVideoModal, openEmbedVideoModal } from "../../components/video/charismaVideoModal";
 import { parseFavoriCount } from "../../components/video/favoriCount";
 import { Dialog, DialogContent, DialogTitle } from "@/editeur/components/ui/dialog";
 import { VisuallyHidden } from "@/editeur/components/ui/visually-hidden";
@@ -87,6 +88,24 @@ const View: FC<NodeViewProps> = () => {
   const hasExpectedCount = videos.length === EXPECTED_VIDEOS_COUNT;
   const displayVideos = useMemo(() => videos.slice(0, EXPECTED_VIDEOS_COUNT), [videos]);
 
+  const openVideoModal = (video: NodeVideoHomeItem) => {
+    if (!video.source) return;
+    if (isViewMode) {
+      if (video.type === "youtube") {
+        openEmbedVideoModal({ src: video.source, title: video.title || "Vidéo Youtube" });
+        return;
+      }
+      openCharismaVideoModal({
+        src: video.source,
+        poster: video.poster,
+        mediaId: video.id,
+        favoriCount: video.favoriCount,
+      });
+      return;
+    }
+    setSelectedVideo(video);
+  };
+
   return (
     <>
       <section
@@ -136,15 +155,15 @@ const View: FC<NodeViewProps> = () => {
                   tabIndex={0}
                   {...videoModalAttrs}
                   onClick={() => {
-                    if (!isEditMode && !isViewMode && video.source) {
-                      setSelectedVideo(video);
+                    if (!isEditMode) {
+                      openVideoModal(video);
                     }
                   }}
                   onKeyDown={(event) => {
-                    if (isEditMode || isViewMode || !video.source) return;
+                    if (isEditMode || !video.source) return;
                     if (event.key === "Enter" || event.key === " ") {
                       event.preventDefault();
-                      setSelectedVideo(video);
+                      openVideoModal(video);
                     }
                   }}
                 >

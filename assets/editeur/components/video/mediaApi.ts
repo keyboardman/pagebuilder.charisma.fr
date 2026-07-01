@@ -32,7 +32,7 @@ export async function sendCharismaMediaCompteur(
   fetchImpl: typeof fetch = fetch
 ): Promise<Response> {
   return fetchImpl(buildCharismaMediaCompteurUrl(mediaId), {
-    method: "POST",
+    method: "PUT",
     credentials: "include",
   });
 }
