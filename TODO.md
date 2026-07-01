@@ -14,6 +14,7 @@
 12. OK NodeFlex et les menu des enfants pose un problème graphique
 13. OK SEO champ meta title
 14. OK menu flottant afin que flex soit plus représentatif
-15. compteur de vues et like pour videoApi
-16. enlever node-root-style n'est plus nécessaire
+15. OK compteur de vues et like pour videoApi
+16. OK enlever node-root-style n'est plus nécessaire
 17. favicon erreur
+18. OK Structure ajouter un oeil pour desactivéer un node avec ces enfants 

@@ -6,7 +6,6 @@ import { NodeSettingsWrapper } from "../components/NodeSettingsWrapper";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/editeur/components/ui/tabs";
 import type { NodeRootType } from "./index";
 import BackgroundSettings from "./Settings/BackgroundSettings";
-import TypographySettings from "./Settings/TypographySettings";
 
 const Settings: FC<NodeSettingsProps> = () => {
   const { node, onChange } = useNodeBuilderContext();
@@ -19,7 +18,6 @@ const Settings: FC<NodeSettingsProps> = () => {
           <TabsList className="justify-center w-full">
             <TabsTrigger value="general">Général</TabsTrigger>
             <TabsTrigger value="background">Arrière-plan</TabsTrigger>
-            <TabsTrigger value="typography">Typographie</TabsTrigger>
           </TabsList>
         }
         content={
@@ -44,10 +42,6 @@ const Settings: FC<NodeSettingsProps> = () => {
 
             <TabsContent value="background" className="mt-0">
               <BackgroundSettings />
-            </TabsContent>
-
-            <TabsContent value="typography" className="mt-0">
-              <TypographySettings />
             </TabsContent>
           </>
         }

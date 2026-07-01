@@ -1,9 +1,12 @@
 import { useEffect, useRef, useState } from "react";
-import { ChevronDown, ChevronRight, GripVertical } from "lucide-react";
+import { ChevronDown, ChevronRight, Eye, EyeOff, GripVertical } from "lucide-react";
 import { useDraggable } from "@dnd-kit/react";
 import { Input } from "@/editeur/components/ui/input";
 import type { NodeType } from "../../types/NodeType";
 import { useBuilderContext } from "../../services/providers/BuilderContext";
+import { useAppContext } from "../../services/providers/AppContext";
+import { NODE_ROOT_TYPE } from "../../ManagerNode/NodeRoot";
+import { isNodeEffectivelyHidden } from "../../utils/nodeVisibility";
 import {
   getNodeDisplayLabel,
   getNodeTypeLabel,
@@ -38,6 +41,7 @@ export default function ExplorerRow({
   onSelect,
 }: ExplorerRowProps) {
   const { updateNode } = useBuilderContext();
+  const { nodes } = useAppContext();
   const [isEditing, setIsEditing] = useState(false);
   const [draftLabel, setDraftLabel] = useState("");
   const inputRef = useRef<HTMLInputElement>(null);
@@ -102,6 +106,15 @@ export default function ExplorerRow({
     commitEditing();
   };
 
+  const isRootNode = node.type === NODE_ROOT_TYPE;
+  const effectivelyHidden = isNodeEffectivelyHidden(node.id, nodes);
+
+  const handleToggleVisibility = (event: React.MouseEvent) => {
+    event.stopPropagation();
+    event.preventDefault();
+    updateNode({ ...node, hidden: !node.hidden });
+  };
+
   return (
     <div
       ref={isDraggable ? dragRef : undefined}
@@ -109,7 +122,8 @@ export default function ExplorerRow({
       className={cn(
         "flex min-h-8 items-center gap-1 rounded-md px-1 text-sm transition-colors hover:bg-accent/60",
         isActive && "bg-accent text-accent-foreground",
-        isDraggable && "cursor-pointer"
+        isDraggable && "cursor-pointer",
+        effectivelyHidden && "opacity-50"
       )}
       style={{ paddingLeft: `${depth * 12 + 4}px` }}
       onClick={onSelect}
@@ -171,6 +185,20 @@ export default function ExplorerRow({
           </>
         )}
       </span>
+      {!isRootNode ? (
+        <button
+          type="button"
+          className="flex h-5 w-5 shrink-0 items-center justify-center rounded-sm text-muted-foreground hover:text-foreground"
+          onClick={handleToggleVisibility}
+          aria-label={effectivelyHidden ? "Afficher le composant" : "Masquer le composant"}
+        >
+          {effectivelyHidden ? (
+            <EyeOff className="h-3.5 w-3.5" />
+          ) : (
+            <Eye className="h-3.5 w-3.5" />
+          )}
+        </button>
+      ) : null}
     </div>
   );
 }

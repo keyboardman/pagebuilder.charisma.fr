@@ -27,6 +27,8 @@ export interface NodeType {
   parent: ParentProps;
   /** Nom affiché dans l'explorateur et le bandeau du builder (n'affecte pas le rendu public). */
   editorLabel?: string;
+  /** Masque le nœud sur le canevas et en rendu public ; pilotable depuis l'explorateur Structure. */
+  hidden?: boolean;
   attributes?: NodeAttributes;
   isDroppable?: boolean;
   content?: Record<string, any>;

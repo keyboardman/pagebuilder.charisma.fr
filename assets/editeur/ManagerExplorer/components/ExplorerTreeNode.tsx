@@ -31,8 +31,6 @@ export default function ExplorerTreeNode({
   const showZoneHeaders = childGroups.length > 1;
   const isDraggable = node.type !== NODE_ROOT_TYPE;
 
-  console.log("childGroups", childGroups);
-
   const handleRowClick = () => {
     onSelect(node.id);
     if (isExpandable && !isExpanded) {

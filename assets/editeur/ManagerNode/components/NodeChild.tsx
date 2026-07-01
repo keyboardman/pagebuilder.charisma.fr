@@ -5,6 +5,7 @@ import { APP_MODE, useAppContext } from "../../services/providers/AppContext";
 import { useNodeContext } from "../../services/providers/NodeContext";
 import { useNodeBuilderContext } from "../../services/providers/NodeBuilderContext";
 import { type ReactNode } from "react";
+import { isNodeEffectivelyHidden } from "../../utils/nodeVisibility";
 import DropZone from "./DropZone";
 import NodeRegistry, { isKnownNode } from "./NodeRegistry";
 import { cn } from "@/editeur/lib/utils";
@@ -38,10 +39,16 @@ function NodeChildBuilder({ children }: { children: ReactNode }) {
 }
 
 function NodeChildComponent() {
-  const { mode } = useAppContext();
+  const { mode, nodes } = useAppContext();
   const { node } = useNodeContext();
 
   if (!node || !isKnownNode(node)) {
+    return null;
+  }
+
+  const effectivelyHidden = isNodeEffectivelyHidden(node.id, nodes);
+
+  if (effectivelyHidden) {
     return null;
   }
 

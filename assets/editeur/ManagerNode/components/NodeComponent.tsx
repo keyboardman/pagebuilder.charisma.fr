@@ -5,6 +5,7 @@ import NodeRegistry, { isKnownNode } from "./NodeRegistry";
 import { APP_MODE } from "../../services/providers/AppContext";
 import { NODE_ROOT_TYPE } from "../NodeRoot";
 import { useAppContext } from "../../services/providers/AppContext";
+import { isNodeEffectivelyHidden } from "../../utils/nodeVisibility";
 import DropZone from "./DropZone";
 import NodeMenu from "./NodeMenu";
 import { cn } from "@/editeur/lib/utils";
@@ -50,13 +51,19 @@ function NodeBuilderComponent({ children }: { children: ReactNode }) {
 }
 
 function NodeComponent() {
-  const { mode } = useAppContext();
+  const { mode, nodes } = useAppContext();
   const { node } = useNodeContext();
 
   if (!node) return <EmptySettings />;
 
   if (!isKnownNode(node)) {
     return <EmptySettings />;
+  }
+
+  const effectivelyHidden = isNodeEffectivelyHidden(node.id, nodes);
+
+  if (effectivelyHidden) {
+    return null;
   }
 
   const Component = NodeRegistry[node.type].view;
