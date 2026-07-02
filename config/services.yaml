@@ -87,6 +87,9 @@ services:
     App\PageBuilder\ApiCard\CharismaEvenementHomeApiCard:
         tags: [app.builder_api_card]
 
+    App\PageBuilder\ApiCard\CharismaEvenementRetrospectiveApiCard:
+        tags: [app.builder_api_card]
+
     App\PageBuilder\ApiCard\StubNavListApiCard:
         tags: [app.builder_api_card]
 
