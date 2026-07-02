@@ -14,6 +14,10 @@ const classByType: Record<string, string | undefined> = {
   desktop: undefined,
 };
 
+/** Gouttière horizontale mobile / tablette (1rem / 16px, équivalent Tailwind px-4). */
+const HORIZONTAL_GUTTER = "px-4";
+const VIEWPORT_HORIZONTAL_GUTTER = "max-lg:px-4";
+
 interface NodeRootContentProps {
   nodes: NodesType;
   nodeId: string;
@@ -30,9 +34,14 @@ const Content: FC<NodeRootContentProps> = ({
   const hasCustomBackground = hasCustomNodeRootBackground(background);
   const wrapperStyle = getNodeRootWrapperStyle(background);
 
+  const horizontalGutter =
+    breakpoint === "mobile" || breakpoint === "tablet"
+      ? HORIZONTAL_GUTTER
+      : VIEWPORT_HORIZONTAL_GUTTER;
+
   const innerColumnBase = breakpoint
-    ? `${classByType[breakpoint]} m-auto transition-all duration-500 ease-in-out`
-    : "max-w-3xl m-auto transition-all duration-500 ease-in-out";
+    ? `${classByType[breakpoint]} m-auto ${horizontalGutter} transition-all duration-500 ease-in-out`
+    : `max-w-3xl m-auto ${horizontalGutter} transition-all duration-500 ease-in-out`;
   const innerColumnClass = hasCustomBackground
     ? innerColumnBase
     : `${innerColumnBase} bg-background`;

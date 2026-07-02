@@ -48,13 +48,16 @@ describe("NodeRoot Content", () => {
     const { rerender } = render(<Content nodes={{}} nodeId="root-1" breakpoint="mobile" />);
     let innerColumn = document.querySelector(".node-root-content > .relative.z-10");
     expect(innerColumn?.className).toContain("max-w-sm");
+    expect(innerColumn?.className).toContain("px-4");
 
     rerender(<Content nodes={{}} nodeId="root-1" breakpoint="tablet" />);
     innerColumn = document.querySelector(".node-root-content > .relative.z-10");
     expect(innerColumn?.className).toContain("max-w-lg");
+    expect(innerColumn?.className).toContain("px-4");
 
     rerender(<Content nodes={{}} nodeId="root-1" />);
     innerColumn = document.querySelector(".node-root-content > .relative.z-10");
     expect(innerColumn?.className).toContain("max-w-3xl");
+    expect(innerColumn?.className).toContain("max-lg:px-4");
   });
 });
