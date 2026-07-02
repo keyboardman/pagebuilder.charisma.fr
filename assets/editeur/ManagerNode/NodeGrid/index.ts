@@ -6,8 +6,26 @@ import {
 import View from './View'
 import Settings from './Settings'
 import { IoGridOutline } from 'react-icons/io5'
+import {
+    type BreakpointKey,
+    type NodeGridLayout,
+    cols,
+    rows,
+    buildDesktopCellZones,
+    cellCount,
+    getCellVisibilityClassesForView,
+    isCellVisibleAtBreakpoint,
+} from './layoutHelpers'
 
-export type BreakpointKey = "mobile" | "tablet" | "desktop";
+export type { BreakpointKey, NodeGridLayout }
+export {
+    cols,
+    rows,
+    buildDesktopCellZones,
+    cellCount,
+    getCellVisibilityClassesForView,
+    isCellVisibleAtBreakpoint,
+}
 
 export const NODE_GRID_TYPE = 'node-grid' as const
 
@@ -66,40 +84,6 @@ export const GAP_CLASS: Record<number, string> = {
     8: 'gap-8',
     10: 'gap-10',
     12: 'gap-12'
-}
-
-export const cols = (layout: NodeGridLayout, key: BreakpointKey) =>
-    layout[key]?.columns ?? layout.desktop?.columns ?? 2;
-
-export const rows = (layout: NodeGridLayout, key: BreakpointKey) =>
-    layout[key]?.rows ?? layout.desktop?.rows ?? 2;
-
-/** Zones `cell-{row}-{col}` dérivées de la structure desktop. */
-export const buildDesktopCellZones = (layout: NodeGridLayout): string[] => {
-    const cDesktop = cols(layout, 'desktop')
-    const rDesktop = rows(layout, 'desktop')
-    const zones: string[] = []
-    for (let row = 0; row < rDesktop; row++) {
-        for (let col = 0; col < cDesktop; col++) {
-            zones.push(`cell-${row}-${col}`)
-        }
-    }
-    return zones
-}
-
-export interface NodeGridLayout {
-    desktop?: {
-        columns?: number
-        rows?: number
-    }
-    tablet?: {
-        columns?: number
-        rows?: number
-    }
-    mobile?: {
-        columns?: number
-        rows?: number
-    }
 }
 
 export interface NodeGridType extends NodeType {

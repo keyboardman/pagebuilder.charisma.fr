@@ -12,9 +12,13 @@ import {
   LG_GRID_COLS,
   GAP_CLASS,
   type BreakpointKey,
+} from "./index";
+import {
   buildDesktopCellZones,
   cols,
-} from "./index";
+  getCellVisibilityClassesForView,
+  isCellVisibleAtBreakpoint,
+} from "./layoutHelpers";
 
 
 const View: FC<NodeViewProps | NodeEditProps> = () => {
@@ -64,8 +68,8 @@ const View: FC<NodeViewProps | NodeEditProps> = () => {
       gapClass,
     ].join(" ");
 
-    cells = desktopZones.map((zone) => (
-      <div key={zone}>
+    cells = desktopZones.map((zone, index) => (
+      <div key={zone} className={getCellVisibilityClassesForView(index, layout) || undefined}>
         <NodeCollection nodes={getChildren(zone)} parentId={node.id} zone={zone} />
       </div>
     ));
@@ -74,8 +78,11 @@ const View: FC<NodeViewProps | NodeEditProps> = () => {
 
     gridClasses = ["grid", GRID_COLS[previewColumns] ?? "grid-cols-2", gapClass].join(" ");
 
-    cells = desktopZones.map((zone) => (
-      <div key={zone}>
+    cells = desktopZones.map((zone, index) => (
+      <div
+        key={zone}
+        className={isCellVisibleAtBreakpoint(index, layout, currentBreakpoint) ? undefined : "hidden"}
+      >
         <NodeCollection nodes={getChildren(zone)} parentId={node.id} zone={zone} />
       </div>
     ));
