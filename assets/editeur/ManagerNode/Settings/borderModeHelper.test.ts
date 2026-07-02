@@ -3,6 +3,7 @@ import {
     applyPerSideBorderValue,
     applyUnifiedBorderValue,
     buildUnifiedBorder,
+    collapsePerSideToUnified,
     detectBorderMode,
     expandUnifiedBorderToPerSide,
     getUnifiedBorder,
@@ -76,6 +77,71 @@ describe("normalisation border shorthand/longhands", () => {
             borderRight: "1px solid #000",
             borderBottom: "1px solid #000",
             borderLeft: "1px solid #000",
+        });
+    });
+});
+
+describe("collapsePerSideToUnified", () => {
+    it("convertit des longhands identiques en shorthand border", () => {
+        expect(
+            collapsePerSideToUnified({
+                borderTop: "1px solid #000",
+                borderRight: "1px solid #000",
+                borderBottom: "1px solid #000",
+                borderLeft: "1px solid #000",
+            }),
+        ).toEqual({ border: "1px solid #000" });
+    });
+
+    it("convertit des longhands differents en proprietes globales", () => {
+        expect(
+            collapsePerSideToUnified({
+                borderTop: "1px solid red",
+                borderRight: "2px solid red",
+                borderBottom: "1px solid red",
+                borderLeft: "2px solid red",
+            }),
+        ).toEqual({
+            borderWidth: "1px 2px",
+            borderStyle: "solid",
+            borderColor: "red",
+        });
+    });
+
+    it("ne modifie pas des longhands partiels", () => {
+        const style = { borderTop: "1px solid red", borderBottom: "2px solid blue" };
+        expect(collapsePerSideToUnified(style)).toEqual(style);
+    });
+});
+
+describe("getUnifiedBorderParts depuis longhands par cote", () => {
+    it("lit les parties depuis des longhands identiques", () => {
+        expect(
+            getUnifiedBorderParts({
+                borderTop: "2px dashed blue",
+                borderRight: "2px dashed blue",
+                borderBottom: "2px dashed blue",
+                borderLeft: "2px dashed blue",
+            }),
+        ).toEqual({
+            width: "2px",
+            style: "dashed",
+            color: "blue",
+        });
+    });
+
+    it("lit les parties depuis des longhands differents", () => {
+        expect(
+            getUnifiedBorderParts({
+                borderTop: "1px solid red",
+                borderRight: "2px solid red",
+                borderBottom: "1px solid red",
+                borderLeft: "2px solid red",
+            }),
+        ).toEqual({
+            width: "1px 2px",
+            style: "solid",
+            color: "red",
         });
     });
 });

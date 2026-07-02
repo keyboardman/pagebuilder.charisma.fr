@@ -9,6 +9,7 @@ import { SettingsSectionTitle } from "./SettingsSectionTitle";
 import {
     applyPerSideBorderValue,
     applyUnifiedBorderValue,
+    collapsePerSideToUnified,
     detectBorderMode,
     expandUnifiedBorderToPerSide,
     getPerSideBorderValue,
@@ -98,6 +99,11 @@ export function Border2Settings({ style, onChange, themeOverrideSelector }: Bord
             onChange(expandUnifiedBorderToPerSide(style));
             setMode("per-side");
             return;
+        }
+
+        const collapsed = collapsePerSideToUnified(style);
+        if (collapsed !== style) {
+            onChange(collapsed);
         }
         setMode("unified");
     };
