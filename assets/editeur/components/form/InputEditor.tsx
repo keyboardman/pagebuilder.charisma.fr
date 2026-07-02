@@ -13,10 +13,7 @@ interface InputEditorProps {
 
 const NBSP = "\u00A0";
 
-const spacesToNbspEntity = (text: string): string =>
-    text.replace(/ /g, "&nbsp;").replace(/\u00A0/g, "&nbsp;");
-
-/** Normalise le HTML produit par contentEditable (sauts de ligne navigateur, espaces → &nbsp;). */
+/** Normalise le HTML produit par contentEditable (blocs div → br, espaces insécables → &nbsp;). */
 export function normalizeContentEditableHtml(html: string): string {
     const trimmed = html.trim();
     if (!trimmed || trimmed === "<br>" || /^<div><br><\/div>$/i.test(trimmed)) {
@@ -31,7 +28,7 @@ export function normalizeContentEditableHtml(html: string): string {
         })
         .replace(/(<br\s*\/?>\s*)+$/i, "");
 
-    return spacesToNbspEntity(normalized);
+    return normalized.replace(/\u00A0/g, "&nbsp;");
 }
 
 export function InputEditor({
@@ -95,7 +92,7 @@ export function InputEditor({
                 range.collapse(true);
             }
             if (line) {
-                const textNode = document.createTextNode(line.replace(/ /g, NBSP));
+                const textNode = document.createTextNode(line);
                 range.insertNode(textNode);
                 range.setStartAfter(textNode);
                 range.collapse(true);
@@ -106,15 +103,44 @@ export function InputEditor({
         selection.addRange(range);
     };
 
-    const handleKeyDown = (e: React.KeyboardEvent<HTMLElement>) => {
-        if (e.key === " ") {
-            e.preventDefault();
-            insertTextAtCursor(NBSP);
+    const insertBrAtCursor = () => {
+        const el = ref.current;
+        if (!el) return;
+
+        el.focus();
+        const selection = window.getSelection();
+        if (!selection) return;
+
+        let range: Range;
+        if (selection.rangeCount > 0 && el.contains(selection.anchorNode)) {
+            range = selection.getRangeAt(0);
+        } else {
+            range = document.createRange();
+            range.selectNodeContents(el);
+            range.collapse(false);
         }
+
+        const br = document.createElement("br");
+        range.insertNode(br);
+        range.setStartAfter(br);
+        range.collapse(true);
+
+        selection.removeAllRanges();
+        selection.addRange(range);
     };
 
-    const handleKeyPress = (e: React.KeyboardEvent<HTMLElement>) => {
-        if (e.key === " ") e.preventDefault();
+    const handleKeyDown = (e: React.KeyboardEvent<HTMLElement>) => {
+        if (e.key === "Enter") {
+            e.preventDefault();
+            e.stopPropagation();
+            insertBrAtCursor();
+            return;
+        }
+        if (e.key === " " && e.shiftKey) {
+            e.preventDefault();
+            e.stopPropagation();
+            insertTextAtCursor(NBSP);
+        }
     };
 
     const handlePaste = (e: React.ClipboardEvent<HTMLElement>) => {
@@ -149,7 +175,6 @@ export function InputEditor({
             onBlur?.(normalizeContentEditableHtml(ref.current.innerHTML));
         },
         onKeyDown: handleKeyDown,
-        onKeyPress: handleKeyPress,
         onPaste: handlePaste,
         ...rest,
     };

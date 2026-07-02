@@ -49,6 +49,10 @@ export const desktopWidthOptions = [
   { label: "Personnalisé", value: "custom" as const },
 ];
 
+// Classes Tailwind explicites (requis pour le JIT — order responsive)
+export const RESPONSIVE_ORDER_SCAN_CLASSES =
+  "order-1 order-2 sm:order-1 sm:order-2 lg:order-1 lg:order-2";
+
 // Classes Tailwind explicites (requis pour le JIT)
 const PRESET_CLASSES: Record<
   PresetColumnWidth,

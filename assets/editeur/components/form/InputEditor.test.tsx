@@ -13,18 +13,22 @@ describe("normalizeContentEditableHtml", () => {
 
   it("convertit les blocs div en sauts de ligne br", () => {
     expect(normalizeContentEditableHtml("<div>Ligne 1</div><div>Ligne 2</div>")).toBe(
-      "Ligne&nbsp;1<br>Ligne&nbsp;2"
+      "Ligne 1<br>Ligne 2"
     );
   });
 
-  it("convertit les espaces en entités &nbsp;", () => {
-    expect(normalizeContentEditableHtml("hello world")).toBe("hello&nbsp;world");
-    expect(normalizeContentEditableHtml("a\u00A0b")).toBe("a&nbsp;b");
+  it("conserve les espaces normaux", () => {
+    expect(normalizeContentEditableHtml("hello world")).toBe("hello world");
   });
 
-  it("combine sauts de ligne et espaces insécables", () => {
+  it("préserve les espaces insécables en entité &nbsp;", () => {
+    expect(normalizeContentEditableHtml("a\u00A0b")).toBe("a&nbsp;b");
+    expect(normalizeContentEditableHtml("mot&nbsp;!")).toBe("mot&nbsp;!");
+  });
+
+  it("combine sauts de ligne et espaces", () => {
     expect(normalizeContentEditableHtml("<div>foo bar</div><div>baz</div>")).toBe(
-      "foo&nbsp;bar<br>baz"
+      "foo bar<br>baz"
     );
   });
 });
@@ -54,20 +58,35 @@ describe("InputEditor", () => {
     editor.innerHTML = "<div>foo bar</div><div>baz</div>";
     fireEvent.blur(editor);
 
-    expect(onBlur).toHaveBeenCalledWith("foo&nbsp;bar<br>baz");
+    expect(onBlur).toHaveBeenCalledWith("foo bar<br>baz");
   });
 
-  it("insère un espace insécable lors d'un appui sur Espace", async () => {
+  it("insère un espace normal lors d'un appui sur Espace", async () => {
     const user = userEvent.setup();
     const onBlur = vi.fn();
     const { container } = render(<InputEditor value="" onBlur={onBlur} />);
     const editor = getEditor(container);
 
     await user.click(editor);
-    await user.keyboard("a ");
+    await user.keyboard("a b");
     fireEvent.blur(editor);
 
-    expect(onBlur).toHaveBeenCalledWith("a&nbsp;");
+    expect(onBlur).toHaveBeenCalledWith("a b");
+  });
+
+  it("insère un espace insécable avec Maj+Espace", async () => {
+    const user = userEvent.setup();
+    const onBlur = vi.fn();
+    const { container } = render(<InputEditor value="" onBlur={onBlur} />);
+    const editor = getEditor(container);
+
+    await user.click(editor);
+    await user.keyboard("mot");
+    fireEvent.keyDown(editor, { key: " ", shiftKey: true });
+    await user.keyboard("!");
+    fireEvent.blur(editor);
+
+    expect(onBlur).toHaveBeenCalledWith("mot&nbsp;!");
   });
 
   it("insère des sauts de ligne lors d'un collage multiligne", async () => {
@@ -80,7 +99,20 @@ describe("InputEditor", () => {
     await user.paste("ligne 1\nligne 2");
     fireEvent.blur(editor);
 
-    expect(onBlur).toHaveBeenCalledWith("ligne&nbsp;1<br>ligne&nbsp;2");
+    expect(onBlur).toHaveBeenCalledWith("ligne 1<br>ligne 2");
+  });
+
+  it("insère un saut de ligne lors d'un appui sur Entrée", async () => {
+    const user = userEvent.setup();
+    const onBlur = vi.fn();
+    const { container } = render(<InputEditor value="" onBlur={onBlur} />);
+    const editor = getEditor(container);
+
+    await user.click(editor);
+    await user.keyboard("ligne 1{Enter}ligne 2");
+    fireEvent.blur(editor);
+
+    expect(onBlur).toHaveBeenCalledWith("ligne 1<br>ligne 2");
   });
 
   it("synchronise la valeur externe quand le champ n'a pas le focus", () => {
