@@ -157,7 +157,7 @@ export default function ExplorerRow({
         <span className="h-5 w-5 shrink-0" aria-hidden />
       )}
       <span
-        className="flex min-w-0 flex-1 items-baseline gap-1 whitespace-nowrap"
+        className="flex min-w-0 flex-1 items-baseline gap-1 overflow-hidden"
         onDoubleClick={startEditing}
       >
         {isEditing ? (
@@ -176,7 +176,7 @@ export default function ExplorerRow({
           />
         ) : (
           <>
-            <span className="font-medium">{getNodeDisplayLabel(node)}</span>
+            <span className="min-w-0 truncate font-medium">{getNodeDisplayLabel(node)}</span>
             {hasCustomNodeLabel(node) ? (
               <span className="text-xs text-muted-foreground">
                 ({getNodeTypeLabel(node)})

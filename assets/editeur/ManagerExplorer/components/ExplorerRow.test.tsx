@@ -19,9 +19,9 @@ vi.mock("../../ManagerNode/NodeRoot", () => ({
 }));
 
 vi.mock("../utils/explorerTree", () => ({
-  getNodeDisplayLabel: () => "Mon bloc",
+  getNodeDisplayLabel: (node: { editorLabel?: string }) => node.editorLabel ?? "Mon bloc",
   getNodeTypeLabel: () => "Text",
-  hasCustomNodeLabel: () => false,
+  hasCustomNodeLabel: (node: { editorLabel?: string }) => Boolean(node.editorLabel),
 }));
 
 function createAppValue(nodes: AppType["nodes"]): AppType {
@@ -133,6 +133,22 @@ describe("ExplorerRow — visibilité", () => {
 
     expect(screen.getByRole("button", { name: "Afficher le composant" })).toBeTruthy();
   });
+
+  it("garde l'icône œil accessible avec un titre très long", () => {
+    const node = createTestNode({
+      id: "child-1",
+      type: "node-text",
+      editorLabel:
+        "Titre-extremement-long-qui-ne-doit-jamais-cacher-le-bouton-oeil-dans-la-structure".repeat(
+          3
+        ),
+    });
+
+    renderExplorerRow(node);
+
+    expect(screen.getByRole("button", { name: "Masquer le composant" })).toBeTruthy();
+    expect(screen.getByText(node.editorLabel ?? "")).toHaveClass("truncate");
+  });
 });
 
 describe("ExplorerRow — interactions", () => {
@@ -185,13 +201,13 @@ describe("ExplorerRow — interactions", () => {
 
     renderExplorerRow(node, { updateNode });
 
-    fireEvent.doubleClick(screen.getByText("Mon bloc"));
+    fireEvent.doubleClick(screen.getByText("Avant"));
     const input = screen.getByRole("textbox", { name: "Nom dans l'éditeur" });
     fireEvent.change(input, { target: { value: "Après" } });
     fireEvent.keyDown(input, { key: "Escape" });
 
     expect(updateNode).not.toHaveBeenCalled();
-    expect(screen.getByText("Mon bloc")).toBeTruthy();
+    expect(screen.getByText("Avant")).toBeTruthy();
   });
 
   it("réactive un nœud masqué via l'icône œil", () => {

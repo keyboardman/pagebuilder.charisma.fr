@@ -17,4 +17,6 @@
 15. OK compteur de vues et like pour videoApi
 16. OK enlever node-root-style n'est plus nécessaire
 17. favicon erreur
-18. OK Structure ajouter un oeil pour desactivéer un node avec ces enfants 
+18. OK Structure ajouter un oeil pour desactivéer un node avec ces enfants
+19. OK Oeil masqué parfois si le titre est trop long
+
