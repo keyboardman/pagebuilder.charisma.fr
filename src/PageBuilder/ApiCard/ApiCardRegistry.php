@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace App\PageBuilder\ApiCard;
 
+use App\PageBuilder\ApiList\ApiListBehaviorInterface;
+
 /**
  * Registre des APIs card exposées au builder (services tagués app.builder_api_card).
  */
@@ -37,16 +39,12 @@ final class ApiCardRegistry
     {
         $out = [];
         foreach ($this->cards as $card) {
-            $collectionMode = 'normal';
-            if ($card instanceof ApiCardBehaviorInterface) {
-                $collectionMode = $card->getCollectionMode();
-            }
             $out[] = [
                 'id' => $card->getId(),
                 'label' => $card->getLabel(),
                 'type' => $card->getType(),
                 'category' => $card->getCategory(),
-                'collectionMode' => $collectionMode,
+                'collectionMode' => $this->resolveCollectionMode($card),
             ];
         }
         return $out;
@@ -55,5 +53,18 @@ final class ApiCardRegistry
     public function get(string $id): ?ApiCardInterface
     {
         return $this->cards[$id] ?? null;
+    }
+
+    private function resolveCollectionMode(ApiCardInterface $card): string
+    {
+        if ($card instanceof ApiCardBehaviorInterface) {
+            return $card->getCollectionMode();
+        }
+
+        if ($card instanceof ApiListBehaviorInterface) {
+            return $card->getCollectionMode();
+        }
+
+        return 'normal';
     }
 }

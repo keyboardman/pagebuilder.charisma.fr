@@ -7,6 +7,6 @@ namespace App\PageBuilder\ApiCard;
 /**
  * API card de type « list » (menus de navigation, listes de liens, etc.).
  */
-interface ApiCardListInterface extends ApiCardInterface
+interface ApiCardListInterface
 {
 }

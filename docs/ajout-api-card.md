@@ -33,7 +33,7 @@ Chaque type dispose d’une **interface marqueur** et d’une **classe abstraite
 | Images | `ApiCardImageInterface` | `AbstractApiCardImage` | `image` |
 | Listes (`AbstractApiCardList`, type `list`) | `ApiCardListInterface` | `AbstractApiCardList` | `list` |
 
-Les APIs de type `list` alimentent **NodeNavApi** (menu de liens) et **NodeListApi** (liste riche : image, titre, description, compteur optionnels).
+Les APIs de type `list` alimentent **NodeNavApi** (menu de liens) et **NodeListApi** (liste riche : titre, description, compteur et like optionnels).
 
 La classe concrète **étend** la classe abstraite (`extends AbstractApiCardArticle`, etc.). Pour combiner un type avec `ApiCardBehaviorInterface`, utiliser `extends` + `implements` :
 
@@ -175,7 +175,7 @@ Transforme un objet brut (réponse API) en format standard utilisé par le build
 
 Pour une API de type **`list`**, le mapping SHALL fournir au minimum `id`, `title` et `link`. La cible des liens (`target`, ex. `_self` / `_blank`) est configurée dans le nœud **NodeNavApi** (`node-nav-api`), pas dans l’ApiCard. Le nœud charge toute la collection et affiche un lien par item (sans sélection item par item).
 
-Pour le nœud **NodeListApi** (`node-list-api`), les APIs éligibles sont les types **`list`** (`AbstractApiCardList`). Le nœud charge toute la collection et affiche pour chaque item les champs **image**, **titre**, **description**, **compteur** et **like** selon les toggles `show` configurés dans le builder. Les champs `description`, `image`, `counter` et `like` du mapping restent optionnels : s’ils sont absents, ils ne sont pas rendus pour cet item.
+Pour le nœud **NodeListApi** (`node-list-api`), les APIs éligibles sont les types **`list`** (`AbstractApiCardList`). Le nœud charge toute la collection et affiche pour chaque item les champs **titre**, **description**, **compteur** et **like** selon les toggles `show` configurés dans le builder. Les champs `description`, `counter` et `like` du mapping restent optionnels : s’ils sont absents, ils ne sont pas rendus pour cet item.
 
 Chaque implémentation `list` SHALL définir son propre `mapItem()` : le mapping des champs distants vers le contrat builder dépend de l’endpoint (ex. En Action home : `vues` → `counter`, `likes` → `like`).
 
@@ -265,7 +265,7 @@ Recharger la page de l’éditeur (ou vider le cache Symfony si besoin) pour voi
 - **Comportement optionnel** : `src/PageBuilder/ApiCard/ApiCardBehaviorInterface.php`
 - **Types (interfaces)** : `ApiCardArticleInterface`, `ApiCardVideoInterface`, `ApiCardImageInterface`, `ApiCardListInterface`
 - **Types (classes abstraites, `getType()` inclus)** : `AbstractApiCardArticle`, `AbstractApiCardVideo`, `AbstractApiCardImage`, `AbstractApiCardList`
-- **Exemple list** : `StubNavListApiCard.php` (menu de démonstration), `FlashnewsThemeApiList.php` (thèmes Flashnews pour NodeNavApi), `CharismaArticleEnactionHomeApiList.php` et `CharismaArticleExpressionHomeApiList.php` (articles home pour NodeListApi)
+- **Exemple list** : `StubNavListApiCard.php` (menu de démonstration), `FlashnewsThemeApiList.php` (thèmes Flashnews pour NodeNavApi), `FlashnewsArticleHomeApiList.php` (articles home Flashnews pour NodeListApi), `CharismaTemoignageHomeApiList.php` (témoignages home Charisma pour NodeListApi), `CharismaArticleEnactionHomeApiList.php` et `CharismaArticleExpressionHomeApiList.php` (articles home pour NodeListApi)
 - **Exemples** : `CharismaArticleAuteurApiCard.php`, `CharismaTemoignageApiCard.php`, `FlashnewsApiCard.php`, `CharismaVideosApiCard.php`
 - **Registre** : `src/PageBuilder/ApiCard/ApiCardRegistry.php`
 - **Logique HTTP partagée** : `src/PageBuilder/Api/ApiCardEndpointProvider.php`

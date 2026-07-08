@@ -12,17 +12,14 @@ import { type NodeSettingsProps } from "../NodeConfigurationType";
 import { useNodeBuilderContext } from "../../services/providers/NodeBuilderContext";
 import { NodeSettingsWrapper } from "../components/NodeSettingsWrapper";
 import type { NodeListApiType } from "./index";
-import { LIST_API_ELIGIBLE_TYPE } from "./index";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/editeur/components/ui/tabs";
-import { apiRegistry } from "../../ManagerApi/ApiRegistry";
 import { Switch } from "@/editeur/components/ui/switch";
 import { THEME_SELECTORS } from "../Settings/themeOverrideSelectors";
-import { fetchListApiCollectionCached } from "./listApiUtils";
+import { fetchListApiCollectionCached, hasListMetricValue } from "./listApiUtils";
 
 const PART_SELECTORS = {
   list: THEME_SELECTORS.listApi,
   item: `${THEME_SELECTORS.listApi} .ce-list-api-item`,
-  image: `${THEME_SELECTORS.listApi} .ce-list-api-image`,
   title: `${THEME_SELECTORS.listApi} .ce-list-api-title`,
   description: `${THEME_SELECTORS.listApi} .ce-list-api-description`,
   counter: `${THEME_SELECTORS.listApi} .ce-list-api-counter`,
@@ -30,7 +27,7 @@ const PART_SELECTORS = {
 } as const;
 
 type StyledPartKey = keyof typeof PART_SELECTORS;
-type OptionalFieldKey = "image" | "description" | "counter" | "like";
+type OptionalFieldKey = "description" | "counter" | "like";
 
 function StyledPartSettings({ part }: { part: StyledPartKey }) {
   const { node, onChange } = useNodeBuilderContext();
@@ -96,72 +93,80 @@ const Settings: FC<NodeSettingsProps> = () => {
   const listNode = node as NodeListApiType;
   const content = listNode.content ?? { show: {} };
 
-  const apiOptions = useMemo(
-    () =>
-      apiRegistry.listByType(LIST_API_ELIGIBLE_TYPE).map((adapter) => ({
-        value: adapter.id,
-        label: adapter.label,
-      })),
-    []
+  const [listSources, setListSources] = useState<Array<{ id: string; label: string; collectionMode?: string }>>([]);
+
+  useEffect(() => {
+    let cancelled = false;
+    const load = async () => {
+      try {
+        const res = await fetch("/api/page-builder/lists", {
+          credentials: "same-origin",
+          headers: { Accept: "application/json" },
+        });
+        if (!res.ok) return;
+        const data = (await res.json()) as { items: Array<{ id: string; label: string; collectionMode?: string }> };
+        if (!cancelled) setListSources(data.items ?? []);
+      } catch {
+        // ignore : en cas d'erreur on laisse la liste vide
+      }
+    };
+
+    void load();
+    return () => {
+      cancelled = true;
+    };
+  }, []);
+
+  const selectedListApiId = (content.apiId ?? "").trim();
+  const selectedListSource = useMemo(
+    () => (selectedListApiId ? listSources.find((s) => s.id === selectedListApiId) ?? null : null),
+    [listSources, selectedListApiId]
   );
 
-  // Stabiliser la référence adapter pour éviter de relancer `fetchCollection`
-  // à chaque rerender (par ex. basculement d’onglets dans le panneau).
-  const selectedAdapterApiId = (content.apiId ?? "").trim();
-  const selectedAdapter = useMemo(
-    () => (selectedAdapterApiId ? apiRegistry.get(selectedAdapterApiId) : null),
-    [selectedAdapterApiId]
+  const apiOptions = useMemo(
+    () =>
+      listSources.map((s) => ({
+        value: s.id,
+        label: s.label,
+      })),
+    [listSources]
   );
   const [availableFields, setAvailableFields] = useState<Record<OptionalFieldKey, boolean>>({
-    image: true,
     description: true,
     counter: true,
-    like: true,
+    like: false,
   });
 
   useEffect(() => {
     let cancelled = false;
 
     const evaluateOptionalFields = async () => {
-      if (!selectedAdapter) {
+      if (!selectedListSource) {
         setAvailableFields({
-          image: true,
           description: true,
           counter: true,
-          like: true,
+          like: false,
         });
         return;
       }
 
-      const hasValue = (value: unknown): boolean => {
-        if (value == null) return false;
-        if (typeof value === "string") return value.trim() !== "";
-        return true;
-      };
-
       try {
-        const isFixedCollection = selectedAdapter.collectionMode === "fixed";
-        const mapped = await fetchListApiCollectionCached(selectedAdapter.id, {
-          page: 1,
-          limit: isFixedCollection ? 50 : 20,
-        });
+        const mapped = await fetchListApiCollectionCached(selectedListSource.id);
 
         if (cancelled) return;
 
         setAvailableFields({
-          image: mapped.some((item) => hasValue(item.image)),
-          description: mapped.some((item) => hasValue(item.description)),
-          counter: mapped.some((item) => hasValue(item.counter)),
-          like: mapped.some((item) => hasValue((item as { like?: unknown }).like)),
+          description: mapped.some((item) => (item.description?.trim() ?? "") !== ""),
+          counter: mapped.some((item) => hasListMetricValue(item.counter)),
+          like: mapped.some((item) => hasListMetricValue(item.like)),
         });
       } catch {
         if (cancelled) return;
         // En cas d'erreur réseau, on laisse toutes les options visibles.
         setAvailableFields({
-          image: true,
           description: true,
           counter: true,
-          like: true,
+          like: false,
         });
       }
     };
@@ -171,7 +176,7 @@ const Settings: FC<NodeSettingsProps> = () => {
     return () => {
       cancelled = true;
     };
-  }, [selectedAdapter]);
+  }, [selectedListSource]);
 
   const updateShow = (key: keyof NodeListApiType["content"]["show"], checked: boolean) => {
     onChange({
@@ -196,11 +201,10 @@ const Settings: FC<NodeSettingsProps> = () => {
                 <TabsTrigger value="general">Général</TabsTrigger>
                 <TabsTrigger value="list">Container</TabsTrigger>
                 <TabsTrigger value="item">Item</TabsTrigger>
-                {availableFields.image ? <TabsTrigger value="image">Image</TabsTrigger> : null}
                 <TabsTrigger value="title">Titre</TabsTrigger>
                 {availableFields.description ? <TabsTrigger value="description">Description</TabsTrigger> : null}
                 {availableFields.counter ? <TabsTrigger value="counter">Compteur</TabsTrigger> : null}
-                <TabsTrigger value="like">Like</TabsTrigger>
+                {availableFields.like ? <TabsTrigger value="like">Like</TabsTrigger> : null}
               </TabsList>
               <TabsContent value="general" className="mt-0">
                 <Base2Settings
@@ -229,23 +233,13 @@ const Settings: FC<NodeSettingsProps> = () => {
                     />
                   </div>
 
-                  {selectedAdapter ? (
+                  {selectedListSource ? (
                     <p className="text-muted-foreground text-[0.7rem] px-1">
-                      Source : <span className="font-medium text-foreground">{selectedAdapter.label}</span> (
-                      {selectedAdapter.type})
+                      Source : <span className="font-medium text-foreground">{selectedListSource.label}</span>
                     </p>
                   ) : null}
 
                   <div className="grid grid-cols-2 gap-x-4 gap-y-2 pt-1">
-                    {availableFields.image ? (
-                      <label className="flex items-center justify-between gap-2">
-                        Image
-                        <Switch
-                          checked={content.show?.image !== false}
-                          onCheckedChange={(checked) => updateShow("image", checked)}
-                        />
-                      </label>
-                    ) : null}
                     <label className="flex items-center justify-between gap-2">
                       Titre
                       <Switch
@@ -271,13 +265,15 @@ const Settings: FC<NodeSettingsProps> = () => {
                         />
                       </label>
                     ) : null}
-                    <label className="flex items-center justify-between gap-2">
-                      Like
-                      <Switch
-                        checked={content.show?.like !== false}
-                        onCheckedChange={(checked) => updateShow("like", checked)}
-                      />
-                    </label>
+                    {availableFields.like ? (
+                      <label className="flex items-center justify-between gap-2">
+                        Like
+                        <Switch
+                          checked={content.show?.like !== false}
+                          onCheckedChange={(checked) => updateShow("like", checked)}
+                        />
+                      </label>
+                    ) : null}
                   </div>
                 </div>
               </TabsContent>
@@ -291,11 +287,6 @@ const Settings: FC<NodeSettingsProps> = () => {
               <TabsContent value="item" className="mt-0 h-full">
                 <StyledPartSettings part="item" />
               </TabsContent>
-              {availableFields.image ? (
-                <TabsContent value="image" className="mt-0 h-full">
-                  <StyledPartSettings part="image" />
-                </TabsContent>
-              ) : null}
               <TabsContent value="title" className="mt-0 h-full">
                 <StyledPartSettings part="title" />
               </TabsContent>
@@ -309,9 +300,11 @@ const Settings: FC<NodeSettingsProps> = () => {
                   <StyledPartSettings part="counter" />
                 </TabsContent>
               ) : null}
-              <TabsContent value="like" className="mt-0 h-full">
-                <StyledPartSettings part="like" />
-              </TabsContent>
+              {availableFields.like ? (
+                <TabsContent value="like" className="mt-0 h-full">
+                  <StyledPartSettings part="like" />
+                </TabsContent>
+              ) : null}
             </>
           }
         />

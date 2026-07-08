@@ -1,4 +1,4 @@
-import { type FC, useMemo } from "react";
+import { type FC, useEffect, useMemo, useState } from "react";
 import {
   Base2Settings,
   Background2Settings,
@@ -13,7 +13,6 @@ import { useNodeBuilderContext } from "../../services/providers/NodeBuilderConte
 import { NodeSettingsWrapper } from "../components/NodeSettingsWrapper";
 import type { NodeNavApiType, NodeNavDirection, NodeNavVariant, NodeNavApiTarget } from "./index";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/editeur/components/ui/tabs";
-import { apiRegistry } from "../../ManagerApi/ApiRegistry";
 
 const DIRECTION_OPTIONS: { value: NodeNavDirection; label: string }[] = [
   { value: "horizontal", label: "Horizontal" },
@@ -29,16 +28,39 @@ const Settings: FC<NodeSettingsProps> = () => {
   const { node: navNode, onChange } = useNodeBuilderContext();
   const node = navNode as NodeNavApiType;
 
+  const [listSources, setListSources] = useState<Array<{ id: string; label: string }>>([]);
+
+  useEffect(() => {
+    let cancelled = false;
+    const load = async () => {
+      try {
+        const res = await fetch("/api/page-builder/lists", {
+          credentials: "same-origin",
+          headers: { Accept: "application/json" },
+        });
+        if (!res.ok) return;
+        const data = (await res.json()) as { items: Array<{ id: string; label: string }> };
+        if (!cancelled) setListSources(data.items ?? []);
+      } catch {
+        // ignore
+      }
+    };
+    void load();
+    return () => {
+      cancelled = true;
+    };
+  }, []);
+
   const listApiOptions = useMemo(
     () =>
-      apiRegistry.listByType("list").map((adapter) => ({
-        value: adapter.id,
-        label: adapter.label,
+      listSources.map((s) => ({
+        value: s.id,
+        label: s.label,
       })),
-    []
+    [listSources]
   );
 
-  const selectedAdapter = node.content?.apiId ? apiRegistry.get(node.content.apiId) : null;
+  const selectedSource = node.content?.apiId ? listSources.find((s) => s.id === node.content?.apiId) : null;
 
   return (
     <Tabs className="flex h-full min-h-0 flex-1 flex-col overflow-hidden" defaultValue="general">
@@ -78,9 +100,9 @@ const Settings: FC<NodeSettingsProps> = () => {
                     />
                   </div>
 
-                  {selectedAdapter ? (
+                  {selectedSource ? (
                     <p className="text-muted-foreground text-[0.7rem] px-1">
-                      Source : <span className="font-medium text-foreground">{selectedAdapter.label}</span>
+                      Source : <span className="font-medium text-foreground">{selectedSource.label}</span>
                     </p>
                   ) : null}
 

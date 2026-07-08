@@ -4,7 +4,7 @@ import { type NodeViewProps } from "../NodeConfigurationType";
 import { cn } from "@/editeur/lib/utils";
 import { styleForView } from "../../utils/styleHelper";
 import type { NodeListApiType } from "./index";
-import { ViewImage, HasLink } from "../shared/card";
+import { HasLink } from "../shared/card";
 import {
   formatCounterValue,
   formatLikeValue,
@@ -12,7 +12,6 @@ import {
   type ListApiMappedItem,
   fetchListApiCollectionCached,
 } from "./listApiUtils";
-import { apiRegistry } from "../../ManagerApi/ApiRegistry";
 import { CHARISMA_HEART_PATH } from "../../components/video/heartIcon";
 
 const View: FC<NodeViewProps> = () => {
@@ -36,28 +35,11 @@ const View: FC<NodeViewProps> = () => {
         return;
       }
 
-      // `apiRegistry` peut être alimenté après le premier mount du builder.
-      // Dans ce cas, on évite de mettre `error=true` (sinon on affiche "Liste indisponible").
-      const adapter = apiRegistry.get(apiId);
-      if (!adapter) {
-        if (!cancelled) {
-          setItems([]);
-          setError(false);
-          setLoading(false);
-          window.setTimeout(() => {
-            if (!cancelled) {
-              void load();
-            }
-          }, 300);
-        }
-        return;
-      }
-
       setLoading(true);
       setError(false);
 
       try {
-        const nextItems = await fetchListApiCollectionCached(apiId, { page: 1 });
+        const nextItems = await fetchListApiCollectionCached(apiId);
         if (!cancelled) {
           setItems(nextItems);
         }
@@ -122,14 +104,12 @@ const View: FC<NodeViewProps> = () => {
   };
 
   const renderItem = (item: ListApiMappedItem) => {
-    const imageSrc = item.image?.trim() ?? "";
     const titleText = item.title?.trim() ?? "";
     const descriptionText = item.description?.trim() ?? "";
     const counterText = formatCounterValue(item.counter);
     const likeText = formatLikeValue(item.like);
     const link = item.link?.trim() ?? "";
 
-    const showImage = isShowEnabled(show.image) && imageSrc !== "";
     const showTitle = isShowEnabled(show.title) && titleText !== "";
     const showDescription = isShowEnabled(show.description) && descriptionText !== "";
     const showCounter = isShowEnabled(show.counter) && counterText !== "";
@@ -137,14 +117,6 @@ const View: FC<NodeViewProps> = () => {
 
     const content = (
       <>
-        {showImage ? (
-          <ViewImage
-            image={imageSrc}
-            alt={titleText || "Image"}
-            className={cn("ce-list-api-image", listNode.content?.image?.className)}
-            style={listNode.content?.image?.style ?? {}}
-          />
-        ) : null}
         {showTitle ? (
           <h3
             className={cn("ce-header ce-header-h3 ce-list-api-title", listNode.content?.title?.className)}

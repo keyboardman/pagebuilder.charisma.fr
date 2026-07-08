@@ -5,11 +5,13 @@ TBD - created by archiving change add-builder-api-registry-php. Update Purpose a
 ## Requirements
 ### Requirement: Interfaces PHP pour les APIs card (article et vidéo)
 
-Le système SHALL exposer des interfaces PHP décrivant le contrat des APIs « card » utilisables par le builder. Une interface de base (ex. `ApiCardInterface`) SHALL définir les méthodes : identifiant, libellé, type, récupération d’une collection, récupération d’un item par ID, et mapping d’un item brut vers un format standard (id, title, description, image, labels, link, text, raw). Les interfaces `ApiCardArticleInterface`, `ApiCardVideoInterface`, `ApiCardImageInterface` et `ApiCardListInterface` SHALL étendre cette base et SHALL fournir une implémentation par défaut de `getType()` retournant respectivement `article`, `video`, `image` et `list`. Les classes concrètes implémentant une interface typée SHALL NOT être tenues de redéclarer `getType()` tant qu'elles n'ont pas besoin de surcharger le type.
+Le système SHALL exposer des interfaces PHP décrivant le contrat des APIs « card » utilisables par le builder. Une interface de base (ex. `ApiCardInterface`) SHALL définir les méthodes : identifiant, libellé, type, récupération d’une collection, récupération d’un item par ID, et mapping d’un item brut vers un format standard (id, title, description, image, labels, link, text, counter, raw). Les interfaces `ApiCardArticleInterface`, `ApiCardVideoInterface`, `ApiCardImageInterface` et `ApiCardListInterface` SHALL étendre cette base et SHALL fournir une implémentation par défaut de `getType()` retournant respectivement `article`, `video`, `image` et `list`. Les classes concrètes implémentant une interface typée SHALL NOT être tenues de redéclarer `getType()` tant qu'elles n'ont pas besoin de surcharger le type.
 
 Pour les APIs de type `article`, `video`, `image` et `list`, le contrat SHALL permettre deux modes de consommation:
 - un mode normal (collection standard, ex. pilotée par recherche/filtres/pagination selon l’implémentation),
 - un mode collection fixe (curatée côté backend), destinée à un usage éditorial dans le builder, sans exiger de recherche ni de pagination pilotée par l’utilisateur.
+
+Le champ **`counter`** SHALL être optionnel dans le format mappé : lorsqu’il est présent, il SHALL représenter une valeur affichable (nombre ou chaîne) telle qu’un compteur de vues, de likes ou un rang.
 
 #### Scenario: Implémentation d’une API article
 
@@ -51,10 +53,34 @@ Pour les APIs de type `article`, `video`, `image` et `list`, le contrat SHALL pe
 - **WHEN** un développeur crée un service PHP implémentant `ApiCardListInterface` et retournant une collection fixe d’entrées de navigation
 - **THEN** ce service peut être enregistré dans le registre et exposé au builder comme API de type `list`, sans dépendre d’une interaction de recherche utilisateur
 
+#### Scenario: Mapping avec compteur optionnel
+
+- **WHEN** une implémentation ApiCard mappe un item brut contenant un compteur exploitable (ex. vues, likes, rang)
+- **THEN** l’item mappé expose ce compteur dans le champ optionnel `counter` en plus des champs standard existants
+
 #### Scenario: Type par défaut hérité de l'interface
 
 - **WHEN** le registre appelle `getType()` sur un service implémentant `ApiCardImageInterface` sans méthode `getType()` propre
 - **THEN** la valeur retournée est `image`
+
+### Requirement: Propagation du champ counter dans les réponses API Platform
+
+Les ressources et DTOs exposant un item ApiCard mappé (ex. `BuilderApiCardItem`, `BuilderApiCardItemData`) SHALL inclure le champ optionnel **`counter`**. La factory de mapping backend SHALL transmettre `counter` depuis le résultat de `mapItem` vers le JSON retourné par les endpoints API Platform de collection et de détail item.
+
+#### Scenario: Item avec compteur dans une collection paginée
+
+- **WHEN** le frontend appelle l’endpoint de collection pour une API dont `mapItem` retourne un `counter`
+- **THEN** chaque item JSON de la réponse contient le champ `counter` avec la valeur mappée
+
+#### Scenario: Item sans compteur
+
+- **WHEN** le frontend appelle l’endpoint de collection ou de détail pour une API dont `mapItem` ne retourne pas de `counter`
+- **THEN** le champ `counter` est absent ou null dans le JSON, sans erreur de sérialisation
+
+#### Scenario: Compatibilité des clients existants
+
+- **WHEN** un client builder existant consomme les endpoints ApiCard sans connaître le champ `counter`
+- **THEN** le comportement des champs existants (`id`, `title`, `description`, `image`, etc.) reste inchangé
 
 ### Requirement: Registre Symfony listant toutes les APIs card
 
@@ -138,12 +164,17 @@ Pour une API de type `article` ou `video` exploitée en collection fixe, chaque 
 
 ### Requirement: Format minimal des items list pour la navigation
 
-Pour une API de type `list`, chaque item mappé SHALL fournir au minimum un identifiant stable (`id`), un libellé affichable (`title`) et une URL de destination (`link`). Les champs `description`, `image`, `labels` et `text` restent optionnels. La cible des liens (`target`) ne fait pas partie du contrat ApiCard `list` : elle est gérée par le nœud **NodeNavApi** dans le builder.
+Pour une API de type `list`, chaque item mappé SHALL fournir au minimum un identifiant stable (`id`), un libellé affichable (`title`) et une URL de destination (`link`). Les champs `description`, `image`, `labels`, `text` et `counter` restent optionnels. La cible des liens (`target`) ne fait pas partie du contrat ApiCard `list` : elle est gérée par le nœud **NodeNavApi** dans le builder. Le nœud **NodeListApi** SHALL consommer les mêmes APIs `list` et exploiter les champs optionnels `description`, `counter` et `like` lorsqu’ils sont fournis par `mapItem` ; le champ `image` SHALL être ignoré par **NodeListApi**.
 
 #### Scenario: Mapping d’un item list exploitable par NodeNavApi
 
 - **WHEN** le backend mappe un item brut provenant d’une API `list`
 - **THEN** l’item JSON contient `id`, `title` et `link` non vides pour permettre le rendu d’un lien de menu sans transformation supplémentaire côté frontend
+
+#### Scenario: Mapping d’un item list riche pour NodeListApi
+
+- **WHEN** le backend mappe un item `list` contenant `description`, `counter` ou `like` en plus de `id` et `title`
+- **THEN** l’item JSON expose ces champs optionnels pour permettre le rendu conditionnel dans **NodeListApi** sans transformation supplémentaire côté frontend ; le champ `image` n’est pas affiché par **NodeListApi**
 
 ### Requirement: Endpoints builder API compatibles API Platform
 

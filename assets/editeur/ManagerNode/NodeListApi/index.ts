@@ -10,7 +10,6 @@ export const NODE_LIST_API_TYPE = "node-list-api" as const;
 export const LIST_API_ELIGIBLE_TYPE = "list" as const;
 
 export interface NodeListApiShow {
-  image?: boolean;
   title?: boolean;
   description?: boolean;
   counter?: boolean;
@@ -29,7 +28,6 @@ export interface NodeListApiType extends NodeType {
     show: NodeListApiShow;
     list: NodeListApiStyledPart;
     item: NodeListApiStyledPart;
-    image: NodeListApiStyledPart;
     title: NodeListApiStyledPart;
     description: NodeListApiStyledPart;
     counter: NodeListApiStyledPart;
@@ -54,7 +52,6 @@ export const NodeListApi: NodeConfigurationType = {
     content: {
       apiId: "",
       show: {
-        image: true,
         title: true,
         description: true,
         counter: true,
@@ -65,10 +62,6 @@ export const NodeListApi: NodeConfigurationType = {
         style: {},
       },
       item: {
-        className: "",
-        style: {},
-      },
-      image: {
         className: "",
         style: {},
       },

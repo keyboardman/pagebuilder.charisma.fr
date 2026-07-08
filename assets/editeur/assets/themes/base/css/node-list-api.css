@@ -19,10 +19,8 @@
   gap: 0.5rem;
 }
 
-.ce-list-api-image {
-  display: block;
-  max-width: 100%;
-  height: auto;
+.ce-list-api img {
+  display: none;
 }
 
 .ce-list-api-title {

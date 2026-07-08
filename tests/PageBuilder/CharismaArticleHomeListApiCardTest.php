@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace App\Tests\PageBuilder;
 
-use App\PageBuilder\ApiCard\CharismaArticleEnactionHomeApiList;
-use App\PageBuilder\ApiCard\CharismaArticleExpressionHomeApiList;
+use App\PageBuilder\ApiList\CharismaArticleEnactionHomeApiList;
+use App\PageBuilder\ApiList\CharismaArticleExpressionHomeApiList;
 use PHPUnit\Framework\TestCase;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
 use Symfony\Contracts\HttpClient\ResponseInterface;
@@ -36,7 +36,7 @@ final class CharismaArticleHomeListApiCardTest extends TestCase
      *
      * @param class-string $class
      */
-    public function testFetchCollectionUsesHomeEndpoint(string $class, string $id, string $label, string $url): void
+    public function testFetchItemsUsesHomeEndpointAndMapsFields(string $class, string $id, string $label, string $url): void
     {
         $response = $this->createMock(ResponseInterface::class);
         $response->expects($this->once())
@@ -61,24 +61,23 @@ final class CharismaArticleHomeListApiCardTest extends TestCase
             ->with(
                 'GET',
                 $url,
-                [
-                    'query' => [
-                        'page' => '1',
-                        'itemsPerPage' => '5',
-                        'titre' => 'Roms',
-                    ],
-                    'timeout' => 30,
-                ]
+                ['timeout' => 30]
             )
             ->willReturn($response);
 
+        /** @var object{fetchItems: callable(): array, getId: callable(): string, getLabel: callable(): string, getCollectionMode: callable(): string} $card */
         $card = new $class($client);
-        $result = $card->fetchCollection(['page' => 1, 'limit' => 5, 'search' => 'Roms']);
+        $result = $card->fetchItems();
 
-        $this->assertSame(10, $result['total']);
-        $this->assertCount(1, $result['items']);
-        $this->assertSame(235, $result['items'][0]->id);
-        $this->assertSame('list', $card->getType());
+        $this->assertCount(1, $result);
+        $this->assertSame('235', $result[0]['id']);
+        $this->assertSame('Évangélisation dans un camp de Roms', $result[0]['title']);
+        $this->assertSame('Dimanche 13 avril…', $result[0]['description']);
+        $this->assertSame(12438, $result[0]['counter']);
+        $this->assertSame(336, $result[0]['like']);
+        $this->assertSame('https://www.charisma.fr/fr/enaction.php?article=235', $result[0]['link'] ?? $result[0]['link']);
+        $this->assertNull($result[0]['image']);
+
         $this->assertSame($id, $card->getId());
         $this->assertSame($label, $card->getLabel());
         $this->assertSame('fixed', $card->getCollectionMode());
@@ -89,7 +88,7 @@ final class CharismaArticleHomeListApiCardTest extends TestCase
      *
      * @param class-string $class
      */
-    public function testFetchCollectionReturnsEmptyPayloadOnHttpFailure(string $class): void
+    public function testFetchItemsReturnsEmptyPayloadOnHttpFailure(string $class): void
     {
         $client = $this->createMock(HttpClientInterface::class);
         $client->expects($this->once())
@@ -97,60 +96,9 @@ final class CharismaArticleHomeListApiCardTest extends TestCase
             ->willThrowException(new \RuntimeException('boom'));
 
         $card = new $class($client);
-        $result = $card->fetchCollection([]);
+        $result = $card->fetchItems();
 
-        $this->assertSame(['items' => [], 'total' => 0], $result);
-    }
-
-    public function testEnactionMapItemUsesVuesAsCounter(): void
-    {
-        $client = $this->createMock(HttpClientInterface::class);
-        $card = new CharismaArticleEnactionHomeApiList($client);
-
-        $raw = (object) [
-            'id' => 235,
-            'titre' => 'Évangélisation dans un camp de Roms',
-            'resume' => 'Dimanche 13 avril…',
-            'vues' => 12438,
-            'likes' => 336,
-            'url' => 'https://www.charisma.fr/fr/enaction.php?article=235',
-        ];
-
-        $mapped = $card->mapItem($raw);
-
-        $this->assertSame('235', $mapped['id']);
-        $this->assertSame('Évangélisation dans un camp de Roms', $mapped['title']);
-        $this->assertSame('Dimanche 13 avril…', $mapped['description']);
-        $this->assertSame(12438, $mapped['counter']);
-        $this->assertSame(336, $mapped['like']);
-        $this->assertSame('https://www.charisma.fr/fr/enaction.php?article=235', $mapped['link']);
-        $this->assertNull($mapped['image']);
-        $this->assertSame($raw, $mapped['raw']);
-    }
-
-    public function testExpressionMapItemUsesVuesAsCounter(): void
-    {
-        $client = $this->createMock(HttpClientInterface::class);
-        $card = new CharismaArticleExpressionHomeApiList($client);
-
-        $raw = (object) [
-            'id' => 128,
-            'titre' => 'Quand un peuple se met à rêver',
-            'resume' => 'Finalement un rêve est accompli !',
-            'vues' => 13021,
-            'likes' => 260,
-            'url' => 'https://www.charisma.fr/fr/expression.php?article=128',
-        ];
-
-        $mapped = $card->mapItem($raw);
-
-        $this->assertSame('128', $mapped['id']);
-        $this->assertSame('Quand un peuple se met à rêver', $mapped['title']);
-        $this->assertSame('Finalement un rêve est accompli !', $mapped['description']);
-        $this->assertSame(13021, $mapped['counter']);
-        $this->assertSame(260, $mapped['like']);
-        $this->assertSame('https://www.charisma.fr/fr/expression.php?article=128', $mapped['link']);
-        $this->assertNull($mapped['image']);
-        $this->assertSame($raw, $mapped['raw']);
+        $this->assertSame([], $result);
     }
 }
+

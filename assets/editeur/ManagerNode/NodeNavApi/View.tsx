@@ -7,7 +7,6 @@ import type { NodeNavApiType, NodeNavApiOptions, NavApiLinkItem } from "./index"
 import { cn } from "@/editeur/lib/utils";
 import { IoMenuOutline } from "react-icons/io5";
 import useMediaQuery, { MEDIA_MAX_TABLET } from "../../hooks/useMediaQuery";
-import { apiRegistry } from "../../ManagerApi/ApiRegistry";
 
 const defaultOptions: NodeNavApiOptions = {
   direction: "horizontal",
@@ -24,20 +23,17 @@ function useIsTabletOrSmaller(): boolean {
   return breakpointTabletOrMobile || viewportMaxTablet;
 }
 
-function mapCollectionToLinks(items: unknown[], adapter: NonNullable<ReturnType<typeof apiRegistry.get>>): NavApiLinkItem[] {
+function mapItemsToLinks(items: Array<{ id?: unknown; title?: unknown; link?: unknown }>): NavApiLinkItem[] {
   return items
     .map((item) => {
-      const mapped = adapter.mapItem(item);
-      const link = mapped.link?.trim();
-      const title = mapped.title?.trim();
-      if (!link || !title) {
+      const id = String(item.id ?? "");
+      const link = typeof item.link === "string" ? item.link.trim() : String(item.link ?? "");
+      const title = typeof item.title === "string" ? item.title.trim() : String(item.title ?? "");
+      if (!id || !link || !title) {
         return null;
       }
-      return {
-        id: mapped.id,
-        title,
-        link,
-      };
+
+      return { id, title, link };
     })
     .filter((item): item is NavApiLinkItem => item !== null);
 }
@@ -67,31 +63,23 @@ const View: FC<NodeViewProps | NodeEditProps> = () => {
         return;
       }
 
-      const adapter = apiRegistry.get(apiId);
-      if (!adapter) {
-        if (!cancelled) {
-          setLinks([]);
-          setError(true);
-          setLoading(false);
-        }
-        return;
-      }
-
       setLoading(true);
       setError(false);
 
       try {
-        const isFixedCollection = adapter.collectionMode === "fixed";
-        const result = await adapter.fetchCollection({
-          page: 1,
-          limit: isFixedCollection ? 200 : 100,
+        const res = await fetch(`/api/page-builder/lists/${encodeURIComponent(apiId)}/items`, {
+          credentials: "same-origin",
+          headers: { Accept: "application/json" },
         });
 
-        if (cancelled) {
-          return;
+        if (!res.ok) {
+          throw new Error("fetch list items failed");
         }
 
-        setLinks(mapCollectionToLinks(result.items ?? [], adapter));
+        const data = (await res.json()) as { items: Array<{ id?: unknown; title?: unknown; link?: unknown }> };
+        if (!cancelled) {
+          setLinks(mapItemsToLinks(data.items ?? []));
+        }
       } catch {
         if (!cancelled) {
           setLinks([]);

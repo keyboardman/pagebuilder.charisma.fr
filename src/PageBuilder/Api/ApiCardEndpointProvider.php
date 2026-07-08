@@ -5,7 +5,10 @@ declare(strict_types=1);
 namespace App\PageBuilder\Api;
 
 use App\PageBuilder\ApiCard\ApiCardInterface;
+use App\PageBuilder\ApiCard\ApiCardItemsAlreadyMappedInterface;
 use App\PageBuilder\ApiCard\ApiCardRegistry;
+use App\PageBuilder\ApiList\ApiListBehaviorInterface;
+use App\PageBuilder\ApiList\ApiListItemsAlreadyMappedInterface;
 
 final class ApiCardEndpointProvider
 {
@@ -46,6 +49,13 @@ final class ApiCardEndpointProvider
                 continue;
             }
 
+            if ($this->isFixedAlreadyMappedSource($card)) {
+                // Les cards "déjà mappées" renvoient directement les champs
+                // attendus par le contrat builder.
+                $mapped[] = $this->mappedItemNormalizer->normalize((array) $item);
+                continue;
+            }
+
             $mapped[] = $this->mappedItemNormalizer->normalize($card->mapItem($item));
         }
 
@@ -63,6 +73,16 @@ final class ApiCardEndpointProvider
             $raw = $card->fetchItem($itemId);
         } catch (\Throwable) {
             throw ApiCardEndpointProviderException::itemNotFound($itemId);
+        }
+
+        if ($this->isFixedAlreadyMappedSource($card)) {
+            if (!\is_object($raw)) {
+                // Par sécurité : on garde la signature "object" mais on tolère
+                // potentiellement un tableau.
+                return $this->mappedItemNormalizer->normalize((array) $raw);
+            }
+
+            return $this->mappedItemNormalizer->normalize((array) $raw);
         }
 
         return $this->mappedItemNormalizer->normalize($card->mapItem($raw));
@@ -92,5 +112,25 @@ final class ApiCardEndpointProvider
         }
 
         return $card;
+    }
+
+    private function isFixedAlreadyMappedSource(ApiCardInterface $card): bool
+    {
+        $isAlreadyMapped = $card instanceof ApiCardItemsAlreadyMappedInterface
+            || $card instanceof ApiListItemsAlreadyMappedInterface;
+
+        if (!$isAlreadyMapped) {
+            return false;
+        }
+
+        if ($card instanceof \App\PageBuilder\ApiCard\ApiCardBehaviorInterface) {
+            return $card->getCollectionMode() === 'fixed';
+        }
+
+        if ($card instanceof ApiListBehaviorInterface) {
+            return $card->getCollectionMode() === 'fixed';
+        }
+
+        return false;
     }
 }
