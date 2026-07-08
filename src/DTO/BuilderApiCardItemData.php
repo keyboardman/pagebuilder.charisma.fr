@@ -24,6 +24,10 @@ final class BuilderApiCardItemData
 
     public ?string $text = null;
 
+    public ?string $counter = null;
+
+    public ?string $like = null;
+
     /** @var array<string, mixed>|null */
     public ?array $raw = null;
 }

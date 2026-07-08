@@ -19,6 +19,7 @@ import NodeHero from "../NodeHero";
 import NodeHtml from "../NodeHtml";
 import NodeNav from "../NodeNav";
 import NodeNavApi from "../NodeNavApi";
+import NodeListApi from "../NodeListApi";
 import NodeNavItem from "../NodeNavItem";
 import NodeSlideshow from "../NodeSlideshow";
 import NodeRichText from "../NodeRichText";
@@ -54,6 +55,7 @@ export const NodeRegistry = {
     [NodeRichText.type]: NodeRichText,
     [NodeNav.type]: NodeNav,
     [NodeNavApi.type]: NodeNavApi,
+    [NodeListApi.type]: NodeListApi,
     [NodeNavItem.type]: NodeNavItem,
     [NodeSlideshow.type]: NodeSlideshow,
     [NodeForm.type]: NodeForm,

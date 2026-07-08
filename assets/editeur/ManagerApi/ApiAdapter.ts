@@ -3,7 +3,7 @@
  * - "article" : pour les APIs fournissant des articles de blog, actualités, etc.
  * - "video" : pour les APIs fournissant des vidéos
  * - "image" : pour les APIs fournissant des images
- * - "list" : pour les APIs fournissant des listes de liens (menus de navigation)
+ * - "list" : pour les APIs fournissant des listes (menus NodeNavApi, listes riches NodeListApi)
  */
 export type ApiAdapterType = "article" | "video" | "image" | "list";
 export type ApiCollectionMode = "normal" | "fixed";
@@ -92,6 +92,8 @@ export interface ApiAdapter<TItem = any> {
       labels?: string[];
       link?: string;
       text?: string;
+      counter?: string | number;
+      like?: string | number;
       raw: TItem;
     };
   }

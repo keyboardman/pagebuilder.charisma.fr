@@ -32,4 +32,45 @@ final class BuilderApiResourceFactoryTest extends TestCase
         $this->assertSame('/', $page->items[0]->link);
         $this->assertSame(['href' => '/'], $page->items[0]->raw);
     }
+
+    public function testCreateItemMapsCounterWhenPresent(): void
+    {
+        $factory = new BuilderApiResourceFactory();
+
+        $item = $factory->createItem([
+            'id' => '1',
+            'title' => 'Article',
+            'counter' => 42,
+            'raw' => ['views' => 42],
+        ]);
+
+        $this->assertSame('42', $item->counter);
+    }
+
+    public function testCreateItemLeavesCounterNullWhenAbsent(): void
+    {
+        $factory = new BuilderApiResourceFactory();
+
+        $item = $factory->createItem([
+            'id' => '1',
+            'title' => 'Article',
+            'raw' => [],
+        ]);
+
+        $this->assertNull($item->counter);
+    }
+
+    public function testCreateItemMapsLikeWhenPresent(): void
+    {
+        $factory = new BuilderApiResourceFactory();
+
+        $item = $factory->createItem([
+            'id' => '1',
+            'title' => 'Article',
+            'like' => 12,
+            'raw' => ['likes' => 12],
+        ]);
+
+        $this->assertSame('12', $item->like);
+    }
 }

@@ -90,6 +90,12 @@ services:
     App\PageBuilder\ApiCard\CharismaEvenementRetrospectiveApiCard:
         tags: [app.builder_api_card]
 
+    App\PageBuilder\ApiCard\CharismaArticleEnactionHomeApiList:
+        tags: [app.builder_api_card]
+
+    App\PageBuilder\ApiCard\CharismaArticleExpressionHomeApiList:
+        tags: [app.builder_api_card]
+
     App\PageBuilder\ApiCard\StubNavListApiCard:
         tags: [app.builder_api_card]
 

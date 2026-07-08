@@ -60,6 +60,8 @@ final class BuilderApiResourceFactory
         $item->labels = \is_array($data['labels'] ?? null) ? array_values($data['labels']) : null;
         $item->link = isset($data['link']) ? (string) $data['link'] : null;
         $item->text = isset($data['text']) ? (string) $data['text'] : null;
+        $item->counter = isset($data['counter']) ? (string) $data['counter'] : null;
+        $item->like = isset($data['like']) ? (string) $data['like'] : null;
         $raw = $data['raw'] ?? null;
         $item->raw = \is_array($raw) ? $raw : null;
 
