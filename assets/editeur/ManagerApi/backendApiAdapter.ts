@@ -68,6 +68,14 @@ export function createBackendApiAdapter(meta: BackendApiMeta, baseUrl: string): 
         nestedRaw != null && typeof nestedRaw === "object"
           ? nestedRaw
           : item;
+      const rawRecord =
+        raw != null && typeof raw === "object"
+          ? (raw as Record<string, unknown>)
+          : undefined;
+      const counterSource =
+        o?.counter ?? rawRecord?.vues ?? rawRecord?.views;
+      const likeSource =
+        o?.like ?? rawRecord?.likes ?? rawRecord?.favoris ?? rawRecord?.favori;
 
       return {
         id: String(o?.id ?? ""),
@@ -77,6 +85,18 @@ export function createBackendApiAdapter(meta: BackendApiMeta, baseUrl: string): 
         labels: Array.isArray(o?.labels) ? (o.labels as string[]) : undefined,
         link: o?.link != null ? String(o.link) : undefined,
         text: o?.text != null ? String(o.text) : undefined,
+        counter:
+          counterSource != null && counterSource !== ""
+            ? typeof counterSource === "number"
+              ? counterSource
+              : String(counterSource)
+            : undefined,
+        like:
+          likeSource != null && likeSource !== ""
+            ? typeof likeSource === "number"
+              ? likeSource
+              : String(likeSource)
+            : undefined,
         raw,
       };
     },

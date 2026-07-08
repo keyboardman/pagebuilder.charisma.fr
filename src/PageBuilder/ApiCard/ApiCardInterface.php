@@ -39,7 +39,7 @@ interface ApiCardInterface
     /**
      * Mappe un item brut vers le format standard (id, title, description?, image?, labels?, link?, text?, raw).
      *
-     * @return array{id: string, title: string, description?: string, image?: string, labels?: list<string>, link?: string, text?: string, raw: object}
+     * @return array{id: string, title: string, description?: string, image?: string, labels?: list<string>, link?: string, text?: string, counter?: string|int, like?: string|int, raw: object}
      */
     public function mapItem(object $item): array;
 

@@ -1,0 +1,95 @@
+.ce-list-api {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.ce-list-api-items {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.ce-list-api-item {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.ce-list-api-image {
+  display: block;
+  max-width: 100%;
+  height: auto;
+}
+
+.ce-list-api-title {
+  font-weight: 600;
+}
+
+.ce-list-api-description.ce-text {
+  color: inherit;
+  opacity: 0.85;
+  margin-bottom: 0 !important;
+}
+
+.ce-list-api-description.ce-text > :last-child {
+  margin-bottom: 0 !important;
+}
+
+.ce-list-api-description.ce-text p,
+.ce-list-api-description.ce-text ul,
+.ce-list-api-description.ce-text ol,
+.ce-list-api-description.ce-text h1,
+.ce-list-api-description.ce-text h2,
+.ce-list-api-description.ce-text h3,
+.ce-list-api-description.ce-text h4,
+.ce-list-api-description.ce-text h5,
+.ce-list-api-description.ce-text h6 {
+  margin-bottom: 0 !important;
+}
+
+.ce-list-api-metrics {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  align-self: flex-end;
+}
+
+.ce-list-api-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25rem;
+  border-radius: 9999px;
+  padding: 0.2rem 0.55rem;
+  font-size: 0.75rem;
+  font-weight: 600;
+  line-height: 1;
+  border: 1px solid rgba(148, 163, 184, 0.35);
+  background-color: rgba(241, 245, 249, 0.9);
+  color: rgba(51, 65, 85, 1);
+}
+
+.ce-list-api-counter {
+  min-width: 2rem;
+  justify-content: center;
+}
+
+.ce-list-api-like {
+  color: rgba(185, 28, 28, 1);
+  background-color: rgba(254, 226, 226, 0.9);
+  border-color: rgba(248, 113, 113, 0.35);
+}
+
+.ce-list-api-like-icon {
+  width: 0.82rem;
+  height: 0.82rem;
+  fill: currentColor;
+  color: currentColor;
+}
+
+.ce-list-api-status {
+  display: block;
+}

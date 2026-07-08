@@ -10,14 +10,14 @@
         "php": ">=8.4",
         "ext-ctype": "*",
         "ext-iconv": "*",
-        "api-platform/doctrine-orm": "^4.3.15",
+        "api-platform/doctrine-orm": "^4.3.16",
         "api-platform/symfony": "^4.3.15",
         "doctrine/doctrine-bundle": "^3.2.4",
         "doctrine/doctrine-migrations-bundle": "^4.0",
         "doctrine/orm": "^3.6.7",
         "keyboardman/filemanager-bundle": "dev-main",
-        "league/flysystem": "^3.35.1",
-        "league/flysystem-aws-s3-v3": "^3.35.1",
+        "league/flysystem": "^3.35.2",
+        "league/flysystem-aws-s3-v3": "^3.35.2",
         "league/flysystem-bundle": "^3.7.0",
         "nelmio/cors-bundle": "^2.6.1",
         "phpdocumentor/reflection-docblock": "^5.6.7",
@@ -53,7 +53,7 @@
         "symfony/webpack-encore-bundle": "^2.4.1",
         "symfony/yaml": "8.0.*",
         "twig/extra-bundle": "^2.12|^3.24",
-        "twig/twig": "^2.12|^3.27.1"
+        "twig/twig": "^2.12|^3.28.0"
     },
     "config": {
         "allow-plugins": {
@@ -116,8 +116,8 @@
     },
     "require-dev": {
         "doctrine/doctrine-fixtures-bundle": "^4.3.1",
-        "phpstan/phpstan": "^2.2.2",
-        "phpunit/phpunit": "^12.5.30",
+        "phpstan/phpstan": "^2.2.5",
+        "phpunit/phpunit": "^12.5.31",
         "symfony/browser-kit": "8.0.*",
         "symfony/css-selector": "8.0.*",
         "symfony/debug-bundle": "8.0.*",

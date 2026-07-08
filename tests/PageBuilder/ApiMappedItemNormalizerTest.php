@@ -20,6 +20,8 @@ final class ApiMappedItemNormalizerTest extends TestCase
             'labels' => ['a'],
             'link' => '/page',
             'text' => 'Texte',
+            'counter' => 123,
+            'like' => 45,
             'raw' => (object) ['foo' => 'bar'],
         ];
 
@@ -32,6 +34,8 @@ final class ApiMappedItemNormalizerTest extends TestCase
         $this->assertSame(['a'], $normalized['labels']);
         $this->assertSame('/page', $normalized['link']);
         $this->assertSame('Texte', $normalized['text']);
+        $this->assertSame(123, $normalized['counter']);
+        $this->assertSame(45, $normalized['like']);
         $this->assertSame(['foo' => 'bar'], $normalized['raw']);
     }
 
@@ -53,5 +57,7 @@ final class ApiMappedItemNormalizerTest extends TestCase
         $this->assertNull($normalized['labels']);
         $this->assertNull($normalized['link']);
         $this->assertNull($normalized['text']);
+        $this->assertNull($normalized['counter']);
+        $this->assertNull($normalized['like']);
     }
 }

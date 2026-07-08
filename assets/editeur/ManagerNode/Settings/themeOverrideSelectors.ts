@@ -13,6 +13,7 @@ export const THEME_SELECTORS = {
     formRadioLabel: ".ce-form-radio-label",
     nav: ".ce-menu",
     navApi: ".ce-menu-api",
+    listApi: ".ce-list-api",
     navItem: ".ce-nav-item",
     text: ".ce-text",
     richText: ".ce-rich-text",
