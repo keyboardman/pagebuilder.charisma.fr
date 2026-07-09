@@ -103,7 +103,10 @@ describe("Border2Settings", () => {
 
         expect(onChange).toHaveBeenCalled();
         const lastCall = onChange.mock.calls.at(-1)?.[0] as CSSProperties;
-        expect(lastCall.borderBottom).toBe("2px solid #000");
+        expect(lastCall.borderBottomWidth).toBe("2px");
+        expect(lastCall.borderBottomStyle).toBe("solid");
+        expect(lastCall.borderBottomColor).toBe("#000");
+        expect(lastCall.borderBottom).toBeUndefined();
         expect(lastCall.border).toBeUndefined();
     });
 
@@ -155,9 +158,60 @@ describe("Border2Settings", () => {
         await vi.advanceTimersByTimeAsync(500);
 
         const lastCall = onChange.mock.calls.at(-1)?.[0] as CSSProperties;
-        expect(lastCall.border).toBe("1px solid #000000");
+        expect(lastCall.borderTopColor).toBe("#000000");
+        expect(lastCall.borderRightColor).toBe("#000000");
+        expect(lastCall.borderBottomColor).toBe("#000000");
+        expect(lastCall.borderLeftColor).toBe("#000000");
+        expect(lastCall.borderTopWidth).toBe("1px");
+        expect(lastCall.borderTopStyle).toBe("solid");
+        expect(lastCall.border).toBeUndefined();
+        expect(lastCall.borderColor).toBeUndefined();
         expect(lastCall.borderTop).toBeUndefined();
         expect(lastCall.borderBottom).toBeUndefined();
+    });
+
+    it("ne remplit pas border-width quand seule border-color est saisie", async () => {
+        const user = userEvent.setup();
+        const onChange = vi.fn();
+        renderBorderSettings({}, onChange);
+
+        const colorInput = getInputByLabel("border-color");
+        await user.type(colorInput, "blue");
+        await vi.advanceTimersByTimeAsync(500);
+
+        const lastCall = onChange.mock.calls.at(-1)?.[0] as CSSProperties;
+        expect(lastCall.borderTopColor).toBe("blue");
+        expect(lastCall.borderRightColor).toBe("blue");
+        expect(lastCall.borderBottomColor).toBe("blue");
+        expect(lastCall.borderLeftColor).toBe("blue");
+        expect(lastCall.borderTopWidth).toBeUndefined();
+        expect(lastCall.borderWidth).toBeUndefined();
+        expect(lastCall.border).toBeUndefined();
+
+        expect(getInputByLabel("border-width")).toHaveValue("");
+        expect(getInputByLabel("border-color")).toHaveValue("blue");
+    });
+
+    it("ne remplit pas border-width quand seul border-style est selectionne", async () => {
+        const user = userEvent.setup();
+        const onChange = vi.fn();
+        renderBorderSettings({}, onChange);
+
+        const styleLabel = screen.getByText("border-style");
+        const styleGroup = styleLabel.parentElement;
+        if (!styleGroup) {
+            throw new Error("Select border-style introuvable");
+        }
+        const styleSelect = within(styleGroup).getByRole("combobox");
+        await user.selectOptions(styleSelect, "solid");
+        await vi.advanceTimersByTimeAsync(500);
+
+        const lastCall = onChange.mock.calls.at(-1)?.[0] as CSSProperties;
+        expect(lastCall.borderTopStyle).toBe("solid");
+        expect(lastCall.borderTopWidth).toBeUndefined();
+        expect(lastCall.borderWidth).toBeUndefined();
+
+        expect(getInputByLabel("border-width")).toHaveValue("");
     });
 });
 

@@ -7,13 +7,12 @@ import { useThemeStylePlaceholder } from "../../services/themeStyleHints";
 import type { ThemeAwareStyleSettingsProps } from "./types";
 import { SettingsSectionTitle } from "./SettingsSectionTitle";
 import {
-    applyPerSideBorderValue,
-    applyUnifiedBorderValue,
+    applyPerSideBorderParts,
+    applyUnifiedBorderParts,
     collapsePerSideToUnified,
     detectBorderMode,
     expandUnifiedBorderToPerSide,
-    getPerSideBorderValue,
-    parseUnifiedBorder,
+    getPerSideBorderParts,
     getUnifiedBorderParts,
     type BorderMode,
     type BorderSide,
@@ -35,11 +34,8 @@ function updateUnifiedBorderPart(
 ): CSSProperties {
     const nextParts = getUnifiedBorderParts(style);
     nextParts[field] = value;
-    const nextValue = [nextParts.width, nextParts.style, nextParts.color]
-        .filter((part) => part.trim() !== "")
-        .join(" ")
-        .trim();
-    return applyUnifiedBorderValue(style, nextValue);
+    console.log("updateUnifiedBorderPart", { field, value, nextParts });
+    return applyUnifiedBorderParts(style, nextParts);
 }
 
 function updatePerSideBorderPart(
@@ -48,13 +44,9 @@ function updatePerSideBorderPart(
     field: "width" | "style" | "color",
     value: string,
 ): CSSProperties {
-    const current = parseUnifiedBorder(getPerSideBorderValue(style, side));
+    const current = getPerSideBorderParts(style, side);
     current[field] = value;
-    const nextValue = [current.width, current.style, current.color]
-        .filter((part) => part.trim() !== "")
-        .join(" ")
-        .trim();
-    return applyPerSideBorderValue(style, side, nextValue);
+    return applyPerSideBorderParts(style, side, current);
 }
 
 export function Border2Settings({ style, onChange, themeOverrideSelector }: Border2SettingsProps) {
@@ -171,7 +163,7 @@ export function Border2Settings({ style, onChange, themeOverrideSelector }: Bord
             ) : (
                 <>
                     {SIDES.map(({ side, label }) => {
-                        const sideParts = parseUnifiedBorder(getPerSideBorderValue(style, side));
+                        const sideParts = getPerSideBorderParts(style, side);
                         const widthPlaceholder =
                             side === "top"
                                 ? borderTopWidthPlaceholder ?? borderTopPlaceholder
