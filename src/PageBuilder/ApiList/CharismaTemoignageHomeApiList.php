@@ -9,7 +9,7 @@ namespace App\PageBuilder\ApiList;
  */
 final class CharismaTemoignageHomeApiList extends ApiList
 {
-    protected const ENDPOINT_URL = 'https://api.charisma.fr/api/charisma/temoignages/home';
+    protected const ENDPOINT_URL = 'https://api.charisma.fr/api/charisma/temoignages';
     protected const COLLECTION_MODE = 'fixed';
 
     public function getId(): string

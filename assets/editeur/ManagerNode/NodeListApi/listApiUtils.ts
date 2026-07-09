@@ -1,3 +1,7 @@
+export const DEFAULT_LIST_API_ITEMS_PER_PAGE = 10;
+
+export const MAX_LIST_API_ITEMS_PER_PAGE = 100;
+
 export interface ListApiMappedItem {
   id: string;
   title: string;
@@ -5,6 +9,34 @@ export interface ListApiMappedItem {
   counter?: string | number;
   like?: string | number;
   link?: string;
+}
+
+export interface ListApiCollectionResponse {
+  items: ListApiMappedItem[];
+  totalItems: number;
+  totalPages: number;
+  page: number;
+  itemsPerPage: number;
+}
+
+export function normalizeListApiPage(page?: number): number {
+  return Math.max(1, page ?? 1);
+}
+
+export function normalizeListApiItemsPerPage(value?: number): number {
+  if (value == null || Number.isNaN(value) || value < 1) {
+    return DEFAULT_LIST_API_ITEMS_PER_PAGE;
+  }
+
+  return Math.min(value, MAX_LIST_API_ITEMS_PER_PAGE);
+}
+
+export function computeTotalPages(totalItems: number, itemsPerPage: number): number {
+  if (totalItems <= 0) {
+    return 0;
+  }
+
+  return Math.max(1, Math.ceil(totalItems / itemsPerPage));
 }
 
 export function hasListMetricValue(value: unknown): boolean {
@@ -25,15 +57,10 @@ function normalizeListMetric(value: string | number | undefined): string | numbe
   return hasListMetricValue(value) ? value : undefined;
 }
 
-export function mapCollectionToListItems(
-  items: unknown[]
-): ListApiMappedItem[] {
+export function mapCollectionToListItems(items: unknown[]): ListApiMappedItem[] {
   return items.map((item) => {
     const o = item as Partial<ListApiMappedItem> & { id?: unknown; title?: unknown };
 
-    // Le backend `/page-builder/lists/{apiId}/items` renvoie les items déjà mappés
-    // au contrat standard (id, title, description, counter, like, link, raw…).
-    // On évite donc de re-mapper côté frontend.
     return {
       id: String(o?.id ?? ""),
       title: String(o?.title ?? ""),
@@ -45,31 +72,69 @@ export function mapCollectionToListItems(
   });
 }
 
+function buildListApiItemsUrl(apiId: string, page: number, itemsPerPage: number): string {
+  const params = new URLSearchParams({
+    page: String(page),
+    itemsPerPage: String(itemsPerPage),
+  });
+
+  return `/api/page-builder/lists/${encodeURIComponent(apiId)}/items?${params.toString()}`;
+}
+
+function buildListApiCacheKey(apiId: string, page: number, itemsPerPage: number): string {
+  return `${apiId}:${page}:${itemsPerPage}`;
+}
+
 // Cache in-memory (durée de vie: session/page). But: éviter des refetchs
 // quand on bascule entre PREVIEW et EDIT (remount du composant).
-const listApiCollectionCache = new Map<string, ListApiMappedItem[]>();
-const listApiCollectionInFlight = new Map<string, Promise<ListApiMappedItem[]>>();
+const listApiCollectionCache = new Map<string, ListApiCollectionResponse>();
+const listApiCollectionInFlight = new Map<string, Promise<ListApiCollectionResponse>>();
 
-async function fetchListItems(apiId: string): Promise<ListApiMappedItem[]> {
-  const res = await fetch(
-    `/api/page-builder/lists/${encodeURIComponent(apiId)}/items`,
-    {
-      credentials: "same-origin",
-      headers: { Accept: "application/json" },
-    }
-  );
+async function fetchListItems(
+  apiId: string,
+  page: number,
+  itemsPerPage: number
+): Promise<ListApiCollectionResponse> {
+  const res = await fetch(buildListApiItemsUrl(apiId, page, itemsPerPage), {
+    credentials: "same-origin",
+    headers: { Accept: "application/json" },
+  });
 
   if (!res.ok) {
     const text = await res.text().catch(() => res.statusText);
     throw new Error(text || "fetchListItems failed");
   }
 
-  const data = (await res.json()) as { items: unknown[] };
-  return mapCollectionToListItems(data.items ?? []);
+  const data = (await res.json()) as {
+    items: unknown[];
+    totalItems?: number;
+    totalPages?: number;
+    page?: number;
+    itemsPerPage?: number;
+  };
+
+  const safeItemsPerPage = normalizeListApiItemsPerPage(data.itemsPerPage);
+  const safePage = normalizeListApiPage(data.page);
+  const totalItems = data.totalItems ?? 0;
+  const totalPages = data.totalPages ?? computeTotalPages(totalItems, safeItemsPerPage);
+
+  return {
+    items: mapCollectionToListItems(data.items ?? []),
+    totalItems,
+    totalPages,
+    page: safePage,
+    itemsPerPage: safeItemsPerPage,
+  };
 }
 
-export async function fetchListApiCollectionCached(apiId: string): Promise<ListApiMappedItem[]> {
-  const cacheKey = apiId;
+export async function fetchListApiCollectionCached(
+  apiId: string,
+  page?: number,
+  itemsPerPage?: number
+): Promise<ListApiCollectionResponse> {
+  const safePage = normalizeListApiPage(page);
+  const safeItemsPerPage = normalizeListApiItemsPerPage(itemsPerPage);
+  const cacheKey = buildListApiCacheKey(apiId, safePage, safeItemsPerPage);
 
   const cached = listApiCollectionCache.get(cacheKey);
   if (cached) {
@@ -81,7 +146,7 @@ export async function fetchListApiCollectionCached(apiId: string): Promise<ListA
     return inFlight;
   }
 
-  const promise = fetchListItems(apiId);
+  const promise = fetchListItems(apiId, safePage, safeItemsPerPage);
 
   listApiCollectionInFlight.set(cacheKey, promise);
 

@@ -11,7 +11,17 @@ final class FlashnewsThemeApiList extends ApiList
 {
     private const BASE_URL = 'https://www.flashnews.fr';
 
-    protected const ENDPOINT_URL = 'https://www.flashnews.fr/api/themes?pagination=false';
+    protected const ENDPOINT_URL = 'https://www.flashnews.fr/api/themes';
+
+    protected function supportsPagination(): bool
+    {
+        return false;
+    }
+
+    protected function getFixedQueryParams(): array
+    {
+        return ['pagination' => 'false'];
+    }
     protected const COLLECTION_MODE = 'fixed';
 
     public function getId(): string

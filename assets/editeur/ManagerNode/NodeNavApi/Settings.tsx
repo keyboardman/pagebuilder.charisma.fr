@@ -12,6 +12,12 @@ import { type NodeSettingsProps } from "../NodeConfigurationType";
 import { useNodeBuilderContext } from "../../services/providers/NodeBuilderContext";
 import { NodeSettingsWrapper } from "../components/NodeSettingsWrapper";
 import type { NodeNavApiType, NodeNavDirection, NodeNavVariant, NodeNavApiTarget } from "./index";
+import { ListApiDisplayPaginationSettings } from "../NodeListApi/ListApiDisplayPaginationSettings";
+import {
+  fetchListApiCollectionCached,
+  normalizeListApiItemsPerPage,
+  normalizeListApiPage,
+} from "../NodeListApi/listApiUtils";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/editeur/components/ui/tabs";
 
 const DIRECTION_OPTIONS: { value: NodeNavDirection; label: string }[] = [
@@ -61,6 +67,41 @@ const Settings: FC<NodeSettingsProps> = () => {
   );
 
   const selectedSource = node.content?.apiId ? listSources.find((s) => s.id === node.content?.apiId) : null;
+  const [totalPages, setTotalPages] = useState(0);
+  const currentPage = normalizeListApiPage(node.content?.page);
+  const currentItemsPerPage = normalizeListApiItemsPerPage(node.content?.itemsPerPage);
+
+  useEffect(() => {
+    let cancelled = false;
+
+    const loadPaginationMeta = async () => {
+      if (!selectedSource) {
+        setTotalPages(0);
+        return;
+      }
+
+      try {
+        const response = await fetchListApiCollectionCached(
+          selectedSource.id,
+          currentPage,
+          currentItemsPerPage
+        );
+        if (!cancelled) {
+          setTotalPages(response.totalPages);
+        }
+      } catch {
+        if (!cancelled) {
+          setTotalPages(0);
+        }
+      }
+    };
+
+    void loadPaginationMeta();
+
+    return () => {
+      cancelled = true;
+    };
+  }, [selectedSource, currentPage, currentItemsPerPage]);
 
   return (
     <Tabs className="flex h-full min-h-0 flex-1 flex-col overflow-hidden" defaultValue="general">
@@ -105,6 +146,28 @@ const Settings: FC<NodeSettingsProps> = () => {
                       Source : <span className="font-medium text-foreground">{selectedSource.label}</span>
                     </p>
                   ) : null}
+
+                  <ListApiDisplayPaginationSettings
+                    page={node.content?.page}
+                    itemsPerPage={node.content?.itemsPerPage}
+                    totalPages={totalPages}
+                    onPageChange={(page) =>
+                      onChange({
+                        ...node,
+                        content: { ...node.content, page },
+                      })
+                    }
+                    onItemsPerPageChange={(itemsPerPage) =>
+                      onChange({
+                        ...node,
+                        content: {
+                          ...node.content,
+                          itemsPerPage,
+                          page: 1,
+                        },
+                      })
+                    }
+                  />
 
                   <div className="flex items-center gap-2">
                     <span className="node-block-title w-14 shrink-0 text-foreground text-sm">Target</span>

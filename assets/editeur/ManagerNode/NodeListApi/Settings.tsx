@@ -15,7 +15,8 @@ import type { NodeListApiType } from "./index";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/editeur/components/ui/tabs";
 import { Switch } from "@/editeur/components/ui/switch";
 import { THEME_SELECTORS } from "../Settings/themeOverrideSelectors";
-import { fetchListApiCollectionCached, hasListMetricValue } from "./listApiUtils";
+import { fetchListApiCollectionCached, hasListMetricValue, normalizeListApiItemsPerPage, normalizeListApiPage } from "./listApiUtils";
+import { ListApiDisplayPaginationSettings } from "./ListApiDisplayPaginationSettings";
 
 const PART_SELECTORS = {
   list: THEME_SELECTORS.listApi,
@@ -136,6 +137,10 @@ const Settings: FC<NodeSettingsProps> = () => {
     counter: true,
     like: false,
   });
+  const [totalPages, setTotalPages] = useState(0);
+
+  const currentPage = normalizeListApiPage(content.page);
+  const currentItemsPerPage = normalizeListApiItemsPerPage(content.itemsPerPage);
 
   useEffect(() => {
     let cancelled = false;
@@ -147,22 +152,28 @@ const Settings: FC<NodeSettingsProps> = () => {
           counter: true,
           like: false,
         });
+        setTotalPages(0);
         return;
       }
 
       try {
-        const mapped = await fetchListApiCollectionCached(selectedListSource.id);
+        const response = await fetchListApiCollectionCached(
+          selectedListSource.id,
+          currentPage,
+          currentItemsPerPage
+        );
 
         if (cancelled) return;
 
+        setTotalPages(response.totalPages);
         setAvailableFields({
-          description: mapped.some((item) => (item.description?.trim() ?? "") !== ""),
-          counter: mapped.some((item) => hasListMetricValue(item.counter)),
-          like: mapped.some((item) => hasListMetricValue(item.like)),
+          description: response.items.some((item) => (item.description?.trim() ?? "") !== ""),
+          counter: response.items.some((item) => hasListMetricValue(item.counter)),
+          like: response.items.some((item) => hasListMetricValue(item.like)),
         });
       } catch {
         if (cancelled) return;
-        // En cas d'erreur réseau, on laisse toutes les options visibles.
+        setTotalPages(0);
         setAvailableFields({
           description: true,
           counter: true,
@@ -176,7 +187,7 @@ const Settings: FC<NodeSettingsProps> = () => {
     return () => {
       cancelled = true;
     };
-  }, [selectedListSource]);
+  }, [selectedListSource, currentPage, currentItemsPerPage]);
 
   const updateShow = (key: keyof NodeListApiType["content"]["show"], checked: boolean) => {
     onChange({
@@ -238,6 +249,28 @@ const Settings: FC<NodeSettingsProps> = () => {
                       Source : <span className="font-medium text-foreground">{selectedListSource.label}</span>
                     </p>
                   ) : null}
+
+                  <ListApiDisplayPaginationSettings
+                    page={content.page}
+                    itemsPerPage={content.itemsPerPage}
+                    totalPages={totalPages}
+                    onPageChange={(page) =>
+                      onChange({
+                        ...node,
+                        content: { ...content, page },
+                      })
+                    }
+                    onItemsPerPageChange={(itemsPerPage) =>
+                      onChange({
+                        ...node,
+                        content: {
+                          ...content,
+                          itemsPerPage,
+                          page: 1,
+                        },
+                      })
+                    }
+                  />
 
                   <div className="grid grid-cols-2 gap-x-4 gap-y-2 pt-1">
                     <label className="flex items-center justify-between gap-2">

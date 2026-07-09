@@ -11,6 +11,8 @@ import {
   isShowEnabled,
   type ListApiMappedItem,
   fetchListApiCollectionCached,
+  normalizeListApiItemsPerPage,
+  normalizeListApiPage,
 } from "./listApiUtils";
 import { CHARISMA_HEART_PATH } from "../../components/video/heartIcon";
 
@@ -19,6 +21,8 @@ const View: FC<NodeViewProps> = () => {
   const listNode = node as NodeListApiType;
   const apiId = listNode.content?.apiId?.trim() ?? "";
   const show = listNode.content?.show ?? {};
+  const page = normalizeListApiPage(listNode.content?.page);
+  const itemsPerPage = normalizeListApiItemsPerPage(listNode.content?.itemsPerPage);
 
   const [items, setItems] = useState<ListApiMappedItem[]>([]);
   const [loading, setLoading] = useState(false);
@@ -39,9 +43,9 @@ const View: FC<NodeViewProps> = () => {
       setError(false);
 
       try {
-        const nextItems = await fetchListApiCollectionCached(apiId);
+        const response = await fetchListApiCollectionCached(apiId, page, itemsPerPage);
         if (!cancelled) {
-          setItems(nextItems);
+          setItems(response.items);
         }
       } catch {
         if (!cancelled) {
@@ -60,7 +64,7 @@ const View: FC<NodeViewProps> = () => {
     return () => {
       cancelled = true;
     };
-  }, [apiId]);
+  }, [apiId, page, itemsPerPage]);
 
   const listStyle = listNode.content?.list?.style ?? {};
   const listClassName = listNode.content?.list?.className ?? "";
@@ -132,10 +136,7 @@ const View: FC<NodeViewProps> = () => {
           />
         ) : null}
         {showCounter || showLike ? (
-          <div
-            className="ce-list-api-metrics"
-            style={metricsRowDefaultStyle}
-          >
+          <div className="ce-list-api-metrics" style={metricsRowDefaultStyle}>
             {showCounter ? (
               <div
                 className={cn("ce-list-api-counter ce-list-api-badge", listNode.content?.counter?.className)}
@@ -173,11 +174,7 @@ const View: FC<NodeViewProps> = () => {
     );
 
     return (
-      <li
-        key={item.id}
-        className={cn("ce-list-api-item", itemClassName)}
-        style={styleForView(itemStyle)}
-      >
+      <li key={item.id} className={cn("ce-list-api-item", itemClassName)} style={styleForView(itemStyle)}>
         {link ? <HasLink link={link}>{content}</HasLink> : content}
       </li>
     );

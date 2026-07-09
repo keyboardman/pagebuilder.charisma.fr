@@ -10,7 +10,7 @@ namespace App\PageBuilder\ApiList;
  */
 final class CharismaArticleEnactionHomeApiList extends ApiList
 {
-    protected const ENDPOINT_URL = 'https://api.charisma.fr/api/charisma/article/enactions/home';
+    protected const ENDPOINT_URL = 'https://api.charisma.fr/api/charisma/article/enactions';
     protected const COLLECTION_MODE = 'fixed';
 
     public function getId(): string

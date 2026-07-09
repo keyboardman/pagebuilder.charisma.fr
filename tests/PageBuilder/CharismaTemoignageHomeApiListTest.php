@@ -11,7 +11,7 @@ use Symfony\Contracts\HttpClient\ResponseInterface;
 
 final class CharismaTemoignageHomeApiListTest extends TestCase
 {
-    public function testFetchItemsUsesHomeEndpoint(): void
+    public function testFetchItemsUsesHomeEndpointWithApiPlatformPagination(): void
     {
         $response = $this->createMock(ResponseInterface::class);
         $response->expects($this->once())
@@ -20,7 +20,7 @@ final class CharismaTemoignageHomeApiListTest extends TestCase
                 'member' => [
                     ['id' => 140, 'titre' => 'J\'en avais beaucoup souffert', 'url' => 'https://www.charisma.fr/fr/temoignages.php?article=140'],
                 ],
-                'totalItems' => 10,
+                'totalItems' => 48,
             ]);
 
         $client = $this->createMock(HttpClientInterface::class);
@@ -29,17 +29,25 @@ final class CharismaTemoignageHomeApiListTest extends TestCase
             ->with(
                 'GET',
                 'https://api.charisma.fr/api/charisma/temoignages/home',
-                ['timeout' => 30]
+                [
+                    'query' => [
+                        'page' => '1',
+                        'itemsPerPage' => '10',
+                    ],
+                    'timeout' => 30,
+                ]
             )
             ->willReturn($response);
 
         $card = new CharismaTemoignageHomeApiList($client);
-        $result = $card->fetchItems();
+        $result = $card->fetchItems(['page' => 1, 'itemsPerPage' => 10]);
 
-        $this->assertCount(1, $result);
-        $this->assertSame('140', $result[0]['id']);
-        $this->assertSame('J\'en avais beaucoup souffert', $result[0]['title']);
-        $this->assertSame('https://www.charisma.fr/fr/temoignages.php?article=140', $result[0]['link']);
+        $this->assertCount(1, $result->items);
+        $this->assertSame('140', $result->items[0]['id']);
+        $this->assertSame('J\'en avais beaucoup souffert', $result->items[0]['title']);
+        $this->assertSame('https://www.charisma.fr/fr/temoignages.php?article=140', $result->items[0]['link']);
+        $this->assertSame(48, $result->totalItems);
+        $this->assertSame(5, $result->totalPages);
     }
 
     public function testFetchItemsReturnsEmptyPayloadOnHttpFailure(): void
@@ -52,7 +60,7 @@ final class CharismaTemoignageHomeApiListTest extends TestCase
         $card = new CharismaTemoignageHomeApiList($client);
         $result = $card->fetchItems();
 
-        $this->assertSame([], $result);
+        $this->assertSame([], $result->items);
     }
 
     public function testCardMetadataAndBehaviorMatchContract(): void

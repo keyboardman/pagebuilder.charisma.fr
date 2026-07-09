@@ -33,6 +33,8 @@ export interface NodeNavApiType extends NodeType {
   type: "node-nav-api";
   content?: {
     apiId?: string;
+    page?: number;
+    itemsPerPage?: number;
     options: NodeNavApiOptions;
     nav: {
       id?: string;
@@ -64,6 +66,8 @@ export const NodeNavApi: NodeConfigurationType = {
     ...defaultNodeConfiguration.default,
     content: {
       apiId: "",
+      page: 1,
+      itemsPerPage: 10,
       options: {
         direction: "horizontal",
         variant: "navbar",

@@ -11,7 +11,7 @@ use Symfony\Contracts\HttpClient\ResponseInterface;
 
 final class FlashnewsArticleHomeApiListTest extends TestCase
 {
-    public function testFetchItemsUsesArticlesEndpoint(): void
+    public function testFetchItemsUsesArticlesEndpointWithApiPlatformPagination(): void
     {
         $response = $this->createMock(ResponseInterface::class);
         $response->expects($this->once())
@@ -22,9 +22,7 @@ final class FlashnewsArticleHomeApiListTest extends TestCase
                         'id' => 3157,
                         'titre' => 'La France de la corruption',
                         'viewResume' => 'Une « loi-cadeau ».',
-                        'image' => '/upload/flashnews/58b94a018d067.png',
-                        'themes' => ['Justice', 'Politique'],
-                        'vues' => 42,
+                        'compteur' => 42,
                         'likes' => 3,
                         'link' => 'https://www.flashnews.fr/article/la-france-de-la-corruption-poursuit-joyeusement-son-chemin-3157',
                     ],
@@ -37,29 +35,35 @@ final class FlashnewsArticleHomeApiListTest extends TestCase
             ->method('request')
             ->with(
                 'GET',
-                'https://www.flashnews.fr/api/articles?page=1&itemsPerPage=10&order[publication]=desc',
-                ['timeout' => 30]
+                'https://www.flashnews.fr/api/articles',
+                [
+                    'query' => [
+                        'order[publication]' => 'desc',
+                        'page' => '2',
+                        'itemsPerPage' => '20',
+                    ],
+                    'timeout' => 30,
+                ]
             )
             ->willReturn($response);
 
         $card = new FlashnewsArticleHomeApiList($client);
-        $result = $card->fetchItems();
+        $result = $card->fetchItems(['page' => 2, 'itemsPerPage' => 20]);
 
-        $this->assertCount(1, $result);
-        $this->assertSame('3157', $result[0]['id']);
-        $this->assertSame('La France de la corruption', $result[0]['title']);
-        $this->assertSame('Une « loi-cadeau ».', $result[0]['description']);
-        $this->assertSame(
-            'https://www.flashnews.fr/upload/flashnews/58b94a018d067.png',
-            $result[0]['image']
-        );
-        $this->assertSame(['Justice', 'Politique'], $result[0]['labels']);
+        $this->assertCount(1, $result->items);
+        $this->assertSame('3157', $result->items[0]['id']);
+        $this->assertSame('La France de la corruption', $result->items[0]['title']);
+        $this->assertSame('Une « loi-cadeau ».', $result->items[0]['description']);
         $this->assertSame(
             'https://www.flashnews.fr/article/la-france-de-la-corruption-poursuit-joyeusement-son-chemin-3157',
-            $result[0]['link']
+            $result->items[0]['link']
         );
-        $this->assertSame(42, $result[0]['counter']);
-        $this->assertSame(3, $result[0]['like']);
+        $this->assertSame(42, $result->items[0]['counter']);
+        $this->assertSame(3, $result->items[0]['like']);
+        $this->assertSame(568, $result->totalItems);
+        $this->assertSame(29, $result->totalPages);
+        $this->assertSame(2, $result->page);
+        $this->assertSame(20, $result->itemsPerPage);
     }
 
     public function testFetchItemsReturnsEmptyPayloadOnHttpFailure(): void
@@ -70,9 +74,11 @@ final class FlashnewsArticleHomeApiListTest extends TestCase
             ->willThrowException(new \RuntimeException('boom'));
 
         $card = new FlashnewsArticleHomeApiList($client);
-        $result = $card->fetchItems();
+        $result = $card->fetchItems(['page' => 1, 'itemsPerPage' => 10]);
 
-        $this->assertSame([], $result);
+        $this->assertSame([], $result->items);
+        $this->assertSame(0, $result->totalItems);
+        $this->assertSame(0, $result->totalPages);
     }
 
     public function testCardMetadataAndBehaviorMatchContract(): void

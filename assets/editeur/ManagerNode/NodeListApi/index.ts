@@ -25,6 +25,8 @@ export interface NodeListApiType extends NodeType {
   type: "node-list-api";
   content: {
     apiId?: string;
+    page?: number;
+    itemsPerPage?: number;
     show: NodeListApiShow;
     list: NodeListApiStyledPart;
     item: NodeListApiStyledPart;
@@ -51,6 +53,8 @@ export const NodeListApi: NodeConfigurationType = {
     ...defaultNodeConfiguration.default,
     content: {
       apiId: "",
+      page: 1,
+      itemsPerPage: 10,
       show: {
         title: true,
         description: true,

@@ -20,6 +20,10 @@ final class BuilderApiListItemsPageNormalizer implements NormalizerInterface
 
         return [
             'items' => array_map($this->normalizeItem(...), $object->items),
+            'totalItems' => $object->totalItems,
+            'totalPages' => $object->totalPages,
+            'page' => $object->page,
+            'itemsPerPage' => $object->itemsPerPage,
         ];
     }
 

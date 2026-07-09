@@ -52,7 +52,7 @@ final class CharismaArticleHomeListApiCardTest extends TestCase
                         'url' => 'https://www.charisma.fr/fr/enaction.php?article=235',
                     ],
                 ],
-                'totalItems' => 10,
+                'totalItems' => 48,
             ]);
 
         $client = $this->createMock(HttpClientInterface::class);
@@ -61,22 +61,29 @@ final class CharismaArticleHomeListApiCardTest extends TestCase
             ->with(
                 'GET',
                 $url,
-                ['timeout' => 30]
+                [
+                    'query' => [
+                        'page' => '1',
+                        'itemsPerPage' => '10',
+                    ],
+                    'timeout' => 30,
+                ]
             )
             ->willReturn($response);
 
-        /** @var object{fetchItems: callable(): array, getId: callable(): string, getLabel: callable(): string, getCollectionMode: callable(): string} $card */
         $card = new $class($client);
-        $result = $card->fetchItems();
+        $result = $card->fetchItems(['page' => 1, 'itemsPerPage' => 10]);
 
-        $this->assertCount(1, $result);
-        $this->assertSame('235', $result[0]['id']);
-        $this->assertSame('Évangélisation dans un camp de Roms', $result[0]['title']);
-        $this->assertSame('Dimanche 13 avril…', $result[0]['description']);
-        $this->assertSame(12438, $result[0]['counter']);
-        $this->assertSame(336, $result[0]['like']);
-        $this->assertSame('https://www.charisma.fr/fr/enaction.php?article=235', $result[0]['link'] ?? $result[0]['link']);
-        $this->assertNull($result[0]['image']);
+        $this->assertCount(1, $result->items);
+        $this->assertSame('235', $result->items[0]['id']);
+        $this->assertSame('Évangélisation dans un camp de Roms', $result->items[0]['title']);
+        $this->assertSame('Dimanche 13 avril…', $result->items[0]['description']);
+        $this->assertSame(12438, $result->items[0]['counter']);
+        $this->assertSame(336, $result->items[0]['like']);
+        $this->assertSame('https://www.charisma.fr/fr/enaction.php?article=235', $result->items[0]['link'] ?? $result->items[0]['link']);
+        $this->assertNull($result->items[0]['image'] ?? null);
+        $this->assertSame(48, $result->totalItems);
+        $this->assertSame(5, $result->totalPages);
 
         $this->assertSame($id, $card->getId());
         $this->assertSame($label, $card->getLabel());
@@ -98,7 +105,6 @@ final class CharismaArticleHomeListApiCardTest extends TestCase
         $card = new $class($client);
         $result = $card->fetchItems();
 
-        $this->assertSame([], $result);
+        $this->assertSame([], $result->items);
     }
 }
-

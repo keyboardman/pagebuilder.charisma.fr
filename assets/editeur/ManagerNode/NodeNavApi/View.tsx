@@ -7,6 +7,11 @@ import type { NodeNavApiType, NodeNavApiOptions, NavApiLinkItem } from "./index"
 import { cn } from "@/editeur/lib/utils";
 import { IoMenuOutline } from "react-icons/io5";
 import useMediaQuery, { MEDIA_MAX_TABLET } from "../../hooks/useMediaQuery";
+import {
+  fetchListApiCollectionCached,
+  normalizeListApiItemsPerPage,
+  normalizeListApiPage,
+} from "../NodeListApi/listApiUtils";
 
 const defaultOptions: NodeNavApiOptions = {
   direction: "horizontal",
@@ -42,15 +47,18 @@ const View: FC<NodeViewProps | NodeEditProps> = () => {
   const { node } = useNodeContext();
   const isTabletOrSmaller = useIsTabletOrSmaller();
   const [burgerOpen, setBurgerOpen] = useState(false);
+
+  const navNode = node as NodeNavApiType;
+  const apiId = navNode.content?.apiId ?? "";
+  const page = normalizeListApiPage(navNode.content?.page);
+  const itemsPerPage = normalizeListApiItemsPerPage(navNode.content?.itemsPerPage);
+  const options = { ...defaultOptions, ...navNode?.content?.options };
+  const linkTarget = options.target ?? "_self";
+
   const [links, setLinks] = useState<NavApiLinkItem[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(false);
   const scrollRef = useRef<HTMLDivElement>(null);
-
-  const navNode = node as NodeNavApiType;
-  const apiId = navNode.content?.apiId ?? "";
-  const options = { ...defaultOptions, ...navNode?.content?.options };
-  const linkTarget = options.target ?? "_self";
 
   useEffect(() => {
     let cancelled = false;
@@ -67,18 +75,9 @@ const View: FC<NodeViewProps | NodeEditProps> = () => {
       setError(false);
 
       try {
-        const res = await fetch(`/api/page-builder/lists/${encodeURIComponent(apiId)}/items`, {
-          credentials: "same-origin",
-          headers: { Accept: "application/json" },
-        });
-
-        if (!res.ok) {
-          throw new Error("fetch list items failed");
-        }
-
-        const data = (await res.json()) as { items: Array<{ id?: unknown; title?: unknown; link?: unknown }> };
+        const response = await fetchListApiCollectionCached(apiId, page, itemsPerPage);
         if (!cancelled) {
-          setLinks(mapItemsToLinks(data.items ?? []));
+          setLinks(mapItemsToLinks(response.items));
         }
       } catch {
         if (!cancelled) {
@@ -97,7 +96,7 @@ const View: FC<NodeViewProps | NodeEditProps> = () => {
     return () => {
       cancelled = true;
     };
-  }, [apiId]);
+  }, [apiId, page, itemsPerPage]);
 
   const isVertical = options.direction === "vertical";
   const variant = options.variant ?? "navbar";

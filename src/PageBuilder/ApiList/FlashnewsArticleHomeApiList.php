@@ -10,8 +10,13 @@ namespace App\PageBuilder\ApiList;
 final class FlashnewsArticleHomeApiList extends ApiList
 {
     private const BASE_URL = 'https://www.flashnews.fr';
-    protected const ENDPOINT_URL = 'https://www.flashnews.fr/api/articles?page=1&itemsPerPage=10&order[publication]=desc';
+    protected const ENDPOINT_URL = 'https://www.flashnews.fr/api/articles';
     protected const COLLECTION_MODE = 'fixed';
+
+    protected function getFixedQueryParams(): array
+    {
+        return ['order[publication]' => 'desc'];
+    }
 
     public function getId(): string
     {

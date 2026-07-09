@@ -8,6 +8,16 @@ use Symfony\Component\HttpFoundation\Request;
 
 final class ApiRequestParamHelper
 {
+    public function buildListCollectionParams(Request $request): array
+    {
+        $itemsPerPage = max(1, min(100, (int) $request->query->get('itemsPerPage', 10)));
+
+        return [
+            'page' => max(1, (int) $request->query->get('page', 1)),
+            'itemsPerPage' => $itemsPerPage,
+        ];
+    }
+
     /**
      * @return array<string, mixed>
      */
