@@ -1,4 +1,8 @@
-import { apiRegistry } from "../../ManagerApi/ApiRegistry";
+import {
+  fetchListImageItems,
+  MAX_LIST_IMAGE_ITEMS_PER_PAGE,
+  type ListImageMappedItem,
+} from "../NodeListImage/listImageApiUtils";
 import type { NodeSlideshowSlide } from ".";
 
 export const DEFAULT_SLIDE_SRC = "https://placehold.net/3-800x600.png";
@@ -39,24 +43,6 @@ export function resolveSlidesMode(content: SlideshowContentLike): "manual" | "ap
   return "manual";
 }
 
-export function mapCollectionToSlides(
-  items: unknown[],
-  adapter: NonNullable<ReturnType<typeof apiRegistry.get>>,
-  apiId: string
-): NodeSlideshowSlide[] {
-  return items
-    .map((item) => adapter.mapItem(item))
-    .filter((mapped) => (mapped.image ?? "").trim().length > 0)
-    .map((mapped) => ({
-      src: String(mapped.image ?? ""),
-      alt: mapped.title ?? "",
-      source: "api-fixed" as const,
-      link: mapped.link ?? "",
-      apiId,
-      itemId: mapped.id,
-    }));
-}
-
 export function placeholderApiSlide(apiId?: string): NodeSlideshowSlide {
   return {
     src: DEFAULT_SLIDE_SRC,
@@ -67,18 +53,25 @@ export function placeholderApiSlide(apiId?: string): NodeSlideshowSlide {
   };
 }
 
+export function mapListImageItemsToSlides(items: ListImageMappedItem[], apiId: string): NodeSlideshowSlide[] {
+  return items
+    .filter((item) => (item.image ?? "").trim().length > 0)
+    .map((item) => ({
+      src: String(item.image),
+      alt: item.alt ?? "",
+      source: "api-fixed" as const,
+      link: item.link ?? "",
+      apiId,
+      itemId: item.id,
+    }));
+}
+
 export async function fetchSlidesFromApi(apiId: string): Promise<NodeSlideshowSlide[]> {
-  const adapter = apiRegistry.get(apiId);
-  if (!adapter) {
-    return [placeholderApiSlide(apiId)];
-  }
-
-  const result = await adapter.fetchCollection({
+  const result = await fetchListImageItems(apiId, {
     page: 1,
-    limit: 200,
+    itemsPerPage: MAX_LIST_IMAGE_ITEMS_PER_PAGE,
   });
-
-  const mapped = mapCollectionToSlides(result.items ?? [], adapter, apiId);
+  const mapped = mapListImageItemsToSlides(result.items ?? [], apiId);
   return mapped.length > 0 ? mapped : [placeholderApiSlide(apiId)];
 }
 

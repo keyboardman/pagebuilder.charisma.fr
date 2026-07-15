@@ -5,10 +5,7 @@ import { Base2Settings } from "../Settings";
 import Form from "../../components/form";
 import { InputFile } from "../../components/form/InputFile";
 import { useNodeBuilderContext } from "../../services/providers/NodeBuilderContext";
-import { apiRegistry } from "../../ManagerApi/ApiRegistry";
-import { ApiManagerModal } from "../../ManagerApi/ApiManagerModal";
 import { Button } from "@/editeur/components/ui/button";
-import { Database } from "lucide-react";
 import { Switch } from "@/editeur/components/ui/switch";
 import { cn } from "@/editeur/lib/utils";
 import type { NodeSlideshowSlide, NodeSlideshowType } from ".";
@@ -20,6 +17,8 @@ import {
   resolveApiId,
   resolveSlidesMode,
 } from "./slideshowApi";
+import { fetchListImageCatalog } from "../NodeListImage/listImageApiUtils";
+import type { ListImageSourceMeta } from "../NodeListImage/listImageApiUtils";
 import { Table, TableHeader, TableBody, TableRow, TableCell, TableHead } from "@/editeur/components/ui/table";
 import { Monitor, Tablet, Phone } from "lucide-react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/editeur/components/ui/tabs";
@@ -80,7 +79,7 @@ const Settings: FC<NodeSettingsProps> = () => {
   const [dragOverIndex, setDragOverIndex] = useState<number | null>(null);
   const [apiLoading, setApiLoading] = useState(false);
   const [apiError, setApiError] = useState<string | null>(null);
-  const [apiModalOpen, setApiModalOpen] = useState(false);
+  const [listImageSources, setListImageSources] = useState<ListImageSourceMeta[]>([]);
 
   const displaySlides = slidesMode === "manual" ? manualSlides : apiPreviewSlides;
 
@@ -154,7 +153,35 @@ const Settings: FC<NodeSettingsProps> = () => {
   };
 
   const apiId = resolveApiId(contentForMode);
-  const selectedApiAdapter = apiId ? apiRegistry.get(apiId) : null;
+  const selectedListSource = useMemo(
+    () => (apiId ? listImageSources.find((source) => source.id === apiId) ?? null : null),
+    [apiId, listImageSources]
+  );
+  const listImageOptions = useMemo(
+    () =>
+      listImageSources.map((source) => ({
+        value: source.id,
+        label: source.label,
+      })),
+    [listImageSources]
+  );
+
+  useEffect(() => {
+    let cancelled = false;
+    const load = async () => {
+      try {
+        const items = await fetchListImageCatalog();
+        if (!cancelled) setListImageSources(items);
+      } catch {
+        // ignore : en cas d'erreur on laisse la liste vide
+      }
+    };
+
+    void load();
+    return () => {
+      cancelled = true;
+    };
+  }, []);
 
   const loadSlidesFromApi = async (nextApiId: string) => {
     if (!nextApiId) return;
@@ -459,36 +486,30 @@ const Settings: FC<NodeSettingsProps> = () => {
                       </div>
                     ) : (
                       <div className="space-y-2">
-                        {selectedApiAdapter && (
+                        {selectedListSource && (
                           <p className="text-xs text-muted-foreground">
-                            API : <span className="font-medium text-foreground">{selectedApiAdapter.label}</span>
+                            API : <span className="font-medium text-foreground">{selectedListSource.label}</span>
                           </p>
                         )}
-                        <Button
-                          type="button"
-                          variant="outline"
-                          size="sm"
-                          onClick={() => setApiModalOpen(true)}
-                        >
-                          <Database className="h-4 w-4 mr-2" />
-                          {apiId ? "Changer l'API" : "Sélectionner une API"}
-                        </Button>
-                        <ApiManagerModal
-                          open={apiModalOpen}
-                          onOpenChange={setApiModalOpen}
-                          apiId={apiId}
-                          typeFilter="image"
-                          collectionModeFilter="fixed"
-                          selectionMode="api"
-                          onSelect={(nextApiId) => {
-                            setApiPreviewSlides([]);
-                            updateContent({
-                              slidesMode: "api-endpoint",
-                              apiId: nextApiId,
-                              slides: [],
-                            });
-                          }}
-                        />
+                        <Form.Group>
+                          <Form.Label text="Source API image" />
+                          <Form.Select
+                            value={apiId}
+                            onChange={(value) => {
+                              const nextApiId = value ?? "";
+                              setApiPreviewSlides([]);
+                              updateContent({
+                                slidesMode: "api-endpoint",
+                                apiId: nextApiId || undefined,
+                                slides: [],
+                              });
+                            }}
+                            options={listImageOptions}
+                            placeholder={
+                              listImageOptions.length ? "Choisir une API image…" : "Aucune API image"
+                            }
+                          />
+                        </Form.Group>
                         {apiLoading && <p className="text-xs text-muted-foreground">Chargement...</p>}
                         {apiError && (
                           <p className="text-xs text-destructive bg-destructive/10 border border-destructive/20 rounded p-2">

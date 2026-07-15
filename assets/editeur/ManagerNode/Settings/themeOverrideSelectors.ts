@@ -14,6 +14,7 @@ export const THEME_SELECTORS = {
     nav: ".ce-menu",
     navApi: ".ce-menu-api",
     listApi: ".ce-list-api",
+    listImageApi: ".ce-list-image",
     navItem: ".ce-nav-item",
     text: ".ce-text",
     richText: ".ce-rich-text",

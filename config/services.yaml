@@ -70,6 +70,10 @@ services:
         arguments:
             $sources: !tagged_iterator app.builder_api_list_article_dynamique
 
+    App\PageBuilder\ApiListImage\ApiListImageRegistry:
+        arguments:
+            $lists: !tagged_iterator app.builder_api_list_image
+
     # StubApiCard : pas de tag pour ne pas l’afficher dans le builder (conservé pour tests)
     # App\PageBuilder\ApiCard\StubApiCard:
     #     tags: [app.builder_api_card]
@@ -101,8 +105,14 @@ services:
     App\PageBuilder\ApiCard\CharismaEvenementHomeApiCard:
         tags: [app.builder_api_card]
 
+    App\PageBuilder\ApiListImage\CharismaEvenementHomeApiListImage:
+        tags: [app.builder_api_list_image]
+
     App\PageBuilder\ApiCard\CharismaEvenementRetrospectiveApiCard:
         tags: [app.builder_api_card]
+
+    App\PageBuilder\ApiListImage\CharismaEvenementRetrospectiveApiListImage:
+        tags: [app.builder_api_list_image]
 
     App\PageBuilder\ApiListArticle\CharismaArticleEnactionHomeApiListArticle:
         tags: [app.builder_api_list_article]

@@ -9,6 +9,7 @@ use App\DTO\BuilderApiCardCategoryData;
 use App\ApiResource\BuilderApiCardItem;
 use App\ApiResource\BuilderApiCardItemsPage;
 use App\DTO\BuilderApiCardItemData;
+use App\DTO\BuilderApiListImageItemData;
 
 final class BuilderApiResourceFactory
 {
@@ -44,6 +45,20 @@ final class BuilderApiResourceFactory
     public function createItemData(array $data): BuilderApiCardItemData
     {
         return $this->mapItemData($data, new BuilderApiCardItemData());
+    }
+
+    /**
+     * @param array<string, mixed> $data
+     */
+    public function createListImageItemData(array $data): BuilderApiListImageItemData
+    {
+        $item = new BuilderApiListImageItemData();
+        $item->id = (string) ($data['id'] ?? '');
+        $item->image = (string) ($data['image'] ?? '');
+        $item->link = isset($data['link']) ? (string) $data['link'] : null;
+        $item->alt = isset($data['alt']) ? (string) $data['alt'] : null;
+
+        return $item;
     }
 
     /**

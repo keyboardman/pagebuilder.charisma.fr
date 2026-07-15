@@ -6,6 +6,7 @@ namespace App\Tests\PageBuilder;
 
 use App\PageBuilder\ApiCard\ApiCardRegistry;
 use App\PageBuilder\ApiListArticle\ApiListArticleRegistry;
+use App\PageBuilder\ApiListImage\ApiListImageRegistry;
 use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
 
 final class ApiCardServiceRegistrationTest extends KernelTestCase
@@ -66,5 +67,31 @@ final class ApiCardServiceRegistrationTest extends KernelTestCase
             $this->assertSame($id, $source->getId());
             $this->assertSame($label, $source->getLabel());
         }
+    }
+
+    public function testEvenementHomeApiListImageIsRegisteredInBuilderRegistry(): void
+    {
+        self::bootKernel();
+        /** @var ApiListImageRegistry $registry */
+        $registry = self::getContainer()->get(ApiListImageRegistry::class);
+
+        $list = $registry->get('charisma_evenement_home');
+        $this->assertNotNull($list);
+        $this->assertSame('charisma_evenement_home', $list->getId());
+        $this->assertSame('fixed', $list->getCollectionMode());
+        $this->assertSame('Evènements Home', $list->getLabel());
+    }
+
+    public function testEvenementRetrospectiveApiListImageIsRegisteredInBuilderRegistry(): void
+    {
+        self::bootKernel();
+        /** @var ApiListImageRegistry $registry */
+        $registry = self::getContainer()->get(ApiListImageRegistry::class);
+
+        $list = $registry->get('charisma_evenement_retrospective');
+        $this->assertNotNull($list);
+        $this->assertSame('charisma_evenement_retrospective', $list->getId());
+        $this->assertSame('fixed', $list->getCollectionMode());
+        $this->assertSame('Evènements retrospective', $list->getLabel());
     }
 }
