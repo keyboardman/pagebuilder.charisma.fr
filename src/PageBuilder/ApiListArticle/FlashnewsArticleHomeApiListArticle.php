@@ -2,12 +2,12 @@
 
 declare(strict_types=1);
 
-namespace App\PageBuilder\ApiList;
+namespace App\PageBuilder\ApiListArticle;
 
 /**
  * Endpoint NodeListApi : articles home Flashnews.
  */
-final class FlashnewsArticleHomeApiList extends ApiList
+final class FlashnewsArticleHomeApiListArticle extends ApiListArticle
 {
     private const BASE_URL = 'https://www.flashnews.fr';
     protected const ENDPOINT_URL = 'https://www.flashnews.fr/api/articles';

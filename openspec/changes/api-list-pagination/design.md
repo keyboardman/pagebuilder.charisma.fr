@@ -1,6 +1,6 @@
 ## Context
 
-Les nœuds `NodeListApi` et `NodeNavApi` chargent une collection fixe via `GET /api/page-builder/lists/{apiId}/items` (sans pagination). Le backend `ApiList` interroge un endpoint distant figé et renvoie tous les items mappés.
+Les nœuds `NodeListApi` et `NodeNavApi` chargent une collection fixe via `GET /api/page-builder/lists/{apiId}/items` (sans pagination). Le backend `ApiListArticle` interroge un endpoint distant figé et renvoie tous les items mappés.
 
 Besoin utilisateur : limiter **l'affichage** à N éléments et choisir quelle « page » de la collection montrer — par ex. page 2 avec 10 items/page → afficher les items 11 à 20 de la collection reçue.
 
@@ -16,7 +16,7 @@ Les noms `page` et `itemsPerPage` reprennent la convention API Platform pour la 
 
 **Non-Goals:**
 
-- Modifier `ApiList`, `BuilderApiListItemsPageProvider` ou les endpoints distants
+- Modifier `ApiListArticle`, `BuilderApiListArticleItemsPageProvider` ou les endpoints distants
 - Pagination interactive côté visiteur (pas de boutons « page suivante » dans le rendu public)
 - Re-fetch backend lors du changement de page
 - Supporter `itemsPerPage` arbitraire (seulement 10, 20, 30)
@@ -60,7 +60,7 @@ Placé sous le sélecteur d'API, avant les toggles `show`.
 
 ## Risks / Trade-offs
 
-- **[Trade-off] Collection incomplète côté backend** → Le découpage s'applique sur ce que le backend fournit déjà ; si l'ApiList ne renvoie que 10 items, l'utilisateur ne pourra pas afficher la page 2 au-delà de ces 10 items.
+- **[Trade-off] Collection incomplète côté backend** → Le découpage s'applique sur ce que le backend fournit déjà ; si l'ApiListArticle ne renvoie que 10 items, l'utilisateur ne pourra pas afficher la page 2 au-delà de ces 10 items.
 - **[Risque] Pages existantes** → Sans `itemsPerPage` persisté, comportement inchangé (tous les items affichés).
 - **[Trade-off] Pas de contrôle visiteur** → Fenêtre d'affichage fixe choisie à l'édition.
 

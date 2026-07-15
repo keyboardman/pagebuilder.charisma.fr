@@ -2,12 +2,12 @@
 
 declare(strict_types=1);
 
-namespace App\PageBuilder\ApiList;
+namespace App\PageBuilder\ApiListArticle;
 
 /**
  * Endpoint NodeListApi : témoignages home Charisma.
  */
-final class CharismaTemoignageHomeApiList extends ApiList
+final class CharismaTemoignageHomeApiListArticle extends ApiListArticle
 {
     protected const ENDPOINT_URL = 'https://api.charisma.fr/api/charisma/temoignages';
     protected const COLLECTION_MODE = 'fixed';

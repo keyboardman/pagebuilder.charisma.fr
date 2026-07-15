@@ -6,19 +6,19 @@ namespace App\ApiResource;
 
 use ApiPlatform\Metadata\ApiResource;
 use ApiPlatform\Metadata\Get;
-use App\State\BuilderApiListsCatalogProvider;
+use App\State\BuilderApiListArticleCatalogProvider;
 
 #[ApiResource(
     operations: [
         new Get(
             uriTemplate: '/page-builder/lists',
-            provider: BuilderApiListsCatalogProvider::class,
+            provider: BuilderApiListArticleCatalogProvider::class,
             security: 'true',
             stateless: false,
         ),
     ],
 )]
-final class BuilderApiListsCatalogResponse
+final class BuilderApiListArticleCatalogResponse
 {
     /** @var list<array{id: string, label: string, collectionMode: string}> */
     public array $items = [];

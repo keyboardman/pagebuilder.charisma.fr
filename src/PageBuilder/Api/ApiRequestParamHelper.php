@@ -19,6 +19,24 @@ final class ApiRequestParamHelper
     }
 
     /**
+     * @return array{page: int, itemsPerPage: int, search?: string}
+     */
+    public function buildDynamicListCollectionParams(Request $request): array
+    {
+        $params = [
+            'page' => max(1, (int) $request->query->get('page', 1)),
+            'itemsPerPage' => max(1, min(100, (int) $request->query->get('itemsPerPage', 20))),
+        ];
+
+        $search = $request->query->get('search');
+        if (\is_string($search) && trim($search) !== '') {
+            $params['search'] = trim($search);
+        }
+
+        return $params;
+    }
+
+    /**
      * @return array<string, mixed>
      */
     public function buildCardCollectionParams(Request $request, string $categoryParamName): array

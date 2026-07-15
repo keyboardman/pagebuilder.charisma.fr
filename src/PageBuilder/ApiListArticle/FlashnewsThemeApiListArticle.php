@@ -2,12 +2,12 @@
 
 declare(strict_types=1);
 
-namespace App\PageBuilder\ApiList;
+namespace App\PageBuilder\ApiListArticle;
 
 /**
  * Liste « Flashnews thèmes » depuis https://www.flashnews.fr/api/themes
  */
-final class FlashnewsThemeApiList extends ApiList
+final class FlashnewsThemeApiListArticle extends ApiListArticle
 {
     private const BASE_URL = 'https://www.flashnews.fr';
 

@@ -2,30 +2,29 @@
 
 declare(strict_types=1);
 
-namespace App\PageBuilder\ApiList;
+namespace App\PageBuilder\ApiListArticle;
 
 /**
- * Liste « En Action » (home) depuis
- * https://api.charisma.fr/api/charisma/article/enactions/home
+ * Liste « Expressions » (home) depuis
+ * https://api.charisma.fr/api/charisma/article/expressions/home
  */
-final class CharismaArticleEnactionHomeApiList extends ApiList
+final class CharismaArticleExpressionHomeApiListArticle extends ApiListArticle
 {
-    protected const ENDPOINT_URL = 'https://api.charisma.fr/api/charisma/article/enactions';
+    protected const ENDPOINT_URL = 'https://api.charisma.fr/api/charisma/article/expressions';
     protected const COLLECTION_MODE = 'fixed';
 
     public function getId(): string
     {
-        return 'charisma_article_enaction_home';
+        return 'charisma_article_expression_home';
     }
 
     public function getLabel(): string
     {
-        return 'En Action (home)';
+        return 'Expressions (home)';
     }
 
     protected function mapRemoteItemToNodeList(mixed $item): array
     {
-        $raw = is_array($item) ? (object) $item : $item;
 
         $id = is_array($item) ? ($item['id'] ?? null) : ($item->id ?? null);
         $titre = is_array($item) ? ($item['titre'] ?? '') : ($item->titre ?? '');
@@ -41,7 +40,7 @@ final class CharismaArticleEnactionHomeApiList extends ApiList
             $counter = isset($item->vues) ? (int) $item->vues : null;
             $like = isset($item->likes) ? (int) $item->likes : null;
         }
-        
+
         $mapped = [
             'id' => $id !== null ? (string) $id : '',
             'title' => (string) $titre,

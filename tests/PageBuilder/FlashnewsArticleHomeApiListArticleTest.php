@@ -4,12 +4,12 @@ declare(strict_types=1);
 
 namespace App\Tests\PageBuilder;
 
-use App\PageBuilder\ApiList\FlashnewsArticleHomeApiList;
+use App\PageBuilder\ApiListArticle\FlashnewsArticleHomeApiListArticle;
 use PHPUnit\Framework\TestCase;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
 use Symfony\Contracts\HttpClient\ResponseInterface;
 
-final class FlashnewsArticleHomeApiListTest extends TestCase
+final class FlashnewsArticleHomeApiListArticleTest extends TestCase
 {
     public function testFetchItemsUsesArticlesEndpointWithApiPlatformPagination(): void
     {
@@ -47,7 +47,7 @@ final class FlashnewsArticleHomeApiListTest extends TestCase
             )
             ->willReturn($response);
 
-        $card = new FlashnewsArticleHomeApiList($client);
+        $card = new FlashnewsArticleHomeApiListArticle($client);
         $result = $card->fetchItems(['page' => 2, 'itemsPerPage' => 20]);
 
         $this->assertCount(1, $result->items);
@@ -73,7 +73,7 @@ final class FlashnewsArticleHomeApiListTest extends TestCase
             ->method('request')
             ->willThrowException(new \RuntimeException('boom'));
 
-        $card = new FlashnewsArticleHomeApiList($client);
+        $card = new FlashnewsArticleHomeApiListArticle($client);
         $result = $card->fetchItems(['page' => 1, 'itemsPerPage' => 10]);
 
         $this->assertSame([], $result->items);
@@ -83,7 +83,7 @@ final class FlashnewsArticleHomeApiListTest extends TestCase
 
     public function testCardMetadataAndBehaviorMatchContract(): void
     {
-        $card = new FlashnewsArticleHomeApiList($this->createStub(HttpClientInterface::class));
+        $card = new FlashnewsArticleHomeApiListArticle($this->createStub(HttpClientInterface::class));
 
         $this->assertSame('flashnews_article_home', $card->getId());
         $this->assertSame('Flashnews (home)', $card->getLabel());

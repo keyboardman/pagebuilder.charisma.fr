@@ -4,37 +4,33 @@ declare(strict_types=1);
 
 namespace App\Serializer;
 
-use App\ApiResource\BuilderApiListItemsPage;
+use App\ApiResource\BuilderApiListArticleDynamicResolveResponse;
 use App\DTO\BuilderApiCardItemData;
 use Symfony\Component\DependencyInjection\Attribute\AutoconfigureTag;
 use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
 
 #[AutoconfigureTag('serializer.normalizer', ['priority' => 100])]
-final class BuilderApiListItemsPageNormalizer implements NormalizerInterface
+final class BuilderApiListArticleDynamicResolveResponseNormalizer implements NormalizerInterface
 {
     public function normalize(mixed $object, ?string $format = null, array $context = []): array
     {
-        if (!$object instanceof BuilderApiListItemsPage) {
-            throw new \InvalidArgumentException('Expected BuilderApiListItemsPage.');
+        if (!$object instanceof BuilderApiListArticleDynamicResolveResponse) {
+            throw new \InvalidArgumentException('Expected BuilderApiListArticleDynamicResolveResponse.');
         }
 
         return [
             'items' => array_map($this->normalizeItem(...), $object->items),
-            'totalItems' => $object->totalItems,
-            'totalPages' => $object->totalPages,
-            'page' => $object->page,
-            'itemsPerPage' => $object->itemsPerPage,
         ];
     }
 
     public function supportsNormalization(mixed $data, ?string $format = null, array $context = []): bool
     {
-        return $data instanceof BuilderApiListItemsPage;
+        return $data instanceof BuilderApiListArticleDynamicResolveResponse;
     }
 
     public function getSupportedTypes(?string $format): array
     {
-        return [BuilderApiListItemsPage::class => true];
+        return [BuilderApiListArticleDynamicResolveResponse::class => true];
     }
 
     /**
@@ -86,4 +82,3 @@ final class BuilderApiListItemsPageNormalizer implements NormalizerInterface
         return $trimmed !== '' && $trimmed !== '0';
     }
 }
-

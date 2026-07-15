@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace App\PageBuilder\ApiList;
+namespace App\PageBuilder\ApiListArticle;
 
 use Symfony\Contracts\HttpClient\HttpClientInterface;
 
@@ -11,11 +11,11 @@ use Symfony\Contracts\HttpClient\HttpClientInterface;
  *
  * Distinction avec ApiCard :
  * - ApiCard (/page-builder/cards) : sélection d'un item dans la modale backend (article, image…)
- * - ApiList (/page-builder/lists) : collection branchée avec pagination API Platform (page, itemsPerPage)
+ * - ApiListArticle (/page-builder/lists) : collection branchée avec pagination API Platform (page, itemsPerPage)
  *
  * Chaque implémentation fournit un endpoint, un id, un label et un mapping item-par-item.
  */
-abstract class ApiList implements ApiListBehaviorInterface
+abstract class ApiListArticle implements ApiListArticleBehaviorInterface
 {
     protected const ENDPOINT_URL = '';
     protected const COLLECTION_MODE = 'fixed';
@@ -23,7 +23,7 @@ abstract class ApiList implements ApiListBehaviorInterface
     protected const MAX_ITEMS_PER_PAGE = 100;
 
     public function __construct(
-        private readonly HttpClientInterface $httpClient,
+        protected readonly HttpClientInterface $httpClient,
     ) {
     }
 
@@ -39,7 +39,7 @@ abstract class ApiList implements ApiListBehaviorInterface
     /**
      * @param array{page?: int|string, itemsPerPage?: int|string} $params
      */
-    public function fetchItems(array $params = []): ApiListPageResult
+    public function fetchItems(array $params = []): ApiListArticlePageResult
     {
         $page = max(1, (int) ($params['page'] ?? 1));
         $itemsPerPage = $this->normalizeItemsPerPage($params['itemsPerPage'] ?? 10);
@@ -71,14 +71,14 @@ abstract class ApiList implements ApiListBehaviorInterface
                     ? (int) max(1, (int) ceil($totalItems / $itemsPerPage))
                     : 0;
 
-                return new ApiListPageResult($items, $totalItems, $totalPages, $page, $itemsPerPage);
+                return new ApiListArticlePageResult($items, $totalItems, $totalPages, $page, $itemsPerPage);
             }
 
             $totalItems = \count($items);
 
-            return new ApiListPageResult($items, $totalItems, $totalItems > 0 ? 1 : 0, 1, $totalItems);
+            return new ApiListArticlePageResult($items, $totalItems, $totalItems > 0 ? 1 : 0, 1, $totalItems);
         } catch (\Throwable) {
-            return ApiListPageResult::empty($page, $itemsPerPage);
+            return ApiListArticlePageResult::empty($page, $itemsPerPage);
         }
     }
 
@@ -118,6 +118,41 @@ abstract class ApiList implements ApiListBehaviorInterface
         }
 
         return min($int, self::MAX_ITEMS_PER_PAGE);
+    }
+
+    /**
+     * Recherche un item mappé par identifiant dans la collection distante.
+     *
+     * @return array<string, mixed>|null
+     */
+    public function findItemById(string $id): ?array
+    {
+        if ($id === '') {
+            return null;
+        }
+
+        $page = 1;
+
+        do {
+            $result = $this->fetchItems([
+                'page' => $page,
+                'itemsPerPage' => self::MAX_ITEMS_PER_PAGE,
+            ]);
+
+            foreach ($result->items as $item) {
+                if (!\is_array($item)) {
+                    continue;
+                }
+
+                if ((string) ($item['id'] ?? '') === $id) {
+                    return $item;
+                }
+            }
+
+            ++$page;
+        } while ($page <= $result->totalPages);
+
+        return null;
     }
 
     /**

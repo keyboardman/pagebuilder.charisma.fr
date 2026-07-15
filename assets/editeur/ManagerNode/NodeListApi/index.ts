@@ -9,6 +9,13 @@ export const NODE_LIST_API_TYPE = "node-list-api" as const;
 
 export const LIST_API_ELIGIBLE_TYPE = "list" as const;
 
+export type NodeListApiMode = "fixed" | "dynamic";
+
+export interface NodeListApiDynamicEntry {
+  id: string;
+  type: string;
+}
+
 export interface NodeListApiShow {
   title?: boolean;
   description?: boolean;
@@ -24,7 +31,9 @@ export interface NodeListApiStyledPart {
 export interface NodeListApiType extends NodeType {
   type: "node-list-api";
   content: {
+    listMode?: NodeListApiMode;
     apiId?: string;
+    dynamicItems?: NodeListApiDynamicEntry[];
     page?: number;
     itemsPerPage?: number;
     show: NodeListApiShow;
@@ -44,7 +53,7 @@ export const NodeListApi: NodeConfigurationType = {
   type: NODE_LIST_API_TYPE,
   button: {
     ...defaultNodeConfiguration.button,
-    label: "Liste API",
+    label: "Liste <br/> Articles",
     icon: IoListOutline,
     category: "api",
     order: 4,
@@ -52,7 +61,9 @@ export const NodeListApi: NodeConfigurationType = {
   default: {
     ...defaultNodeConfiguration.default,
     content: {
+      listMode: "fixed",
       apiId: "",
+      dynamicItems: [],
       page: 1,
       itemsPerPage: 10,
       show: {

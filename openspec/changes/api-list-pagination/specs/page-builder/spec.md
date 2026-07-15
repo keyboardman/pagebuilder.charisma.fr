@@ -2,7 +2,7 @@
 
 ### Requirement: Menu de navigation piloté par API (NodeNavApi)
 
-Le builder SHALL fournir un type de nœud **NodeNavApi** (identifiant `node-nav-api`) qui affiche un menu de navigation alimenté par une **ApiList** (voir capacité `node-list-api-apilist-base`). Le nœud SHALL exposer un champ **apiId** pour sélectionner la source. Le nœud SHALL charger la collection complète via `GET /api/page-builder/lists/{apiId}/items` (sans paramètres de pagination) et SHALL rendre chaque item mappé comme un lien (`title` → libellé, `link` → `href`). Le nœud SHALL exposer une option **target** (`_self` ou `_blank`) appliquée à tous les liens du menu ; cette option SHALL être configurée côté **NodeNavApi** et ne SHALL pas dépendre du mapping ApiList. Le nœud SHALL **ne pas** être droppable et SHALL **ne pas** accepter d'enfants **NodeNavItem** : les entrées proviennent uniquement de l'API.
+Le builder SHALL fournir un type de nœud **NodeNavApi** (identifiant `node-nav-api`) qui affiche un menu de navigation alimenté par une **ApiListArticle** (voir capacité `node-list-api-apilist-base`). Le nœud SHALL exposer un champ **apiId** pour sélectionner la source. Le nœud SHALL charger la collection complète via `GET /api/page-builder/lists/{apiId}/items` (sans paramètres de pagination) et SHALL rendre chaque item mappé comme un lien (`title` → libellé, `link` → `href`). Le nœud SHALL exposer une option **target** (`_self` ou `_blank`) appliquée à tous les liens du menu ; cette option SHALL être configurée côté **NodeNavApi** et ne SHALL pas dépendre du mapping ApiListArticle. Le nœud SHALL **ne pas** être droppable et SHALL **ne pas** accepter d'enfants **NodeNavItem** : les entrées proviennent uniquement de l'API.
 
 Le NodeNavApi SHALL exposer dans ses réglages **page** (entier ≥ 1) et **itemsPerPage** (10, 20 ou 30) pour limiter le nombre de liens **affichés** à partir de la collection chargée. Lorsque `itemsPerPage` est absent, le nœud SHALL afficher tous les items de la collection (rétrocompatibilité). Le découpage SHALL s'appliquer localement : `items affichés = collection.slice((page - 1) * itemsPerPage, page * itemsPerPage)`.
 
@@ -11,7 +11,7 @@ Le NodeNavApi SHALL réutiliser les options de présentation du **NodeNav** : **
 #### Scenario: Ajout d'un NodeNavApi depuis le panneau
 
 - **WHEN** l'utilisateur ajoute un bloc menu API (NodeNavApi) depuis le panneau des composants
-- **THEN** un nœud `node-nav-api` est inséré ; l'utilisateur peut choisir une ApiList dans les réglages ; aucun enfant manuel n'est attendu
+- **THEN** un nœud `node-nav-api` est inséré ; l'utilisateur peut choisir une ApiListArticle dans les réglages ; aucun enfant manuel n'est attendu
 
 #### Scenario: Sélection d'une API list
 
@@ -36,7 +36,7 @@ Le NodeNavApi SHALL réutiliser les options de présentation du **NodeNav** : **
 #### Scenario: Option target appliquée à tous les liens
 
 - **WHEN** l'utilisateur configure l'option **target** du NodeNavApi sur `_blank`
-- **THEN** tous les liens rendus depuis la collection API utilisent `target="_blank"` (et `rel="noopener noreferrer"`) quel que soit le contenu mappé par l'ApiList
+- **THEN** tous les liens rendus depuis la collection API utilisent `target="_blank"` (et `rel="noopener noreferrer"`) quel que soit le contenu mappé par l'ApiListArticle
 
 #### Scenario: Options direction et variante
 
@@ -65,18 +65,18 @@ Le NodeNavApi SHALL réutiliser les options de présentation du **NodeNav** : **
 
 ### Requirement: Liste d'items pilotée par API (NodeListApi)
 
-Le builder SHALL fournir un type de nœud **NodeListApi** (identifiant `node-list-api`) qui affiche une liste d'items alimentée par une **ApiList** (voir capacité `node-list-api-apilist-base`). Le nœud SHALL exposer un champ **apiId** pour sélectionner la source. Le nœud SHALL charger la collection complète via `GET /api/page-builder/lists/{apiId}/items` (sans paramètres de pagination) et SHALL rendre chaque item mappé dans une structure de liste. Le nœud SHALL **ne pas** être droppable et SHALL **ne pas** accepter d'enfants : les entrées proviennent uniquement de l'API.
+Le builder SHALL fournir un type de nœud **NodeListApi** (identifiant `node-list-api`) qui affiche une liste d'items alimentée par une **ApiListArticle** (voir capacité `node-list-api-apilist-base`). Le nœud SHALL exposer un champ **apiId** pour sélectionner la source. Le nœud SHALL charger la collection complète via `GET /api/page-builder/lists/{apiId}/items` (sans paramètres de pagination) et SHALL rendre chaque item mappé dans une structure de liste. Le nœud SHALL **ne pas** être droppable et SHALL **ne pas** accepter d'enfants : les entrées proviennent uniquement de l'API.
 
 Le NodeListApi SHALL exposer dans ses réglages **page** (entier ≥ 1) et **itemsPerPage** (10, 20 ou 30) pour limiter le nombre d'éléments **affichés** à partir de la collection chargée. Lorsque `itemsPerPage` est absent, le nœud SHALL afficher tous les items de la collection (rétrocompatibilité). Le découpage SHALL s'appliquer localement : `items affichés = collection.slice((page - 1) * itemsPerPage, page * itemsPerPage)`.
 
-Pour chaque item, le nœud SHALL pouvoir afficher optionnellement **titre**, **description**, **compteur** et **like**, contrôlés par `content.show.title`, `content.show.description`, `content.show.counter` et `content.show.like`. Le nœud SHALL **ne pas** afficher d'image, y compris via le champ `image` du mapping ApiList ou des balises `<img>` dans le contenu HTML. Lorsqu'un toggle `show` est activé mais que le champ correspondant est absent dans l'item mappé, le nœud SHALL omettre cet élément sans réserver d'espace vide. Lorsqu'un toggle `show` est désactivé, le nœud SHALL ne pas rendre cet élément quel que soit le contenu mappé.
+Pour chaque item, le nœud SHALL pouvoir afficher optionnellement **titre**, **description**, **compteur** et **like**, contrôlés par `content.show.title`, `content.show.description`, `content.show.counter` et `content.show.like`. Le nœud SHALL **ne pas** afficher d'image, y compris via le champ `image` du mapping ApiListArticle ou des balises `<img>` dans le contenu HTML. Lorsqu'un toggle `show` est activé mais que le champ correspondant est absent dans l'item mappé, le nœud SHALL omettre cet élément sans réserver d'espace vide. Lorsqu'un toggle `show` est désactivé, le nœud SHALL ne pas rendre cet élément quel que soit le contenu mappé.
 
 Le NodeListApi SHALL exposer des réglages de style par sous-partie (conteneur liste, item, titre, description, compteur, like) et SHALL utiliser des hooks DOM (`ce-list-api`, `ce-list-api-item`, et classes dérivées par sous-partie) pour le ciblage CSS thème. Si l'item mappé fournit un `link`, le nœud SHALL permettre une navigation vers cette URL (comportement aligné sur **NodeCardApi** pour les zones cliquables).
 
 #### Scenario: Ajout d'un NodeListApi depuis le panneau
 
 - **WHEN** l'utilisateur ajoute un bloc liste API (NodeListApi) depuis le panneau des composants
-- **THEN** un nœud `node-list-api` est inséré ; l'utilisateur peut choisir une ApiList dans les réglages ; aucun enfant manuel n'est attendu
+- **THEN** un nœud `node-list-api` est inséré ; l'utilisateur peut choisir une ApiListArticle dans les réglages ; aucun enfant manuel n'est attendu
 
 #### Scenario: Sélection d'une API éligible
 
@@ -111,7 +111,7 @@ Le NodeListApi SHALL exposer des réglages de style par sous-partie (conteneur l
 #### Scenario: Toggle show désactivé
 
 - **WHEN** l'utilisateur désactive `show.description`
-- **THEN** la description n'est pas rendue pour aucun item de la liste, même si présente dans le mapping ApiList
+- **THEN** la description n'est pas rendue pour aucun item de la liste, même si présente dans le mapping ApiListArticle
 
 #### Scenario: Lien sur item
 

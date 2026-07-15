@@ -12,13 +12,19 @@ use App\DTO\BuilderApiCardItemData;
     operations: [
         new Get(
             uriTemplate: '/page-builder/lists/{apiId}/items',
-            provider: \App\State\BuilderApiListItemsPageProvider::class,
+            provider: \App\State\BuilderApiListArticleItemsPageProvider::class,
+            security: 'true',
+            stateless: false,
+        ),
+        new Get(
+            uriTemplate: '/page-builder/lists/dynamic/{apiId}/items',
+            provider: \App\State\BuilderApiListArticleDynamicItemsPageProvider::class,
             security: 'true',
             stateless: false,
         ),
     ],
 )]
-final class BuilderApiListItemsPage
+final class BuilderApiListArticleItemsPage
 {
     /** @var list<BuilderApiCardItemData> */
     public array $items = [];

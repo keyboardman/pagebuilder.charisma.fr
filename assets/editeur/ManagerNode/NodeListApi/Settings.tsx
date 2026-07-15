@@ -15,8 +15,16 @@ import type { NodeListApiType } from "./index";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/editeur/components/ui/tabs";
 import { Switch } from "@/editeur/components/ui/switch";
 import { THEME_SELECTORS } from "../Settings/themeOverrideSelectors";
-import { fetchListApiCollectionCached, hasListMetricValue, normalizeListApiItemsPerPage, normalizeListApiPage } from "./listApiUtils";
+import {
+  fetchDynamicListItemsCached,
+  fetchListApiCollectionCached,
+  hasListMetricValue,
+  normalizeListApiItemsPerPage,
+  normalizeListApiMode,
+  normalizeListApiPage,
+} from "./listApiUtils";
 import { ListApiDisplayPaginationSettings } from "./ListApiDisplayPaginationSettings";
+import { ListApiDynamicItemsSettings } from "./ListApiDynamicItemsSettings";
 
 const PART_SELECTORS = {
   list: THEME_SELECTORS.listApi,
@@ -93,6 +101,8 @@ const Settings: FC<NodeSettingsProps> = () => {
   const { node, onChange } = useNodeBuilderContext();
   const listNode = node as NodeListApiType;
   const content = listNode.content ?? { show: {} };
+  const listMode = normalizeListApiMode(content.listMode);
+  const dynamicItems = content.dynamicItems ?? [];
 
   const [listSources, setListSources] = useState<Array<{ id: string; label: string; collectionMode?: string }>>([]);
 
@@ -146,6 +156,40 @@ const Settings: FC<NodeSettingsProps> = () => {
     let cancelled = false;
 
     const evaluateOptionalFields = async () => {
+      if (listMode === "dynamic") {
+        if (dynamicItems.length === 0) {
+          setAvailableFields({
+            description: true,
+            counter: true,
+            like: false,
+          });
+          setTotalPages(0);
+          return;
+        }
+
+        try {
+          const resolved = await fetchDynamicListItemsCached(dynamicItems);
+
+          if (cancelled) return;
+
+          setAvailableFields({
+            description: resolved.some((item) => (item.description?.trim() ?? "") !== ""),
+            counter: resolved.some((item) => hasListMetricValue(item.counter)),
+            like: resolved.some((item) => hasListMetricValue(item.like)),
+          });
+        } catch {
+          if (cancelled) return;
+          setTotalPages(0);
+          setAvailableFields({
+            description: true,
+            counter: true,
+            like: false,
+          });
+        }
+
+        return;
+      }
+
       if (!selectedListSource) {
         setAvailableFields({
           description: true,
@@ -187,7 +231,7 @@ const Settings: FC<NodeSettingsProps> = () => {
     return () => {
       cancelled = true;
     };
-  }, [selectedListSource, currentPage, currentItemsPerPage]);
+  }, [listMode, dynamicItems, selectedListSource, currentPage, currentItemsPerPage]);
 
   const updateShow = (key: keyof NodeListApiType["content"]["show"], checked: boolean) => {
     onChange({
@@ -229,48 +273,103 @@ const Settings: FC<NodeSettingsProps> = () => {
                   <p className="node-block-title font-medium text-foreground text-sm">Liste API</p>
 
                   <div className="flex items-center gap-2">
-                    <span className="node-block-title w-14 shrink-0 text-foreground text-sm">API</span>
+                    <span className="node-block-title w-14 shrink-0 text-foreground text-sm">Mode</span>
                     <Form.Select
-                      value={content.apiId ?? ""}
-                      onChange={(v) =>
+                      value={listMode}
+                      onChange={(value) => {
+                        const nextMode = normalizeListApiMode(value);
+                        if (nextMode === "dynamic") {
+                          onChange({
+                            ...node,
+                            content: {
+                              ...content,
+                              listMode: "dynamic",
+                              dynamicItems: dynamicItems.length > 0 ? dynamicItems : [],
+                            },
+                          });
+                          return;
+                        }
+
                         onChange({
                           ...node,
-                          content: { ...content, apiId: v },
-                        })
-                      }
-                      options={apiOptions}
-                      placeholder={apiOptions.length ? "Choisir une API list…" : "Aucune API list"}
+                          content: {
+                            ...content,
+                            listMode: "fixed",
+                            apiId: content.apiId ?? "",
+                          },
+                        });
+                      }}
+                      options={[
+                        { value: "fixed", label: "Collection fixe" },
+                        { value: "dynamic", label: "Sélection dynamique" },
+                      ]}
                       className="h-7 flex-1 min-w-0 text-[0.75rem]"
                     />
                   </div>
 
-                  {selectedListSource ? (
-                    <p className="text-muted-foreground text-[0.7rem] px-1">
-                      Source : <span className="font-medium text-foreground">{selectedListSource.label}</span>
-                    </p>
-                  ) : null}
+                  {listMode === "fixed" ? (
+                    <>
+                      <div className="flex items-center gap-2">
+                        <span className="node-block-title w-14 shrink-0 text-foreground text-sm">API</span>
+                        <Form.Select
+                          value={content.apiId ?? ""}
+                          onChange={(v) =>
+                            onChange({
+                              ...node,
+                              content: { ...content, apiId: v },
+                            })
+                          }
+                          options={apiOptions}
+                          placeholder={apiOptions.length ? "Choisir une API list…" : "Aucune API list"}
+                          className="h-7 flex-1 min-w-0 text-[0.75rem]"
+                        />
+                      </div>
 
-                  <ListApiDisplayPaginationSettings
-                    page={content.page}
-                    itemsPerPage={content.itemsPerPage}
-                    totalPages={totalPages}
-                    onPageChange={(page) =>
-                      onChange({
-                        ...node,
-                        content: { ...content, page },
-                      })
-                    }
-                    onItemsPerPageChange={(itemsPerPage) =>
-                      onChange({
-                        ...node,
-                        content: {
-                          ...content,
-                          itemsPerPage,
-                          page: 1,
-                        },
-                      })
-                    }
-                  />
+                      {selectedListSource ? (
+                        <p className="text-muted-foreground text-[0.7rem] px-1">
+                          Source : <span className="font-medium text-foreground">{selectedListSource.label}</span>
+                        </p>
+                      ) : null}
+                    </>
+                  ) : (
+                    <ListApiDynamicItemsSettings
+                      items={dynamicItems}
+                      onChange={(nextItems) =>
+                        onChange({
+                          ...node,
+                          content: {
+                            ...content,
+                            listMode: "dynamic",
+                            dynamicItems: nextItems,
+                          },
+                        })
+                      }
+                    />
+                  )}
+
+                  {listMode === "fixed" ? (
+                    <ListApiDisplayPaginationSettings
+                      page={content.page}
+                      itemsPerPage={content.itemsPerPage}
+                      totalPages={totalPages}
+                      onPageChange={(page) =>
+                        onChange({
+                          ...node,
+                          content: { ...content, page },
+                        })
+                      }
+                      onItemsPerPageChange={(itemsPerPage) =>
+                        onChange({
+                          ...node,
+                          content: {
+                            ...content,
+                            itemsPerPage,
+                            page: 1,
+                          },
+                        })
+                      }
+                    />
+                  ) : null}
 
                   <div className="grid grid-cols-2 gap-x-4 gap-y-2 pt-1">
                     <label className="flex items-center justify-between gap-2">

@@ -2,20 +2,20 @@
 
 declare(strict_types=1);
 
-namespace App\PageBuilder\ApiList;
+namespace App\PageBuilder\ApiListArticle;
 
 /**
- * Registre des sources "ApiList" (NodeListApi / NodeNavApi).
+ * Registre des sources "ApiListArticle" (NodeListApi / NodeNavApi).
  *
- * @psalm-type ApiListMeta = array{id: string, label: string, collectionMode: string}
+ * @psalm-type ApiListArticleMeta = array{id: string, label: string, collectionMode: string}
  */
-final class ApiListRegistry
+final class ApiListArticleRegistry
 {
-    /** @var array<string, ApiList> */
+    /** @var array<string, ApiListArticle> */
     private array $lists = [];
 
     /**
-     * @param iterable<ApiList> $lists
+     * @param iterable<ApiListArticle> $lists
      */
     public function __construct(iterable $lists)
     {
@@ -41,7 +41,7 @@ final class ApiListRegistry
         return $out;
     }
 
-    public function get(string $id): ?ApiList
+    public function get(string $id): ?ApiListArticle
     {
         return $this->lists[$id] ?? null;
     }

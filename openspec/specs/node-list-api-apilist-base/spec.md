@@ -2,43 +2,43 @@
 
 ## Purpose
 
-Séparer les sources backend **ApiCard** (sélection modale paginée) et **ApiList** (collections fixes pour `NodeListApi` / `NodeNavApi`), avec une base partagée `ApiList` et un contrat de mapping unifié.
+Séparer les sources backend **ApiCard** (sélection modale paginée) et **ApiListArticle** (collections fixes pour `NodeListApi` / `NodeNavApi`), avec une base partagée `ApiListArticle` et un contrat de mapping unifié.
 
 ## Requirements
 
-### Requirement: Séparation ApiCard vs ApiList
+### Requirement: Séparation ApiCard vs ApiListArticle
 
 Le système SHALL distinguer deux sous-systèmes backend :
 
 - **ApiCard** (`/api/page-builder/cards/*`) : sources pour la **sélection d'un item** dans la modale backend (articles, images, vidéos, etc.) avec pagination, recherche et `total`.
-- **ApiList** (`/api/page-builder/lists/*`) : **collections fixes** consommées telles quelles par `NodeListApi` et `NodeNavApi`, sans ouvrir la modale backend.
+- **ApiListArticle** (`/api/page-builder/lists/*`) : **collections fixes** consommées telles quelles par `NodeListApi` et `NodeNavApi`, sans ouvrir la modale backend.
 
-Les implémentations `ApiList` SHALL NOT dépendre de `AbstractApiCardList`, `ApiCardInterface` ni `ApiCardBehaviorInterface`.
+Les implémentations `ApiListArticle` SHALL NOT dépendre de `AbstractApiCardList`, `ApiCardInterface` ni `ApiCardBehaviorInterface`.
 
 #### Scenario: Sélection article via modale cards
 - **WHEN** l'éditeur ouvre la modale de sélection pour un nœud card (article, image, vidéo)
 - **THEN** le frontend appelle `/api/page-builder/cards/{apiId}/items` avec `page`, `limit` et éventuellement `search`
 
-#### Scenario: Liste fixe via ApiList
+#### Scenario: Liste fixe via ApiListArticle
 - **WHEN** un nœud `NodeListApi` ou `NodeNavApi` charge sa source
 - **THEN** le frontend appelle `/api/page-builder/lists/{apiId}/items` sans paramètres de pagination
 
-### Requirement: Base partagée ApiList
+### Requirement: Base partagée ApiListArticle
 
-Le système SHALL fournir `App\PageBuilder\ApiList\ApiList` avec :
+Le système SHALL fournir `App\PageBuilder\ApiListArticle\ApiListArticle` avec :
 - `getId(): string` et `getLabel(): string`
 - `fetchItems(): array` appelant `ENDPOINT_URL` et retournant une liste d'items déjà mappés
 - un mapping privé item-par-item délégué à `mapRemoteItemToNodeList()`
 
 #### Scenario: Appel nominal
-- **WHEN** le builder demande les items d'une ApiList
+- **WHEN** le builder demande les items d'une ApiListArticle
 - **THEN** le backend interroge l'endpoint distant configuré et renvoie uniquement `items` (tableau JSON)
 
 #### Scenario: Dégradation en cas d'erreur HTTP
 - **WHEN** l'appel HTTP échoue
 - **THEN** `fetchItems()` retourne `[]` sans propager d'exception
 
-### Requirement: Catalogue ApiList
+### Requirement: Catalogue ApiListArticle
 
 Le système SHALL exposer `GET /api/page-builder/lists` listant les sources disponibles (`id`, `label`, `collectionMode`).
 
@@ -48,7 +48,7 @@ Le système SHALL exposer `GET /api/page-builder/lists` listant les sources disp
 
 ### Requirement: Contrat mapping pour NodeListApi / NodeNavApi
 
-Chaque item ApiList SHALL mapper au minimum `id`, `title` et `link` (pour NavApi), plus optionnellement `description`, `image`, `labels`, `counter`, `like`.
+Chaque item ApiListArticle SHALL mapper au minimum `id`, `title` et `link` (pour NavApi), plus optionnellement `description`, `image`, `labels`, `counter`, `like`.
 
 #### Scenario: Counter/like disponibles
 - **WHEN** l'API distante fournit des champs de vues/likes

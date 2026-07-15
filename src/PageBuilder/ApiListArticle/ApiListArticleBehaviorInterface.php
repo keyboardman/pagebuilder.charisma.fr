@@ -2,13 +2,13 @@
 
 declare(strict_types=1);
 
-namespace App\PageBuilder\ApiList;
+namespace App\PageBuilder\ApiListArticle;
 
 /**
- * Comportement des collections fixes `ApiList` (NodeListApi / NodeNavApi).
+ * Comportement des collections fixes `ApiListArticle` (NodeListApi / NodeNavApi).
  * Distinct des ApiCard utilisées pour la sélection item-par-item dans la modale backend.
  */
-interface ApiListBehaviorInterface
+interface ApiListArticleBehaviorInterface
 {
     public function getCollectionMode(): string;
 }

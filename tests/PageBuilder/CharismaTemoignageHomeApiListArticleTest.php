@@ -4,12 +4,12 @@ declare(strict_types=1);
 
 namespace App\Tests\PageBuilder;
 
-use App\PageBuilder\ApiList\CharismaTemoignageHomeApiList;
+use App\PageBuilder\ApiListArticle\CharismaTemoignageHomeApiListArticle;
 use PHPUnit\Framework\TestCase;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
 use Symfony\Contracts\HttpClient\ResponseInterface;
 
-final class CharismaTemoignageHomeApiListTest extends TestCase
+final class CharismaTemoignageHomeApiListArticleTest extends TestCase
 {
     public function testFetchItemsUsesHomeEndpointWithApiPlatformPagination(): void
     {
@@ -39,7 +39,7 @@ final class CharismaTemoignageHomeApiListTest extends TestCase
             )
             ->willReturn($response);
 
-        $card = new CharismaTemoignageHomeApiList($client);
+        $card = new CharismaTemoignageHomeApiListArticle($client);
         $result = $card->fetchItems(['page' => 1, 'itemsPerPage' => 10]);
 
         $this->assertCount(1, $result->items);
@@ -57,7 +57,7 @@ final class CharismaTemoignageHomeApiListTest extends TestCase
             ->method('request')
             ->willThrowException(new \RuntimeException('boom'));
 
-        $card = new CharismaTemoignageHomeApiList($client);
+        $card = new CharismaTemoignageHomeApiListArticle($client);
         $result = $card->fetchItems();
 
         $this->assertSame([], $result->items);
@@ -66,7 +66,7 @@ final class CharismaTemoignageHomeApiListTest extends TestCase
     public function testCardMetadataAndBehaviorMatchContract(): void
     {
         $client = $this->createMock(HttpClientInterface::class);
-        $card = new CharismaTemoignageHomeApiList($client);
+        $card = new CharismaTemoignageHomeApiListArticle($client);
 
         $this->assertSame('charisma_temoignage_home', $card->getId());
         $this->assertSame('fixed', $card->getCollectionMode());

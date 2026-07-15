@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace App\Tests\PageBuilder;
 
-use App\PageBuilder\ApiList\CharismaArticleEnactionHomeApiList;
-use App\PageBuilder\ApiList\CharismaArticleExpressionHomeApiList;
+use App\PageBuilder\ApiListArticle\CharismaArticleEnactionHomeApiListArticle;
+use App\PageBuilder\ApiListArticle\CharismaArticleExpressionHomeApiListArticle;
 use PHPUnit\Framework\TestCase;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
 use Symfony\Contracts\HttpClient\ResponseInterface;
@@ -18,13 +18,13 @@ final class CharismaArticleHomeListApiCardTest extends TestCase
     public static function cardProvider(): iterable
     {
         yield 'enaction' => [
-            CharismaArticleEnactionHomeApiList::class,
+            CharismaArticleEnactionHomeApiListArticle::class,
             'charisma_article_enaction_home',
             'En Action (home)',
             'https://api.charisma.fr/api/charisma/article/enactions/home',
         ];
         yield 'expression' => [
-            CharismaArticleExpressionHomeApiList::class,
+            CharismaArticleExpressionHomeApiListArticle::class,
             'charisma_article_expression_home',
             'Expressions (home)',
             'https://api.charisma.fr/api/charisma/article/expressions/home',

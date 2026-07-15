@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace App\PageBuilder\ApiCard;
 
-use App\PageBuilder\ApiList\ApiListBehaviorInterface;
+use App\PageBuilder\ApiListArticle\ApiListArticleBehaviorInterface;
 
 /**
  * Registre des APIs card exposées au builder (services tagués app.builder_api_card).
@@ -61,7 +61,7 @@ final class ApiCardRegistry
             return $card->getCollectionMode();
         }
 
-        if ($card instanceof ApiListBehaviorInterface) {
+        if ($card instanceof ApiListArticleBehaviorInterface) {
             return $card->getCollectionMode();
         }
 

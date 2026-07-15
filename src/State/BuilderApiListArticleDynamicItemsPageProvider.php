@@ -6,46 +6,46 @@ namespace App\State;
 
 use ApiPlatform\Metadata\Operation;
 use ApiPlatform\State\ProviderInterface;
-use App\ApiResource\BuilderApiListItemsPage;
+use App\ApiResource\BuilderApiListArticleItemsPage;
 use App\PageBuilder\Api\ApiRequestParamHelper;
 use App\PageBuilder\Api\BuilderApiResourceFactory;
-use App\PageBuilder\ApiList\ApiListRegistry;
+use App\PageBuilder\ApiListArticleDynamique\ApiListArticleDynamiqueRegistry;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
 /**
- * @implements ProviderInterface<BuilderApiListItemsPage>
+ * @implements ProviderInterface<BuilderApiListArticleItemsPage>
  */
-final class BuilderApiListItemsPageProvider implements ProviderInterface
+final class BuilderApiListArticleDynamicItemsPageProvider implements ProviderInterface
 {
     public function __construct(
-        private readonly ApiListRegistry $apiListRegistry,
+        private readonly ApiListArticleDynamiqueRegistry $apiListArticleDynamiqueRegistry,
         private readonly BuilderApiResourceFactory $resourceFactory,
         private readonly ApiRequestParamHelper $requestParamHelper,
     ) {
     }
 
-    public function provide(Operation $operation, array $uriVariables = [], array $context = []): BuilderApiListItemsPage
+    public function provide(Operation $operation, array $uriVariables = [], array $context = []): BuilderApiListArticleItemsPage
     {
         $apiId = (string) ($uriVariables['apiId'] ?? '');
         if ($apiId === '') {
             throw new NotFoundHttpException('API not found');
         }
 
-        $list = $this->apiListRegistry->get($apiId);
-        if ($list === null) {
+        $source = $this->apiListArticleDynamiqueRegistry->get($apiId);
+        if ($source === null) {
             throw new NotFoundHttpException('API not found');
         }
 
         $request = $context['request'] ?? null;
         if (!$request instanceof Request) {
-            throw new \LogicException('Request is required to fetch list collection.');
+            throw new \LogicException('Request is required to fetch dynamic list collection.');
         }
 
-        $params = $this->requestParamHelper->buildListCollectionParams($request);
-        $result = $list->fetchItems($params);
+        $params = $this->requestParamHelper->buildDynamicListCollectionParams($request);
+        $result = $source->fetchItems($params);
 
-        $page = new BuilderApiListItemsPage();
+        $page = new BuilderApiListArticleItemsPage();
         $page->totalItems = $result->totalItems;
         $page->totalPages = $result->totalPages;
         $page->page = $result->page;

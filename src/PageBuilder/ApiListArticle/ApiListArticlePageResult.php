@@ -2,9 +2,9 @@
 
 declare(strict_types=1);
 
-namespace App\PageBuilder\ApiList;
+namespace App\PageBuilder\ApiListArticle;
 
-final class ApiListPageResult
+final class ApiListArticlePageResult
 {
     /**
      * @param list<array<string, mixed>> $items

@@ -36,7 +36,7 @@ const NodeComponentButton = React.forwardRef<
           {icon ? (
             <Icon className="text-xl text-accent-foreground" icon={icon} />
           ) : null}
-          <span className="text-xs text-muted-foreground">{label}</span>
+          <span className="text-xs text-muted-foreground" dangerouslySetInnerHTML={{ __html: label }} />
         </Button>
       </TooltipTrigger>
       <TooltipContent>

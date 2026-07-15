@@ -51,7 +51,7 @@ export default function NodeMenu() {
           {title}
         </span>
         {showTypeHint ? (
-          <span className="truncate text-[10px] normal-case text-muted-foreground">
+          <span className="truncate text-[10px] normal-case text-muted-foreground" >
             {typeLabel}
           </span>
         ) : null}

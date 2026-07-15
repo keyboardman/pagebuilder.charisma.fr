@@ -4,6 +4,7 @@ import {
   getNodeDisplayLabel,
   getNodeTypeLabel,
   hasCustomNodeLabel,
+  stripHtmlForPlainTextLabel,
 } from "./nodeLabel";
 
 const NODE_ROOT_TYPE = "node-root";
@@ -14,6 +15,7 @@ vi.mock("../ManagerNode/components/NodeRegistry", () => {
   const registry: Record<string, { button: { label: string } }> = {
     "node-image": { button: { label: "Image" } },
     "node-text": { button: { label: "Text" } },
+    "node-list-api": { button: { label: "Liste <br/> Articles" } },
   };
 
   return {
@@ -30,6 +32,13 @@ vi.mock("../ManagerNode/NodeRoot", () => ({
   NODE_ROOT_TYPE: "node-root",
 }));
 
+describe("stripHtmlForPlainTextLabel", () => {
+  it("retire les balises br pour l'affichage texte", () => {
+    expect(stripHtmlForPlainTextLabel("Liste <br/> Articles")).toBe("Liste Articles");
+    expect(stripHtmlForPlainTextLabel("Ligne 1<br>Ligne 2")).toBe("Ligne 1 Ligne 2");
+  });
+});
+
 describe("getNodeTypeLabel", () => {
   it("retourne Page pour le nœud racine", () => {
     const node = createTestNode({ type: NODE_ROOT_TYPE });
@@ -44,6 +53,11 @@ describe("getNodeTypeLabel", () => {
   it("retire le préfixe node- pour un type inconnu", () => {
     const node = createTestNode({ type: "node-custom-widget" });
     expect(getNodeTypeLabel(node)).toBe("custom-widget");
+  });
+
+  it("retire le HTML du libellé registre", () => {
+    const node = createTestNode({ type: "node-list-api" });
+    expect(getNodeTypeLabel(node)).toBe("Liste Articles");
   });
 });
 

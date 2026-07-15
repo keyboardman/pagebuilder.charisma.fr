@@ -1,6 +1,24 @@
+import type { NodeListApiDynamicEntry, NodeListApiMode } from "./index";
+
 export const DEFAULT_LIST_API_ITEMS_PER_PAGE = 10;
 
 export const MAX_LIST_API_ITEMS_PER_PAGE = 100;
+
+export function normalizeListApiMode(value?: string): NodeListApiMode {
+  return value === "dynamic" ? "dynamic" : "fixed";
+}
+
+export function paginateListApiItems<T>(items: T[], page: number, itemsPerPage?: number): T[] {
+  if (itemsPerPage == null || itemsPerPage < 1) {
+    return items;
+  }
+
+  const safePage = normalizeListApiPage(page);
+  const safeSize = normalizeListApiItemsPerPage(itemsPerPage);
+  const start = (safePage - 1) * safeSize;
+
+  return items.slice(start, start + safeSize);
+}
 
 export interface ListApiMappedItem {
   id: string;
@@ -171,3 +189,175 @@ export function formatCounterValue(counter: string | number | undefined): string
 }
 
 export const formatLikeValue = formatCounterValue;
+
+export interface DynamicListSource {
+  id: string;
+  label: string;
+}
+
+function buildDynamicListItemsUrl(apiId: string, page: number, itemsPerPage: number, search?: string): string {
+  const params = new URLSearchParams({
+    page: String(page),
+    itemsPerPage: String(itemsPerPage),
+  });
+  if (search?.trim()) {
+    params.set("search", search.trim());
+  }
+
+  return `/api/page-builder/lists/dynamic/${encodeURIComponent(apiId)}/items?${params.toString()}`;
+}
+
+function buildDynamicListCollectionCacheKey(
+  apiId: string,
+  page: number,
+  itemsPerPage: number,
+  search?: string
+): string {
+  return `${apiId}:${page}:${itemsPerPage}:${search ?? ""}`;
+}
+
+const dynamicListCollectionCache = new Map<string, ListApiCollectionResponse>();
+const dynamicListCollectionInFlight = new Map<string, Promise<ListApiCollectionResponse>>();
+
+export async function fetchDynamicListSources(): Promise<DynamicListSource[]> {
+  const res = await fetch("/api/page-builder/lists/dynamic", {
+    credentials: "same-origin",
+    headers: { Accept: "application/json" },
+  });
+
+  if (!res.ok) {
+    return [];
+  }
+
+  const data = (await res.json()) as { items?: DynamicListSource[] };
+  return data.items ?? [];
+}
+
+async function fetchDynamicListCollection(
+  apiId: string,
+  page: number,
+  itemsPerPage: number,
+  search?: string
+): Promise<ListApiCollectionResponse> {
+  const res = await fetch(buildDynamicListItemsUrl(apiId, page, itemsPerPage, search), {
+    credentials: "same-origin",
+    headers: { Accept: "application/json" },
+  });
+
+  if (!res.ok) {
+    const text = await res.text().catch(() => res.statusText);
+    throw new Error(text || "fetchDynamicListCollection failed");
+  }
+
+  const data = (await res.json()) as {
+    items: unknown[];
+    totalItems?: number;
+    totalPages?: number;
+    page?: number;
+    itemsPerPage?: number;
+  };
+
+  const safeItemsPerPage = normalizeListApiItemsPerPage(data.itemsPerPage);
+  const safePage = normalizeListApiPage(data.page);
+  const totalItems = data.totalItems ?? 0;
+  const totalPages = data.totalPages ?? computeTotalPages(totalItems, safeItemsPerPage);
+
+  return {
+    items: mapCollectionToListItems(data.items ?? []),
+    totalItems,
+    totalPages,
+    page: safePage,
+    itemsPerPage: safeItemsPerPage,
+  };
+}
+
+export async function fetchDynamicListCollectionCached(
+  apiId: string,
+  page?: number,
+  itemsPerPage?: number,
+  search?: string
+): Promise<ListApiCollectionResponse> {
+  const safePage = normalizeListApiPage(page);
+  const safeItemsPerPage = normalizeListApiItemsPerPage(itemsPerPage);
+  const cacheKey = buildDynamicListCollectionCacheKey(apiId, safePage, safeItemsPerPage, search);
+
+  const cached = dynamicListCollectionCache.get(cacheKey);
+  if (cached) {
+    return cached;
+  }
+
+  const inFlight = dynamicListCollectionInFlight.get(cacheKey);
+  if (inFlight) {
+    return inFlight;
+  }
+
+  const promise = fetchDynamicListCollection(apiId, safePage, safeItemsPerPage, search);
+  dynamicListCollectionInFlight.set(cacheKey, promise);
+
+  try {
+    const mapped = await promise;
+    dynamicListCollectionCache.set(cacheKey, mapped);
+    return mapped;
+  } finally {
+    dynamicListCollectionInFlight.delete(cacheKey);
+  }
+}
+
+function buildDynamicListCacheKey(entries: NodeListApiDynamicEntry[]): string {
+  return entries.map((entry) => `${entry.type}:${entry.id}`).join("|");
+}
+
+const dynamicListCache = new Map<string, ListApiMappedItem[]>();
+const dynamicListInFlight = new Map<string, Promise<ListApiMappedItem[]>>();
+
+async function fetchDynamicListItems(entries: NodeListApiDynamicEntry[]): Promise<ListApiMappedItem[]> {
+  if (entries.length === 0) {
+    return [];
+  }
+
+  const res = await fetch("/api/page-builder/lists/dynamic/resolve", {
+    method: "POST",
+    credentials: "same-origin",
+    headers: {
+      Accept: "application/json",
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({ entries }),
+  });
+
+  if (!res.ok) {
+    const text = await res.text().catch(() => res.statusText);
+    throw new Error(text || "fetchDynamicListItems failed");
+  }
+
+  const data = (await res.json()) as { items?: unknown[] };
+
+  return mapCollectionToListItems(data.items ?? []);
+}
+
+export async function fetchDynamicListItemsCached(
+  entries: NodeListApiDynamicEntry[]
+): Promise<ListApiMappedItem[]> {
+  const cacheKey = buildDynamicListCacheKey(entries);
+
+  const cached = dynamicListCache.get(cacheKey);
+  if (cached) {
+    return cached;
+  }
+
+  const inFlight = dynamicListInFlight.get(cacheKey);
+  if (inFlight) {
+    return inFlight;
+  }
+
+  const promise = fetchDynamicListItems(entries);
+  dynamicListInFlight.set(cacheKey, promise);
+
+  try {
+    const mapped = await promise;
+    dynamicListCache.set(cacheKey, mapped);
+    return mapped;
+  } finally {
+    dynamicListInFlight.delete(cacheKey);
+  }
+}

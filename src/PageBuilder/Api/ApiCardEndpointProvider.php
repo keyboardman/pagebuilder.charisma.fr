@@ -7,8 +7,8 @@ namespace App\PageBuilder\Api;
 use App\PageBuilder\ApiCard\ApiCardInterface;
 use App\PageBuilder\ApiCard\ApiCardItemsAlreadyMappedInterface;
 use App\PageBuilder\ApiCard\ApiCardRegistry;
-use App\PageBuilder\ApiList\ApiListBehaviorInterface;
-use App\PageBuilder\ApiList\ApiListItemsAlreadyMappedInterface;
+use App\PageBuilder\ApiListArticle\ApiListArticleBehaviorInterface;
+use App\PageBuilder\ApiListArticle\ApiListArticleItemsAlreadyMappedInterface;
 
 final class ApiCardEndpointProvider
 {
@@ -117,7 +117,7 @@ final class ApiCardEndpointProvider
     private function isFixedAlreadyMappedSource(ApiCardInterface $card): bool
     {
         $isAlreadyMapped = $card instanceof ApiCardItemsAlreadyMappedInterface
-            || $card instanceof ApiListItemsAlreadyMappedInterface;
+            || $card instanceof ApiListArticleItemsAlreadyMappedInterface;
 
         if (!$isAlreadyMapped) {
             return false;
@@ -127,7 +127,7 @@ final class ApiCardEndpointProvider
             return $card->getCollectionMode() === 'fixed';
         }
 
-        if ($card instanceof ApiListBehaviorInterface) {
+        if ($card instanceof ApiListArticleBehaviorInterface) {
             return $card->getCollectionMode() === 'fixed';
         }
 

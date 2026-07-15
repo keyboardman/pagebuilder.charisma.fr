@@ -265,7 +265,7 @@ Recharger la page de l’éditeur (ou vider le cache Symfony si besoin) pour voi
 - **Comportement optionnel** : `src/PageBuilder/ApiCard/ApiCardBehaviorInterface.php`
 - **Types (interfaces)** : `ApiCardArticleInterface`, `ApiCardVideoInterface`, `ApiCardImageInterface`, `ApiCardListInterface`
 - **Types (classes abstraites, `getType()` inclus)** : `AbstractApiCardArticle`, `AbstractApiCardVideo`, `AbstractApiCardImage`, `AbstractApiCardList`
-- **Exemple list** : `StubNavListApiCard.php` (menu de démonstration), `FlashnewsThemeApiList.php` (thèmes Flashnews pour NodeNavApi), `FlashnewsArticleHomeApiList.php` (articles home Flashnews pour NodeListApi), `CharismaTemoignageHomeApiList.php` (témoignages home Charisma pour NodeListApi), `CharismaArticleEnactionHomeApiList.php` et `CharismaArticleExpressionHomeApiList.php` (articles home pour NodeListApi)
+- **Exemple list** : `StubNavListApiCard.php` (menu de démonstration), `FlashnewsThemeApiListArticle.php` (thèmes Flashnews pour NodeNavApi), `FlashnewsArticleHomeApiListArticle.php` (articles home Flashnews pour NodeListApi), `CharismaTemoignageHomeApiListArticle.php` (témoignages home Charisma pour NodeListApi), `CharismaArticleEnactionHomeApiListArticle.php` et `CharismaArticleExpressionHomeApiListArticle.php` (articles home pour NodeListApi)
 - **Exemples** : `CharismaArticleAuteurApiCard.php`, `CharismaTemoignageApiCard.php`, `FlashnewsApiCard.php`, `CharismaVideosApiCard.php`
 - **Registre** : `src/PageBuilder/ApiCard/ApiCardRegistry.php`
 - **Logique HTTP partagée** : `src/PageBuilder/Api/ApiCardEndpointProvider.php`

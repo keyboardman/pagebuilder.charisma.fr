@@ -1,4 +1,4 @@
-import { type FC, useEffect, useState } from "react";
+import { type FC, useEffect, useMemo, useState } from "react";
 import { useNodeContext } from "../../services/providers/NodeContext";
 import { type NodeViewProps } from "../NodeConfigurationType";
 import { cn } from "@/editeur/lib/utils";
@@ -10,8 +10,10 @@ import {
   formatLikeValue,
   isShowEnabled,
   type ListApiMappedItem,
+  fetchDynamicListItemsCached,
   fetchListApiCollectionCached,
   normalizeListApiItemsPerPage,
+  normalizeListApiMode,
   normalizeListApiPage,
 } from "./listApiUtils";
 import { CHARISMA_HEART_PATH } from "../../components/video/heartIcon";
@@ -19,7 +21,10 @@ import { CHARISMA_HEART_PATH } from "../../components/video/heartIcon";
 const View: FC<NodeViewProps> = () => {
   const { node } = useNodeContext();
   const listNode = node as NodeListApiType;
+  const listMode = normalizeListApiMode(listNode.content?.listMode);
   const apiId = listNode.content?.apiId?.trim() ?? "";
+  const dynamicItems = listNode.content?.dynamicItems ?? [];
+  const dynamicItemsKey = useMemo(() => JSON.stringify(dynamicItems), [dynamicItems]);
   const show = listNode.content?.show ?? {};
   const page = normalizeListApiPage(listNode.content?.page);
   const itemsPerPage = normalizeListApiItemsPerPage(listNode.content?.itemsPerPage);
@@ -32,6 +37,36 @@ const View: FC<NodeViewProps> = () => {
     let cancelled = false;
 
     const load = async () => {
+      if (listMode === "dynamic") {
+        if (dynamicItems.length === 0) {
+          setItems([]);
+          setError(false);
+          setLoading(false);
+          return;
+        }
+
+        setLoading(true);
+        setError(false);
+
+        try {
+          const resolved = await fetchDynamicListItemsCached(dynamicItems);
+          if (!cancelled) {
+            setItems(resolved);
+          }
+        } catch {
+          if (!cancelled) {
+            setItems([]);
+            setError(true);
+          }
+        } finally {
+          if (!cancelled) {
+            setLoading(false);
+          }
+        }
+
+        return;
+      }
+
       if (!apiId) {
         setItems([]);
         setError(false);
@@ -64,7 +99,7 @@ const View: FC<NodeViewProps> = () => {
     return () => {
       cancelled = true;
     };
-  }, [apiId, page, itemsPerPage]);
+  }, [listMode, apiId, dynamicItemsKey, page, itemsPerPage]);
 
   const listStyle = listNode.content?.list?.style ?? {};
   const listClassName = listNode.content?.list?.className ?? "";
@@ -194,10 +229,13 @@ const View: FC<NodeViewProps> = () => {
       {!loading && error ? (
         <span className="ce-list-api-status text-xs text-muted-foreground">Liste indisponible</span>
       ) : null}
-      {!loading && !error && !apiId ? (
+      {!loading && !error && listMode === "fixed" && !apiId ? (
         <span className="ce-list-api-status text-xs text-muted-foreground">Sélectionnez une API list</span>
       ) : null}
-      {!loading && !error && apiId && items.length === 0 ? (
+      {!loading && !error && listMode === "dynamic" && dynamicItems.length === 0 ? (
+        <span className="ce-list-api-status text-xs text-muted-foreground">Ajoutez des items à la liste</span>
+      ) : null}
+      {!loading && !error && ((listMode === "fixed" && apiId) || (listMode === "dynamic" && dynamicItems.length > 0)) && items.length === 0 ? (
         <span className="ce-list-api-status text-xs text-muted-foreground">Aucun item</span>
       ) : null}
       {items.length > 0 ? <ul className="ce-list-api-items">{items.map(renderItem)}</ul> : null}
