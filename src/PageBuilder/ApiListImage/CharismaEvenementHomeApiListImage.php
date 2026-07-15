@@ -7,7 +7,7 @@ namespace App\PageBuilder\ApiListImage;
 /**
  * Endpoint NodeSlideshow : bannières événements home Charisma.
  */
-final class CharismaEvenementHomeApiListImage extends ApiListImage
+final class CharismaEvenementHomeApiListImage extends CharismaBanniereEvenementApiListImage
 {
     protected const ENDPOINT_URL = 'https://api.charisma.fr/api/charisma/banniere/evenements/home';
     protected const COLLECTION_MODE = 'fixed';

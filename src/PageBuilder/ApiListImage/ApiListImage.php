@@ -45,16 +45,7 @@ abstract class ApiListImage implements ApiListImageBehaviorInterface
         $itemsPerPage = $this->normalizeItemsPerPage($params['itemsPerPage'] ?? 10);
 
         try {
-            $response = $this->httpClient->request(
-                'GET',
-                static::ENDPOINT_URL,
-                [
-                    'query' => $this->buildQuery($page, $itemsPerPage),
-                    'timeout' => 30,
-                ]
-            );
-
-            $data = $response->toArray();
+            $data = $this->requestRemoteCollection($page, $itemsPerPage);
             $member = $data['member'] ?? [];
             if (!\is_array($member)) {
                 $member = [];
@@ -66,10 +57,7 @@ abstract class ApiListImage implements ApiListImageBehaviorInterface
             );
 
             if ($this->supportsPagination()) {
-                $totalItems = (int) ($data['totalItems'] ?? \count($items));
-                $totalPages = $totalItems > 0
-                    ? (int) max(1, (int) ceil($totalItems / $itemsPerPage))
-                    : 0;
+                [$totalItems, $totalPages] = $this->resolvePaginationTotals($data, $page, $itemsPerPage, \count($member));
 
                 return new ApiListImagePageResult($items, $totalItems, $totalPages, $page, $itemsPerPage);
             }
@@ -85,6 +73,44 @@ abstract class ApiListImage implements ApiListImageBehaviorInterface
     protected function supportsPagination(): bool
     {
         return true;
+    }
+
+    protected function getItemsPerPageQueryParam(): string
+    {
+        return 'itemsPerPage';
+    }
+
+    /**
+     * @return array<string, mixed>
+     */
+    protected function requestRemoteCollection(int $page, int $itemsPerPage): array
+    {
+        $response = $this->httpClient->request(
+            'GET',
+            static::ENDPOINT_URL,
+            [
+                'query' => $this->buildQuery($page, $itemsPerPage),
+                'timeout' => 30,
+            ]
+        );
+
+        return $response->toArray();
+    }
+
+    /**
+     * @param array<string, mixed> $data
+     * @return array{0: int, 1: int}
+     */
+    protected function resolvePaginationTotals(array $data, int $page, int $itemsPerPage, int $memberCount): array
+    {
+        unset($page, $memberCount);
+
+        $totalItems = (int) ($data['totalItems'] ?? 0);
+        $totalPages = $totalItems > 0
+            ? (int) max(1, (int) ceil($totalItems / $itemsPerPage))
+            : 0;
+
+        return [$totalItems, $totalPages];
     }
 
     /**
@@ -104,7 +130,7 @@ abstract class ApiListImage implements ApiListImageBehaviorInterface
 
         if ($this->supportsPagination()) {
             $query['page'] = (string) $page;
-            $query['itemsPerPage'] = (string) $itemsPerPage;
+            $query[$this->getItemsPerPageQueryParam()] = (string) $itemsPerPage;
         }
 
         return $query;

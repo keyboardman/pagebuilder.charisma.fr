@@ -11,7 +11,7 @@ use Symfony\Contracts\HttpClient\ResponseInterface;
 
 final class CharismaEvenementHomeApiListImageTest extends TestCase
 {
-    public function testFetchItemsUsesHomeEndpointWithApiPlatformPagination(): void
+    public function testFetchItemsUsesHomeEndpointWithItemPerPageParam(): void
     {
         $response = $this->createMock(ResponseInterface::class);
         $response->expects($this->once())
@@ -20,7 +20,7 @@ final class CharismaEvenementHomeApiListImageTest extends TestCase
                 'member' => [
                     ['id' => 12, 'source' => 'https://cdn.example/banner.jpg', 'link' => 'https://example/event'],
                 ],
-                'totalItems' => 24,
+                'totalItems' => 1,
             ]);
 
         $client = $this->createMock(HttpClientInterface::class);
@@ -32,7 +32,7 @@ final class CharismaEvenementHomeApiListImageTest extends TestCase
                 [
                     'query' => [
                         'page' => '1',
-                        'itemsPerPage' => '10',
+                        'itemPerPage' => '10',
                     ],
                     'timeout' => 30,
                 ]
@@ -48,8 +48,40 @@ final class CharismaEvenementHomeApiListImageTest extends TestCase
         $this->assertSame('https://example/event', $result->items[0]['link']);
         $this->assertArrayNotHasKey('title', $result->items[0]);
         $this->assertArrayNotHasKey('description', $result->items[0]);
-        $this->assertSame(24, $result->totalItems);
-        $this->assertSame(3, $result->totalPages);
+        $this->assertSame(1, $result->totalItems);
+        $this->assertSame(1, $result->totalPages);
+    }
+
+    public function testFetchItemsProbesNextPagesToComputeTotalPages(): void
+    {
+        $page1Response = $this->createMock(ResponseInterface::class);
+        $page1Response->method('toArray')->willReturn([
+            'member' => [
+                ['id' => 1, 'source' => 'https://cdn.example/1.jpg', 'link' => 'https://example/1'],
+                ['id' => 2, 'source' => 'https://cdn.example/2.jpg', 'link' => 'https://example/2'],
+            ],
+            'totalItems' => 2,
+        ]);
+
+        $page2Response = $this->createMock(ResponseInterface::class);
+        $page2Response->method('toArray')->willReturn([
+            'member' => [
+                ['id' => 3, 'source' => 'https://cdn.example/3.jpg', 'link' => 'https://example/3'],
+            ],
+            'totalItems' => 1,
+        ]);
+
+        $client = $this->createMock(HttpClientInterface::class);
+        $client->expects($this->exactly(2))
+            ->method('request')
+            ->willReturnOnConsecutiveCalls($page1Response, $page2Response);
+
+        $list = new CharismaEvenementHomeApiListImage($client);
+        $result = $list->fetchItems(['page' => 1, 'itemsPerPage' => 2]);
+
+        $this->assertCount(2, $result->items);
+        $this->assertSame(3, $result->totalItems);
+        $this->assertSame(2, $result->totalPages);
     }
 
     public function testFetchItemsReturnsEmptyPayloadOnHttpFailure(): void

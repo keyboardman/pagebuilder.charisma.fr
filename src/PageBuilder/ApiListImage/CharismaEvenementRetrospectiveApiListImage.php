@@ -7,7 +7,7 @@ namespace App\PageBuilder\ApiListImage;
 /**
  * Endpoint NodeSlideshow : bannières événements rétrospective Charisma.
  */
-final class CharismaEvenementRetrospectiveApiListImage extends ApiListImage
+final class CharismaEvenementRetrospectiveApiListImage extends CharismaBanniereEvenementApiListImage
 {
     protected const ENDPOINT_URL = 'https://api.charisma.fr/api/charisma/banniere/evenements/retrospective';
     protected const COLLECTION_MODE = 'fixed';
