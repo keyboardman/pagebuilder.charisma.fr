@@ -1,0 +1,26 @@
+parameters:
+    app.media_upload_guidelines:
+        title: 'Conventions médias'
+        intro: 'Recommandations indicatives pour optimiser les images du site.'
+        sections:
+            - title: 'Formats'
+              items:
+                  - 'WebP en priorité pour les photos'
+                  - 'JPEG acceptable si WebP indisponible'
+                  - 'PNG pour transparence ou logos uniquement'
+                  - 'Éviter PNG pour les photos (fichiers plus lourds)'
+            - title: 'Dimensions cibles'
+              items:
+                  - 'Hero / bannière : 1920 × 800 px — ≤ 300 Ko'
+                  - 'Carte / vignette : 800 × 600 px — ≤ 150 Ko'
+                  - 'Pleine largeur contenu : 1200 × 675 px (16:9) — ≤ 200 Ko'
+                  - 'Logo / icône : SVG ou PNG fond transparent — ≤ 100 Ko'
+            - title: 'Nommage'
+              items:
+                  - 'Minuscules, tirets, sans espaces ni accents'
+                  - 'Ex. evenement-2026-hero.webp'
+            - title: 'Avant upload'
+              items:
+                  - 'Redimensionner à la taille d''affichage réelle'
+                  - 'Compresser l''image (qualité 80–85 % pour JPEG/WebP)'
+                  - 'Vérifier le poids avant envoi'

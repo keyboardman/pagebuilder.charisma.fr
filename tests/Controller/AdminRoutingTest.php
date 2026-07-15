@@ -122,6 +122,19 @@ class AdminRoutingTest extends WebTestCase
         self::assertResponseRedirects('/login');
     }
 
+    public function testPagesListShowsMediaUploadGuidelines(): void
+    {
+        $client = static::createClient();
+        $admin = $this->createUser('admin-pages-guidelines@example.test');
+        $client->loginUser($admin);
+
+        $client->request('GET', '/admin/page/');
+
+        self::assertResponseIsSuccessful();
+        self::assertStringContainsString('Conventions médias', $client->getResponse()->getContent());
+        self::assertStringContainsString('1920 × 800 px', $client->getResponse()->getContent());
+    }
+
     public function testRootRedirectsToAdminDashboardWhenAuthenticated(): void
     {
         $client = static::createClient();

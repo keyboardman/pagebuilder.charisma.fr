@@ -1,6 +1,8 @@
 twig:
     file_name_pattern: '*.twig'
     form_themes: ['form/shadcn_theme.html.twig']
+    globals:
+        media_upload_guidelines: '%app.media_upload_guidelines%'
 
 when@test:
     twig:

@@ -1,0 +1,22 @@
+{% if media_upload_guidelines is defined and media_upload_guidelines %}
+	<div class="card p-4 text-sm text-muted-foreground">
+		<div class="font-semibold text-foreground mb-1">
+			{{ media_upload_guidelines.title }}
+		</div>
+		{% if media_upload_guidelines.intro is defined and media_upload_guidelines.intro %}
+			<p class="mb-3">{{ media_upload_guidelines.intro }}</p>
+		{% endif %}
+		<div class="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
+			{% for section in media_upload_guidelines.sections|default([]) %}
+				<div>
+					<div class="font-medium text-foreground mb-1">{{ section.title }}</div>
+					<ul class="list-disc pl-4 space-y-0.5">
+						{% for item in section.items|default([]) %}
+							<li>{{ item }}</li>
+						{% endfor %}
+					</ul>
+				</div>
+			{% endfor %}
+		</div>
+	</div>
+{% endif %}
