@@ -99,7 +99,7 @@ final class ConfigurableApiCollection implements ApiCollectionInterface
                 return new ApiCollectionPageResult($slice, $totalItems, $totalPages, $page, $itemsPerPage);
             }
 
-            $totalItems = \is_array($data) ? (int) ($data['totalItems'] ?? \count($items)) : \count($items);
+            $totalItems = $this->resolveTotalItems($data, \count($items));
             $totalPages = $totalItems > 0 ? (int) max(1, (int) ceil($totalItems / $itemsPerPage)) : 0;
 
             return new ApiCollectionPageResult($items, $totalItems, $totalPages, $page, $itemsPerPage);
@@ -167,10 +167,37 @@ final class ConfigurableApiCollection implements ApiCollectionInterface
                 ];
             }
 
+            usort(
+                $out,
+                static function (array $a, array $b): int {
+                    return strcasecmp($a['label'], $b['label']);
+                },
+            );
+
             return $out;
         } catch (\Throwable) {
             return [];
         }
+    }
+
+    /**
+     * @param list<mixed>|array<string, mixed> $data
+     */
+    private function resolveTotalItems(mixed $data, int $fallback): int
+    {
+        if (!\is_array($data)) {
+            return $fallback;
+        }
+
+        if (isset($data['totalItems']) && is_numeric($data['totalItems'])) {
+            return (int) $data['totalItems'];
+        }
+
+        if (isset($data['hydra:totalItems']) && is_numeric($data['hydra:totalItems'])) {
+            return (int) $data['hydra:totalItems'];
+        }
+
+        return $fallback;
     }
 
     /**

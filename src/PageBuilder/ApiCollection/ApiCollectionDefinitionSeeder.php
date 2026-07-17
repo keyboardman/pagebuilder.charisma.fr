@@ -11,7 +11,6 @@ use Doctrine\DBAL\Connection;
  *
  * Hors scope v1 (restent adapters PHP actifs) :
  * - charisma_evenement_home / charisma_evenement_retrospective (pagination custom)
- * - videos (Hydra avancé)
  *
  * Classes PHP seedées : tags DI retirés + @deprecated (conservées pour rollback / tests).
  *
@@ -23,6 +22,8 @@ final class ApiCollectionDefinitionSeeder
     private const LABEL_SUFFIX = ' — Collection';
 
     private const FLASHNEWS_THEMES_URL = 'https://www.flashnews.fr/api/themes';
+
+    private const VIDEOS_CATEGORIES_URL = 'https://content.charisma.fr/web/api/categories.json';
 
     /**
      * @return list<array{
@@ -281,6 +282,34 @@ final class ApiCollectionDefinitionSeeder
                 ],
                 $charismaSearchOnly,
             ),
+            // ApiCard video (Hydra JSON-LD)
+            self::row(
+                'videos',
+                'Videos',
+                'video',
+                ['fixed', 'dynamic'],
+                'https://content.charisma.fr/web/api/media.jsonld',
+                'https://content.charisma.fr/web/api/media/{id}.json',
+                null,
+                ['order[title]' => 'asc'],
+                'hydra',
+                [
+                    'id' => 'id',
+                    'title' => 'title',
+                    'image' => 'thumbnails.medium',
+                    'link' => 'play',
+                    'like' => 'favori',
+                ],
+                [
+                    'member_path' => 'hydra:member',
+                    'search_query_param' => 'title',
+                    'category_query_param' => 'viewCategorie',
+                    'categories_url' => self::VIDEOS_CATEGORIES_URL,
+                    'categories_member_path' => 'member',
+                    'categories_id_path' => 'nom',
+                    'categories_label_path' => 'fullTitle',
+                ],
+            ),
         ];
     }
 
@@ -345,6 +374,7 @@ final class ApiCollectionDefinitionSeeder
      * @param array<string, string> $queryParams
      * @param array<string, string> $fieldMapping
      * @param array{
+     *   member_path?: string,
      *   search_query_param?: ?string,
      *   category_query_param?: ?string,
      *   categories_url?: ?string,
@@ -398,7 +428,7 @@ final class ApiCollectionDefinitionSeeder
             'image_prefix' => $imagePrefix,
             'query_params' => $queryParams,
             'pagination_style' => $paginationStyle,
-            'member_path' => 'member',
+            'member_path' => $filters['member_path'] ?? 'member',
             'field_mapping' => $fieldMapping,
             'headers' => [],
             'search_query_param' => $filters['search_query_param'] ?? null,

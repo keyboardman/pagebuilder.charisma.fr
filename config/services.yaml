@@ -102,9 +102,9 @@ services:
     # App\PageBuilder\ApiListArticle\CharismaTemoignageHomeApiListArticle:
     #     tags: [app.builder_api_list_article]
 
-    # Hors seed v1 — restent actifs (bannières custom, videos, stubs)
-    App\PageBuilder\ApiCard\CharismaVideosApiCard:
-        tags: [app.builder_api_card]
+    # Hors seed — restent actifs (bannières custom, stubs)
+    # App\PageBuilder\ApiCard\CharismaVideosApiCard:
+    #     tags: [app.builder_api_card]
 
     App\PageBuilder\ApiCard\CharismaEvenementHomeApiCard:
         tags: [app.builder_api_card]

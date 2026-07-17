@@ -22,7 +22,31 @@ final class ApiCollectionDefinitionSeederTest extends TestCase
         $ids = ApiCollectionDefinitionSeeder::seededApiIds();
         $this->assertNotContains('charisma_evenement_home', $ids);
         $this->assertNotContains('charisma_evenement_retrospective', $ids);
-        $this->assertNotContains('videos', $ids);
+    }
+
+    public function testVideosIsSeededWithHydraPathsAndFilters(): void
+    {
+        $ids = ApiCollectionDefinitionSeeder::seededApiIds();
+        $this->assertContains('videos', $ids);
+
+        $videos = null;
+        foreach (ApiCollectionDefinitionSeeder::definitions() as $row) {
+            if ($row['api_id'] === 'videos') {
+                $videos = $row;
+                break;
+            }
+        }
+
+        $this->assertNotNull($videos);
+        $this->assertSame('video', $videos['type']);
+        $this->assertSame(['fixed', 'dynamic'], $videos['supported_modes']);
+        $this->assertSame('hydra:member', $videos['member_path']);
+        $this->assertSame('title', $videos['search_query_param']);
+        $this->assertSame('viewCategorie', $videos['category_query_param']);
+        $this->assertSame('https://content.charisma.fr/web/api/categories.json', $videos['categories_url']);
+        $this->assertSame('nom', $videos['categories_id_path']);
+        $this->assertSame('fullTitle', $videos['categories_label_path']);
+        $this->assertStringContainsString('media.jsonld', $videos['endpoint_url']);
     }
 
     public function testSeedIsIdempotentAndDoesNotOverwrite(): void
@@ -46,6 +70,12 @@ final class ApiCollectionDefinitionSeederTest extends TestCase
                 member_path VARCHAR(128) NOT NULL,
                 field_mapping CLOB NOT NULL,
                 headers CLOB NOT NULL,
+                search_query_param VARCHAR(128) DEFAULT NULL,
+                category_query_param VARCHAR(128) DEFAULT NULL,
+                categories_url VARCHAR(2000) DEFAULT NULL,
+                categories_member_path VARCHAR(128) DEFAULT 'member' NOT NULL,
+                categories_id_path VARCHAR(128) DEFAULT 'id' NOT NULL,
+                categories_label_path VARCHAR(128) DEFAULT 'label' NOT NULL,
                 enabled BOOLEAN DEFAULT 1 NOT NULL
             )
         SQL);

@@ -13,7 +13,7 @@ Le système SHALL fournir une migration Doctrine qui insère dans `api_collectio
 #### Scenario: Migration appliquée sur base vide
 
 - **WHEN** la migration de seed est exécutée sur une table `api_collection_definition` vide
-- **THEN** toutes les définitions du set v1 (articles Charisma/Flashnews fixed et dynamic, thèmes Flashnews, ApiCard flashnews / témoignage / evenement / auteur) sont présentes avec `enabled=true`
+- **THEN** toutes les définitions du set seedé (articles Charisma/Flashnews fixed et dynamic, thèmes Flashnews, ApiCard flashnews / témoignage / evenement / auteur, et `videos`) sont présentes avec `enabled=true`
 
 #### Scenario: Migration idempotente
 
@@ -62,19 +62,24 @@ Chaque définition seedée SHALL reproduire l’endpoint, les query params fixes
 - **WHEN** la définition `charisma_article_enaction` est chargée
 - **THEN** `item_url_template` vaut `{endpoint}/{id}` (ou équivalent documenté) et `supported_modes` inclut `dynamic`
 
+#### Scenario: Videos Hydra JSON-LD
+
+- **WHEN** la définition `videos` est chargée
+- **THEN** `endpoint_url` pointe vers `media.jsonld`, `member_path` vaut `hydra:member`, `supported_modes` contient `fixed` et `dynamic`, et les filtres de picking mappent `search`→`title` et `category`→`viewCategorie`
+
 ### Requirement: Exclusions hors runtime
 
-Les sources dont le comportement PHP n’est pas reproductible par `ConfigurableApiCollection` (pagination custom bannières, Hydra avancé vidéos, stubs) SHALL NOT être seedées en v1 et SHALL rester exposées via adapters PHP.
+Les sources dont le comportement PHP n’est pas reproductible par `ConfigurableApiCollection` (pagination custom bannières, stubs) SHALL NOT être seedées et SHALL rester exposées via adapters PHP.
 
 #### Scenario: Bannières non seedées
 
-- **WHEN** la migration v1 est appliquée
+- **WHEN** la migration de seed est appliquée
 - **THEN** `charisma_evenement_home` et `charisma_evenement_retrospective` sont absents de `api_collection_definition` et restent disponibles via adapters PHP
 
-#### Scenario: Videos non seedées
+#### Scenario: Videos seedées
 
-- **WHEN** la migration v1 est appliquée
-- **THEN** l’api `videos` est absente de la table seedée et reste disponible via adapter ApiCard
+- **WHEN** la migration de seed videos est appliquée
+- **THEN** l’api `videos` est présente dans `api_collection_definition` avec type `video` et n’est plus enregistrée via tag DI ApiCard
 
 ### Requirement: Retrait des adapters PHP redondants
 
@@ -87,5 +92,5 @@ Après application du seed, les services PHP dont l’`api_id` est couvert par u
 
 #### Scenario: Adapters restants
 
-- **WHEN** les tags des classes seedées sont retirés
-- **THEN** les adapters pour bannières et `videos` restent enregistrés
+- **WHEN** les tags des classes seedées (y compris `videos`) sont retirés
+- **THEN** les adapters pour bannières restent enregistrés

@@ -151,6 +151,61 @@ final class ConfigurableApiCollectionTest extends TestCase
         $this->assertArrayNotHasKey('counter', $page->items[1]);
     }
 
+    public function testHydraJsonLdMemberAndTotalItems(): void
+    {
+        $client = new MockHttpClient(static function (string $method, string $url): MockResponse {
+            self::assertStringContainsString('page=1', $url);
+            self::assertStringContainsString('itemsPerPage=2', $url);
+
+            return new MockResponse(json_encode([
+                'hydra:member' => [
+                    [
+                        'id' => 941,
+                        'title' => 'Video A',
+                        'thumbnails' => ['medium' => 'https://img/a.jpg'],
+                        'play' => 'https://stream/a.mp4',
+                        'favori' => 3,
+                    ],
+                    [
+                        'id' => 942,
+                        'title' => 'Video B',
+                        'thumbnails' => ['medium' => 'https://img/b.jpg'],
+                        'play' => 'https://stream/b.mp4',
+                    ],
+                ],
+                'hydra:totalItems' => 1993,
+            ], \JSON_THROW_ON_ERROR));
+        });
+
+        $definition = (new ApiCollectionDefinition())
+            ->setApiId('videos')
+            ->setLabel('Videos')
+            ->setType('video')
+            ->setSupportedModes(['fixed', 'dynamic'])
+            ->setEndpointUrl('https://content.example/media.jsonld')
+            ->setPaginationStyle('hydra')
+            ->setMemberPath('hydra:member')
+            ->setFieldMapping([
+                'id' => 'id',
+                'title' => 'title',
+                'image' => 'thumbnails.medium',
+                'link' => 'play',
+                'like' => 'favori',
+            ]);
+
+        $collection = new ConfigurableApiCollection($definition, $client);
+        $page = $collection->fetchItems(['page' => 1, 'itemsPerPage' => 2]);
+
+        $this->assertSame(1993, $page->totalItems);
+        $this->assertSame(997, $page->totalPages);
+        $this->assertCount(2, $page->items);
+        $this->assertSame('941', $page->items[0]['id']);
+        $this->assertSame('Video A', $page->items[0]['title']);
+        $this->assertSame('https://img/a.jpg', $page->items[0]['image']);
+        $this->assertSame('https://stream/a.mp4', $page->items[0]['link']);
+        $this->assertSame(3, $page->items[0]['like']);
+    }
+
     public function testPaginationNoneSlicesLocally(): void
     {
         $client = new MockHttpClient(new MockResponse(json_encode([
@@ -305,8 +360,8 @@ final class ConfigurableApiCollectionTest extends TestCase
 
             return new MockResponse(json_encode([
                 'member' => [
-                    ['id' => 1, 'nom' => 'Actu'],
                     ['id' => 2, 'nom' => 'Sport'],
+                    ['id' => 1, 'nom' => 'Actu'],
                 ],
             ], \JSON_THROW_ON_ERROR));
         });
@@ -329,6 +384,47 @@ final class ConfigurableApiCollectionTest extends TestCase
         $this->assertSame([
             ['id' => 'Actu', 'label' => 'Actu'],
             ['id' => 'Sport', 'label' => 'Sport'],
+        ], $categories);
+    }
+
+    public function testFetchCategoriesSortedByLabel(): void
+    {
+        $client = new MockHttpClient(new MockResponse(json_encode([
+            [
+                'id' => 2,
+                'nom' => 'Témoignage',
+                'fullTitle' => 'Témoignage',
+            ],
+            [
+                'id' => 1,
+                'nom' => 'Apologétique',
+                'fullTitle' => 'Apologétique',
+            ],
+            [
+                'id' => 3,
+                'nom' => 'Biographie',
+                'fullTitle' => 'Biographie',
+            ],
+        ], \JSON_THROW_ON_ERROR)));
+
+        $definition = (new ApiCollectionDefinition())
+            ->setApiId('videos')
+            ->setLabel('Videos')
+            ->setType('video')
+            ->setSupportedModes(['dynamic'])
+            ->setEndpointUrl('https://content.example/media.jsonld')
+            ->setCategoriesUrl('https://content.example/categories.json')
+            ->setCategoriesIdPath('nom')
+            ->setCategoriesLabelPath('fullTitle')
+            ->setFieldMapping(['id' => 'id']);
+
+        $collection = new ConfigurableApiCollection($definition, $client);
+        $categories = $collection->fetchCategories();
+
+        $this->assertSame([
+            ['id' => 'Apologétique', 'label' => 'Apologétique'],
+            ['id' => 'Biographie', 'label' => 'Biographie'],
+            ['id' => 'Témoignage', 'label' => 'Témoignage'],
         ], $categories);
     }
 

@@ -170,7 +170,7 @@ Une `ApiCollectionDefinition` SHALL pouvoir déclarer optionnellement `searchQue
 
 ### Requirement: Adapters de compatibilité
 
-Le registre ApiCollection SHALL inclure des **adapters** exposant les sources PHP encore non migrées en définition seedée (notamment ApiListImage bannières à pagination custom, ApiCard video, et tout ApiList/ApiCard hors set seed v1) sous le contrat ApiCollection. Les sources déjà seedées en base SHALL NOT nécessiter d’adapter PHP actif pour le même `api_id`.
+Le registre ApiCollection SHALL inclure des **adapters** exposant les sources PHP encore non migrées en définition seedée (notamment ApiListImage bannières à pagination custom, et tout ApiList/ApiCard hors set seed) sous le contrat ApiCollection. Les sources déjà seedées en base SHALL NOT nécessiter d’adapter PHP actif pour le même `api_id`.
 
 #### Scenario: Liste image legacy visible
 

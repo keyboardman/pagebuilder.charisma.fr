@@ -13,7 +13,7 @@ use App\PageBuilder\ApiListImage\ApiListImageRegistry;
  * Registre unifié ApiCollection : adapters legacy restants + définitions admin enabled.
  *
  * Les boucles ApiListArticle / ApiListArticleDynamique restent pour rollback (re-tag services) ;
- * en prod post-seed elles sont vides — seules ApiListImage (bannières) et ApiCard video restent actives.
+ * en prod post-seed elles sont vides — seules ApiListImage (bannières) restent actives via adapters.
  *
  * @psalm-type ApiCollectionMeta = array{
  *   id: string,

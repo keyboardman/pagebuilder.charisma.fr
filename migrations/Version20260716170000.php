@@ -11,7 +11,7 @@ use Doctrine\Migrations\AbstractMigration;
 /**
  * Seed ApiList / ApiCard exprimables dans api_collection_definition.
  *
- * Hors scope (restent PHP) : charisma_evenement_home, charisma_evenement_retrospective, videos.
+ * Hors scope (restent PHP) : charisma_evenement_home, charisma_evenement_retrospective.
  * Rollback : down() supprime les api_id seedés ; re-taguer les ApiList* dans services.yaml si besoin.
  */
 final class Version20260716170000 extends AbstractMigration

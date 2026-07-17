@@ -1,9 +1,9 @@
-import { type FC, useState } from "react";
+import { type FC, useEffect, useState } from "react";
 import { Button } from "@/editeur/components/ui/button";
 import { Database, Trash2 } from "lucide-react";
-import { ApiManagerModal } from "../../../ManagerApi/ApiManagerModal";
-import { apiRegistry } from "../../../ManagerApi/ApiRegistry";
 import type { CollectionVideoDynamicEntry } from "../index";
+import { fetchCollectionCatalog } from "../collectionApiUtils";
+import { CollectionItemPickerModal } from "./CollectionItemPickerModal";
 
 interface CollectionVideoDynamicItemsSettingsProps {
   items: CollectionVideoDynamicEntry[];
@@ -15,6 +15,34 @@ export const CollectionVideoDynamicItemsSettings: FC<CollectionVideoDynamicItems
   onChange,
 }) => {
   const [modalOpen, setModalOpen] = useState(false);
+  const [sourceLabels, setSourceLabels] = useState<Record<string, string>>({});
+
+  useEffect(() => {
+    let cancelled = false;
+
+    const loadSources = async () => {
+      try {
+        const sources = await fetchCollectionCatalog("video", "dynamic", { bypassCache: true });
+        if (cancelled) return;
+
+        const next: Record<string, string> = {};
+        sources.forEach((source) => {
+          next[source.id] = source.label;
+        });
+        setSourceLabels(next);
+      } catch {
+        if (!cancelled) {
+          setSourceLabels({});
+        }
+      }
+    };
+
+    void loadSources();
+
+    return () => {
+      cancelled = true;
+    };
+  }, []);
 
   return (
     <div className="space-y-2">
@@ -26,8 +54,7 @@ export const CollectionVideoDynamicItemsSettings: FC<CollectionVideoDynamicItems
       {items.length > 0 ? (
         <ul className="space-y-1">
           {items.map((entry, index) => {
-            const adapter = apiRegistry.get(entry.apiId);
-            const label = adapter?.label ?? entry.apiId;
+            const label = sourceLabels[entry.apiId] ?? entry.apiId;
             const displayTitle = entry.title?.trim() || entry.itemId;
             return (
               <li
@@ -54,19 +81,19 @@ export const CollectionVideoDynamicItemsSettings: FC<CollectionVideoDynamicItems
         <p className="text-xs text-muted-foreground">Aucune vidéo sélectionnée.</p>
       )}
 
-      <ApiManagerModal
+      <CollectionItemPickerModal
         open={modalOpen}
         onOpenChange={setModalOpen}
-        typeFilter="video"
-        onSelect={(apiId, itemId, mappedData) => {
-          const exists = items.some((entry) => entry.apiId === apiId && entry.itemId === itemId);
+        collectionType="video"
+        mode="dynamic"
+        onSelect={(apiId, item) => {
+          const exists = items.some((entry) => entry.apiId === apiId && entry.itemId === item.id);
           if (!exists) {
             onChange([
               ...items,
-              { apiId, itemId, title: mappedData?.title?.trim() || undefined },
+              { apiId, itemId: item.id, title: item.title?.trim() || undefined },
             ]);
           }
-          setModalOpen(false);
         }}
       />
     </div>

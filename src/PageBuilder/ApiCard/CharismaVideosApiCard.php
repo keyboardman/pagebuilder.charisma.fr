@@ -8,6 +8,8 @@ use Symfony\Contracts\HttpClient\HttpClientInterface;
 
 /**
  * API card « Videos » : médias vidéo depuis https://content.charisma.fr/web/api/media
+ *
+ * @deprecated since 2026-07 — remplacé par ApiCollectionDefinition (`videos`). Conservé pour rollback / tests.
  */
 final class CharismaVideosApiCard extends AbstractApiCardVideo
 {
