@@ -89,7 +89,8 @@ function buildItemsUrl(
   apiId: string,
   page: number,
   itemsPerPage: number,
-  search?: string
+  search?: string,
+  category?: string
 ): string {
   const params = new URLSearchParams({
     page: String(page),
@@ -97,6 +98,9 @@ function buildItemsUrl(
   });
   if (search && search.trim() !== "") {
     params.set("search", search.trim());
+  }
+  if (category && category.trim() !== "") {
+    params.set("category", category.trim());
   }
   return `/api/page-builder/collections/${encodeURIComponent(apiId)}/items?${params.toString()}`;
 }
@@ -158,12 +162,14 @@ export async function fetchCollectionItemsPage(
   apiId: string,
   page = 1,
   itemsPerPage = 10,
-  search?: string
+  search?: string,
+  category?: string
 ): Promise<CollectionApiPageResponse> {
   const safePage = Math.max(1, page);
   const safeSize = Math.max(1, Math.min(100, itemsPerPage));
   const searchKey = search?.trim() || "";
-  const key = `${apiId}:${safePage}:${safeSize}:${searchKey}`;
+  const categoryKey = category?.trim() || "";
+  const key = `${apiId}:${safePage}:${safeSize}:${searchKey}:${categoryKey}`;
 
   const cached = itemsCache.get(key);
   if (cached) return cached;
@@ -172,10 +178,13 @@ export async function fetchCollectionItemsPage(
   if (inflight) return inflight;
 
   const promise = (async () => {
-    const res = await fetch(buildItemsUrl(apiId, safePage, safeSize, searchKey || undefined), {
-      credentials: "same-origin",
-      headers: { Accept: "application/json" },
-    });
+    const res = await fetch(
+      buildItemsUrl(apiId, safePage, safeSize, searchKey || undefined, categoryKey || undefined),
+      {
+        credentials: "same-origin",
+        headers: { Accept: "application/json" },
+      }
+    );
     if (!res.ok) {
       throw new Error(`Collections items HTTP ${res.status}`);
     }
@@ -203,6 +212,37 @@ export async function fetchCollectionItemsPage(
   } finally {
     itemsInFlight.delete(key);
   }
+}
+
+export async function fetchCollectionCategories(
+  apiId: string
+): Promise<Array<{ id: string; label: string }>> {
+  const res = await fetch(
+    `/api/page-builder/collections/${encodeURIComponent(apiId)}/categories`,
+    {
+      credentials: "same-origin",
+      headers: { Accept: "application/json" },
+      cache: "no-store",
+    }
+  );
+  if (!res.ok) {
+    return [];
+  }
+  const data = (await res.json()) as unknown;
+  if (Array.isArray(data)) {
+    return data
+      .filter((c): c is { id: string; label: string } => c != null && typeof c === "object")
+      .map((c) => ({ id: String((c as { id?: unknown }).id ?? ""), label: String((c as { label?: unknown }).label ?? "") }))
+      .filter((c) => c.id !== "" && c.label !== "");
+  }
+  if (data != null && typeof data === "object" && Array.isArray((data as { categories?: unknown }).categories)) {
+    const cats = (data as { categories: unknown[] }).categories;
+    return cats
+      .filter((c): c is { id: string; label: string } => c != null && typeof c === "object")
+      .map((c) => ({ id: String((c as { id?: unknown }).id ?? ""), label: String((c as { label?: unknown }).label ?? "") }))
+      .filter((c) => c.id !== "" && c.label !== "");
+  }
+  return [];
 }
 
 export async function resolveCollectionEntries(

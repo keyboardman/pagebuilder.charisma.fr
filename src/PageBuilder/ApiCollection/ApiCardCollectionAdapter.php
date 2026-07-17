@@ -53,6 +53,9 @@ final class ApiCardCollectionAdapter implements ApiCollectionInterface
         if (isset($params['search']) && \is_string($params['search']) && $params['search'] !== '') {
             $cardParams['search'] = $params['search'];
         }
+        if (isset($params['category']) && \is_string($params['category']) && $params['category'] !== '') {
+            $cardParams['category'] = $params['category'];
+        }
 
         try {
             $result = $this->card->fetchCollection($cardParams);
@@ -84,5 +87,39 @@ final class ApiCardCollectionAdapter implements ApiCollectionInterface
         }
 
         return ApiCollectionItemNormalizer::normalize($this->card->mapItem($raw));
+    }
+
+    /**
+     * @return list<array{id: string, label: string}>
+     */
+    public function fetchCategories(): array
+    {
+        try {
+            $categories = $this->card->fetchCategories();
+        } catch (\Throwable) {
+            return [];
+        }
+
+        if ($categories === null || $categories === []) {
+            return [];
+        }
+
+        $out = [];
+        foreach ($categories as $category) {
+            if (!\is_array($category)) {
+                continue;
+            }
+            $id = $category['id'] ?? null;
+            $label = $category['label'] ?? null;
+            if ($id === null || $label === null || (string) $label === '') {
+                continue;
+            }
+            $out[] = [
+                'id' => (string) $id,
+                'label' => (string) $label,
+            ];
+        }
+
+        return $out;
     }
 }

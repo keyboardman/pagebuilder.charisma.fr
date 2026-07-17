@@ -38,6 +38,24 @@
 
 <div class="card p-4 space-y-4">
     <div>
+        <h2 class="text-lg font-semibold">Filtres de picking</h2>
+        <p class="text-sm text-muted-foreground mt-1">
+            Mapping des params builder <code class="text-xs">search</code> / <code class="text-xs">category</code>
+            vers les query params distants, et URL pour peupler le sélecteur de catégories.
+        </p>
+    </div>
+    <div class="grid gap-4 sm:grid-cols-2">
+        <div>{{ form_row(form.searchQueryParam) }}</div>
+        <div>{{ form_row(form.categoryQueryParam) }}</div>
+        <div class="sm:col-span-2">{{ form_row(form.categoriesUrl) }}</div>
+        <div>{{ form_row(form.categoriesMemberPath) }}</div>
+        <div>{{ form_row(form.categoriesIdPath) }}</div>
+        <div>{{ form_row(form.categoriesLabelPath) }}</div>
+    </div>
+</div>
+
+<div class="card p-4 space-y-4">
+    <div>
         <h2 class="text-lg font-semibold">Pagination &amp; parsing</h2>
         <p class="text-sm text-muted-foreground mt-1">Comment découper la réponse JSON et où trouver la liste d’items.</p>
     </div>

@@ -50,4 +50,33 @@ final class ApiRequestParamHelperTest extends TestCase
 
         $this->assertSame([1 => true, 2 => true], $excludeIds);
     }
+
+    public function testBuildDynamicListCollectionParamsIncludesSearchAndCategory(): void
+    {
+        $helper = new ApiRequestParamHelper();
+        $request = new Request([
+            'page' => '2',
+            'itemsPerPage' => '15',
+            'search' => '  paris  ',
+            'category' => '  actu  ',
+        ]);
+
+        $params = $helper->buildDynamicListCollectionParams($request);
+
+        $this->assertSame(2, $params['page']);
+        $this->assertSame(15, $params['itemsPerPage']);
+        $this->assertSame('paris', $params['search']);
+        $this->assertSame('actu', $params['category']);
+    }
+
+    public function testBuildDynamicListCollectionParamsOmitsEmptyFilters(): void
+    {
+        $helper = new ApiRequestParamHelper();
+        $request = new Request(['page' => '1', 'search' => '  ', 'category' => '']);
+
+        $params = $helper->buildDynamicListCollectionParams($request);
+
+        $this->assertArrayNotHasKey('search', $params);
+        $this->assertArrayNotHasKey('category', $params);
+    }
 }

@@ -19,7 +19,7 @@ final class ApiRequestParamHelper
     }
 
     /**
-     * @return array{page: int, itemsPerPage: int, search?: string}
+     * @return array{page: int, itemsPerPage: int, search?: string, category?: string}
      */
     public function buildDynamicListCollectionParams(Request $request): array
     {
@@ -31,6 +31,11 @@ final class ApiRequestParamHelper
         $search = $request->query->get('search');
         if (\is_string($search) && trim($search) !== '') {
             $params['search'] = trim($search);
+        }
+
+        $category = $request->query->get('category');
+        if (\is_string($category) && trim($category) !== '') {
+            $params['category'] = trim($category);
         }
 
         return $params;

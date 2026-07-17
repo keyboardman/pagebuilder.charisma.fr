@@ -105,6 +105,59 @@ final class ApiCollectionDefinitionType extends AbstractType
                     'placeholder' => 'https://cdn.example.com',
                 ],
             ])
+            ->add('searchQueryParam', TextType::class, [
+                'label' => 'Paramètre distant search',
+                'required' => false,
+                'help' => 'Nom du query param distant pour la recherche (ex. titre). Vide = search ignoré.',
+                'attr' => [
+                    'class' => 'flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm font-mono text-xs',
+                    'placeholder' => 'titre',
+                ],
+            ])
+            ->add('categoryQueryParam', TextType::class, [
+                'label' => 'Paramètre distant category',
+                'required' => false,
+                'help' => 'Nom du query param distant pour la catégorie (ex. themes). Vide = category ignoré.',
+                'attr' => [
+                    'class' => 'flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm font-mono text-xs',
+                    'placeholder' => 'themes',
+                ],
+            ])
+            ->add('categoriesUrl', UrlType::class, [
+                'label' => 'URL des catégories (picker)',
+                'required' => false,
+                'default_protocol' => 'https',
+                'help' => 'Endpoint JSON listant les catégories pour le filtre du picker.',
+                'attr' => [
+                    'class' => 'flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm',
+                    'placeholder' => 'https://api.example.com/themes',
+                ],
+            ])
+            ->add('categoriesMemberPath', TextType::class, [
+                'label' => 'Chemin liste catégories',
+                'required' => false,
+                'help' => 'Chemin pointé vers le tableau de catégories. Défaut : member.',
+                'attr' => [
+                    'class' => 'flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm font-mono text-xs',
+                    'placeholder' => 'member',
+                ],
+            ])
+            ->add('categoriesIdPath', TextType::class, [
+                'label' => 'Chemin id catégorie',
+                'required' => false,
+                'attr' => [
+                    'class' => 'flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm font-mono text-xs',
+                    'placeholder' => 'id',
+                ],
+            ])
+            ->add('categoriesLabelPath', TextType::class, [
+                'label' => 'Chemin label catégorie',
+                'required' => false,
+                'attr' => [
+                    'class' => 'flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm font-mono text-xs',
+                    'placeholder' => 'label',
+                ],
+            ])
             ->add('paginationStyle', ChoiceType::class, [
                 'label' => 'Style de pagination',
                 'choices' => [

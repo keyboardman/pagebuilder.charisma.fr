@@ -57,4 +57,9 @@ final class ApiListArticleCollectionAdapter implements ApiCollectionInterface
 
         return $item !== null ? ApiCollectionItemNormalizer::normalize($item) : null;
     }
+
+    public function fetchCategories(): array
+    {
+        return [];
+    }
 }

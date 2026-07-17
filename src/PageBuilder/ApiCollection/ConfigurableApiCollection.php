@@ -62,6 +62,26 @@ final class ConfigurableApiCollection implements ApiCollectionInterface
                 $query['limit'] = (string) $itemsPerPage;
             }
 
+            $searchParam = $this->definition->getSearchQueryParam();
+            if (
+                $searchParam !== null
+                && isset($params['search'])
+                && \is_string($params['search'])
+                && $params['search'] !== ''
+            ) {
+                $query[$searchParam] = $params['search'];
+            }
+
+            $categoryParam = $this->definition->getCategoryQueryParam();
+            if (
+                $categoryParam !== null
+                && isset($params['category'])
+                && \is_string($params['category'])
+                && $params['category'] !== ''
+            ) {
+                $query[$categoryParam] = $params['category'];
+            }
+
             $response = $this->httpClient->request('GET', $this->definition->getEndpointUrl(), [
                 'query' => $query,
                 'headers' => $this->definition->getHeaders(),
@@ -108,6 +128,67 @@ final class ConfigurableApiCollection implements ApiCollectionInterface
         } catch (\Throwable) {
             return null;
         }
+    }
+
+    /**
+     * @return list<array{id: string, label: string}>
+     */
+    public function fetchCategories(): array
+    {
+        $url = $this->definition->getCategoriesUrl();
+        if ($url === null || $url === '') {
+            return [];
+        }
+
+        try {
+            $response = $this->httpClient->request('GET', $url, [
+                'query' => ['pagination' => 'false'],
+                'headers' => $this->definition->getHeaders(),
+                'timeout' => 30,
+            ]);
+            $data = $response->toArray(false);
+            $member = $this->extractCategoriesMember($data);
+            $idPath = $this->definition->getCategoriesIdPath();
+            $labelPath = $this->definition->getCategoriesLabelPath();
+            $out = [];
+
+            foreach ($member as $raw) {
+                if (!\is_array($raw)) {
+                    continue;
+                }
+                $id = DotPathResolver::get($raw, $idPath);
+                $label = DotPathResolver::get($raw, $labelPath);
+                if ($id === null || $label === null || (string) $label === '') {
+                    continue;
+                }
+                $out[] = [
+                    'id' => (string) $id,
+                    'label' => (string) $label,
+                ];
+            }
+
+            return $out;
+        } catch (\Throwable) {
+            return [];
+        }
+    }
+
+    /**
+     * @return list<mixed>
+     */
+    private function extractCategoriesMember(mixed $data): array
+    {
+        if (\is_array($data) && array_is_list($data)) {
+            return $data;
+        }
+
+        $path = $this->definition->getCategoriesMemberPath();
+        $member = DotPathResolver::get($data, $path);
+        if (\is_array($member)) {
+            return array_values($member);
+        }
+
+        return [];
     }
 
     /**

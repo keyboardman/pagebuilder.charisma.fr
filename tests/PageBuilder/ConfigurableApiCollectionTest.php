@@ -233,4 +233,117 @@ final class ConfigurableApiCollectionTest extends TestCase
         $this->assertSame('https://cdn.example.com/media/a.jpg', $page->items[0]['image']);
         $this->assertSame('https://cdn.other/b.jpg', $page->items[1]['image']);
     }
+
+    public function testSearchAndCategoryMappedToRemoteQueryParams(): void
+    {
+        $client = new MockHttpClient(static function (string $method, string $url): MockResponse {
+            self::assertStringContainsString('titre=paris', $url);
+            self::assertStringContainsString('themes=actu', $url);
+
+            return new MockResponse(json_encode([
+                'member' => [
+                    ['id' => 1, 'titre' => 'Paris'],
+                ],
+                'totalItems' => 1,
+            ], \JSON_THROW_ON_ERROR));
+        });
+
+        $definition = (new ApiCollectionDefinition())
+            ->setApiId('flashnews')
+            ->setLabel('Flashnews')
+            ->setType('article')
+            ->setSupportedModes(['dynamic'])
+            ->setEndpointUrl('https://api.example/articles')
+            ->setPaginationStyle('hydra')
+            ->setMemberPath('member')
+            ->setSearchQueryParam('titre')
+            ->setCategoryQueryParam('themes')
+            ->setFieldMapping(['id' => 'id', 'title' => 'titre']);
+
+        $collection = new ConfigurableApiCollection($definition, $client);
+        $page = $collection->fetchItems([
+            'page' => 1,
+            'itemsPerPage' => 10,
+            'search' => 'paris',
+            'category' => 'actu',
+        ]);
+
+        $this->assertCount(1, $page->items);
+        $this->assertSame('Paris', $page->items[0]['title']);
+    }
+
+    public function testSearchIgnoredWhenSearchQueryParamNotConfigured(): void
+    {
+        $client = new MockHttpClient(static function (string $method, string $url): MockResponse {
+            self::assertStringNotContainsString('titre=', $url);
+            self::assertStringNotContainsString('search=', $url);
+
+            return new MockResponse(json_encode([
+                'member' => [],
+                'totalItems' => 0,
+            ], \JSON_THROW_ON_ERROR));
+        });
+
+        $definition = (new ApiCollectionDefinition())
+            ->setApiId('no_search')
+            ->setLabel('No search')
+            ->setType('article')
+            ->setSupportedModes(['dynamic'])
+            ->setEndpointUrl('https://api.example/articles')
+            ->setPaginationStyle('hydra')
+            ->setMemberPath('member')
+            ->setFieldMapping(['id' => 'id', 'title' => 'titre']);
+
+        $collection = new ConfigurableApiCollection($definition, $client);
+        $collection->fetchItems(['page' => 1, 'itemsPerPage' => 10, 'search' => 'ignored']);
+    }
+
+    public function testFetchCategoriesFromConfiguredUrl(): void
+    {
+        $client = new MockHttpClient(static function (string $method, string $url): MockResponse {
+            self::assertStringContainsString('/themes', $url);
+
+            return new MockResponse(json_encode([
+                'member' => [
+                    ['id' => 1, 'nom' => 'Actu'],
+                    ['id' => 2, 'nom' => 'Sport'],
+                ],
+            ], \JSON_THROW_ON_ERROR));
+        });
+
+        $definition = (new ApiCollectionDefinition())
+            ->setApiId('flashnews')
+            ->setLabel('Flashnews')
+            ->setType('article')
+            ->setSupportedModes(['dynamic'])
+            ->setEndpointUrl('https://api.example/articles')
+            ->setCategoriesUrl('https://api.example/themes')
+            ->setCategoriesMemberPath('member')
+            ->setCategoriesIdPath('nom')
+            ->setCategoriesLabelPath('nom')
+            ->setFieldMapping(['id' => 'id']);
+
+        $collection = new ConfigurableApiCollection($definition, $client);
+        $categories = $collection->fetchCategories();
+
+        $this->assertSame([
+            ['id' => 'Actu', 'label' => 'Actu'],
+            ['id' => 'Sport', 'label' => 'Sport'],
+        ], $categories);
+    }
+
+    public function testFetchCategoriesEmptyWithoutUrl(): void
+    {
+        $client = new MockHttpClient();
+        $definition = (new ApiCollectionDefinition())
+            ->setApiId('plain')
+            ->setLabel('Plain')
+            ->setType('article')
+            ->setSupportedModes(['fixed'])
+            ->setEndpointUrl('https://api.example/articles')
+            ->setFieldMapping(['id' => 'id']);
+
+        $collection = new ConfigurableApiCollection($definition, $client);
+        $this->assertSame([], $collection->fetchCategories());
+    }
 }

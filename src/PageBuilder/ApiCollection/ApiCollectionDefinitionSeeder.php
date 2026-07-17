@@ -22,6 +22,8 @@ final class ApiCollectionDefinitionSeeder
 {
     private const LABEL_SUFFIX = ' — Collection';
 
+    private const FLASHNEWS_THEMES_URL = 'https://www.flashnews.fr/api/themes';
+
     /**
      * @return list<array{
      *   api_id: string,
@@ -36,6 +38,12 @@ final class ApiCollectionDefinitionSeeder
      *   member_path: string,
      *   field_mapping: array<string, string>,
      *   headers: array<string, string>,
+     *   search_query_param: ?string,
+     *   category_query_param: ?string,
+     *   categories_url: ?string,
+     *   categories_member_path: string,
+     *   categories_id_path: string,
+     *   categories_label_path: string,
      *   enabled: bool
      * }>
      */
@@ -65,6 +73,19 @@ final class ApiCollectionDefinitionSeeder
             'link' => 'link',
             'counter' => 'compteur',
             'like' => 'likes',
+        ];
+
+        $flashnewsFilters = [
+            'search_query_param' => 'titre',
+            'category_query_param' => 'themes',
+            'categories_url' => self::FLASHNEWS_THEMES_URL,
+            'categories_member_path' => 'member',
+            'categories_id_path' => 'nom',
+            'categories_label_path' => 'nom',
+        ];
+
+        $charismaSearchOnly = [
+            'search_query_param' => 'titre',
         ];
 
         return [
@@ -116,6 +137,7 @@ final class ApiCollectionDefinitionSeeder
                 ['order[publication]' => 'desc'],
                 'hydra',
                 $flashnewsArticleMapping,
+                $flashnewsFilters,
             ),
             self::row(
                 'flashnews-themes',
@@ -145,6 +167,7 @@ final class ApiCollectionDefinitionSeeder
                 [],
                 'hydra',
                 $charismaArticleMapping,
+                $charismaSearchOnly,
             ),
             self::row(
                 'charisma_article_expression',
@@ -157,6 +180,7 @@ final class ApiCollectionDefinitionSeeder
                 [],
                 'hydra',
                 $charismaArticleMapping,
+                $charismaSearchOnly,
             ),
             self::row(
                 'charisma_temoignage',
@@ -169,6 +193,7 @@ final class ApiCollectionDefinitionSeeder
                 [],
                 'hydra',
                 $temoignageMapping,
+                $charismaSearchOnly,
             ),
             self::row(
                 'flashnews_article',
@@ -181,6 +206,7 @@ final class ApiCollectionDefinitionSeeder
                 ['order[publication]' => 'desc'],
                 'hydra',
                 $flashnewsArticleMapping,
+                $flashnewsFilters,
             ),
             self::row(
                 'charisma_article_auteur',
@@ -193,6 +219,7 @@ final class ApiCollectionDefinitionSeeder
                 [],
                 'hydra',
                 $charismaArticleMapping + ['labels' => 'classements.?.nom', 'image' => 'auteur.photo'],
+                $charismaSearchOnly,
             ),
             // ApiCard exprimables
             self::row(
@@ -213,6 +240,7 @@ final class ApiCollectionDefinitionSeeder
                     'link' => 'viewUrl',
                     'labels' => 'tags.member',
                 ],
+                $flashnewsFilters,
             ),
             self::row(
                 'charisma_article_temoignage',
@@ -232,6 +260,7 @@ final class ApiCollectionDefinitionSeeder
                     'link' => 'url',
                     'label' => 'theme.nom',
                 ],
+                $charismaSearchOnly,
             ),
             self::row(
                 'charisma_evenement',
@@ -250,6 +279,7 @@ final class ApiCollectionDefinitionSeeder
                     'image' => 'thumbnails.normal',
                     'link' => 'url',
                 ],
+                $charismaSearchOnly,
             ),
         ];
     }
@@ -296,6 +326,12 @@ final class ApiCollectionDefinitionSeeder
                 'member_path' => $row['member_path'],
                 'field_mapping' => json_encode($row['field_mapping'], \JSON_THROW_ON_ERROR),
                 'headers' => json_encode($row['headers'], \JSON_THROW_ON_ERROR),
+                'search_query_param' => $row['search_query_param'],
+                'category_query_param' => $row['category_query_param'],
+                'categories_url' => $row['categories_url'],
+                'categories_member_path' => $row['categories_member_path'],
+                'categories_id_path' => $row['categories_id_path'],
+                'categories_label_path' => $row['categories_label_path'],
                 'enabled' => $row['enabled'],
             ]);
             ++$inserted;
@@ -308,6 +344,14 @@ final class ApiCollectionDefinitionSeeder
      * @param list<string> $supportedModes
      * @param array<string, string> $queryParams
      * @param array<string, string> $fieldMapping
+     * @param array{
+     *   search_query_param?: ?string,
+     *   category_query_param?: ?string,
+     *   categories_url?: ?string,
+     *   categories_member_path?: string,
+     *   categories_id_path?: string,
+     *   categories_label_path?: string
+     * } $filters
      *
      * @return array{
      *   api_id: string,
@@ -322,6 +366,12 @@ final class ApiCollectionDefinitionSeeder
      *   member_path: string,
      *   field_mapping: array<string, string>,
      *   headers: array<string, string>,
+     *   search_query_param: ?string,
+     *   category_query_param: ?string,
+     *   categories_url: ?string,
+     *   categories_member_path: string,
+     *   categories_id_path: string,
+     *   categories_label_path: string,
      *   enabled: bool
      * }
      */
@@ -336,6 +386,7 @@ final class ApiCollectionDefinitionSeeder
         array $queryParams,
         string $paginationStyle,
         array $fieldMapping,
+        array $filters = [],
     ): array {
         return [
             'api_id' => $apiId,
@@ -350,6 +401,12 @@ final class ApiCollectionDefinitionSeeder
             'member_path' => 'member',
             'field_mapping' => $fieldMapping,
             'headers' => [],
+            'search_query_param' => $filters['search_query_param'] ?? null,
+            'category_query_param' => $filters['category_query_param'] ?? null,
+            'categories_url' => $filters['categories_url'] ?? null,
+            'categories_member_path' => $filters['categories_member_path'] ?? 'member',
+            'categories_id_path' => $filters['categories_id_path'] ?? 'id',
+            'categories_label_path' => $filters['categories_label_path'] ?? 'label',
             'enabled' => true,
         ];
     }

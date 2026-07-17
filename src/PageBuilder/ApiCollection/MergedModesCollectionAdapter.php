@@ -68,4 +68,14 @@ final class MergedModesCollectionAdapter implements ApiCollectionInterface
 
         return $this->primary->fetchItem($id);
     }
+
+    public function fetchCategories(): array
+    {
+        $secondary = $this->secondary->fetchCategories();
+        if ($secondary !== []) {
+            return $secondary;
+        }
+
+        return $this->primary->fetchCategories();
+    }
 }

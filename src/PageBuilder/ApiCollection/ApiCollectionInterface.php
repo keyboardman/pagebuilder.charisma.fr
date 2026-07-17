@@ -24,7 +24,7 @@ interface ApiCollectionInterface
     public function getSupportedModes(): array;
 
     /**
-     * @param array{page?: int|string, itemsPerPage?: int|string, search?: string} $params
+     * @param array{page?: int|string, itemsPerPage?: int|string, search?: string, category?: string} $params
      */
     public function fetchItems(array $params = []): ApiCollectionPageResult;
 
@@ -34,4 +34,11 @@ interface ApiCollectionInterface
      * @return array<string, mixed>|null
      */
     public function fetchItem(string $id): ?array;
+
+    /**
+     * Catégories pour le filtre du picker. Tableau vide si non supporté.
+     *
+     * @return list<array{id: string, label: string}>
+     */
+    public function fetchCategories(): array;
 }

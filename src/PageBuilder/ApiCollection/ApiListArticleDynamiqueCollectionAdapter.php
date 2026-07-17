@@ -57,4 +57,9 @@ final class ApiListArticleDynamiqueCollectionAdapter implements ApiCollectionInt
 
         return $item !== null ? ApiCollectionItemNormalizer::normalize($item) : null;
     }
+
+    public function fetchCategories(): array
+    {
+        return [];
+    }
 }

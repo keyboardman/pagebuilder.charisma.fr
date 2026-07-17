@@ -83,6 +83,30 @@ class ApiCollectionDefinition
     #[ORM\Column(type: 'json')]
     private array $headers = [];
 
+    /**
+     * Nom du query param distant pour mapper `search` (ex. titre). Null = filtre ignoré.
+     */
+    #[ORM\Column(type: 'string', length: 128, nullable: true)]
+    private ?string $searchQueryParam = null;
+
+    /**
+     * Nom du query param distant pour mapper `category` (ex. themes). Null = filtre ignoré.
+     */
+    #[ORM\Column(type: 'string', length: 128, nullable: true)]
+    private ?string $categoryQueryParam = null;
+
+    #[ORM\Column(type: 'string', length: 2000, nullable: true)]
+    private ?string $categoriesUrl = null;
+
+    #[ORM\Column(type: 'string', length: 128, options: ['default' => 'member'])]
+    private string $categoriesMemberPath = 'member';
+
+    #[ORM\Column(type: 'string', length: 128, options: ['default' => 'id'])]
+    private string $categoriesIdPath = 'id';
+
+    #[ORM\Column(type: 'string', length: 128, options: ['default' => 'label'])]
+    private string $categoriesLabelPath = 'label';
+
     #[ORM\Column(type: 'boolean', options: ['default' => true])]
     private bool $enabled = true;
 
@@ -256,6 +280,81 @@ class ApiCollectionDefinition
     public function setHeaders(array $headers): static
     {
         $this->headers = $headers;
+
+        return $this;
+    }
+
+    public function getSearchQueryParam(): ?string
+    {
+        return $this->searchQueryParam;
+    }
+
+    public function setSearchQueryParam(?string $searchQueryParam): static
+    {
+        $trimmed = $searchQueryParam !== null ? trim($searchQueryParam) : '';
+        $this->searchQueryParam = $trimmed !== '' ? $trimmed : null;
+
+        return $this;
+    }
+
+    public function getCategoryQueryParam(): ?string
+    {
+        return $this->categoryQueryParam;
+    }
+
+    public function setCategoryQueryParam(?string $categoryQueryParam): static
+    {
+        $trimmed = $categoryQueryParam !== null ? trim($categoryQueryParam) : '';
+        $this->categoryQueryParam = $trimmed !== '' ? $trimmed : null;
+
+        return $this;
+    }
+
+    public function getCategoriesUrl(): ?string
+    {
+        return $this->categoriesUrl;
+    }
+
+    public function setCategoriesUrl(?string $categoriesUrl): static
+    {
+        $trimmed = $categoriesUrl !== null ? trim($categoriesUrl) : '';
+        $this->categoriesUrl = $trimmed !== '' ? $trimmed : null;
+
+        return $this;
+    }
+
+    public function getCategoriesMemberPath(): string
+    {
+        return $this->categoriesMemberPath;
+    }
+
+    public function setCategoriesMemberPath(string $categoriesMemberPath): static
+    {
+        $this->categoriesMemberPath = $categoriesMemberPath !== '' ? $categoriesMemberPath : 'member';
+
+        return $this;
+    }
+
+    public function getCategoriesIdPath(): string
+    {
+        return $this->categoriesIdPath;
+    }
+
+    public function setCategoriesIdPath(string $categoriesIdPath): static
+    {
+        $this->categoriesIdPath = $categoriesIdPath !== '' ? $categoriesIdPath : 'id';
+
+        return $this;
+    }
+
+    public function getCategoriesLabelPath(): string
+    {
+        return $this->categoriesLabelPath;
+    }
+
+    public function setCategoriesLabelPath(string $categoriesLabelPath): static
+    {
+        $this->categoriesLabelPath = $categoriesLabelPath !== '' ? $categoriesLabelPath : 'label';
 
         return $this;
     }

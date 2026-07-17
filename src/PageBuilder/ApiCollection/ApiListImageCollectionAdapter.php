@@ -60,4 +60,9 @@ final class ApiListImageCollectionAdapter implements ApiCollectionInterface
 
         return null;
     }
+
+    public function fetchCategories(): array
+    {
+        return [];
+    }
 }

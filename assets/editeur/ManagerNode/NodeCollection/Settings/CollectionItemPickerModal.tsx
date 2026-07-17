@@ -12,6 +12,7 @@ import { ChevronLeft, ChevronRight, Loader2, Search } from "lucide-react";
 import { cn } from "@/editeur/lib/utils";
 import {
   fetchCollectionCatalog,
+  fetchCollectionCategories,
   fetchCollectionItemsPage,
   type CollectionApiMappedItem,
 } from "../collectionApiUtils";
@@ -66,6 +67,8 @@ export function CollectionItemPickerModal({
   const [page, setPage] = useState(1);
   const [totalPages, setTotalPages] = useState(0);
   const [searchTerm, setSearchTerm] = useState("");
+  const [categories, setCategories] = useState<Array<{ id: string; label: string }>>([]);
+  const [selectedCategory, setSelectedCategory] = useState("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -104,9 +107,42 @@ export function CollectionItemPickerModal({
       setPage(1);
       setTotalPages(0);
       setSearchTerm("");
+      setCategories([]);
+      setSelectedCategory("");
       setError(null);
     }
   }, [open]);
+
+  useEffect(() => {
+    if (!open || !selectedSourceId) {
+      setCategories([]);
+      setSelectedCategory("");
+      return;
+    }
+
+    let cancelled = false;
+
+    const loadCategories = async () => {
+      try {
+        const cats = await fetchCollectionCategories(selectedSourceId);
+        if (!cancelled) {
+          setCategories(cats);
+          setSelectedCategory("");
+        }
+      } catch {
+        if (!cancelled) {
+          setCategories([]);
+          setSelectedCategory("");
+        }
+      }
+    };
+
+    void loadCategories();
+
+    return () => {
+      cancelled = true;
+    };
+  }, [open, selectedSourceId]);
 
   useEffect(() => {
     if (!open || !selectedSourceId) {
@@ -127,7 +163,8 @@ export function CollectionItemPickerModal({
           selectedSourceId,
           page,
           20,
-          searchTerm.trim() || undefined
+          searchTerm.trim() || undefined,
+          selectedCategory.trim() || undefined
         );
         if (cancelled) return;
 
@@ -157,7 +194,7 @@ export function CollectionItemPickerModal({
         clearTimeout(timeoutId);
       }
     };
-  }, [open, selectedSourceId, page, searchTerm]);
+  }, [open, selectedSourceId, page, searchTerm, selectedCategory]);
 
   const listOptions = useMemo(
     () =>
@@ -166,6 +203,17 @@ export function CollectionItemPickerModal({
         label: source.label,
       })),
     [listSources]
+  );
+
+  const categoryOptions = useMemo(
+    () => [
+      { value: "", label: "Toutes les catégories" },
+      ...categories.map((category) => ({
+        value: category.id,
+        label: category.label,
+      })),
+    ],
+    [categories]
   );
 
   const selectedSource = useMemo(
@@ -206,6 +254,7 @@ export function CollectionItemPickerModal({
                     setSelectedSourceId(value);
                     setPage(1);
                     setSearchTerm("");
+                    setSelectedCategory("");
                   }}
                   options={listOptions}
                   placeholder="Choisir une source…"
@@ -216,6 +265,21 @@ export function CollectionItemPickerModal({
                 <p className="text-xs text-muted-foreground">
                   Source : <span className="font-medium text-foreground">{selectedSource.label}</span>
                 </p>
+              ) : null}
+
+              {selectedSourceId && categories.length > 0 ? (
+                <Form.Group>
+                  <Form.Label text="Catégorie" />
+                  <Form.Select
+                    value={selectedCategory}
+                    onChange={(value) => {
+                      setSelectedCategory(value);
+                      setPage(1);
+                    }}
+                    options={categoryOptions}
+                    placeholder="Toutes les catégories"
+                  />
+                </Form.Group>
               ) : null}
 
               {selectedSourceId ? (
