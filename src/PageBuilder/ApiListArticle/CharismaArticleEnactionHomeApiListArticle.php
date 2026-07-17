@@ -7,6 +7,8 @@ namespace App\PageBuilder\ApiListArticle;
 /**
  * Liste « En Action » (home) depuis
  * https://api.charisma.fr/api/charisma/article/enactions/home
+ *
+ * @deprecated since 2026-07 — remplacé par ApiCollectionDefinition (`charisma_article_enaction_home`). Conservé pour rollback / tests.
  */
 final class CharismaArticleEnactionHomeApiListArticle extends ApiListArticle
 {

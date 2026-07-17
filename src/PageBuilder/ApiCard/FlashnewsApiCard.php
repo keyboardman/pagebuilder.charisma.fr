@@ -8,6 +8,8 @@ use Symfony\Contracts\HttpClient\HttpClientInterface;
 
 /**
  * API card « Flashnews » : articles depuis https://www.flashnews.fr/api/articles
+ *
+ * @deprecated since 2026-07 — remplacé par ApiCollectionDefinition (`flashnews`). Conservé pour rollback / tests.
  */
 final class FlashnewsApiCard extends AbstractApiCardArticle
 {

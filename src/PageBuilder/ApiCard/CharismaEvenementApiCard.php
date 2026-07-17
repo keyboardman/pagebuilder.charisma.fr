@@ -8,6 +8,8 @@ use Symfony\Contracts\HttpClient\HttpClientInterface;
 
 /**
  * API card « Evenements » : événements depuis https://api.charisma.fr/api/charisma/evenements
+ *
+ * @deprecated since 2026-07 — remplacé par ApiCollectionDefinition (`charisma_evenement`). Conservé pour rollback / tests.
  */
 final class CharismaEvenementApiCard extends AbstractApiCardImage implements ApiCardBehaviorInterface
 {

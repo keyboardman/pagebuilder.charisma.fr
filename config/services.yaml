@@ -86,28 +86,24 @@ services:
     # App\PageBuilder\ApiCard\StubApiCard:
     #     tags: [app.builder_api_card]
 
-    App\PageBuilder\ApiCard\FlashnewsApiCard:
-        tags: [app.builder_api_card]
-
-    # Seedés en api_collection_definition (Version20260716170000) — tags list retirés
+    # Seedés en api_collection_definition (Version20260716170000) — tags retirés (classes @deprecated)
+    # App\PageBuilder\ApiCard\FlashnewsApiCard:
+    #     tags: [app.builder_api_card]
+    # App\PageBuilder\ApiCard\CharismaArticleAuteurApiCard:
+    #     tags: [app.builder_api_card]
+    # App\PageBuilder\ApiCard\CharismaTemoignageApiCard:
+    #     tags: [app.builder_api_card]
+    # App\PageBuilder\ApiCard\CharismaEvenementApiCard:
+    #     tags: [app.builder_api_card]
     # App\PageBuilder\ApiListArticle\FlashnewsThemeApiListArticle:
     #     tags: [app.builder_api_list_article]
     # App\PageBuilder\ApiListArticle\FlashnewsArticleHomeApiListArticle:
     #     tags: [app.builder_api_list_article]
-
-    App\PageBuilder\ApiCard\CharismaArticleAuteurApiCard:
-        tags: [app.builder_api_card]
-
-    App\PageBuilder\ApiCard\CharismaVideosApiCard:
-        tags: [app.builder_api_card]
-
-    App\PageBuilder\ApiCard\CharismaTemoignageApiCard:
-        tags: [app.builder_api_card]
-
     # App\PageBuilder\ApiListArticle\CharismaTemoignageHomeApiListArticle:
     #     tags: [app.builder_api_list_article]
 
-    App\PageBuilder\ApiCard\CharismaEvenementApiCard:
+    # Hors seed v1 — restent actifs (bannières custom, videos, stubs)
+    App\PageBuilder\ApiCard\CharismaVideosApiCard:
         tags: [app.builder_api_card]
 
     App\PageBuilder\ApiCard\CharismaEvenementHomeApiCard:

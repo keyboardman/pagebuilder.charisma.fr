@@ -6,6 +6,8 @@ namespace App\PageBuilder\ApiListArticle;
 
 /**
  * Liste « Flashnews thèmes » depuis https://www.flashnews.fr/api/themes
+ *
+ * @deprecated since 2026-07 — remplacé par ApiCollectionDefinition (`flashnews-themes`). Conservé pour rollback / tests.
  */
 final class FlashnewsThemeApiListArticle extends ApiListArticle
 {

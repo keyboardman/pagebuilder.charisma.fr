@@ -8,6 +8,8 @@ use Symfony\Contracts\HttpClient\HttpClientInterface;
 
 /**
  * API card « Articles Auteur » : articles depuis https://api.charisma.fr/api/charisma/article/auteurs
+ *
+ * @deprecated since 2026-07 — remplacé par ApiCollectionDefinition (`charisma_article_auteur`). Conservé pour rollback / tests.
  */
 final class CharismaArticleAuteurApiCard extends AbstractApiCardArticle
 {

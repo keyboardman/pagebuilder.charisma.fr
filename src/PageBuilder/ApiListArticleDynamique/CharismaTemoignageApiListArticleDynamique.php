@@ -11,6 +11,8 @@ use App\PageBuilder\ApiListArticle\ApiListArticlePageResult;
  *
  * Collection : GET https://api.charisma.fr/api/charisma/temoignages
  * Item       : GET https://api.charisma.fr/api/charisma/temoignages/{id}
+ *
+ * @deprecated since 2026-07 — remplacé par ApiCollectionDefinition (`charisma_temoignage`). Conservé pour rollback / tests.
  */
 final class CharismaTemoignageApiListArticleDynamique extends AbstractCharismaArticleApiListArticleDynamique
 {

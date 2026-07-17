@@ -6,6 +6,8 @@ namespace App\PageBuilder\ApiListArticle;
 
 /**
  * Endpoint NodeListApi : témoignages home Charisma.
+ *
+ * @deprecated since 2026-07 — remplacé par ApiCollectionDefinition (`charisma_temoignage_home`). Conservé pour rollback / tests.
  */
 final class CharismaTemoignageHomeApiListArticle extends ApiListArticle
 {

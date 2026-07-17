@@ -6,6 +6,8 @@ namespace App\PageBuilder\ApiListArticle;
 
 /**
  * Endpoint NodeListApi : articles home Flashnews.
+ *
+ * @deprecated since 2026-07 — remplacé par ApiCollectionDefinition (`flashnews_article_home`). Conservé pour rollback / tests.
  */
 final class FlashnewsArticleHomeApiListArticle extends ApiListArticle
 {

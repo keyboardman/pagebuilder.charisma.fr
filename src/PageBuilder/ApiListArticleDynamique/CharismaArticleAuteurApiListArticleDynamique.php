@@ -9,6 +9,8 @@ namespace App\PageBuilder\ApiListArticleDynamique;
  *
  * Collection : GET https://api.charisma.fr/api/charisma/article/auteurs
  * Item       : GET https://api.charisma.fr/api/charisma/article/auteurs/{id}
+ *
+ * @deprecated since 2026-07 — remplacé par ApiCollectionDefinition (`charisma_article_auteur`). Conservé pour rollback / tests.
  */
 final class CharismaArticleAuteurApiListArticleDynamique extends AbstractCharismaArticleApiListArticleDynamique
 {

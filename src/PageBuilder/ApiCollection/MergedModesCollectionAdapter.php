@@ -6,6 +6,8 @@ namespace App\PageBuilder\ApiCollection;
 
 /**
  * Fusionne deux ApiCollection de même id (ex. liste fixed + source dynamic) en cumulant les modes.
+ *
+ * @deprecated since 2026-07 — fusion fixed/dynamic plus utilisée (sources article seedées). Conservé pour rollback.
  */
 final class MergedModesCollectionAdapter implements ApiCollectionInterface
 {

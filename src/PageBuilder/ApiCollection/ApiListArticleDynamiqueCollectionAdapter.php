@@ -8,6 +8,8 @@ use App\PageBuilder\ApiListArticleDynamique\ApiListArticleDynamique;
 
 /**
  * Adapter : ApiListArticleDynamique → ApiCollection type article (dynamic).
+ *
+ * @deprecated since 2026-07 — plus aucune ApiListArticleDynamique taguée (seed ApiCollection). Conservé pour rollback.
  */
 final class ApiListArticleDynamiqueCollectionAdapter implements ApiCollectionInterface
 {

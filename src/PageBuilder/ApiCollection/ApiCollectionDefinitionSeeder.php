@@ -9,12 +9,14 @@ use Doctrine\DBAL\Connection;
 /**
  * Seed idempotent des ApiList / ApiCard exprimables vers api_collection_definition.
  *
- * Hors scope v1 (restent adapters PHP) :
+ * Hors scope v1 (restent adapters PHP actifs) :
  * - charisma_evenement_home / charisma_evenement_retrospective (pagination custom)
  * - videos (Hydra avancé)
  *
+ * Classes PHP seedées : tags DI retirés + @deprecated (conservées pour rollback / tests).
+ *
  * Rollback : DELETE FROM api_collection_definition WHERE api_id IN (…ids seedés…)
- * puis re-taguer les services ApiList* correspondants dans config/services.yaml.
+ * puis re-taguer les services ApiList* / ApiCard correspondants dans config/services.yaml.
  */
 final class ApiCollectionDefinitionSeeder
 {

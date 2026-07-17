@@ -11,6 +11,8 @@ use App\PageBuilder\ApiListArticle\ApiListArticlePageResult;
  *
  * Collection : GET https://www.flashnews.fr/api/articles
  * Item       : GET https://www.flashnews.fr/api/articles/{id}
+ *
+ * @deprecated since 2026-07 — remplacé par ApiCollectionDefinition (`flashnews_article`). Conservé pour rollback / tests.
  */
 final class FlashnewsArticleApiListArticleDynamique extends ApiListArticleDynamique
 {

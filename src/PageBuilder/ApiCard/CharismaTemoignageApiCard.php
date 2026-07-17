@@ -8,6 +8,8 @@ use Symfony\Contracts\HttpClient\HttpClientInterface;
 
 /**
  * API card « Articles Témoignage » : articles depuis https://api.charisma.fr/api/charisma/temoignages
+ *
+ * @deprecated since 2026-07 — remplacé par ApiCollectionDefinition (`charisma_article_temoignage`). Conservé pour rollback / tests.
  */
 final class CharismaTemoignageApiCard extends AbstractApiCardArticle
 {

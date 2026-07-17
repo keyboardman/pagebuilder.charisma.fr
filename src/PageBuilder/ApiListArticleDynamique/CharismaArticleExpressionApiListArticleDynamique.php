@@ -9,6 +9,8 @@ namespace App\PageBuilder\ApiListArticleDynamique;
  *
  * Collection : GET https://api.charisma.fr/api/charisma/article/expressions
  * Item       : GET https://api.charisma.fr/api/charisma/article/expressions/{id}
+ *
+ * @deprecated since 2026-07 — remplacé par ApiCollectionDefinition (`charisma_article_expression`). Conservé pour rollback / tests.
  */
 final class CharismaArticleExpressionApiListArticleDynamique extends AbstractCharismaArticleApiListArticleDynamique
 {

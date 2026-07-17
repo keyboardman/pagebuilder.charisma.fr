@@ -8,6 +8,8 @@ use App\PageBuilder\ApiListArticle\ApiListArticlePageResult;
 
 /**
  * Base pour les articles Charisma paginés (collection + item /{id}).
+ *
+ * @deprecated since 2026-07 — sources concrètes migrées vers ApiCollectionDefinition. Conservé pour rollback / tests.
  */
 abstract class AbstractCharismaArticleApiListArticleDynamique extends ApiListArticleDynamique
 {

@@ -8,6 +8,8 @@ use App\PageBuilder\ApiListArticle\ApiListArticle;
 
 /**
  * Adapter : ApiListArticle (fixed) → ApiCollection type article.
+ *
+ * @deprecated since 2026-07 — plus aucune ApiListArticle taguée (seed ApiCollection). Conservé pour rollback.
  */
 final class ApiListArticleCollectionAdapter implements ApiCollectionInterface
 {
