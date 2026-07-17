@@ -26,6 +26,7 @@ iframe {
 @import "./node-nav-api.css";
 @import "./node-list-api.css";
 @import "./node-list-image.css";
+@import "./node-collection.css";
 @import "./node-nav-item.css";
 
 /* CONTENT */

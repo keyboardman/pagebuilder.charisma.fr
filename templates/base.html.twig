@@ -40,6 +40,9 @@
                 <a href="{{ path('app_builder_form_config_index') }}" class="nav-link {{ app.request.attributes.get('_route')|default('') starts with 'app_builder_form_config' ? 'active' : '' }}">
                     Formulaires
                 </a>
+                <a href="{{ path('app_api_collection_index') }}" class="nav-link {{ (app.request.attributes.get('_route')|default(''))|slice(0, 19) == 'app_api_collection_' ? 'active' : '' }}">
+                    APIs collection
+                </a>
                 <a href="{{ path('app_admin_comptes') }}" class="nav-link {{ (app.request.attributes.get('_route')|default(''))|slice(0, 10) == 'app_admin_compte' ? 'active' : '' }}">
                     Comptes
                 </a>

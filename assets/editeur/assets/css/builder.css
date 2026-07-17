@@ -315,6 +315,15 @@
     color: inherit;
 }
 
+/* Vignettes du picker : non impactées par le CSS thème de la page (img { width:100% }) */
+.api-manager-ui img.collection-picker-thumb {
+    width: 48px !important;
+    height: 48px !important;
+    max-width: 48px !important;
+    object-fit: cover;
+    flex-shrink: 0;
+}
+
 .bg-diagonal-blue {
     background-image: repeating-linear-gradient(
       -45deg,

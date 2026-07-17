@@ -74,6 +74,14 @@ services:
         arguments:
             $lists: !tagged_iterator app.builder_api_list_image
 
+    App\PageBuilder\ApiCollection\ApiCollectionRegistry:
+        arguments:
+            $extraCollections: !tagged_iterator app.builder_api_collection
+
+    # Tag optionnel pour des ApiCollection PHP additionnelles (hors adapters legacy / admin)
+    # App\PageBuilder\ApiCollection\ExampleApiCollection:
+    #     tags: [app.builder_api_collection]
+
     # StubApiCard : pas de tag pour ne pas l’afficher dans le builder (conservé pour tests)
     # App\PageBuilder\ApiCard\StubApiCard:
     #     tags: [app.builder_api_card]
@@ -81,11 +89,11 @@ services:
     App\PageBuilder\ApiCard\FlashnewsApiCard:
         tags: [app.builder_api_card]
 
-    App\PageBuilder\ApiListArticle\FlashnewsThemeApiListArticle:
-        tags: [app.builder_api_list_article]
-
-    App\PageBuilder\ApiListArticle\FlashnewsArticleHomeApiListArticle:
-        tags: [app.builder_api_list_article]
+    # Seedés en api_collection_definition (Version20260716170000) — tags list retirés
+    # App\PageBuilder\ApiListArticle\FlashnewsThemeApiListArticle:
+    #     tags: [app.builder_api_list_article]
+    # App\PageBuilder\ApiListArticle\FlashnewsArticleHomeApiListArticle:
+    #     tags: [app.builder_api_list_article]
 
     App\PageBuilder\ApiCard\CharismaArticleAuteurApiCard:
         tags: [app.builder_api_card]
@@ -96,8 +104,8 @@ services:
     App\PageBuilder\ApiCard\CharismaTemoignageApiCard:
         tags: [app.builder_api_card]
 
-    App\PageBuilder\ApiListArticle\CharismaTemoignageHomeApiListArticle:
-        tags: [app.builder_api_list_article]
+    # App\PageBuilder\ApiListArticle\CharismaTemoignageHomeApiListArticle:
+    #     tags: [app.builder_api_list_article]
 
     App\PageBuilder\ApiCard\CharismaEvenementApiCard:
         tags: [app.builder_api_card]
@@ -114,26 +122,21 @@ services:
     App\PageBuilder\ApiListImage\CharismaEvenementRetrospectiveApiListImage:
         tags: [app.builder_api_list_image]
 
-    App\PageBuilder\ApiListArticle\CharismaArticleEnactionHomeApiListArticle:
-        tags: [app.builder_api_list_article]
+    # App\PageBuilder\ApiListArticle\CharismaArticleEnactionHomeApiListArticle:
+    #     tags: [app.builder_api_list_article]
+    # App\PageBuilder\ApiListArticle\CharismaArticleExpressionHomeApiListArticle:
+    #     tags: [app.builder_api_list_article]
 
-    App\PageBuilder\ApiListArticle\CharismaArticleExpressionHomeApiListArticle:
-        tags: [app.builder_api_list_article]
-
-    App\PageBuilder\ApiListArticleDynamique\CharismaArticleAuteurApiListArticleDynamique:
-        tags: [app.builder_api_list_article_dynamique]
-
-    App\PageBuilder\ApiListArticleDynamique\CharismaArticleEnactionApiListArticleDynamique:
-        tags: [app.builder_api_list_article_dynamique]
-
-    App\PageBuilder\ApiListArticleDynamique\CharismaArticleExpressionApiListArticleDynamique:
-        tags: [app.builder_api_list_article_dynamique]
-
-    App\PageBuilder\ApiListArticleDynamique\CharismaTemoignageApiListArticleDynamique:
-        tags: [app.builder_api_list_article_dynamique]
-
-    App\PageBuilder\ApiListArticleDynamique\FlashnewsArticleApiListArticleDynamique:
-        tags: [app.builder_api_list_article_dynamique]
+    # App\PageBuilder\ApiListArticleDynamique\CharismaArticleAuteurApiListArticleDynamique:
+    #     tags: [app.builder_api_list_article_dynamique]
+    # App\PageBuilder\ApiListArticleDynamique\CharismaArticleEnactionApiListArticleDynamique:
+    #     tags: [app.builder_api_list_article_dynamique]
+    # App\PageBuilder\ApiListArticleDynamique\CharismaArticleExpressionApiListArticleDynamique:
+    #     tags: [app.builder_api_list_article_dynamique]
+    # App\PageBuilder\ApiListArticleDynamique\CharismaTemoignageApiListArticleDynamique:
+    #     tags: [app.builder_api_list_article_dynamique]
+    # App\PageBuilder\ApiListArticleDynamique\FlashnewsArticleApiListArticleDynamique:
+    #     tags: [app.builder_api_list_article_dynamique]
 
     App\PageBuilder\ApiCard\StubNavListApiCard:
         tags: [app.builder_api_card]

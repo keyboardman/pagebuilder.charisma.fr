@@ -165,8 +165,10 @@ export const NODE_OVERRIDE_TARGETS = [
     { key: 'node-form', label: 'NodeForm', selector: '.ce-form' },
     { key: 'node-nav', label: 'NodeNav', selector: '.ce-menu' },
     { key: 'node-nav-api', label: 'NodeNavApi', selector: '.ce-menu-api' },
-    { key: 'node-list-api', label: 'NodeListApi', selector: '.ce-list-api' },
-    { key: 'node-list-image', label: 'NodeListImage', selector: '.ce-list-image' },
+    // Dépréciés (migrés vers node-collection) — clés CSS conservées pour thèmes existants
+    { key: 'node-list-api', label: 'NodeListApi (déprécié)', selector: '.ce-list-api' },
+    { key: 'node-list-image', label: 'NodeListImage (déprécié)', selector: '.ce-list-image' },
+    { key: 'node-collection', label: 'NodeCollection', selector: '.ce-collection' },
     { key: 'node-nav-item', label: 'NodeNavItem', selector: '.ce-nav-item' },
     { key: 'node-text', label: 'NodeText', selector: '.ce-text' },
     { key: 'node-rich-text', label: 'NodeRichText', selector: '.ce-rich-text' },

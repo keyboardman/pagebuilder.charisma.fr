@@ -15,7 +15,7 @@ vi.mock("../ManagerNode/components/NodeRegistry", () => {
   const registry: Record<string, { button: { label: string } }> = {
     "node-image": { button: { label: "Image" } },
     "node-text": { button: { label: "Text" } },
-    "node-list-api": { button: { label: "Liste <br/> Articles" } },
+    "node-collection": { button: { label: "Collection <br/> Unifiée" } },
   };
 
   return {
@@ -56,8 +56,8 @@ describe("getNodeTypeLabel", () => {
   });
 
   it("retire le HTML du libellé registre", () => {
-    const node = createTestNode({ type: "node-list-api" });
-    expect(getNodeTypeLabel(node)).toBe("Liste Articles");
+    const node = createTestNode({ type: "node-collection" });
+    expect(getNodeTypeLabel(node)).toBe("Collection Unifiée");
   });
 });
 

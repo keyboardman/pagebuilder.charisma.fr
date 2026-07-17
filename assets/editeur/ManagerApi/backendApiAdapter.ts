@@ -61,45 +61,7 @@ export function createBackendApiAdapter(meta: BackendApiMeta, baseUrl: string): 
       return (await res.json()) as Record<string, unknown>;
     },
 
-    mapItem(item: unknown) {
-      const o = item as Record<string, unknown>;
-      const nestedRaw = o?.raw;
-      const raw =
-        nestedRaw != null && typeof nestedRaw === "object"
-          ? nestedRaw
-          : item;
-      const rawRecord =
-        raw != null && typeof raw === "object"
-          ? (raw as Record<string, unknown>)
-          : undefined;
-      const counterSource =
-        o?.counter ?? rawRecord?.vues ?? rawRecord?.views;
-      const likeSource =
-        o?.like ?? rawRecord?.likes ?? rawRecord?.favoris ?? rawRecord?.favori;
-
-      return {
-        id: String(o?.id ?? ""),
-        title: String(o?.title ?? ""),
-        description: o?.description != null ? String(o.description) : undefined,
-        image: o?.image != null ? String(o.image) : undefined,
-        labels: Array.isArray(o?.labels) ? (o.labels as string[]) : undefined,
-        link: o?.link != null ? String(o.link) : undefined,
-        text: o?.text != null ? String(o.text) : undefined,
-        counter:
-          counterSource != null && counterSource !== ""
-            ? typeof counterSource === "number"
-              ? counterSource
-              : String(counterSource)
-            : undefined,
-        like:
-          likeSource != null && likeSource !== ""
-            ? typeof likeSource === "number"
-              ? likeSource
-              : String(likeSource)
-            : undefined,
-        raw,
-      };
-    },
+    mapItem: mapBackendCardItem,
 
     async fetchCategories(): Promise<Array<{ id: string; label: string }>> {
       const res = await fetchJson(`${base}/cards/${encodeURIComponent(meta.id)}/categories`);
@@ -108,6 +70,107 @@ export function createBackendApiAdapter(meta: BackendApiMeta, baseUrl: string): 
       return parseJsonCollection<{ id: string; label: string }>(data);
     },
   };
+}
+
+export function mapBackendCardItem(item: unknown) {
+  const o = item as Record<string, unknown>;
+  const nestedRaw = o?.raw;
+  const raw =
+    nestedRaw != null && typeof nestedRaw === "object"
+      ? nestedRaw
+      : item;
+  const rawRecord =
+    raw != null && typeof raw === "object"
+      ? (raw as Record<string, unknown>)
+      : undefined;
+  const counterSource =
+    o?.counter ?? rawRecord?.vues ?? rawRecord?.views;
+  const likeSource =
+    o?.like ?? rawRecord?.likes ?? rawRecord?.favoris ?? rawRecord?.favori;
+
+  return {
+    id: String(o?.id ?? ""),
+    title: String(o?.title ?? ""),
+    description: o?.description != null ? String(o.description) : undefined,
+    image: o?.image != null ? String(o.image) : undefined,
+    labels: Array.isArray(o?.labels) ? (o.labels as string[]) : undefined,
+    link: o?.link != null ? String(o.link) : undefined,
+    text: o?.text != null ? String(o.text) : undefined,
+    counter:
+      counterSource != null && counterSource !== ""
+        ? typeof counterSource === "number"
+          ? counterSource
+          : String(counterSource)
+        : undefined,
+    like:
+      likeSource != null && likeSource !== ""
+        ? typeof likeSource === "number"
+          ? likeSource
+          : String(likeSource)
+        : undefined,
+    raw,
+  };
+}
+
+const DEFAULT_API_CARDS_BASE_URL = "/api/page-builder";
+
+export function resolveApiCardsBaseUrl(): string {
+  if (typeof document !== "undefined") {
+    const fromDom = document
+      .querySelector<HTMLElement>("[data-api-cards-base-url]")
+      ?.dataset.apiCardsBaseUrl?.trim();
+    if (fromDom) {
+      return fromDom.replace(/\/$/, "");
+    }
+  }
+  return DEFAULT_API_CARDS_BASE_URL;
+}
+
+const cardItemCache = new Map<string, Record<string, unknown>>();
+const cardItemInFlight = new Map<string, Promise<Record<string, unknown>>>();
+
+export async function fetchCardItemHttp(
+  apiId: string,
+  itemId: string,
+  baseUrl = resolveApiCardsBaseUrl()
+): Promise<Record<string, unknown>> {
+  const base = baseUrl.replace(/\/$/, "");
+  const cacheKey = `${base}:${apiId}:${itemId}`;
+
+  const cached = cardItemCache.get(cacheKey);
+  if (cached) {
+    return cached;
+  }
+
+  const inFlight = cardItemInFlight.get(cacheKey);
+  if (inFlight) {
+    return inFlight;
+  }
+
+  const promise = (async () => {
+    const res = await fetch(
+      `${base}/cards/${encodeURIComponent(apiId)}/items/${encodeURIComponent(itemId)}`,
+      {
+        credentials: "same-origin",
+        headers: { Accept: "application/json" },
+      }
+    );
+    if (!res.ok) {
+      const text = await res.text().catch(() => res.statusText);
+      throw new Error(text || "fetchCardItemHttp failed");
+    }
+    return (await res.json()) as Record<string, unknown>;
+  })();
+
+  cardItemInFlight.set(cacheKey, promise);
+
+  try {
+    const data = await promise;
+    cardItemCache.set(cacheKey, data);
+    return data;
+  } finally {
+    cardItemInFlight.delete(cacheKey);
+  }
 }
 
 /**

@@ -1,0 +1,73 @@
+{{ form_start(form, { attr: { class: 'space-y-6' } }) }}
+
+{% if form.vars.errors|length > 0 %}
+    <div class="rounded-md border border-destructive/50 bg-destructive/10 p-3 text-sm text-destructive">
+        {{ form_errors(form) }}
+    </div>
+{% endif %}
+
+<div class="card p-4 space-y-4">
+    <div>
+        <h2 class="text-lg font-semibold">Identité</h2>
+        <p class="text-sm text-muted-foreground mt-1">Identifiant builder, type de contenu et modes disponibles.</p>
+    </div>
+    <div class="grid gap-4 sm:grid-cols-2">
+        <div>{{ form_row(form.apiId) }}</div>
+        <div>{{ form_row(form.label) }}</div>
+        <div>{{ form_row(form.type) }}</div>
+        <div class="flex flex-col justify-end pb-1">{{ form_row(form.enabled) }}</div>
+    </div>
+    <div>{{ form_row(form.supportedModes) }}</div>
+</div>
+
+<div class="card p-4 space-y-4">
+    <div>
+        <h2 class="text-lg font-semibold">Source HTTP</h2>
+        <p class="text-sm text-muted-foreground mt-1">Endpoint distant, template item (mode dynamic), préfixe média et paramètres de requête.</p>
+    </div>
+    <div class="space-y-4">
+        {{ form_row(form.endpointUrl) }}
+        {{ form_row(form.itemUrlTemplate) }}
+        {{ form_row(form.imagePrefix) }}
+        <div class="grid gap-4 sm:grid-cols-2">
+            <div>{{ form_row(form.queryParamsText) }}</div>
+            <div>{{ form_row(form.headersText) }}</div>
+        </div>
+    </div>
+</div>
+
+<div class="card p-4 space-y-4">
+    <div>
+        <h2 class="text-lg font-semibold">Pagination &amp; parsing</h2>
+        <p class="text-sm text-muted-foreground mt-1">Comment découper la réponse JSON et où trouver la liste d’items.</p>
+    </div>
+    <div class="grid gap-4 sm:grid-cols-2">
+        <div>{{ form_row(form.paginationStyle) }}</div>
+        <div>{{ form_row(form.memberPath) }}</div>
+    </div>
+</div>
+
+<div class="card p-4 space-y-4">
+    <div>
+        <h2 class="text-lg font-semibold">Mapping des champs</h2>
+        <p class="text-sm text-muted-foreground mt-1">
+            Chemins pointés dans la réponse JSON distante (ex. <code class="text-xs">visuel.url</code>).
+            Laisser vide pour ne pas exposer le champ.
+        </p>
+    </div>
+    <div class="grid gap-4 sm:grid-cols-2">
+        <div>{{ form_row(form.map_id) }}</div>
+        <div>{{ form_row(form.map_image) }}</div>
+        <div>{{ form_row(form.map_title) }}</div>
+        <div>{{ form_row(form.map_description) }}</div>
+        <div>{{ form_row(form.map_label) }}</div>
+        <div>{{ form_row(form.map_labels) }}</div>
+        <div>{{ form_row(form.map_counter) }}</div>
+        <div>{{ form_row(form.map_like) }}</div>
+        <div>{{ form_row(form.map_link) }}</div>
+        <div>{{ form_row(form.map_alt) }}</div>
+    </div>
+</div>
+
+<button type="submit" class="btn btn-primary">{{ submit_label|default('Enregistrer') }}</button>
+{{ form_end(form) }}

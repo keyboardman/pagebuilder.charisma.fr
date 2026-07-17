@@ -1,0 +1,17 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Nouvelle API collection{% endblock %}
+
+{% block body %}
+<div class="max-w-4xl space-y-6">
+    <div>
+        <a href="{{ path('app_api_collection_index') }}" class="btn btn-ghost btn-sm mb-2">← Retour</a>
+        <h1 class="text-2xl font-bold tracking-tight">Nouvelle API collection</h1>
+        <p class="text-sm text-muted-foreground mt-1">
+            Déclaration consommée par NodeCollection (catalogue builder).
+        </p>
+    </div>
+
+    {% include 'api_collection/_form.html.twig' with { submit_label: 'Créer' } %}
+</div>
+{% endblock %}

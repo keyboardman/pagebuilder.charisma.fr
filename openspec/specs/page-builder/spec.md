@@ -930,68 +930,31 @@ Le NodeNavApi SHALL réutiliser les options de présentation du **NodeNav** : **
 
 ### Requirement: Liste d'items pilotée par API (NodeListApi)
 
-Le builder SHALL fournir un type de nœud **NodeListApi** (identifiant `node-list-api`) qui affiche une liste d'items alimentée par une **ApiListArticle** (voir capacité `node-list-api-apilist-base`). Le nœud SHALL exposer un champ **apiId** pour sélectionner la source. Le nœud SHALL charger la collection complète via `GET /api/page-builder/lists/{apiId}/items` (sans paramètres de pagination) et SHALL rendre chaque item mappé dans une structure de liste. Le nœud SHALL **ne pas** être droppable et SHALL **ne pas** accepter d'enfants : les entrées proviennent uniquement de l'API.
+Le nœud **NodeListApi** (`node-list-api`) est **déprécié** au profit de **NodeCollection** (`node-collection` avec `collectionType=article`, `display=list`). Le builder SHALL ne plus proposer ce type dans le panneau des composants. Les pages existantes SHALL être migrées automatiquement vers `node-collection` (voir capacité `node-list-to-collection-migration`). Tant que le code module reste présent pour d’autres dépendances éventuelles, il SHALL ne plus être enregistré comme composant ajoutable.
 
-Le NodeListApi SHALL exposer dans ses réglages **page** (entier ≥ 1) et **itemsPerPage** (10, 20 ou 30) pour limiter le nombre d'éléments **affichés** à partir de la collection chargée. Lorsque `itemsPerPage` est absent, le nœud SHALL afficher tous les items de la collection (rétrocompatibilité). Le découpage SHALL s'appliquer localement : `items affichés = collection.slice((page - 1) * itemsPerPage, page * itemsPerPage)`.
+#### Scenario: Insertion legacy impossible
 
-Pour chaque item, le nœud SHALL pouvoir afficher optionnellement **titre**, **description**, **compteur** et **like**, contrôlés par `content.show.title`, `content.show.description`, `content.show.counter` et `content.show.like`. Le nœud SHALL **ne pas** afficher d'image, y compris via le champ `image` du mapping ApiListArticle ou des balises `<img>` dans le contenu HTML. Lorsqu'un toggle `show` est activé mais que le champ correspondant est absent dans l'item mappé, le nœud SHALL omettre cet élément sans réserver d'espace vide. Lorsqu'un toggle `show` est désactivé, le nœud SHALL ne pas rendre cet élément quel que soit le contenu mappé.
+- **WHEN** l'utilisateur cherche à ajouter un bloc « Liste Articles » depuis la palette
+- **THEN** l'option n’est plus disponible ; il utilise NodeCollection (article)
 
-Le NodeListApi SHALL exposer des réglages de style par sous-partie (conteneur liste, item, titre, description, compteur, like) et SHALL utiliser des hooks DOM (`ce-list-api`, `ce-list-api-item`, et classes dérivées par sous-partie) pour le ciblage CSS thème. Si l'item mappé fournit un `link`, le nœud SHALL permettre une navigation vers cette URL (comportement aligné sur **NodeCardApi** pour les zones cliquables).
+#### Scenario: Contenu historique migré
 
-#### Scenario: Ajout d'un NodeListApi depuis le panneau
+- **WHEN** une page contenait un `node-list-api` avant migration
+- **THEN** le nœud correspondant est un `node-collection` article après migration et reste éditable
 
-- **WHEN** l'utilisateur ajoute un bloc liste API (NodeListApi) depuis le panneau des composants
-- **THEN** un nœud `node-list-api` est inséré ; l'utilisateur peut choisir une ApiListArticle dans les réglages ; aucun enfant manuel n'est attendu
+### Requirement: Dépréciation des nœuds NodeListApi et NodeListImage dans la palette
 
-#### Scenario: Sélection d'une API éligible
+Après la migration des contenus, le registre des nœuds du builder SHALL cesser d’exposer **NodeListApi** (`node-list-api`) et **NodeListImage** (`node-list-image`) dans le panneau des composants. Les nouvelles insertions de ces types SHALL être impossibles via l’UI. Le nœud **NodeCollection** (`node-collection`) demeure le moyen supporté pour les listes article et image.
 
-- **WHEN** l'utilisateur ouvre les réglages du NodeListApi et choisit une API
-- **THEN** les sources exposées par `/api/page-builder/lists` sont proposées ; après validation, `apiId` est persisté dans le contenu du nœud
+#### Scenario: Palette sans Liste Articles / Liste Image
 
-#### Scenario: Rendu des items depuis la collection
+- **WHEN** l’utilisateur ouvre le panneau des composants catégorie API
+- **THEN** les boutons « Liste Articles » (`node-list-api`) et « Liste Image » (`node-list-image`) sont absents ; le bouton « Collection » reste disponible
 
-- **WHEN** le NodeListApi a un `apiId` valide et que l'endpoint collection retourne des items mappés
-- **THEN** le builder affiche une liste contenant un item par entrée de la collection dans l'éditeur, la prévisualisation et le rendu exporté
+#### Scenario: Chargement d’une page migrée
 
-#### Scenario: Limitation d'affichage par page et itemsPerPage
-
-- **WHEN** l'utilisateur configure `page = 1` et `itemsPerPage = 20` sur un NodeListApi dont la collection contient 50 items
-- **THEN** le nœud affiche uniquement les 20 premiers items, sans nouvel appel backend
-
-#### Scenario: Rétrocompatibilité sans itemsPerPage
-
-- **WHEN** un NodeListApi existant n'a pas de `content.itemsPerPage` persisté
-- **THEN** le nœud affiche tous les items de la collection, comme avant ce changement
-
-#### Scenario: Affichage conditionnel titre, description, compteur et like
-
-- **WHEN** l'utilisateur active `show.title`, `show.description`, `show.counter` et `show.like` et que l'item mappé contient ces champs
-- **THEN** chaque item de la liste affiche le titre, la description, le compteur et le like correspondants, sans image
-
-#### Scenario: Champ absent dans l'item mappé
-
-- **WHEN** `show.counter` est activé mais que l'item mappé ne fournit pas de `counter`
-- **THEN** le compteur n'est pas rendu pour cet item et aucun placeholder vide n'est affiché
-
-#### Scenario: Toggle show désactivé
-
-- **WHEN** l'utilisateur désactive `show.description`
-- **THEN** la description n'est pas rendue pour aucun item de la liste, même si présente dans le mapping ApiListArticle
-
-#### Scenario: Lien sur item
-
-- **WHEN** un item mappé fournit un `link` valide
-- **THEN** le rendu expose une zone ou un wrapper cliquable menant vers cette URL (comportement cohérent avec les cards API existantes)
-
-#### Scenario: API indisponible ou collection vide
-
-- **WHEN** l'API sélectionnée ne répond pas, retourne une erreur ou une collection vide
-- **THEN** le NodeListApi affiche un état dégradé (liste vide ou message discret) sans empêcher la sauvegarde de la page
-
-#### Scenario: Persistance du NodeListApi
-
-- **WHEN** l'utilisateur sauvegarde une page contenant un NodeListApi configuré
-- **THEN** le contenu sérialisé conserve `apiId`, `page`, `itemsPerPage`, les toggles `show` et les styles configurés, et permet de recharger la liste à l'affichage
+- **WHEN** une page dont les nœuds list ont été convertis en `node-collection` est chargée dans le builder
+- **THEN** les nœuds s’affichent via le view NodeCollection sans erreur de type inconnu
 
 ### Requirement: NodeListApi mode fixe ou dynamique
 
@@ -2167,4 +2130,41 @@ Le post-traitement serveur du HTML de rendu public (`PageController::renderPageC
 
 - **WHEN** un éditeur authentifié ouvre la preview admin d’une page contenant des nœuds consommateurs d’API card
 - **THEN** `data-api-cards-base-url` est également une URL absolue, avec le même format que sur le rendu public
+
+### Requirement: Enregistrement du nœud NodeCollection dans le builder
+
+Le registre des nœuds du builder (`NodeRegistry`) SHALL inclure **NodeCollection** (type `node-collection`). Le nœud SHALL apparaître dans le panneau des composants avec le label « Collection », une icône dédiée, la catégorie `api`, et SHALL être disponible en édition, preview et rendu final. Le CSS de thème généré SHALL inclure les styles de base du nœud (`node-collection.css`) pour assurer la cohérence visuelle en édition.
+
+#### Scenario: NodeCollection visible dans la palette
+
+- **WHEN** l'utilisateur ouvre le panneau des composants du builder
+- **THEN** le bouton « Collection » (node-collection) est disponible dans la catégorie API
+
+#### Scenario: Styles thème appliqués en édition
+
+- **WHEN** une page contient un NodeCollection et un thème avec CSS généré est actif
+- **THEN** les hooks `ce-collection` et dérivés reçoivent les styles du thème en édition comme en preview
+
+### Requirement: Endpoints page-builder collections
+
+Le backend page-builder SHALL exposer les endpoints ApiCollection sous le préfixe API existant (ex. `/api/page-builder/collections`, `/api/page-builder/collections/{apiId}/items`, `/api/page-builder/collections/resolve`) de façon consommable par le builder (authentification / exposition alignées sur les endpoints cards et lists actuels).
+
+#### Scenario: Catalogue accessible au builder
+
+- **WHEN** le frontend builder demande le catalogue collections avec les credentials habituels page-builder
+- **THEN** il reçoit la liste JSON des APIs actives filtrables par type et mode
+
+#### Scenario: Resolve accessible au rendu
+
+- **WHEN** la preview ou le rendu public résout des items dynamic via collections/resolve
+- **THEN** la requête cible la base API page-builder absolue déjà injectée pour les cards/lists
+
+### Requirement: Navigation admin APIs collection
+
+L’interface d’administration du page-builder SHALL inclure un accès à la gestion des APIs collection (lien de menu vers le CRUD `/admin/api-collection`).
+
+#### Scenario: Accès depuis le menu
+
+- **WHEN** un utilisateur authentifié ouvre l’admin
+- **THEN** il peut naviguer vers la gestion des APIs collection depuis le menu latéral
 

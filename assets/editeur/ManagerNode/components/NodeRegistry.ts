@@ -19,8 +19,7 @@ import NodeHero from "../NodeHero";
 import NodeHtml from "../NodeHtml";
 import NodeNav from "../NodeNav";
 import NodeNavApi from "../NodeNavApi";
-import NodeListApi from "../NodeListApi";
-import NodeListImage from "../NodeListImage";
+import NodeCollection from "../NodeCollection";
 import NodeNavItem from "../NodeNavItem";
 import NodeSlideshow from "../NodeSlideshow";
 import NodeRichText from "../NodeRichText";
@@ -56,8 +55,8 @@ export const NodeRegistry = {
     [NodeRichText.type]: NodeRichText,
     [NodeNav.type]: NodeNav,
     [NodeNavApi.type]: NodeNavApi,
-    [NodeListApi.type]: NodeListApi,
-    [NodeListImage.type]: NodeListImage,
+    // NodeListApi / NodeListImage dépréciés → NodeCollection (migration page.content)
+    [NodeCollection.type]: NodeCollection,
     [NodeNavItem.type]: NodeNavItem,
     [NodeSlideshow.type]: NodeSlideshow,
     [NodeForm.type]: NodeForm,

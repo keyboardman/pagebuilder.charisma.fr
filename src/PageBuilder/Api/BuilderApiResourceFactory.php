@@ -9,6 +9,7 @@ use App\DTO\BuilderApiCardCategoryData;
 use App\ApiResource\BuilderApiCardItem;
 use App\ApiResource\BuilderApiCardItemsPage;
 use App\DTO\BuilderApiCardItemData;
+use App\DTO\BuilderApiCollectionItemData;
 use App\DTO\BuilderApiListImageItemData;
 
 final class BuilderApiResourceFactory
@@ -57,6 +58,33 @@ final class BuilderApiResourceFactory
         $item->image = (string) ($data['image'] ?? '');
         $item->link = isset($data['link']) ? (string) $data['link'] : null;
         $item->alt = isset($data['alt']) ? (string) $data['alt'] : null;
+
+        return $item;
+    }
+
+    /**
+     * @param array<string, mixed> $data
+     */
+    public function createCollectionItemData(array $data): BuilderApiCollectionItemData
+    {
+        $item = new BuilderApiCollectionItemData();
+        $item->id = (string) ($data['id'] ?? '');
+        $item->image = isset($data['image']) ? (string) $data['image'] : null;
+        $item->title = isset($data['title']) ? (string) $data['title'] : null;
+        $item->description = isset($data['description']) ? (string) $data['description'] : null;
+        $item->label = isset($data['label']) ? (string) $data['label'] : null;
+        $item->labels = \is_array($data['labels'] ?? null) ? array_values($data['labels']) : null;
+        $item->link = isset($data['link']) ? (string) $data['link'] : null;
+        $item->alt = isset($data['alt']) ? (string) $data['alt'] : null;
+        $item->text = isset($data['text']) ? (string) $data['text'] : null;
+        if (isset($data['counter']) && $data['counter'] !== null && $data['counter'] !== '') {
+            $item->counter = is_numeric($data['counter']) ? (int) $data['counter'] : (string) $data['counter'];
+        }
+        if (isset($data['like']) && $data['like'] !== null && $data['like'] !== '') {
+            $item->like = is_numeric($data['like']) ? (int) $data['like'] : (string) $data['like'];
+        }
+        $raw = $data['raw'] ?? null;
+        $item->raw = \is_array($raw) ? $raw : null;
 
         return $item;
     }
