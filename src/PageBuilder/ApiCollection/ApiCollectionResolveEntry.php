@@ -20,13 +20,28 @@ final readonly class ApiCollectionResolveEntry
      */
     public static function fromArray(array $data): ?self
     {
-        $apiId = $data['apiId'] ?? $data['type'] ?? null;
-        $itemId = $data['itemId'] ?? $data['id'] ?? null;
+        $apiId = self::stringifyId($data['apiId'] ?? $data['type'] ?? null);
+        $itemId = self::stringifyId($data['itemId'] ?? $data['id'] ?? null);
 
-        if (!\is_string($apiId) || $apiId === '' || !\is_string($itemId) || $itemId === '') {
+        if ($apiId === null || $apiId === '' || $itemId === null || $itemId === '') {
             return null;
         }
 
         return new self($apiId, $itemId);
+    }
+
+    /**
+     * Accepte string ou nombre JSON (legacy NodeVideoApi / ApiCard stockaient parfois itemId en int).
+     */
+    private static function stringifyId(mixed $value): ?string
+    {
+        if (\is_string($value)) {
+            return $value;
+        }
+        if (\is_int($value) || \is_float($value)) {
+            return (string) $value;
+        }
+
+        return null;
     }
 }

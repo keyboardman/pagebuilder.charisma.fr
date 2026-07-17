@@ -9,7 +9,10 @@ import { VideoPlayOverlayIcon } from "../components/VideoPlayOverlayIcon";
 import { getVideoModalDataAttributes } from "../../components/video/videoModalAttributes";
 import { openCharismaVideoModal } from "../../components/video/charismaVideoModal";
 import { parseFavoriCount } from "../../components/video/favoriCount";
-import { apiRegistry } from "../../ManagerApi/ApiRegistry";
+import {
+  resolveCollectionEntries,
+  type CollectionApiMappedItem,
+} from "../NodeCollection/collectionApiUtils";
 
 const ViewTitle: FC<{
   title: string;
@@ -62,6 +65,19 @@ const VideoPlaceholder: FC<{ text?: string }> = ({ text = "Aucune vidéo" }) => 
   );
 };
 
+function favoriFromCollectionItem(item: CollectionApiMappedItem): number {
+  if (typeof item.like === "number" && Number.isFinite(item.like)) {
+    return Math.max(0, Math.floor(item.like));
+  }
+  if (typeof item.like === "string" && item.like.trim() !== "") {
+    const parsed = Number(item.like);
+    if (Number.isFinite(parsed)) {
+      return Math.max(0, Math.floor(parsed));
+    }
+  }
+  return parseFavoriCount(item);
+}
+
 const View: FC<NodeViewProps | NodeEditProps> = () => {
   const { node } = useNodeContext() as { node: NodeVideoApiType };
   const { mode } = useAppContext();
@@ -83,16 +99,14 @@ const View: FC<NodeViewProps | NodeEditProps> = () => {
   useEffect(() => {
     if (!content.apiId || !content.itemId) return;
 
-    const adapter = apiRegistry.get(content.apiId);
-    if (!adapter) return;
-
     let cancelled = false;
-    void adapter
-      .fetchItem(content.itemId)
-      .then((item) => {
+    void resolveCollectionEntries([{ apiId: content.apiId, itemId: String(content.itemId) }])
+      .then((items) => {
         if (cancelled) return;
-        const mapped = adapter.mapItem(item);
-        setFavoriCount(parseFavoriCount(mapped.raw));
+        const item = items[0];
+        if (item) {
+          setFavoriCount(favoriFromCollectionItem(item));
+        }
       })
       .catch(() => undefined);
 

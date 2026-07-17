@@ -97,6 +97,8 @@ final class CharismaVideosApiCard extends AbstractApiCardVideo
             $image = (string) $original;
         }
 
+        $favori = $item->favori ?? null;
+
         return [
             'id' => $id !== null ? (string) $id : '',
             'title' => (string) $title,
@@ -104,6 +106,7 @@ final class CharismaVideosApiCard extends AbstractApiCardVideo
             'image' => $image,
             'labels' => null,
             'link' => $play !== null ? (string) $play : null,
+            'like' => $favori !== null && $favori !== '' ? $favori : null,
             'text' => null,
             'raw' => $item,
         ];

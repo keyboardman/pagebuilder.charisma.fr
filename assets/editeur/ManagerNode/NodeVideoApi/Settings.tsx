@@ -2,8 +2,6 @@ import { type CSSProperties, type FC, useEffect, useState } from "react";
 import { useNodeBuilderContext } from "../../services/providers/NodeBuilderContext";
 import { type NodeSettingsProps } from "../NodeConfigurationType";
 import type { NodeVideoApiType } from "./index";
-import { ApiManagerModal } from "../../ManagerApi/ApiManagerModal";
-import { apiRegistry } from "../../ManagerApi/ApiRegistry";
 import { Loader2, AlertCircle, Database } from "lucide-react";
 import { Button } from "@/editeur/components/ui/button";
 import { NodeSettingsWrapper } from "../components/NodeSettingsWrapper";
@@ -18,6 +16,34 @@ import {
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/editeur/components/ui/tabs";
 import { Switch } from "@/editeur/components/ui/switch";
 import { parseFavoriCount } from "../../components/video/favoriCount";
+import {
+  fetchCollectionCatalog,
+  resolveCollectionEntries,
+  type CollectionApiMappedItem,
+} from "../NodeCollection/collectionApiUtils";
+import { CollectionItemPickerModal } from "../NodeCollection/Settings/CollectionItemPickerModal";
+
+function favoriFromCollectionItem(item: CollectionApiMappedItem): number {
+  if (typeof item.like === "number" && Number.isFinite(item.like)) {
+    return Math.max(0, Math.floor(item.like));
+  }
+  if (typeof item.like === "string" && item.like.trim() !== "") {
+    const parsed = Number(item.like);
+    if (Number.isFinite(parsed)) {
+      return Math.max(0, Math.floor(parsed));
+    }
+  }
+  return parseFavoriCount(item);
+}
+
+function mapCollectionItemToVideoFields(item: CollectionApiMappedItem) {
+  return {
+    src: item.link || item.image || "",
+    poster: item.image || "",
+    title: item.title || "",
+    favoriCount: favoriFromCollectionItem(item),
+  };
+}
 
 const Settings: FC<NodeSettingsProps> = () => {
   const { node, onChange } = useNodeBuilderContext();
@@ -26,6 +52,33 @@ const Settings: FC<NodeSettingsProps> = () => {
   const [loading, setLoading] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
   const [modalOpen, setModalOpen] = useState<boolean>(false);
+  const [sourceLabel, setSourceLabel] = useState<string | null>(null);
+
+  useEffect(() => {
+    let cancelled = false;
+
+    const loadLabel = async () => {
+      if (!content.apiId) {
+        setSourceLabel(null);
+        return;
+      }
+      try {
+        const catalog = await fetchCollectionCatalog("video", undefined, { bypassCache: true });
+        if (cancelled) return;
+        const match = catalog.find((s) => s.id === content.apiId);
+        setSourceLabel(match?.label ?? content.apiId);
+      } catch {
+        if (!cancelled) {
+          setSourceLabel(content.apiId);
+        }
+      }
+    };
+
+    void loadLabel();
+    return () => {
+      cancelled = true;
+    };
+  }, [content.apiId]);
 
   useEffect(() => {
     const loadItem = async () => {
@@ -33,36 +86,34 @@ const Settings: FC<NodeSettingsProps> = () => {
         return;
       }
 
-      const adapter = apiRegistry.get(content.apiId);
-      if (!adapter) {
-        setError("API non trouvée");
-        return;
-      }
-
       setLoading(true);
       setError(null);
 
       try {
-        const item = await adapter.fetchItem(content.itemId);
-        const mappedData = adapter.mapItem(item);
+        const resolved = await resolveCollectionEntries([
+          { apiId: content.apiId, itemId: String(content.itemId) },
+        ]);
+        const item = resolved[0];
 
-        const videoSrc = (mappedData as { src?: string }).src || mappedData.link || mappedData.image || "";
-        const videoPoster = mappedData.image || "";
-        const videoTitle = mappedData.title || "";
-        const favoriCount = parseFavoriCount(mappedData.raw);
+        if (!item) {
+          setError("Vidéo non trouvée");
+          return;
+        }
+
+        const mapped = mapCollectionItemToVideoFields(item);
 
         onChange({
           ...node,
           content: {
             ...videoApiNode.content,
             apiId: content.apiId,
-            itemId: content.itemId,
-            src: videoSrc,
-            poster: videoPoster,
-            favoriCount,
+            itemId: String(content.itemId),
+            src: mapped.src,
+            poster: mapped.poster,
+            favoriCount: mapped.favoriCount,
             title: {
               ...(videoApiNode.content?.title || { className: "", style: {} }),
-              text: videoTitle,
+              text: mapped.title,
             },
             autoplay: true,
             controls: true,
@@ -75,39 +126,25 @@ const Settings: FC<NodeSettingsProps> = () => {
       }
     };
 
-    loadItem();
+    void loadItem();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [content.apiId, content.itemId]);
 
-  const handleItemSelect = (
-    apiId: string,
-    itemId: string,
-    mappedData: {
-      id: string;
-      title: string;
-      description?: string;
-      image?: string;
-      link?: string;
-      raw: unknown;
-    }
-  ) => {
-    const videoSrc = (mappedData as { src?: string }).src || mappedData.link || mappedData.image || "";
-    const videoPoster = mappedData.image || "";
-    const videoTitle = mappedData.title || "";
-    const favoriCount = parseFavoriCount(mappedData.raw);
+  const handleItemSelect = (apiId: string, item: CollectionApiMappedItem) => {
+    const mapped = mapCollectionItemToVideoFields(item);
 
     onChange({
       ...node,
       content: {
         ...videoApiNode.content,
         apiId,
-        itemId,
-        src: videoSrc,
-        poster: videoPoster,
-        favoriCount,
+        itemId: String(item.id),
+        src: mapped.src,
+        poster: mapped.poster,
+        favoriCount: mapped.favoriCount,
         title: {
           ...(videoApiNode.content?.title || { className: "", style: {} }),
-          text: videoTitle,
+          text: mapped.title,
         },
         autoplay: true,
         controls: true,
@@ -116,7 +153,6 @@ const Settings: FC<NodeSettingsProps> = () => {
   };
 
   const renderApiSection = () => {
-    const selectedAdapter = content.apiId ? apiRegistry.get(content.apiId) : null;
     const selectedItemTitle = content.src ? "Vidéo sélectionnée" : "Aucune vidéo sélectionnée";
 
     return (
@@ -133,10 +169,10 @@ const Settings: FC<NodeSettingsProps> = () => {
             <p className="node-block-title text-sm text-destructive">{error}</p>
           </div>
         )}
-        {content.apiId && selectedAdapter && (
+        {content.apiId && (
           <div className="p-2 bg-muted/50 rounded text-xs">
             <p className="node-block-title text-foreground text-sm">
-              API: <span className="font-medium">{selectedAdapter.label}</span>
+              Collection: <span className="font-medium">{sourceLabel ?? content.apiId}</span>
             </p>
             <p className="node-block-title text-foreground mt-1 text-sm">
               Item: <span className="font-medium">{selectedItemTitle}</span>
@@ -152,12 +188,13 @@ const Settings: FC<NodeSettingsProps> = () => {
           <Database className="h-4 w-4 mr-2" />
           {content.apiId && content.itemId ? "Changer la vidéo" : "Sélectionner une vidéo"}
         </Button>
-        <ApiManagerModal
+        <CollectionItemPickerModal
           open={modalOpen}
           onOpenChange={setModalOpen}
-          apiId={content.apiId}
-          itemId={content.itemId}
-          typeFilter="video"
+          collectionType="video"
+          mode="dynamic"
+          initialSourceId={content.apiId}
+          initialItemId={content.itemId}
           onSelect={handleItemSelect}
         />
       </div>

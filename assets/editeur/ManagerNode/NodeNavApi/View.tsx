@@ -7,11 +7,11 @@ import type { NodeNavApiType, NodeNavApiOptions, NavApiLinkItem } from "./index"
 import { cn } from "@/editeur/lib/utils";
 import { IoMenuOutline } from "react-icons/io5";
 import useMediaQuery, { MEDIA_MAX_TABLET } from "../../hooks/useMediaQuery";
+import { fetchCollectionItemsPage } from "../NodeCollection/collectionApiUtils";
 import {
-  fetchListApiCollectionCached,
-  normalizeListApiItemsPerPage,
-  normalizeListApiPage,
-} from "../NodeListApi/listApiUtils";
+  normalizeCollectionItemsPerPage,
+  normalizeCollectionPage,
+} from "../NodeCollection/collectionUtils";
 
 const defaultOptions: NodeNavApiOptions = {
   direction: "horizontal",
@@ -28,6 +28,7 @@ function useIsTabletOrSmaller(): boolean {
   return breakpointTabletOrMobile || viewportMaxTablet;
 }
 
+/** Menu Nav API : titres uniquement (title → libellé, link → href). */
 function mapItemsToLinks(items: Array<{ id?: unknown; title?: unknown; link?: unknown }>): NavApiLinkItem[] {
   return items
     .map((item) => {
@@ -50,8 +51,8 @@ const View: FC<NodeViewProps | NodeEditProps> = () => {
 
   const navNode = node as NodeNavApiType;
   const apiId = navNode.content?.apiId ?? "";
-  const page = normalizeListApiPage(navNode.content?.page);
-  const itemsPerPage = normalizeListApiItemsPerPage(navNode.content?.itemsPerPage);
+  const page = normalizeCollectionPage(navNode.content?.page);
+  const itemsPerPage = normalizeCollectionItemsPerPage(navNode.content?.itemsPerPage);
   const options = { ...defaultOptions, ...navNode?.content?.options };
   const linkTarget = options.target ?? "_self";
 
@@ -75,7 +76,7 @@ const View: FC<NodeViewProps | NodeEditProps> = () => {
       setError(false);
 
       try {
-        const response = await fetchListApiCollectionCached(apiId, page, itemsPerPage);
+        const response = await fetchCollectionItemsPage(apiId, page, itemsPerPage);
         if (!cancelled) {
           setLinks(mapItemsToLinks(response.items));
         }
@@ -223,7 +224,7 @@ const View: FC<NodeViewProps | NodeEditProps> = () => {
           <span className="ce-menu-api-status text-xs text-muted-foreground">Menu indisponible</span>
         ) : null}
         {!loading && !error && !apiId ? (
-          <span className="ce-menu-api-status text-xs text-muted-foreground">Sélectionnez une API list</span>
+          <span className="ce-menu-api-status text-xs text-muted-foreground">Sélectionnez une collection</span>
         ) : null}
       </nav>
 

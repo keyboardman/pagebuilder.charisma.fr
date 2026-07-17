@@ -13,11 +13,11 @@ import { useNodeBuilderContext } from "../../services/providers/NodeBuilderConte
 import { NodeSettingsWrapper } from "../components/NodeSettingsWrapper";
 import type { NodeNavApiType, NodeNavDirection, NodeNavVariant, NodeNavApiTarget } from "./index";
 import { ListApiDisplayPaginationSettings } from "../NodeListApi/ListApiDisplayPaginationSettings";
+import { fetchCollectionCatalog, fetchCollectionItemsPage } from "../NodeCollection/collectionApiUtils";
 import {
-  fetchListApiCollectionCached,
-  normalizeListApiItemsPerPage,
-  normalizeListApiPage,
-} from "../NodeListApi/listApiUtils";
+  normalizeCollectionItemsPerPage,
+  normalizeCollectionPage,
+} from "../NodeCollection/collectionUtils";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/editeur/components/ui/tabs";
 
 const DIRECTION_OPTIONS: { value: NodeNavDirection; label: string }[] = [
@@ -40,13 +40,10 @@ const Settings: FC<NodeSettingsProps> = () => {
     let cancelled = false;
     const load = async () => {
       try {
-        const res = await fetch("/api/page-builder/lists", {
-          credentials: "same-origin",
-          headers: { Accept: "application/json" },
-        });
-        if (!res.ok) return;
-        const data = (await res.json()) as { items: Array<{ id: string; label: string }> };
-        if (!cancelled) setListSources(data.items ?? []);
+        const catalog = await fetchCollectionCatalog("article", "fixed", { bypassCache: true });
+        if (!cancelled) {
+          setListSources(catalog.map((s) => ({ id: s.id, label: s.label })));
+        }
       } catch {
         // ignore
       }
@@ -68,8 +65,8 @@ const Settings: FC<NodeSettingsProps> = () => {
 
   const selectedSource = node.content?.apiId ? listSources.find((s) => s.id === node.content?.apiId) : null;
   const [totalPages, setTotalPages] = useState(0);
-  const currentPage = normalizeListApiPage(node.content?.page);
-  const currentItemsPerPage = normalizeListApiItemsPerPage(node.content?.itemsPerPage);
+  const currentPage = normalizeCollectionPage(node.content?.page);
+  const currentItemsPerPage = normalizeCollectionItemsPerPage(node.content?.itemsPerPage);
 
   useEffect(() => {
     let cancelled = false;
@@ -81,7 +78,7 @@ const Settings: FC<NodeSettingsProps> = () => {
       }
 
       try {
-        const response = await fetchListApiCollectionCached(
+        const response = await fetchCollectionItemsPage(
           selectedSource.id,
           currentPage,
           currentItemsPerPage
@@ -126,7 +123,7 @@ const Settings: FC<NodeSettingsProps> = () => {
                   <p className="node-block-title font-medium text-foreground text-sm">Menu Nav API</p>
 
                   <div className="flex items-center gap-2">
-                    <span className="node-block-title w-14 shrink-0 text-foreground text-sm">API list</span>
+                    <span className="node-block-title w-14 shrink-0 text-foreground text-sm">Collection</span>
                     <Form.Select
                       value={node.content?.apiId ?? ""}
                       onChange={(v) =>
@@ -136,7 +133,9 @@ const Settings: FC<NodeSettingsProps> = () => {
                         })
                       }
                       options={listApiOptions}
-                      placeholder={listApiOptions.length ? "Choisir une API…" : "Aucune API list"}
+                      placeholder={
+                        listApiOptions.length ? "Choisir une collection…" : "Aucune collection fixe"
+                      }
                       className="h-7 flex-1 min-w-0 text-[0.75rem]"
                     />
                   </div>

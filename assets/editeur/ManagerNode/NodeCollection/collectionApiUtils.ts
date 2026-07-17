@@ -208,11 +208,19 @@ export async function fetchCollectionItemsPage(
 export async function resolveCollectionEntries(
   entries: CollectionApiResolveEntry[]
 ): Promise<CollectionApiMappedItem[]> {
-  if (entries.length === 0) {
+  // Normalise ids en string : le JSON legacy peut stocker itemId en number.
+  const normalizedEntries = entries
+    .map((entry) => ({
+      apiId: String(entry.apiId ?? "").trim(),
+      itemId: String(entry.itemId ?? "").trim(),
+    }))
+    .filter((entry) => entry.apiId !== "" && entry.itemId !== "");
+
+  if (normalizedEntries.length === 0) {
     return [];
   }
 
-  const key = JSON.stringify(entries);
+  const key = JSON.stringify(normalizedEntries);
   const cached = resolveCache.get(key);
   if (cached) return cached;
 
@@ -227,7 +235,7 @@ export async function resolveCollectionEntries(
         Accept: "application/json",
         "Content-Type": "application/json",
       },
-      body: JSON.stringify({ entries }),
+      body: JSON.stringify({ entries: normalizedEntries }),
     });
     if (!res.ok) {
       throw new Error(`Collections resolve HTTP ${res.status}`);
