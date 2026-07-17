@@ -32,12 +32,19 @@ final class ApiCollectionItemNormalizer
         }
 
         if (isset($item['labels']) && \is_array($item['labels'])) {
-            $labels = array_values(array_filter(
-                array_map(static fn (mixed $v): string => (string) $v, $item['labels']),
-                static fn (string $v): bool => $v !== ''
-            ));
+            $labels = [];
+            foreach ($item['labels'] as $v) {
+                if (\is_string($v) || \is_int($v) || \is_float($v)) {
+                    $s = trim((string) $v);
+                    if ($s !== '') {
+                        $labels[] = $s;
+                    }
+                }
+                // Ignore arrays/objects (ex. classements bruts) — utiliser un chemin
+                // joker type classements.?.nom dans le mapping admin.
+            }
             if ($labels !== []) {
-                $out['labels'] = $labels;
+                $out['labels'] = array_values($labels);
             }
         } elseif (isset($out['label'])) {
             $out['labels'] = [$out['label']];

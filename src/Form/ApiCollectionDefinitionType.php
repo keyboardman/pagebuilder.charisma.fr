@@ -150,14 +150,24 @@ final class ApiCollectionDefinitionType extends AbstractType
             ]);
 
         foreach (self::MAPPING_FIELDS as $field => $label) {
+            $placeholder = match ($field) {
+                'title' => 'titre',
+                'image' => 'visuel.url',
+                'labels' => 'classements.?.nom',
+                default => $field,
+            };
+            $help = $field === 'labels'
+                ? 'Chemin JSON → liste de chaînes. Pour plucker une propriété dans chaque élément : classements.?.nom (ou classements[].nom). Laisser vide pour ne pas exposer.'
+                : 'Chemin JSON source → champ « ' . $field . ' ». Laisser vide pour ne pas exposer.';
+
             $builder->add('map_' . $field, TextType::class, [
                 'mapped' => false,
                 'required' => false,
                 'label' => $label,
-                'help' => 'Chemin JSON source → champ « ' . $field . ' »',
+                'help' => $help,
                 'attr' => [
                     'class' => 'flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm font-mono text-xs',
-                    'placeholder' => $field === 'title' ? 'titre' : ($field === 'image' ? 'visuel.url' : $field),
+                    'placeholder' => $placeholder,
                 ],
             ]);
         }

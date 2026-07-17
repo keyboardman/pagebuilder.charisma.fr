@@ -21,6 +21,92 @@ final class ConfigurableApiCollectionTest extends TestCase
         $this->assertNull(DotPathResolver::get($data, 'missing.path'));
     }
 
+    public function testDotPathResolverPlucksListProperty(): void
+    {
+        $data = [
+            'classements' => [
+                ['nom' => 'Actualités', 'id' => 1],
+                ['nom' => 'Société', 'id' => 2],
+                ['id' => 3],
+            ],
+        ];
+
+        $this->assertSame(['Actualités', 'Société'], DotPathResolver::get($data, 'classements.?.nom'));
+        $this->assertSame(['Actualités', 'Société'], DotPathResolver::get($data, 'classements.*.nom'));
+        $this->assertSame(['Actualités', 'Société'], DotPathResolver::get($data, 'classements[].nom'));
+    }
+
+    public function testLabelsMappingWithWildcardPath(): void
+    {
+        $client = new MockHttpClient(new MockResponse(json_encode([
+            'member' => [
+                [
+                    'id' => 1,
+                    'titre' => 'A',
+                    'classements' => [
+                        ['nom' => 'Cat A'],
+                        ['nom' => 'Cat B'],
+                    ],
+                ],
+            ],
+            'totalItems' => 1,
+        ], \JSON_THROW_ON_ERROR)));
+
+        $definition = (new ApiCollectionDefinition())
+            ->setApiId('auteur_labels')
+            ->setLabel('Auteur')
+            ->setType('article')
+            ->setSupportedModes(['dynamic'])
+            ->setEndpointUrl('https://api.example/auteurs')
+            ->setPaginationStyle('hydra')
+            ->setMemberPath('member')
+            ->setFieldMapping([
+                'id' => 'id',
+                'title' => 'titre',
+                'labels' => 'classements.?.nom',
+            ]);
+
+        $collection = new ConfigurableApiCollection($definition, $client);
+        $page = $collection->fetchItems(['page' => 1, 'itemsPerPage' => 10]);
+
+        $this->assertSame(['Cat A', 'Cat B'], $page->items[0]['labels']);
+    }
+
+    public function testRawObjectLabelsAreIgnoredWithoutWildcard(): void
+    {
+        $client = new MockHttpClient(new MockResponse(json_encode([
+            'member' => [
+                [
+                    'id' => 1,
+                    'titre' => 'A',
+                    'classements' => [
+                        ['nom' => 'Cat A'],
+                    ],
+                ],
+            ],
+            'totalItems' => 1,
+        ], \JSON_THROW_ON_ERROR)));
+
+        $definition = (new ApiCollectionDefinition())
+            ->setApiId('auteur_raw_labels')
+            ->setLabel('Auteur')
+            ->setType('article')
+            ->setSupportedModes(['dynamic'])
+            ->setEndpointUrl('https://api.example/auteurs')
+            ->setPaginationStyle('hydra')
+            ->setMemberPath('member')
+            ->setFieldMapping([
+                'id' => 'id',
+                'title' => 'titre',
+                'labels' => 'classements',
+            ]);
+
+        $collection = new ConfigurableApiCollection($definition, $client);
+        $page = $collection->fetchItems(['page' => 1, 'itemsPerPage' => 10]);
+
+        $this->assertArrayNotHasKey('labels', $page->items[0]);
+    }
+
     public function testHydraPaginationAndFieldMapping(): void
     {
         $client = new MockHttpClient(static function (string $method, string $url): MockResponse {

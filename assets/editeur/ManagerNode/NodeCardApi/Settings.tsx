@@ -3,8 +3,6 @@ import { Base2Settings } from "../Settings";
 import { useNodeBuilderContext } from "../../services/providers/NodeBuilderContext";
 import { type NodeSettingsProps } from "../NodeConfigurationType";
 import type { NodeCardApiType } from "./index";
-import { ApiManagerModal } from "../../ManagerApi/ApiManagerModal";
-import { apiRegistry } from "../../ManagerApi/ApiRegistry";
 import { Loader2, AlertCircle, Database } from "lucide-react";
 import { Button } from "@/editeur/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/editeur/components/ui/tabs";
@@ -17,24 +15,63 @@ import {
   TextSettings,
   LabelsSettings,
 } from "./Settings/index";
+import {
+  fetchCollectionCatalog,
+  resolveCollectionEntries,
+  type CollectionApiMappedItem,
+} from "../NodeCollection/collectionApiUtils";
+import { CollectionItemPickerModal } from "../NodeCollection/Settings/CollectionItemPickerModal";
 
-function extractText(mappedData: { text?: string; description?: string }): string {
-  return (mappedData?.text?.trim() as string) || "";
+function extractText(item: CollectionApiMappedItem): string {
+  const fromText = item.text?.trim();
+  if (fromText) return fromText;
+  return item.description?.trim() || "";
 }
 
-function extractLabels(mappedData: { labels?: string[] | string; raw: unknown }): string[] {
-  const candidate = mappedData?.labels ?? [];
-
-  if (Array.isArray(candidate)) {
-    return candidate.map((v) => String(v).trim()).filter(Boolean);
+function extractLabels(item: CollectionApiMappedItem): string[] {
+  if (Array.isArray(item.labels) && item.labels.length > 0) {
+    return item.labels.map((v) => String(v).trim()).filter(Boolean);
   }
-  if (typeof candidate === "string") {
-    return candidate
-      .split(",")
-      .map((v) => v.trim())
-      .filter(Boolean);
+  if (typeof item.label === "string" && item.label.trim() !== "") {
+    return [item.label.trim()];
   }
   return [];
+}
+
+function applyCollectionItemToContent(
+  content: NodeCardApiType["content"],
+  apiId: string,
+  item: CollectionApiMappedItem
+): NodeCardApiType["content"] {
+  const nextText = extractText(item);
+  const nextLabels = extractLabels(item);
+
+  return {
+    ...content,
+    apiId,
+    itemId: String(item.id),
+    container: {
+      ...(content?.container ?? {}),
+      link: item.link || content?.container?.link || "#",
+    },
+    title: {
+      ...(content?.title ?? {}),
+      text: item.title || "",
+    },
+    text: {
+      ...(content?.text ?? {}),
+      text: nextText,
+    },
+    image: {
+      ...(content?.image ?? {}),
+      src: item.image || "",
+      alt: item.alt || item.title || "Image",
+    },
+    labels: {
+      ...(content?.labels ?? {}),
+      items: nextLabels,
+    },
+  };
 }
 
 const Settings: FC<NodeSettingsProps> = () => {
@@ -44,6 +81,33 @@ const Settings: FC<NodeSettingsProps> = () => {
   const [loading, setLoading] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
   const [modalOpen, setModalOpen] = useState<boolean>(false);
+  const [sourceLabel, setSourceLabel] = useState<string | null>(null);
+
+  useEffect(() => {
+    let cancelled = false;
+
+    const loadLabel = async () => {
+      if (!content.apiId) {
+        setSourceLabel(null);
+        return;
+      }
+      try {
+        const catalog = await fetchCollectionCatalog("article", undefined, { bypassCache: true });
+        if (cancelled) return;
+        const match = catalog.find((s) => s.id === content.apiId);
+        setSourceLabel(match?.label ?? content.apiId);
+      } catch {
+        if (!cancelled) {
+          setSourceLabel(content.apiId);
+        }
+      }
+    };
+
+    void loadLabel();
+    return () => {
+      cancelled = true;
+    };
+  }, [content.apiId]);
 
   useEffect(() => {
     const loadItem = async () => {
@@ -51,49 +115,23 @@ const Settings: FC<NodeSettingsProps> = () => {
         return;
       }
 
-      const adapter = apiRegistry.get(content.apiId);
-      if (!adapter) {
-        setError("API non trouvée");
-        return;
-      }
-
       setLoading(true);
       setError(null);
 
       try {
-        const item = await adapter.fetchItem(content.itemId);
-        const mappedData = adapter.mapItem(item);
-        const nextText = extractText(mappedData);
-        const nextLabels = extractLabels(mappedData);
+        const resolved = await resolveCollectionEntries([
+          { apiId: content.apiId, itemId: String(content.itemId) },
+        ]);
+        const item = resolved[0];
+
+        if (!item) {
+          setError("Item non trouvé");
+          return;
+        }
 
         onChange({
           ...node,
-          content: {
-            ...cardApiNode.content,
-            apiId: content.apiId,
-            itemId: content.itemId,
-            container: {
-              ...(cardApiNode.content?.container ?? {}),
-              link: mappedData.link || cardApiNode.content?.container?.link || "#",
-            },
-            title: {
-              ...(cardApiNode.content?.title ?? {}),
-              text: mappedData.title,
-            },
-            text: {
-              ...(cardApiNode.content?.text ?? {}),
-              text: nextText,
-            },
-            image: {
-              ...(cardApiNode.content?.image ?? {}),
-              src: mappedData.image || "",
-              alt: mappedData.title || "Image",
-            },
-            labels: {
-              ...(cardApiNode.content?.labels ?? {}),
-              items: nextLabels.length > 0 ? nextLabels : content.labels?.items || [],
-            },
-          },
+          content: applyCollectionItemToContent(cardApiNode.content, content.apiId, item),
         });
       } catch (err) {
         setError(err instanceof Error ? err.message : "Erreur lors du chargement de l'item");
@@ -102,57 +140,19 @@ const Settings: FC<NodeSettingsProps> = () => {
       }
     };
 
-    loadItem();
+    void loadItem();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [content.apiId, content.itemId]);
 
-  const handleItemSelect = (
-    apiId: string,
-    itemId: string,
-    mappedData: {
-      id: string;
-      title: string;
-      description?: string;
-      image?: string;
-      link?: string;
-      raw: unknown;
-    }
-  ) => {
-    const nextText = extractText(mappedData);
-    const nextLabels = extractLabels(mappedData);
+  const handleItemSelect = (apiId: string, item: CollectionApiMappedItem) => {
     onChange({
       ...node,
-      content: {
-        ...cardApiNode.content,
-        apiId,
-        itemId,
-        container: {
-          ...(cardApiNode.content?.container ?? {}),
-          link: mappedData.link || cardApiNode.content?.container?.link || "#",
-        },
-        title: {
-          ...(cardApiNode.content?.title ?? {}),
-          text: mappedData.title,
-        },
-        text: {
-          ...(cardApiNode.content?.text ?? {}),
-          text: nextText,
-        },
-        image: {
-          ...(cardApiNode.content?.image ?? {}),
-          src: mappedData.image || "",
-          alt: mappedData.title || "Image",
-        },
-        labels: {
-          ...(cardApiNode.content?.labels ?? {}),
-          items: nextLabels,
-        },
-      },
+      content: applyCollectionItemToContent(cardApiNode.content, apiId, item),
     });
   };
 
   const renderApiSection = () => {
-    const selectedAdapter = content.apiId ? apiRegistry.get(content.apiId) : null;
+    const selectedTitle = content.title?.text?.trim() || "Item sélectionné";
 
     return (
       <div className="flex flex-1 flex-col gap-1 p-1 m-1 border border-border/30 rounded-lg mb-3">
@@ -168,11 +168,17 @@ const Settings: FC<NodeSettingsProps> = () => {
             <p className="node-block-title text-sm text-destructive">{error}</p>
           </div>
         )}
-        {content.apiId && selectedAdapter && (
+        {content.apiId && (
           <div className="px-2 bg-muted/50 rounded text-xs">
             <p className="node-block-title text-sm text-muted-foreground">
-              API: <span className="font-medium text-foreground">{selectedAdapter.label}</span>
+              Collection:{" "}
+              <span className="font-medium text-foreground">{sourceLabel ?? content.apiId}</span>
             </p>
+            {content.itemId && (
+              <p className="node-block-title text-sm text-muted-foreground mt-1">
+                Item: <span className="font-medium text-foreground">{selectedTitle}</span>
+              </p>
+            )}
           </div>
         )}
         <Button
@@ -184,12 +190,13 @@ const Settings: FC<NodeSettingsProps> = () => {
           <Database className="h-4 w-4 mr-2" />
           {content.apiId && content.itemId ? "Changer l'item" : "Sélectionner un item"}
         </Button>
-        <ApiManagerModal
+        <CollectionItemPickerModal
           open={modalOpen}
           onOpenChange={setModalOpen}
-          apiId={content.apiId}
-          itemId={content.itemId}
-          typeFilter="article"
+          collectionType="article"
+          mode="dynamic"
+          initialSourceId={content.apiId}
+          initialItemId={content.itemId}
           onSelect={handleItemSelect}
         />
       </div>

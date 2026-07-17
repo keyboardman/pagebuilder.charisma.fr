@@ -1,5 +1,5 @@
 import type { NodeCardApiType } from "./index";
-import { apiRegistry } from "../../ManagerApi/ApiRegistry";
+import { resolveCollectionEntries } from "../NodeCollection/collectionApiUtils";
 
 export const getLinkFromNode = async (node: NodeCardApiType): Promise<string> => {
     // Si un lien est défini dans container, l'utiliser
@@ -8,16 +8,15 @@ export const getLinkFromNode = async (node: NodeCardApiType): Promise<string> =>
         return containerLink;
     }
 
-    // Sinon, essayer de récupérer le lien depuis l'API si apiId et itemId sont disponibles
+    // Sinon, essayer de récupérer le lien depuis ApiCollection si apiId et itemId sont disponibles
     if (node?.content?.apiId && node?.content?.itemId) {
         try {
-            const adapter = apiRegistry.get(node.content.apiId);
-            if (adapter) {
-                const item = await adapter.fetchItem(node.content.itemId);
-                const mappedData = adapter.mapItem(item);
-                if (mappedData.link) {
-                    return mappedData.link;
-                }
+            const resolved = await resolveCollectionEntries([
+                { apiId: node.content.apiId, itemId: String(node.content.itemId) },
+            ]);
+            const link = resolved[0]?.link?.trim();
+            if (link) {
+                return link;
             }
         } catch (error) {
             console.warn("[NodeCardApi] Failed to fetch link from API:", error);

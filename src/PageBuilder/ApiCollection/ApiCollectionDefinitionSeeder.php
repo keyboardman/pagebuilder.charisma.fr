@@ -190,7 +190,7 @@ final class ApiCollectionDefinitionSeeder
                 null,
                 [],
                 'hydra',
-                $charismaArticleMapping,
+                $charismaArticleMapping + ['labels' => 'classements.?.nom', 'image' => 'auteur.photo'],
             ),
             // ApiCard exprimables
             self::row(
