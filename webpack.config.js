@@ -23,6 +23,8 @@ Encore.setOutputPath('public/build/')
     .enableStimulusBridge('./assets/controllers.json')
     .splitEntryChunks()
 
+    .enableReactPreset()
+
     // enables the Symfony UX Stimulus bridge (used in assets/stimulus_bootstrap.js)
     .enableStimulusBridge('./assets/controllers.json')
     .enableSingleRuntimeChunk()
@@ -30,9 +32,7 @@ Encore.setOutputPath('public/build/')
     .enableBuildNotifications()
     .enableSourceMaps(!Encore.isProduction())
     .enableVersioning(Encore.isProduction())
-    .enablePostCssLoader()
-    .enableReactPreset()
-    .enableTypeScriptLoader()
+    .enablePostCssLoader()    .enableTypeScriptLoader()
     .enableForkedTypeScriptTypesChecking()
     .enableSassLoader(options => {
         options.implementation = sass

@@ -343,12 +343,12 @@
         ]
     },
     "symfony/ux-react": {
-        "version": "2.32",
+        "version": "2.36",
         "recipe": {
             "repo": "github.com/symfony/recipes",
             "branch": "main",
             "version": "2.9",
-            "ref": "e970076b31d602ae6e2106cf91a82c7e1f7ddff2"
+            "ref": "adec905b8d643c7e15a3a8d070c58ff3021288c6"
         },
         "files": [
             "assets/react/controllers/Hello.jsx"
