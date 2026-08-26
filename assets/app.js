@@ -2,4 +2,7 @@
     import './styles/app.css';
     import './bootstrap';
 
-    registerReactControllerComponents(require.context('./react/controllers', true, /\.(j|t)sx?$/));
+    registerReactControllerComponents(import.meta.webpackContext('./react/controllers', {
+        recursive: true,
+        regExp: /\.(j|t)sx?$/,
+    }));

@@ -1,5 +1,6 @@
-const Encore = require('@symfony/webpack-encore')
-const path = require('path')
+import Encore from '@symfony/webpack-encore'
+import path from 'path'
+import sass from 'sass'
 
 if (!Encore.isRuntimeEnvironmentConfigured()) {
     Encore.configureRuntimeEnvironment(process.env.NODE_ENV || 'dev')
@@ -31,25 +32,22 @@ Encore.setOutputPath('public/build/')
     .enableTypeScriptLoader()
     .enableForkedTypeScriptTypesChecking()
     .enableSassLoader(options => {
-        options.implementation = require('sass');
+        options.implementation = sass
     })
-    
 
-    .configureBabel(config => {
+    .configureBabel((config) => {
+        config.plugins.push(['polyfill-corejs3', { method: 'usage-global', version: '3.49' }])
         config.plugins.push('@babel/plugin-transform-class-properties')
     })
-    .configureBabelPresetEnv(config => {
-        config.useBuiltIns = 'usage'
-        config.corejs = 3
-    })
-    .configureCssMinimizerPlugin(options => {
+    .configureCssMinimizerPlugin((options, MinimizerPlugin) => {
+        options.minify = MinimizerPlugin.cssnanoMinify
         options.minimizerOptions = {
             preset: ['default', { calc: false }]
         }
     })
 ;
 
-const config = Encore.getWebpackConfig()
+const config = await Encore.getWebpackConfig()
 config.watchOptions = config.watchOptions || {}
 config.watchOptions.ignored = [
     ...(Array.isArray(config.watchOptions.ignored)
@@ -70,8 +68,8 @@ config.watchOptions.ignored = [
 config.resolve = config.resolve || {}
 config.resolve.alias = {
     ...(config.resolve.alias || {}),
-    '@': path.resolve(__dirname, 'assets'),
-    '@editeur': path.resolve(__dirname, 'assets/editeur')
+    '@': path.resolve(import.meta.dirname, 'assets'),
+    '@editeur': path.resolve(import.meta.dirname, 'assets/editeur')
 }
 
 config.resolve.extensions = [
@@ -116,4 +114,4 @@ config.module.rules.forEach((rule) => {
     })
 })
 
-module.exports = config
+export default config
