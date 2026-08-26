@@ -1,3 +1,4 @@
+import { pageBuilderApiUrl } from "../../ManagerApi/pageBuilderApiBase";
 import type { NodeListApiDynamicEntry, NodeListApiMode } from "./index";
 
 export const DEFAULT_LIST_API_ITEMS_PER_PAGE = 10;
@@ -96,7 +97,9 @@ function buildListApiItemsUrl(apiId: string, page: number, itemsPerPage: number)
     itemsPerPage: String(itemsPerPage),
   });
 
-  return `/api/page-builder/lists/${encodeURIComponent(apiId)}/items?${params.toString()}`;
+  return pageBuilderApiUrl(
+    `lists/${encodeURIComponent(apiId)}/items?${params.toString()}`
+  );
 }
 
 function buildListApiCacheKey(apiId: string, page: number, itemsPerPage: number): string {
@@ -204,7 +207,9 @@ function buildDynamicListItemsUrl(apiId: string, page: number, itemsPerPage: num
     params.set("search", search.trim());
   }
 
-  return `/api/page-builder/lists/dynamic/${encodeURIComponent(apiId)}/items?${params.toString()}`;
+  return pageBuilderApiUrl(
+    `lists/dynamic/${encodeURIComponent(apiId)}/items?${params.toString()}`
+  );
 }
 
 function buildDynamicListCollectionCacheKey(
@@ -220,7 +225,7 @@ const dynamicListCollectionCache = new Map<string, ListApiCollectionResponse>();
 const dynamicListCollectionInFlight = new Map<string, Promise<ListApiCollectionResponse>>();
 
 export async function fetchDynamicListSources(): Promise<DynamicListSource[]> {
-  const res = await fetch("/api/page-builder/lists/dynamic", {
+  const res = await fetch(pageBuilderApiUrl("lists/dynamic"), {
     credentials: "same-origin",
     headers: { Accept: "application/json" },
   });
@@ -315,7 +320,7 @@ async function fetchDynamicListItems(entries: NodeListApiDynamicEntry[]): Promis
     return [];
   }
 
-  const res = await fetch("/api/page-builder/lists/dynamic/resolve", {
+  const res = await fetch(pageBuilderApiUrl("lists/dynamic/resolve"), {
     method: "POST",
     credentials: "same-origin",
     headers: {

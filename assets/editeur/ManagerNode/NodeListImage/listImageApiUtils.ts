@@ -1,3 +1,4 @@
+import { pageBuilderApiUrl } from "../../ManagerApi/pageBuilderApiBase";
 import type { NodeListImageMediaEntry } from "./index";
 
 export interface ListImageSourceMeta {
@@ -81,7 +82,7 @@ export function mapCollectionToListImageItems(items: unknown[]): ListImageMapped
 }
 
 export async function fetchListImageCatalog(): Promise<ListImageSourceMeta[]> {
-  const res = await fetch("/api/page-builder/lists-image", {
+  const res = await fetch(pageBuilderApiUrl("lists-image"), {
     credentials: "same-origin",
     headers: { Accept: "application/json" },
   });
@@ -99,7 +100,9 @@ export function buildListImageItemsUrl(apiId: string, page = 1, itemsPerPage = D
     itemsPerPage: String(itemsPerPage),
   });
 
-  return `/api/page-builder/lists-image/${encodeURIComponent(apiId)}/items?${params.toString()}`;
+  return pageBuilderApiUrl(
+    `lists-image/${encodeURIComponent(apiId)}/items?${params.toString()}`
+  );
 }
 
 function buildListImageCacheKey(apiId: string, page: number, itemsPerPage: number): string {

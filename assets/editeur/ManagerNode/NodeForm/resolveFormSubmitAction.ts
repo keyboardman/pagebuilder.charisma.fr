@@ -1,9 +1,11 @@
+import { pageBuilderApiUrl } from "../../ManagerApi/pageBuilderApiBase";
+
 const LEGACY_SUBMIT_PATH = /^\/submit\/form\/([a-z0-9][a-z0-9_-]*)\/?$/;
 const API_SUBMIT_PATH = /^\/api\/page-builder\/forms\/([a-z0-9][a-z0-9_-]*)\/submit\/?$/;
 
 /** URL API Platform de soumission pour un slug de configuration. */
 export function builderFormSubmitPath(slug: string): string {
-  return `/api/page-builder/forms/${slug}/submit`;
+  return pageBuilderApiUrl(`forms/${slug}/submit`);
 }
 
 function pathnameFromAction(action: string): string {
@@ -37,7 +39,11 @@ export function resolveFormSubmitAction(action: string, formConfigId?: string): 
   }
 
   if (API_SUBMIT_PATH.test(path)) {
-    return path.replace(/\/$/, "");
+    const match = path.match(API_SUBMIT_PATH);
+    const slugFromPath = match?.[1] ?? "";
+    if (slugFromPath !== "") {
+      return builderFormSubmitPath(slugFromPath);
+    }
   }
 
   return action.trim();

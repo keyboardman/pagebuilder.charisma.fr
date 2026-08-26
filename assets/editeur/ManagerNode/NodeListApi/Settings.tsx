@@ -15,6 +15,7 @@ import type { NodeListApiType } from "./index";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/editeur/components/ui/tabs";
 import { Switch } from "@/editeur/components/ui/switch";
 import { THEME_SELECTORS } from "../Settings/themeOverrideSelectors";
+import { pageBuilderApiUrl } from "../../ManagerApi/pageBuilderApiBase";
 import {
   fetchDynamicListItemsCached,
   fetchListApiCollectionCached,
@@ -110,7 +111,7 @@ const Settings: FC<NodeSettingsProps> = () => {
     let cancelled = false;
     const load = async () => {
       try {
-        const res = await fetch("/api/page-builder/lists", {
+        const res = await fetch(pageBuilderApiUrl("lists"), {
           credentials: "same-origin",
           headers: { Accept: "application/json" },
         });

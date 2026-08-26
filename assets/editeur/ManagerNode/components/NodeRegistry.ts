@@ -5,6 +5,7 @@ import NodeHeader from "../NodeHeader";
 import NodeContainer from "../NodeContainer";
 import NodeFlex from "../NodeFlex";
 import NodeGrid from "../NodeGrid";
+import NodeGridV2 from "../NodeGridV2";
 import NodeImage from "../NodeImage";
 import NodeTwoColumns from "../NodeTwoColumns";
 import NodeVideo from "../NodeVideo";
@@ -44,6 +45,7 @@ export const NodeRegistry = {
     [NodeFlex.type]: NodeFlex,
     [NodeHero.type]: NodeHero,
     [NodeGrid.type]: NodeGrid,
+    [NodeGridV2.type]: NodeGridV2,
     [NodeImage.type]: NodeImage,
     [NodeCard.type]: NodeCard,
     [NodeCardApi.type]: NodeCardApi,

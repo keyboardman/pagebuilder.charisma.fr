@@ -8,6 +8,7 @@ import { cn } from "@/editeur/lib/utils";
 import { IoClose } from "react-icons/io5";
 import { BUILDER_FORM_HONEYPOT_FIELD } from "./builderFormConstants";
 import { resolveFormSubmitAction } from "./resolveFormSubmitAction";
+import { toPageBuilderAbsoluteUrl } from "../../ManagerApi/pageBuilderApiBase";
 
 const View: FC<NodeViewProps | NodeEditProps> = () => {
   const { node, getChildren } = useNodeContext();
@@ -25,10 +26,7 @@ const View: FC<NodeViewProps | NodeEditProps> = () => {
 
   const absoluteAction = useMemo(() => {
     if (!action) return "";
-    if (typeof window === "undefined") return action;
-    if (action.startsWith("http://") || action.startsWith("https://")) return action;
-    const path = action.startsWith("/") ? action : `/${action}`;
-    return `${window.location.origin}${path}`;
+    return toPageBuilderAbsoluteUrl(action);
   }, [action]);
 
   const resolveMessageFromResponse = async (res: Response): Promise<{ ok: boolean; message: string }> => {
@@ -105,7 +103,7 @@ const View: FC<NodeViewProps | NodeEditProps> = () => {
       className={cn("ce-form", node?.attributes?.className)}
       style={styleForView(node?.attributes?.style)}
       method={method}
-      action={action || undefined}
+      action={absoluteAction || undefined}
       onSubmit={onSubmitAjax}
     >
       {formConfigId ? (

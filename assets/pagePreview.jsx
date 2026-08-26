@@ -35,7 +35,7 @@ function PagePreviewApp({ json, apiCardsBaseUrl }) {
   }
 
   return (
-    <AppProvider json={json} view={true}>
+    <AppProvider json={json} view={true} pageBuilderApiBaseUrl={apiCardsBaseUrl}>
       <App />
     </AppProvider>
   );

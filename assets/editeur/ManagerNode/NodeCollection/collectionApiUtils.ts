@@ -1,3 +1,5 @@
+import { pageBuilderApiUrl } from "../../ManagerApi/pageBuilderApiBase";
+
 export interface CollectionApiSourceMeta {
   id: string;
   label: string;
@@ -82,7 +84,7 @@ function buildCatalogUrl(type?: string, mode?: string): string {
   if (type) params.set("type", type);
   if (mode) params.set("mode", mode);
   const qs = params.toString();
-  return qs ? `/api/page-builder/collections?${qs}` : "/api/page-builder/collections";
+  return pageBuilderApiUrl(qs ? `collections?${qs}` : "collections");
 }
 
 function buildItemsUrl(
@@ -102,7 +104,9 @@ function buildItemsUrl(
   if (category && category.trim() !== "") {
     params.set("category", category.trim());
   }
-  return `/api/page-builder/collections/${encodeURIComponent(apiId)}/items?${params.toString()}`;
+  return pageBuilderApiUrl(
+    `collections/${encodeURIComponent(apiId)}/items?${params.toString()}`
+  );
 }
 
 const catalogCache = new Map<string, CollectionApiSourceMeta[]>();
@@ -218,7 +222,7 @@ export async function fetchCollectionCategories(
   apiId: string
 ): Promise<Array<{ id: string; label: string }>> {
   const res = await fetch(
-    `/api/page-builder/collections/${encodeURIComponent(apiId)}/categories`,
+    pageBuilderApiUrl(`collections/${encodeURIComponent(apiId)}/categories`),
     {
       credentials: "same-origin",
       headers: { Accept: "application/json" },
@@ -268,7 +272,7 @@ export async function resolveCollectionEntries(
   if (inflight) return inflight;
 
   const promise = (async () => {
-    const res = await fetch("/api/page-builder/collections/resolve", {
+    const res = await fetch(pageBuilderApiUrl("collections/resolve"), {
       method: "POST",
       credentials: "same-origin",
       headers: {

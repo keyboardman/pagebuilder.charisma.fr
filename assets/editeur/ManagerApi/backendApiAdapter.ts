@@ -1,4 +1,5 @@
 import type { ApiAdapter } from "./ApiAdapter";
+import { resolvePageBuilderApiBaseUrl } from "./pageBuilderApiBase";
 
 export interface BackendApiMeta {
   id: string;
@@ -112,18 +113,8 @@ export function mapBackendCardItem(item: unknown) {
   };
 }
 
-const DEFAULT_API_CARDS_BASE_URL = "/api/page-builder";
-
 export function resolveApiCardsBaseUrl(): string {
-  if (typeof document !== "undefined") {
-    const fromDom = document
-      .querySelector<HTMLElement>("[data-api-cards-base-url]")
-      ?.dataset.apiCardsBaseUrl?.trim();
-    if (fromDom) {
-      return fromDom.replace(/\/$/, "");
-    }
-  }
-  return DEFAULT_API_CARDS_BASE_URL;
+  return resolvePageBuilderApiBaseUrl();
 }
 
 const cardItemCache = new Map<string, Record<string, unknown>>();

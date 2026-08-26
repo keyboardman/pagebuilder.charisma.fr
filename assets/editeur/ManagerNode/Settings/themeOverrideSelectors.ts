@@ -4,6 +4,7 @@ export const THEME_SELECTORS = {
     container: ".ce-container",
     flex: ".ce-flex",
     grid: ".ce-grid",
+    gridV2: ".ce-grid-v2",
     hero: ".ce-hero",
     twoColumns: ".ce-two_columns",
     form: ".ce-form",
