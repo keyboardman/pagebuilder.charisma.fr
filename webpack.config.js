@@ -20,7 +20,12 @@ Encore.setOutputPath('public/build/')
     
     .splitEntryChunks()
 
-    .enableReactPreset()
+    // Babel lit process.env.NODE_ENV (souvent absent sous `encore production`),
+    // alors que DefinePlugin force déjà NODE_ENV=production dans le bundle React :
+    // sans ce flag, JSX compile en jsxDEV alors que le stub prod l’exporte à undefined.
+    .enableReactPreset((options) => {
+        options.development = !Encore.isProduction()
+    })
 
     // enables the Symfony UX Stimulus bridge (used in assets/stimulus_bootstrap.js)
     .enableStimulusBridge('./assets/controllers.json')
