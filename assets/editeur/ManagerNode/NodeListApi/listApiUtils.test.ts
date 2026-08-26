@@ -63,6 +63,7 @@ describe("fetchListApiCollectionCached", () => {
 
     const response = await fetchListApiCollectionCached("flashnews_article_home", 2, 10);
 
+    expect(fetchMock).toHaveBeenCalledTimes(1);
     expect(fetchMock).toHaveBeenCalledWith(
       "/api/page-builder/lists/flashnews_article_home/items?page=2&itemsPerPage=10",
       expect.objectContaining({
@@ -137,6 +138,7 @@ describe("fetchDynamicListItemsCached", () => {
       { id: "2", type: "charisma_article_expression_home" },
     ]);
 
+    expect(fetchMock).toHaveBeenCalledTimes(1);
     expect(fetchMock).toHaveBeenCalledWith(
       "/api/page-builder/lists/dynamic/resolve",
       expect.objectContaining({

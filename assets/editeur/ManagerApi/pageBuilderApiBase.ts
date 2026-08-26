@@ -20,36 +20,7 @@ export function resolvePageBuilderApiBaseUrl(): string {
 export function pageBuilderApiUrl(subpath: string): string {
   const base = resolvePageBuilderApiBaseUrl();
   const path = subpath.replace(/^\//, "");
-  const url = `${base}/${path}`;
-  // #region agent log
-  const hypothesisId = path.startsWith("lists-image")
-    ? "B"
-    : path.startsWith("lists")
-      ? "C"
-      : path.startsWith("forms")
-        ? "D"
-        : "A";
-  fetch("http://127.0.0.1:7375/ingest/e4c19944-5710-4268-9166-c005b5bfd0b6", {
-    method: "POST",
-    headers: { "Content-Type": "application/json", "X-Debug-Session-Id": "1ac27e" },
-    body: JSON.stringify({
-      sessionId: "1ac27e",
-      runId: "post-fix",
-      hypothesisId,
-      location: "pageBuilderApiBase.ts:pageBuilderApiUrl",
-      message: "page-builder API url",
-      data: {
-        base,
-        subpath,
-        url,
-        origin: typeof window !== "undefined" ? window.location.origin : null,
-        isAbsolute: /^https?:\/\//i.test(url),
-      },
-      timestamp: Date.now(),
-    }),
-  }).catch(() => {});
-  // #endregion
-  return url;
+  return `${base}/${path}`;
 }
 
 /** Rend une URL (chemin ou absolue) ciblant l’hôte du page-builder en rendu cross-site. */
