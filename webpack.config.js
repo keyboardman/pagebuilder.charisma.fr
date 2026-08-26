@@ -6,8 +6,6 @@ if (!Encore.isRuntimeEnvironmentConfigured()) {
     Encore.configureRuntimeEnvironment(process.env.NODE_ENV || 'dev')
 }
 
-console.log('webpack.config.js', process.env.NODE_ENV || 'dev') //
-
 Encore.setOutputPath('public/build/')
     .setPublicPath('/build')
     .addEntry('app', './assets/app.js')
@@ -20,7 +18,6 @@ Encore.setOutputPath('public/build/')
     .addEntry('pagePreview', './assets/pagePreview.jsx')
     .addEntry('videoPlayer', './assets/videoPlayer.js')
     
-    .enableStimulusBridge('./assets/controllers.json')
     .splitEntryChunks()
 
     .enableReactPreset()
@@ -80,6 +77,15 @@ config.resolve.extensions = [
     '.ts',
     '.tsx'
 ]
+
+// Encore 7 + "type":"module" active resolve.fullySpecified : les imports relatifs
+// sans extension (ex. ./foo → foo.ts) échouent sinon.
+config.module.rules.push({
+    test: /\.m?js$/,
+    resolve: {
+        fullySpecified: false,
+    },
+})
 
 // Laisser les url() absolues vers public/ (ex. /assets/icons/*.svg) pour le navigateur, sans les résoudre au build.
 config.module.rules.forEach((rule) => {
